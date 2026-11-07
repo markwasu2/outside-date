@@ -15,6 +15,7 @@ import {
   answerDiscovery,
   meetIntervenor,
 } from './systems/regulation';
+import { commissionStudy, orderLongLead, cancelOrder } from './systems/power';
 
 /** Thrown when an action's handler exists in the registry but has no real implementation yet. */
 export class NotImplemented extends Error {}
@@ -46,9 +47,9 @@ export const actionHandlers: Record<(typeof KNOWN_ACTION_HANDLERS)[number], Acti
   prepTestimony,
   answerDiscovery,
   meetIntervenor,
-  commissionStudy: notImplemented('commissionStudy'),
-  orderLongLead: notImplemented('orderLongLead'),
-  cancelOrder: notImplemented('cancelOrder'),
+  commissionStudy,
+  orderLongLead,
+  cancelOrder,
   setInsurance: notImplemented('setInsurance'),
   cureDraw: notImplemented('cureDraw'),
   priceTakeout: notImplemented('priceTakeout'),

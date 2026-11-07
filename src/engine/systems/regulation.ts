@@ -142,6 +142,10 @@ function resolveVote(state: GameState, content: Content): GameState {
       ...next,
       docket: { ...docket, status: 'approved' },
       goodwill: { ...next.goodwill, utility: clampGoodwill(next.goodwill.utility + 5) },
+      // power.ts's startPlants (P3.3) reads this once to compute each plant's plannedOnlineMonth
+      // (= approvalMonth + plantBuildMonths + offset, 4.7); flags is the established bag for
+      // this kind of one-off cross-system bookkeeping (see P3.1 Decisions log).
+      flags: { ...next.flags, docketApprovedMonth: next.month },
       log: [...next.log, { month: next.month, kind: 'milestone', text: 'The power docket passed its vote.' }],
     };
   }

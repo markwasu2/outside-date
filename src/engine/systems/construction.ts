@@ -12,8 +12,13 @@ import { STAGES } from '../types';
 // Shared helpers
 // ---------------------------------------------------------------------------
 
-/** Funding waterfall for hard costs (4.8): equity -> mezz -> senior -> cash, all-or-nothing. */
-function tryFundAmount(state: GameState, amount: number): { state: GameState; funded: boolean } {
+/**
+ * Funding waterfall for hard costs (4.8): equity -> mezz -> senior -> cash, all-or-nothing.
+ * Exported for `power.ts`'s substation order-balance payments (4.8 names "substation balances"
+ * as one of the three hard-cost categories this waterfall covers, alongside construction and
+ * liquid readiness).
+ */
+export function tryFundAmount(state: GameState, amount: number): { state: GameState; funded: boolean } {
   if (amount <= 0) return { state, funded: true };
 
   let remaining = amount;
