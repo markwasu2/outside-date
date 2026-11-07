@@ -149,14 +149,15 @@ describe('power: energization and minimum charge', () => {
     const cashBefore = state.cash;
     const after = step(state, [], content).state;
     const noneDeliveredCost = Math.round(content.tuning.power.minChargePerMwMonth.medium * 62);
-    expect(cashBefore - after.cash).toBe(noneDeliveredCost);
+    // money.tick's burn (P3.4) also runs every step; isolate the min-charge fee from it.
+    expect(cashBefore - after.cash - state.monthlyBurn).toBe(noneDeliveredCost);
 
     const pue = content.tuning.cooling.evaporative.pue;
     const delivered = { ...state, halls: state.halls.map((h, i) => (i === 0 ? { ...h, delivered: true } : h)) };
     const afterDelivered = step(delivered, [], content).state;
     const unusedMW = 62 - 25 * pue;
     const partlyUsedCost = Math.round(content.tuning.power.minChargePerMwMonth.medium * unusedMW);
-    expect(delivered.cash - afterDelivered.cash).toBe(partlyUsedCost);
+    expect(delivered.cash - afterDelivered.cash - state.monthlyBurn).toBe(partlyUsedCost);
     expect(partlyUsedCost).toBeLessThan(noneDeliveredCost);
   });
 });

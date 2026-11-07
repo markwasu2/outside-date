@@ -240,7 +240,8 @@ describe('regulation: the power docket', () => {
     const next = resolveEvent(state, 'redesign', content).state;
     expect(next.docket.status).toBe('open');
     expect(next.docket.voteMonth).toBe(20 + content.tuning.docket.redesignMonths);
-    expect(next.cash).toBe(cashBefore - content.tuning.docket.redesignCost);
+    // resolveEvent also runs the world tick (incl. money.tick's burn, P3.4) after the choice resolves.
+    expect(next.cash).toBe(cashBefore - content.tuning.docket.redesignCost - state.monthlyBurn);
     expect(next.docket.intervenors[0]).toEqual({
       id: 'riverkeepers',
       meetingsNeeded: 1,
