@@ -1,6 +1,13 @@
 import type { ActionDef, Content } from '../content/schemas';
 import type { GameState, PlannedAction } from './types';
 import { KNOWN_ACTION_HANDLERS } from '../content/load';
+import {
+  optionSite,
+  advanceHall,
+  standDown,
+  readyLiquid,
+  fundExtensions,
+} from './systems/construction';
 
 /** Thrown when an action's handler exists in the registry but has no real implementation yet. */
 export class NotImplemented extends Error {}
@@ -25,8 +32,8 @@ function notImplemented(name: string): ActionHandler {
  * `src/engine/systems/*.ts` module) as that system's task is completed.
  */
 export const actionHandlers: Record<(typeof KNOWN_ACTION_HANDLERS)[number], ActionHandler> = {
-  optionSite: notImplemented('optionSite'),
-  fundExtensions: notImplemented('fundExtensions'),
+  optionSite,
+  fundExtensions,
   filePermit: notImplemented('filePermit'),
   fileDocket: notImplemented('fileDocket'),
   prepTestimony: notImplemented('prepTestimony'),
@@ -39,11 +46,11 @@ export const actionHandlers: Record<(typeof KNOWN_ACTION_HANDLERS)[number], Acti
   cureDraw: notImplemented('cureDraw'),
   priceTakeout: notImplemented('priceTakeout'),
   confirmRackSchedule: notImplemented('confirmRackSchedule'),
-  readyLiquid: notImplemented('readyLiquid'),
+  readyLiquid,
   delaySwap: notImplemented('delaySwap'),
-  advanceHall: notImplemented('advanceHall'),
+  advanceHall,
   importCrews: notImplemented('importCrews'),
-  standDown: notImplemented('standDown'),
+  standDown,
   fixInspection: notImplemented('fixInspection'),
   visitCast: notImplemented('visitCast'),
 };
