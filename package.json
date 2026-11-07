@@ -1,0 +1,34 @@
+{
+  "name": "outside-date",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "sim": "tsx src/sim/runSim.ts"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.4",
+    "zod": "^3.23.8",
+    "immer": "^10.1.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "latest",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "latest",
+    "prettier": "latest",
+    "tsx": "latest",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "latest",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
+  }
+}
