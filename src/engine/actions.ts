@@ -8,6 +8,13 @@ import {
   readyLiquid,
   fundExtensions,
 } from './systems/construction';
+import {
+  filePermit,
+  fileDocket,
+  prepTestimony,
+  answerDiscovery,
+  meetIntervenor,
+} from './systems/regulation';
 
 /** Thrown when an action's handler exists in the registry but has no real implementation yet. */
 export class NotImplemented extends Error {}
@@ -34,11 +41,11 @@ function notImplemented(name: string): ActionHandler {
 export const actionHandlers: Record<(typeof KNOWN_ACTION_HANDLERS)[number], ActionHandler> = {
   optionSite,
   fundExtensions,
-  filePermit: notImplemented('filePermit'),
-  fileDocket: notImplemented('fileDocket'),
-  prepTestimony: notImplemented('prepTestimony'),
-  answerDiscovery: notImplemented('answerDiscovery'),
-  meetIntervenor: notImplemented('meetIntervenor'),
+  filePermit,
+  fileDocket,
+  prepTestimony,
+  answerDiscovery,
+  meetIntervenor,
   commissionStudy: notImplemented('commissionStudy'),
   orderLongLead: notImplemented('orderLongLead'),
   cancelOrder: notImplemented('cancelOrder'),

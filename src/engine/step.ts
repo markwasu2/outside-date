@@ -101,13 +101,25 @@ export function resolveEvent(
 function runWorldTick(state: GameState, content: Content): { state: GameState; log: LogEntry[] } {
   let next = state;
   next = powerTick(next, content);
+  // Generic (not regulation-specific) early exit: a system's tick can itself need a mid-tick
+  // player choice (e.g. regulation's docket vote appeal/redesign, P3.2 Decisions log) by setting
+  // phase to 'awaitingChoice'. When `resolveEvent` re-invokes this function, it restarts from the
+  // top, so every tick before the one that paused must be safe to run twice this same month.
+  if (next.phase !== 'playing') return { state: next, log: [] };
   next = regulationTick(next, content);
+  if (next.phase !== 'playing') return { state: next, log: [] };
   next = constructionTick(next, content);
+  if (next.phase !== 'playing') return { state: next, log: [] };
   next = moneyTick(next, content);
+  if (next.phase !== 'playing') return { state: next, log: [] };
   next = insuranceTick(next, content);
+  if (next.phase !== 'playing') return { state: next, log: [] };
   next = leaseTick(next, content);
+  if (next.phase !== 'playing') return { state: next, log: [] };
   next = conversionTick(next, content);
+  if (next.phase !== 'playing') return { state: next, log: [] };
   next = loseCheckTick(next, content);
+  if (next.phase !== 'playing') return { state: next, log: [] };
 
   next = { ...next, month: next.month + 1, apUsedThisMonth: 0 };
 
