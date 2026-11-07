@@ -33,7 +33,8 @@ describe('lease: rent', () => {
     const tierRentMult = content.tuning.tiers[state.setup.hallTier].rentMult;
     const gross = hall.mwIT * 1000 * lease.rentPerKwMonth * tierRentMult;
     const net = gross - content.tuning.lease.landlordCostShare * gross;
-    expect(after.cash - cashBefore).toBe(net - state.monthlyBurn);
+    // insurance.tick's builder's risk premium (P3.6, on by default) also runs every month.
+    expect(after.cash - cashBefore).toBe(net - state.monthlyBurn - content.tuning.insurance.buildersRiskMonthly);
   });
 
   it('charges zero rent while abatementMonthsOwed > 0, and decrements the counter', () => {
@@ -49,7 +50,7 @@ describe('lease: rent', () => {
 
     const after = step(state, [], content).state;
 
-    expect(after.cash - cashBefore).toBe(-state.monthlyBurn);
+    expect(after.cash - cashBefore).toBe(-state.monthlyBurn - content.tuning.insurance.buildersRiskMonthly);
     expect(after.halls[0]?.abatementMonthsOwed).toBe(1);
   });
 });
@@ -68,7 +69,7 @@ describe('lease: late remedy (pre-outside-date)', () => {
     const after = step(state, [], content).state;
 
     const ld = Math.round(content.tuning.lease.ldPerDayPer25MW * (state.halls[0]!.mwIT / 25) * 30);
-    expect(after.cash - cashBefore).toBe(-ld - state.monthlyBurn);
+    expect(after.cash - cashBefore).toBe(-ld - state.monthlyBurn - content.tuning.insurance.buildersRiskMonthly);
     expect(after.halls[0]?.ldMonthsAccrued).toBe(1);
     expect(after.halls[0]?.ldPaid).toBe(ld);
 
@@ -80,7 +81,7 @@ describe('lease: late remedy (pre-outside-date)', () => {
     };
     const cashBefore2 = capped.cash;
     const after2 = step(capped, [], content).state;
-    expect(after2.cash - cashBefore2).toBe(-capped.monthlyBurn);
+    expect(after2.cash - cashBefore2).toBe(-capped.monthlyBurn - content.tuning.insurance.buildersRiskMonthly);
     expect(after2.halls[0]?.ldMonthsAccrued).toBe(content.tuning.lease.ldCapMonths);
   });
 
@@ -97,7 +98,7 @@ describe('lease: late remedy (pre-outside-date)', () => {
 
     const after = step(state, [], content).state;
 
-    expect(after.cash - cashBefore).toBe(-state.monthlyBurn);
+    expect(after.cash - cashBefore).toBe(-state.monthlyBurn - content.tuning.insurance.buildersRiskMonthly);
     expect(after.halls[0]?.abatementMonthsOwed).toBe(1);
   });
 
@@ -115,8 +116,11 @@ describe('lease: late remedy (pre-outside-date)', () => {
     const after = step(state, [], content).state;
 
     // DSU reimburses exactly this late hall's share of burn (monthlyBurn / 1 late hall), which
-    // cancels out money.tick's burn deduction; no LD is charged since DSU covers it.
-    expect(after.cash).toBe(cashBefore);
+    // cancels out money.tick's burn deduction; no LD is charged since DSU covers it. Both the
+    // builder's risk and DSU premiums (insurance.tick, P3.6) still apply since dsu is also on.
+    expect(after.cash).toBe(
+      cashBefore - content.tuning.insurance.buildersRiskMonthly - content.tuning.insurance.dsuMonthly,
+    );
     expect(after.halls[0]?.ldPaid).toBe(0);
     expect(after.halls[0]?.ldMonthsAccrued).toBe(1);
     expect(after.halls[0]?.insuredDelayMonths).toBe(1);
@@ -223,6 +227,6 @@ describe('lease: delaySwap', () => {
     const tierRentMult = content.tuning.tiers[state.setup.hallTier].rentMult;
     const gross = hall.mwIT * 1000 * lease.rentPerKwMonth * tierRentMult * (1 - content.tuning.lease.swapRentCut);
     const net = gross - content.tuning.lease.landlordCostShare * gross;
-    expect(after.cash - cashBefore).toBe(net - state.monthlyBurn);
+    expect(after.cash - cashBefore).toBe(net - state.monthlyBurn - content.tuning.insurance.buildersRiskMonthly);
   });
 });

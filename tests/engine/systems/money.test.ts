@@ -108,7 +108,8 @@ describe('money: senior capitalized interest and mezz PIK accrual, pre-conversio
 
     expect(state.debt.seniorCapitalizedInterest).toBe(500);
     const excess = accrued - 500;
-    expect(cashBefore - state.cash).toBeCloseTo(excess + state.monthlyBurn, 2);
+    // insurance.tick's builder's risk premium (P3.6, on by default) also runs every month.
+    expect(cashBefore - state.cash).toBeCloseTo(excess + state.monthlyBurn + content.tuning.insurance.buildersRiskMonthly, 2);
   });
 
   it('mezz PIK compounds monthly with no cash cost and no commitment cap', () => {
@@ -121,7 +122,8 @@ describe('money: senior capitalized interest and mezz PIK accrual, pre-conversio
 
     const expected = (50_000_000 * rate) / 12;
     expect(state.debt.mezzAccruedPik).toBeCloseTo(expected, 2);
-    expect(cashBefore - state.cash).toBe(state.monthlyBurn); // PIK accrues with no cash cost
+    // PIK accrues with no cash cost; only burn and the builder's risk premium (P3.6) hit cash.
+    expect(cashBefore - state.cash).toBe(state.monthlyBurn + content.tuning.insurance.buildersRiskMonthly);
   });
 });
 
@@ -147,7 +149,7 @@ describe('money: cash-paid interest once the first conversion attempt has happen
 
     expect(state.debt.seniorCapitalizedInterest).toBe(0);
     expect(state.debt.mezzAccruedPik).toBe(0);
-    expect(cashBefore - state.cash).toBeCloseTo(expectedInterest + state.monthlyBurn, 2);
+    expect(cashBefore - state.cash).toBeCloseTo(expectedInterest + state.monthlyBurn + content.tuning.insurance.buildersRiskMonthly, 2);
   });
 
   it('once converted, interest is cash-paid on totalDebt at the permanent rate', () => {
@@ -160,16 +162,16 @@ describe('money: cash-paid interest once the first conversion attempt has happen
 
     state = runMonths(state, 1);
 
-    expect(cashBefore - state.cash).toBeCloseTo(expectedInterest + state.monthlyBurn, 2);
+    expect(cashBefore - state.cash).toBeCloseTo(expectedInterest + state.monthlyBurn + content.tuning.insurance.buildersRiskMonthly, 2);
   });
 });
 
 describe('money: burn', () => {
-  it('reduces cash by monthlyBurn every month', () => {
+  it('reduces cash by monthlyBurn plus the default builder\'s risk premium every month', () => {
     let state = freshState();
     const cashBefore = state.cash;
     state = runMonths(state, 1);
-    expect(cashBefore - state.cash).toBe(state.monthlyBurn);
+    expect(cashBefore - state.cash).toBe(state.monthlyBurn + content.tuning.insurance.buildersRiskMonthly);
   });
 });
 
