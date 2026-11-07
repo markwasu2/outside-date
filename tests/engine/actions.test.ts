@@ -19,7 +19,7 @@ describe('actions registry', () => {
     }
   });
 
-  it('applying any action throws NotImplemented (Phase 3 fills these in)', () => {
+  it('applying a not-yet-implemented action throws NotImplemented (Phase 3 fills these in one at a time)', () => {
     const negotiation: NegotiationChoices = {
       lease: { firstDeliveryMonth: 38, lateRemedy: 'liquidatedDamages' },
       capital: { seniorIndex: 0, mezzIndex: 0, playerShareIndex: 0 },
@@ -28,7 +28,9 @@ describe('actions registry', () => {
     };
     const setup: Setup = { site: 'megasite', hallTier: 'liquid', cooling: 'evaporative', gc: 'costPlus' };
     const state = createGame(content, 'whale', setup, negotiation, 1);
-    expect(() => applyAction(state, { actionId: 'confirmRackSchedule' }, content)).toThrow(NotImplemented);
+    // importCrews is still a stub as of P3.5 (Lease); pick whichever `actions.ts` entry is
+    // still `notImplemented(...)` rather than hardcoding one that P3.5's own work just landed.
+    expect(() => applyAction(state, { actionId: 'importCrews' }, content)).toThrow(NotImplemented);
   });
 
   it('throws a plain Error for an unknown action id', () => {

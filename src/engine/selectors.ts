@@ -1,5 +1,5 @@
 import type { Content } from '../content/schemas';
-import type { GameState } from './types';
+import type { GameState, Hall } from './types';
 
 /** Total outstanding debt (senior principal + capitalized interest, mezz principal + PIK). */
 export function totalDebt(state: GameState): number {
@@ -24,22 +24,34 @@ export function requiredGridMW(state: GameState, content: Content): number {
   return state.halls.reduce((sum, h) => sum + h.mwIT * pue, 0);
 }
 
-/** Monthly rent net of landlord cost share for one delivered, non-terminated hall (4.10), ignoring abatement. */
-function hallMonthlyNoi(state: GameState, content: Content, hallMwIT: number, deliveredMonth: number): number {
-  if (!state.lease) return 0;
+/**
+ * Gross monthly rent for one delivered, non-terminated hall (4.10), before landlord cost
+ * share, ignoring abatement (abatement's "rent is 0 this month" is applied by `lease.ts`'s
+ * `applyRent`, not here, since it's a transient monthly condition, not a rent-level change).
+ * Reduced by any `delaySwap` rent cut accepted for this hall (flags-bag key, see P3.5
+ * Decisions log), which IS a durable rent-level change.
+ */
+export function hallGrossRent(state: GameState, content: Content, hall: Hall): number {
+  if (!state.lease || hall.deliveredMonth === null) return 0;
   const tierRentMult = content.tuning.tiers[state.setup.hallTier].rentMult;
   const escalator = content.tuning.lease.escalator;
-  const years = Math.floor((state.month - deliveredMonth) / 12);
-  const rent = hallMwIT * 1000 * state.lease.rentPerKwMonth * tierRentMult * (1 + escalator) ** years;
-  const landlordCost = content.tuning.lease.landlordCostShare * rent;
-  return rent - landlordCost;
+  const years = Math.floor((state.month - hall.deliveredMonth) / 12);
+  const base = hall.mwIT * 1000 * state.lease.rentPerKwMonth * tierRentMult * (1 + escalator) ** years;
+  const cut = state.flags[`rentCutFraction:${hall.id}`];
+  return base * (1 - (typeof cut === 'number' ? cut : 0));
+}
+
+/** Monthly rent net of landlord cost share for one delivered, non-terminated hall (4.10), ignoring abatement. */
+function hallMonthlyNoi(state: GameState, content: Content, hall: Hall): number {
+  const gross = hallGrossRent(state, content, hall);
+  return gross - content.tuning.lease.landlordCostShare * gross;
 }
 
 /** Forward (annualized) NOI from delivered, non-terminated halls at current rent levels. */
 export function forwardNoi(state: GameState, content: Content): number {
   const monthlyNoi = state.halls
     .filter((h) => h.delivered && !h.terminated && h.deliveredMonth !== null)
-    .reduce((sum, h) => sum + hallMonthlyNoi(state, content, h.mwIT, h.deliveredMonth as number), 0);
+    .reduce((sum, h) => sum + hallMonthlyNoi(state, content, h), 0);
   return monthlyNoi * 12;
 }
 
@@ -62,7 +74,7 @@ function monthlyOutflow(state: GameState, content: Content): number {
 function monthlyInflow(state: GameState, content: Content): number {
   return state.halls
     .filter((h) => h.delivered && !h.terminated && h.deliveredMonth !== null)
-    .reduce((sum, h) => sum + hallMonthlyNoi(state, content, h.mwIT, h.deliveredMonth as number), 0);
+    .reduce((sum, h) => sum + hallMonthlyNoi(state, content, h), 0);
 }
 
 /** Runway in months: cash divided by net monthly burn, or Infinity if inflow covers outflow. */
