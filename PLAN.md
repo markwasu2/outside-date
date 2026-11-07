@@ -679,13 +679,13 @@ Each task: do it, write the tests listed, pass `npm run typecheck && npm test`, 
   - Accept: tree matches section 2.
 
 ### Phase 1: Content
-- [ ] **P1.1** Write zod schemas for every content file (`src/content/schemas.ts`), mirroring sections 5 and 6. Export inferred types.
-- [ ] **P1.2** Write `content/tuning.json` exactly as section 5.
-- [ ] **P1.3** Write `content/actions.json` (6.1), `content/risks.json` (6.4), `content/cast.json` (6.7).
-- [ ] **P1.4** Write `content/events.json` with all 30 cards (6.2), including title and body text.
-- [ ] **P1.5** Write both scenario files (6.3).
-- [ ] **P1.6** Write `content/glossary.json` (6.5) and `content/codex.json` (6.6).
-- [ ] **P1.7** `src/content/load.ts`: load all JSON, validate, deep-merge scenario overrides into tuning, return `Content`. Throw readable errors.
+- [x] **P1.1** Write zod schemas for every content file (`src/content/schemas.ts`), mirroring sections 5 and 6. Export inferred types.
+- [x] **P1.2** Write `content/tuning.json` exactly as section 5.
+- [x] **P1.3** Write `content/actions.json` (6.1), `content/risks.json` (6.4), `content/cast.json` (6.7).
+- [x] **P1.4** Write `content/events.json` with all 30 cards (6.2), including title and body text.
+- [x] **P1.5** Write both scenario files (6.3).
+- [x] **P1.6** Write `content/glossary.json` (6.5) and `content/codex.json` (6.6).
+- [x] **P1.7** `src/content/load.ts`: load all JSON, validate, deep-merge scenario overrides into tuning, return `Content`. Throw readable errors.
   - Tests: every file validates; a deliberately broken fixture fails with a readable message; every event `requires` atom and effect type is in the supported set; every action `handler` name exists in a registry list; no UI-facing text in content contains "Meta", "Entergy", "Louisiana", "Hyperion", "NVIDIA", "CoreWeave" (except `codex.json`); no text contains an em dash.
 
 ### Phase 2: Engine core
@@ -809,6 +809,12 @@ Append entries as `YYYY-MM-DD | task | decision | why`.
 - (start) | plan | Design deltas D1 to D14 adopted over design-v2 | see section 1
 - 2026-11-06 | P0.1 | Pinned `vite@^5.4.11`/`vitest@^2.1.8`/`@vitejs/plugin-react@^4.3.4` instead of latest majors | latest `vite` (8.x) defaults to the rolldown bundler, which requires `node:util.styleText` (Node 21.7+/22+); local Node is v20.10.0 and vitest startup crashed on import. Pinned stable majors that run on Node 20. Revisit the pin if the dev Node version is upgraded.
 - 2026-11-06 | P0.2 | No `docs/design-v2.md` was provided; added the placeholder note verbatim as instructed, no design content invented | source doc was not in the handoff
+- 2026-11-06 | P1.5 | Added a 22nd effect type, `playerShare`, to `EffectTypeSchema` | `partner_dispute`'s "concede" choice needs to move `capital.playerEquityCash`'s ownership share; CLAUDE.md explicitly allows new effect types for cases like this rather than forcing an existing type to do double duty
+- 2026-11-06 | P1.5 | Extended the `requires` DSL with lightweight string-token conventions instead of a nested/conditional schema rewrite: `p:<float>` trailing arg for a probability-gated effect (used by `subpoena`), `fromTuning:<path>` for a value read from `tuning.json` at event-resolution time (used by `drought`), `monthPlus:<N>` and `halfwayTo50` for schedule-relative values (used by `hiring_fair`, `commissioner_turnover`), `randomPending` to pick among currently-pending orders (used by `supply_shock`). Also extended `orderPending:<kind>` to accept `kind: "any"`, and added `gc:<choice>`/`notGc:<choice>` atoms mirroring the existing `cooling:<choice>` pattern (used by `overrun`) | the documented DSL/effect-type set in PLAN.md section 6 didn't cover every mechanic implied by table 6.2's event prose; tokens keep the schema closed-set while letting `src/engine/systems/events.ts` (Phase 3) branch on them per-card. `drought`'s `requires` was simplified to `[]` rather than inventing an OR-of-atom-kinds syntax.
+- 2026-11-06 | P1.5 | Added a free-text optional `note` field to `EventCardSchema` | several cards (`the_ask`, `chip_generation`, `partner_dispute`, `overrun`, `supply_shock`, `hiring_fair`, `commissioner_turnover`) have mechanics too specific to express generically (e.g. `the_ask`'s pro-rata docket-amendment math); `note` documents the intended Phase 3 handler logic without expanding the schema further
+- 2026-11-06 | P1.6 | `docs/design-v2.md` was never provided, so `content/codex.json`'s required real-world anchors (hyperion-overview, the-bond, the-jv, etc.) had no seed source to draw from. Used `WebSearch` to find real, dated, primary-leaning sources (DCD, Louisiana Illuminator, Meta IR, S&P Global, CREFC, Nvidia-ecosystem technical writeups, law firm briefings) for all 21 required entries, each with a real `sourceUrl` and `verifiedOn: 2026-11-06` | codex.json is the one place CLAUDE.md permits real company/place names, and the brief requires real `sourceUrl`s; fabricating URLs is prohibited, so research was the only path that satisfies both constraints
+- 2026-11-06 | P1.7 | Added `'town'` to `RiskHolderSchema` (6.4) | `content/risks.json`'s `waterGap` risk holds the local community, not ratepayers (a utility-bill-paying group already used by `strandedPlants`) or any other existing enum value; caught by the new `tests/content/load.test.ts` schema-validation test, which is exactly the kind of gap that test is meant to catch
+- 2026-11-06 | P1.6 | Could not find a primary source matching the design brief's exact "$12.9B / 5,278 MW" expansion figure (closest verified real deals are Meta-CoreWeave at $14.2B and OpenAI-CoreWeave at ~$22.4B cumulative); folded the CoreWeave credit-stress fact into the `s-and-p-outlook` entry and set `needsVerification: true` on it rather than inventing a matching source for the unverified figure | matches the brief's explicit instruction to flag exactly this claim as needing verification; CoreWeave's CDS spread level itself is well-sourced (CNBC, Morningstar, TechTimes) so only the dollar/MW figure is flagged
 
 ---
 
@@ -816,3 +822,4 @@ Append entries as `YYYY-MM-DD | task | decision | why`.
 Append 2 to 3 lines after each phase: what shipped, what's blocked, key numbers. Final summary goes here when every phase is done.
 
 - **Phase 0 (2026-11-06):** Vite/React/TS scaffold up on Node 20.10; strict tsconfig incl. `noUncheckedIndexedAccess`. Dev server confirmed serving the placeholder title screen; `npm test`/`typecheck`/`lint` all green. Full section-2 folder tree created with empty placeholder modules. No blockers.
+- **Phase 1 (2026-11-06):** All content written and validated: `schemas.ts` (closed effect-type/action-track enums plus a few DSL extensions, see Decisions log), `tuning.json`, `actions.json` (22 actions), `events.json` (30 cards), `risks.json` (11), `cast.json` (9 cast + 4 intervenors), `glossary.json` (48 terms), `codex.json` (21 real-world-anchored entries, researched via web search since `docs/design-v2.md` was never provided), both scenario files. `src/content/load.ts` loads/validates everything, cross-checks every `requires` atom and action `handler` against closed registries, and exports `mergeTuning` for Phase 2. `tests/content/load.test.ts` covers: successful load, a deliberately broken fixture failing readably, atom/handler registry coverage, tuning merge semantics, no restricted real-world names outside codex.json, no em dashes anywhere. One real content bug caught by the new tests: `risks.json`'s `waterGap` used a `defaultHolder` of `"town"` not in the enum; added it as a 9th `RiskHolder` value rather than misusing `ratepayers`. `npm test`/`typecheck`/`lint` all green. No blockers.

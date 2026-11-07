@@ -1,0 +1,380 @@
+[
+  {
+    "id": "storm",
+    "title": "Storm off the gulf",
+    "body": "A late-season storm tracks over Richfield County and sits on your site for a day. Crews pull back until the water clears.",
+    "art": "storm",
+    "odds": 0.25,
+    "window": [24, 59],
+    "seasonMonths": [5, 9],
+    "requires": ["anyHallStageIn:pad|steel|shell"],
+    "effects": [{ "type": "stormDamage", "args": [] }],
+    "note": "Per rules 4.11: pick one hall in pad/steel/shell (seeded). stageMonthsDone = max(0, stageMonthsDone - 1). Damage = tuning.events.stormDamage, builder's risk covers all but the deductible; without it, cash pays it all. insuredDelayMonths +1 only if builder's risk was in force. Also sets a 1-month draw freeze unless DSU is active."
+  },
+  {
+    "id": "supply_shock",
+    "title": "A shock up the supply chain",
+    "body": "A fire at a parts supplier ripples through the grid-equipment market. Everyone's lead times just got longer, yours included.",
+    "art": "supply_shock",
+    "odds": 0.05,
+    "requires": ["orderPending:any"],
+    "effects": [{ "type": "orderSlip", "args": ["randomPending", 6] }],
+    "note": "\"randomPending\" selects uniformly among currently pending transformer/switchgear orders."
+  },
+  {
+    "id": "labor_shortfall",
+    "title": "Not enough hands",
+    "body": "Fitout crews are scarce across the region this quarter. Your general contractor is stretched thin and it shows in the schedule.",
+    "art": "labor_shortfall",
+    "odds": 0.15,
+    "requires": ["anyHallStage:fitout", "notFlag:importCrewsActive"],
+    "effects": [{ "type": "labor", "args": [3] }],
+    "note": "\"importCrewsActive\" is derived: true while month < flags.importCrewsUntil (set by the importCrews action or the union_pla card). labor_shortfall's own odds drop to 0.05 while flags.plaSigned is true (see union_pla)."
+  },
+  {
+    "id": "outlook_cut",
+    "title": "A rating agency cuts the outlook",
+    "body": "A regional rating agency trims its outlook on data center campuses like yours, citing power delivery risk. Buyers get a little more cautious.",
+    "art": "outlook_cut",
+    "odds": 0.03,
+    "window": [24, 59],
+    "once": true,
+    "requires": [],
+    "effects": [
+      { "type": "capRate", "args": [0.005] },
+      { "type": "setFlag", "args": ["outlookCut", true] }
+    ]
+  },
+  {
+    "id": "the_ask",
+    "title": "The tenant wants more",
+    "body": "The Whale's expansion team calls. They want two more halls on your campus, same terms, same you. It is a vote of confidence and a lot more rope.",
+    "art": "the_ask",
+    "codexId": "expansion-docket",
+    "scripted": true,
+    "scriptedMonth": 24,
+    "requires": ["docketApproved"],
+    "effects": [],
+    "choices": [
+      { "id": "yes", "label": "Say yes", "effects": [{ "type": "addAskHalls", "args": [] }] },
+      { "id": "no", "label": "Say no", "effects": [{ "type": "declineAsk", "args": [] }] }
+    ],
+    "note": "Fires at month 24 if the docket is already approved; otherwise fires the month the docket is approved. Yes: addAskHalls adds 2 halls of 25 MW IT, delivery = last hall's delivery + 9 and +12 months, opens a docket amendment vote in 9 months, and scales senior/equity commitments pro rata. No: declineAsk sets tenant goodwill -20. Failing the amendment vote later cancels the ask halls without a lose."
+  },
+  {
+    "id": "chip_generation",
+    "title": "The next generation of racks",
+    "body": "The tenant's hardware team wants to leap to the next rack generation mid-build. Whether that is free, expensive, or a fight depends on what you are cooling with.",
+    "art": "chip_generation",
+    "codexId": "gb200-rack",
+    "scripted": true,
+    "scriptedMonth": 30,
+    "requires": [],
+    "effects": [{ "type": "chipGeneration", "args": [] }],
+    "note": "Tier-dependent, resolved inside the chipGeneration effect handler using setup.hallTier: hybrid = no penalty. liquid = choice of retrofit (each undelivered hall +$4,000,000 and +1 month fitout) or decline (tenant -15). air = tenant -15 and asset score -3 unless retrofit at +$15,000,000 per undelivered hall. The handler sets phase=awaitingChoice with tier-appropriate choices; content intentionally leaves choices empty here since they depend on setup, not a fixed list."
+  },
+  {
+    "id": "drought",
+    "title": "A dry summer",
+    "body": "Richfield County is in a drought watch. Your cooling choice is about to matter to people who live downstream of your water permit.",
+    "art": "drought",
+    "odds": 0.08,
+    "seasonMonths": [5, 7],
+    "requires": [],
+    "effects": [
+      { "type": "goodwill", "args": ["town", "fromTuning:cooling.droughtTown"] },
+      { "type": "goodwill", "args": ["commission", "fromTuning:cooling.droughtCommission"] }
+    ],
+    "note": "Deltas come from tuning.cooling.<setup.cooling>.droughtTown/droughtCommission. Evaporative stings the most, dry cooling is immune."
+  },
+  {
+    "id": "subpoena",
+    "title": "A subpoena from the docket",
+    "body": "Commission Staff wants your internal load forecasts, every draft. You can hand them over or fight the request in front of the commissioners.",
+    "art": "subpoena",
+    "odds": 0.10,
+    "once": true,
+    "requires": ["docketOpen"],
+    "effects": [],
+    "choices": [
+      {
+        "id": "comply",
+        "label": "Comply",
+        "effects": [
+          { "type": "cash", "args": [-1000000] },
+          { "type": "goodwill", "args": ["commission", 5] },
+          { "type": "owedAp", "args": [1] }
+        ]
+      },
+      {
+        "id": "fight",
+        "label": "Fight it",
+        "effects": [
+          { "type": "voteSlip", "args": [3] },
+          { "type": "goodwill", "args": ["town", -5] },
+          { "type": "goodwill", "args": ["town", -10, "p:0.5"] }
+        ]
+      }
+    ],
+    "note": "The trailing \"p:0.5\" arg means the effect handler applies that goodwill delta with 50% probability in addition to the guaranteed -5."
+  },
+  {
+    "id": "tax_check",
+    "title": "The county assessor comes by",
+    "body": "Now that something is actually standing, Richfield County wants to talk about the property tax abatement everyone signed off on. It goes fine. It usually does.",
+    "art": "tax_check",
+    "codexId": "tax-check",
+    "scripted": true,
+    "scriptedTrigger": "afterFirstDelivery",
+    "requires": ["anyHallDelivered"],
+    "effects": [{ "type": "goodwill", "args": ["town", 15] }]
+  },
+  {
+    "id": "draw_freeze",
+    "title": "The lender's engineer flags a draw",
+    "body": "Your monthly draw request does not match the paperwork on file. Until someone sorts it out, the lender is not releasing funds.",
+    "art": "draw_freeze",
+    "odds": 0.05,
+    "requires": ["constructionActive"],
+    "effects": [{ "type": "drawFreeze", "args": ["untilCured"] }],
+    "note": "Cured by the cureDraw action (1 AP)."
+  },
+  {
+    "id": "fitout_fire",
+    "title": "Fire in fitout",
+    "body": "An electrical fault sparks a small fire in a hall under fitout. No one is hurt. The hall is a different story.",
+    "art": "fitout_fire",
+    "odds": 0.03,
+    "requires": ["anyHallStage:fitout"],
+    "effects": [{ "type": "fireDamage", "args": [] }],
+    "note": "Per closed-set handler: hallProgress(randomInStage:fitout, -2), damage = tuning.events.fireDamage paid per builder's risk (full cash cost without it), and that hall's insuredDelayMonths += 2 if builder's risk was in force."
+  },
+  {
+    "id": "overrun",
+    "title": "The budget line that moved",
+    "body": "Steel prices moved again and your general contractor wants to talk about a change order. Under a cost-plus deal, that bill is yours.",
+    "art": "overrun",
+    "odds": 0.06,
+    "requires": ["anyHallStageIn:steel|fitout", "notGc:gmp"],
+    "effects": [{ "type": "hallCostPct", "args": ["randomInStages:steel|fitout", 0.03] }]
+  },
+  {
+    "id": "inspection_fail",
+    "title": "A failed inspection",
+    "body": "The county inspector walks the site and does not like what they see. Work stops on that hall until it is fixed.",
+    "art": "inspection_fail",
+    "odds": 0.06,
+    "requires": ["anyHallStageIn:shell|fitout"],
+    "effects": [{ "type": "hallPause", "args": ["randomInStages:shell|fitout", "untilFixed"] }],
+    "note": "Cleared by the fixInspection action."
+  },
+  {
+    "id": "rate_up",
+    "title": "Rates move up",
+    "body": "The Fed's latest move pushes floating construction rates up. Cap rates follow, a little.",
+    "art": "rate_up",
+    "odds": 0.04,
+    "requires": [],
+    "effects": [
+      { "type": "seniorRate", "args": [0.0025] },
+      { "type": "capRate", "args": [0.0015] }
+    ]
+  },
+  {
+    "id": "rate_down",
+    "title": "Rates move down",
+    "body": "A softer inflation print gives the market room to breathe. Your floating rate eases, and so does the exit math.",
+    "art": "rate_down",
+    "odds": 0.04,
+    "requires": [],
+    "effects": [
+      { "type": "seniorRate", "args": [-0.0025] },
+      { "type": "capRate", "args": [-0.0015] }
+    ]
+  },
+  {
+    "id": "town_hall",
+    "title": "Millbrook calls a town hall",
+    "body": "The town wants a night with you, a microphone, and their questions. Showing up costs an evening. Not showing up costs more.",
+    "art": "town_hall",
+    "odds": 0.06,
+    "requires": [],
+    "effects": [],
+    "choices": [
+      { "id": "attend", "label": "Attend", "effects": [{ "type": "owedAp", "args": [1] }, { "type": "goodwill", "args": ["town", 8] }] },
+      { "id": "skip", "label": "Skip it", "effects": [{ "type": "goodwill", "args": ["town", -5] }] }
+    ]
+  },
+  {
+    "id": "newspaper_profile",
+    "title": "The Clarion runs a profile",
+    "body": "Sam Okafor's piece on the campus runs this week. How it reads depends on how the town feels about you right now.",
+    "art": "newspaper_profile",
+    "odds": 0.05,
+    "requires": [],
+    "effects": [],
+    "note": "Automatic, no player choice: if goodwill.town < 40, commission -5; else town +5."
+  },
+  {
+    "id": "tenant_slide_offer",
+    "title": "The tenant offers to slide a date",
+    "body": "The Whale's deal team floats an idea: push one undelivered hall's date out a bit in exchange for a small rent break. No hard feelings either way.",
+    "art": "tenant_slide_offer",
+    "odds": 0.04,
+    "window": [24, 59],
+    "requires": ["noHallDelivered"],
+    "effects": [],
+    "choices": [
+      { "id": "accept", "label": "Accept", "effects": [] },
+      { "id": "decline", "label": "Decline", "effects": [] }
+    ],
+    "note": "Accept: the next undelivered hall's delivery and outside months +2, rent on that hall -2%. Decline: no change. Implemented directly in the choice handler (same mechanics as the delaySwap action), since hall-date shifts have no generic closed-set effect."
+  },
+  {
+    "id": "governor_visit",
+    "title": "The Governor wants a tour",
+    "body": "Governor Voss is in Richfield County and wants photos at your site. It is good press, if you can spare the afternoon.",
+    "art": "governor_visit",
+    "scripted": true,
+    "scriptedMonth": 3,
+    "requires": [],
+    "effects": [],
+    "choices": [
+      { "id": "host", "label": "Host the visit", "effects": [{ "type": "owedAp", "args": [1] }, { "type": "setFlag", "args": ["rebateUnlocked", true] }] },
+      { "id": "decline", "label": "Decline, politely", "effects": [] }
+    ]
+  },
+  {
+    "id": "union_pla",
+    "title": "A project labor agreement, on the table",
+    "body": "The trades council offers a project labor agreement: steady crews, fair terms, a small premium on the budget. Reyes is waiting on your answer.",
+    "art": "union_pla",
+    "odds": 0.05,
+    "window": [12, 40],
+    "once": true,
+    "requires": [],
+    "effects": [],
+    "choices": [
+      { "id": "sign", "label": "Sign the agreement", "effects": [{ "type": "budgetPct", "args": [0.02] }, { "type": "setFlag", "args": ["plaSigned", true] }] },
+      { "id": "decline", "label": "Decline", "effects": [] }
+    ],
+    "note": "Signing also drops labor_shortfall's draw odds to 0.05 for the rest of the run via flags.plaSigned (see labor_shortfall)."
+  },
+  {
+    "id": "transformer_factory_fire",
+    "title": "Fire at the transformer plant",
+    "body": "A fire shuts down the factory building your transformer. The lead time just got a lot longer.",
+    "art": "transformer_factory_fire",
+    "codexId": "transformer-lead-times",
+    "odds": 0.02,
+    "once": true,
+    "requires": ["orderPending:transformer"],
+    "effects": [{ "type": "orderSlip", "args": ["transformer", 9] }]
+  },
+  {
+    "id": "restudy",
+    "title": "The interconnection study needs another look",
+    "body": "The utility's planners want to rerun part of your interconnection study after a nearby project changed its load profile.",
+    "art": "restudy",
+    "odds": 0.04,
+    "requires": ["studyPending"],
+    "effects": [{ "type": "studySlip", "args": [4] }]
+  },
+  {
+    "id": "partner_dispute",
+    "title": "Your equity partner pushes back",
+    "body": "Your partner does not like a call you made and wants either a bigger share or a pause while lawyers talk. Pick your cost.",
+    "art": "partner_dispute",
+    "odds": 0.03,
+    "once": true,
+    "requires": ["constructionActive"],
+    "effects": [],
+    "choices": [
+      { "id": "concede", "label": "Concede a bigger share", "effects": [{ "type": "playerShare", "args": [-0.05] }] },
+      { "id": "wait", "label": "Wait it out", "effects": [{ "type": "hallPause", "args": ["all", 1] }] }
+    ]
+  },
+  {
+    "id": "neighbor_wells",
+    "title": "Neighbors worry about their wells",
+    "body": "Families near the site say their wells are running low and point at your cooling towers. Evaporative cooling drinks a lot of water.",
+    "art": "neighbor_wells",
+    "codexId": "water-registration",
+    "odds": 0.06,
+    "requires": ["cooling:evaporative", "anyHallDelivered"],
+    "effects": [{ "type": "goodwill", "args": ["town", -6] }],
+    "note": "Mitigation: visitCast(town)."
+  },
+  {
+    "id": "heat_wave_commissioning",
+    "title": "A heat wave during commissioning",
+    "body": "A heat wave rolls through right as a hall is ready to commission. Equipment runs hot and tests slip a little.",
+    "art": "heat_wave_commissioning",
+    "odds": 0.05,
+    "seasonMonths": [6, 8],
+    "requires": ["anyHallStage:rfs"],
+    "effects": [{ "type": "hallProgress", "args": ["randomInStage:rfs", -1] }]
+  },
+  {
+    "id": "equipment_rebate",
+    "title": "The rebate comes through",
+    "body": "The equipment rebate the Governor's office promised finally clears. It is real money, and it is yours.",
+    "art": "equipment_rebate",
+    "codexId": "equipment-rebate-law",
+    "scripted": true,
+    "scriptedTrigger": "afterFirstFitoutComplete",
+    "requires": ["flag:rebateUnlocked"],
+    "effects": [{ "type": "cash", "args": [20000000] }]
+  },
+  {
+    "id": "good_weather",
+    "title": "A good stretch of weather",
+    "body": "Clear skies and mild temperatures for weeks. Every crew on site is ahead of where they expected to be.",
+    "art": "good_weather",
+    "odds": 0.05,
+    "requires": ["constructionActive"],
+    "effects": [{ "type": "hallProgress", "args": ["randomActive", 1] }]
+  },
+  {
+    "id": "hiring_fair",
+    "title": "A regional hiring fair",
+    "body": "The county is running a hiring fair for skilled trades. Sponsoring a booth costs a little cash and buys some goodwill, plus a steadier crew for a while.",
+    "art": "hiring_fair",
+    "odds": 0.04,
+    "requires": [],
+    "effects": [],
+    "choices": [
+      {
+        "id": "host",
+        "label": "Sponsor a booth",
+        "effects": [
+          { "type": "cash", "args": [-1000000] },
+          { "type": "goodwill", "args": ["town", 6] },
+          { "type": "setFlag", "args": ["hiringFairUntil", "monthPlus:6"] }
+        ]
+      },
+      { "id": "skip", "label": "Skip it", "effects": [] }
+    ],
+    "note": "While flags.hiringFairUntil is in the future, labor_shortfall's draw odds are reduced by 0.05."
+  },
+  {
+    "id": "commissioner_turnover",
+    "title": "A commissioner's term ends",
+    "body": "One of the sitting commissioners is replaced mid-docket. The new seat starts from the middle, not from whatever you had built up.",
+    "art": "commissioner_turnover",
+    "odds": 0.03,
+    "once": true,
+    "requires": ["docketOpen"],
+    "effects": [{ "type": "goodwill", "args": ["commission", "halfwayTo50"] }]
+  },
+  {
+    "id": "interconnect_queue_jump",
+    "title": "A favor in the interconnection queue",
+    "body": "Arcadia Public Power has room to move your study up the queue. They only do that for developers they trust.",
+    "art": "interconnect_queue_jump",
+    "odds": 0.03,
+    "once": true,
+    "requires": ["studyPending", "goodwillAtLeast:utility:65"],
+    "effects": [{ "type": "studySlip", "args": [-3] }]
+  }
+]

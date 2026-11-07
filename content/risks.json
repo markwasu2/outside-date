@@ -1,0 +1,79 @@
+[
+  {
+    "id": "deliveryDelay",
+    "label": "Delivery delay",
+    "defaultHolder": "you",
+    "mitigation": "Delay in start-up (DSU) insurance moves the storm-caused part of this to the insurer.",
+    "movedBy": "insurance.dsu"
+  },
+  {
+    "id": "overruns",
+    "label": "Cost overruns",
+    "defaultHolder": "you",
+    "mitigation": "A guaranteed maximum price (GMP) contract moves overruns to the general contractor.",
+    "movedBy": "setup.gc"
+  },
+  {
+    "id": "stormDelay",
+    "label": "Storm delay",
+    "defaultHolder": "you",
+    "mitigation": "DSU moves storm delay cost to the insurer while it is active.",
+    "movedBy": "insurance.dsu"
+  },
+  {
+    "id": "plantSlip",
+    "label": "Power plant slip",
+    "defaultHolder": "you",
+    "mitigation": "A higher minimum power charge lowers slip odds and shifts more of this to the utility.",
+    "movedBy": "power.minCharge"
+  },
+  {
+    "id": "strandedPlants",
+    "label": "Stranded plant capacity",
+    "defaultHolder": "ratepayers",
+    "mitigation": "Informational. See the codex; ratepayers carry this cost in the real world.",
+    "movedBy": null
+  },
+  {
+    "id": "refinancing",
+    "label": "Refinancing risk",
+    "defaultHolder": "you",
+    "mitigation": "Lower leverage at close reduces the odds of a failed conversion test.",
+    "movedBy": "capital.seniorOptions"
+  },
+  {
+    "id": "tenantExit",
+    "label": "Tenant exit",
+    "defaultHolder": "you",
+    "mitigation": "Cut from v1 as a mechanic (residual value guarantee); informational only.",
+    "movedBy": null
+  },
+  {
+    "id": "rateMove",
+    "label": "Interest rate movement",
+    "defaultHolder": "you",
+    "mitigation": "No in-game mitigation. Rate moves are market events.",
+    "movedBy": null
+  },
+  {
+    "id": "laborShortage",
+    "label": "Labor shortage",
+    "defaultHolder": "you",
+    "mitigation": "A project labor agreement or importing crews reduces or prevents this.",
+    "movedBy": "flags.plaSigned"
+  },
+  {
+    "id": "waterGap",
+    "label": "Water availability gap",
+    "defaultHolder": "town",
+    "mitigation": "Hybrid or dry cooling keeps more of this with the town instead of you.",
+    "movedBy": "setup.cooling"
+  },
+  {
+    "id": "chipObsolescence",
+    "label": "Chip generation obsolescence",
+    "defaultHolder": "tenant",
+    "mitigation": "Hybrid tier keeps this with the tenant; air tier shifts some of it to you.",
+    "movedBy": "setup.hallTier"
+  }
+]

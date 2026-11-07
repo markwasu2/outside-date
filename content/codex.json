@@ -1,0 +1,171 @@
+[
+  {
+    "id": "hyperion-overview",
+    "title": "The real campus behind the Whale campaign",
+    "body": "A major social media company is building a multi-building AI data center campus on roughly 2,250 acres in a rural Louisiana parish, with plans to grow it toward 5 gigawatts and tens of billions of dollars of investment. The campaign's four-hall 'Whale' tenant is a fictional stand-in for this kind of deal.",
+    "realAnchor": "Meta's Hyperion data center campus, Richland Parish, Louisiana",
+    "sourceUrl": "https://www.datacenterdynamics.com/en/news/meta-expands-data-center-campus-in-richland-parish-louisiana-to-5gw-will-invest-50bn/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "date-certain-rent",
+    "title": "The famous exception: rent that starts on schedule anyway",
+    "body": "Lawyers who structure these deals note a real shift: some investment-grade tenants now agree to start paying rent on a fixed date no matter what caused a construction delay, instead of only after delivery. That one clause is often what lets lenders treat the lease like a bond. In the game, this is the rare lease term players hope their Whale will agree to.",
+    "realAnchor": "Date-certain rent commencement clauses in hyperscaler data center leases",
+    "sourceUrl": "https://www.cliffordchance.com/content/dam/cliffordchance/briefings/2026/07/The%20Data%20Center%20Lease%20Is%20the%20Bond.pdf",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "the-bond",
+    "title": "The bond behind the campus",
+    "body": "To fund a Louisiana AI campus like this, a special-purpose entity issued over $27 billion in senior secured notes in a single offering, with large asset managers anchoring the deal. The notes amortize over roughly 25 years, treating the tenant's occupancy like rent on a very long mortgage. The game's senior loan and takeout mechanics are modeled loosely on structures like this.",
+    "realAnchor": "Beignet Investor LLC $27.294B senior secured note offering for the Hyperion campus",
+    "sourceUrl": "https://www.tradingview.com/news/seekingalpha:47b9189c6094b:0-inside-wall-street-s-27b-financing-of-meta-s-hyperion-ai-data-center/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "the-jv",
+    "title": "The joint venture that owns the dirt",
+    "body": "Rather than build the campus on its own balance sheet, the tenant formed a joint venture with an asset management firm, which holds the larger ownership stake while the tenant keeps a minority share and the lease. This keeps most of the debt off the tenant's own books. The game's capital stack and equity split are inspired by this kind of structure.",
+    "realAnchor": "Meta / Blue Owl Capital joint venture for the Hyperion data center",
+    "sourceUrl": "https://investor.atmeta.com/investor-news/press-release-details/2025/Meta-Announces-Joint-Venture-with-Funds-Managed-by-Blue-Owl-Capital-to-Develop-Hyperion-Data-Center/default.aspx",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "air-permit-line",
+    "title": "Why air permits matter so much",
+    "body": "Before a utility can run new gas-fired power plants to feed a campus like this, the state's environmental regulator has to issue air operating and pollution-control permits, and hold public hearings on them. Advocacy groups and residents can and do show up to those hearings to push back on projected emissions. In the game, the air permit is one of the three permits players may need before power can flow.",
+    "realAnchor": "Louisiana DEQ air permit review for Entergy gas plants serving the Meta campus",
+    "sourceUrl": "https://www.all4energy.org/take-action/ldeq-entergy-meta-meeting-1/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "first-docket-vote",
+    "title": "The first docket vote",
+    "body": "A real state utility commission voted 4 to 1 to approve a settlement letting the local utility build new generation and transmission to serve a single large tech customer. One commissioner dissented. The game's docket and intervenor mechanics are built around a vote exactly like this one.",
+    "realAnchor": "Louisiana Public Service Commission Docket No. U-37425 settlement vote, August 2025",
+    "sourceUrl": "https://lailluminator.com/2025/08/20/entergy-meta/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "expansion-docket",
+    "title": "The expansion docket",
+    "body": "Less than a year after the first approval, the same commission voted again, this time to fast-track review of a roughly $21 billion follow-on plan for even more generation tied to the same campus. The game's 'the Ask' event, where a tenant requests more halls mid-game and forces a second docket fight, is modeled on this kind of sequence.",
+    "realAnchor": "Louisiana PSC fast-track vote on Entergy's follow-on generation plan, April 2026",
+    "sourceUrl": "https://www.kplctv.com/2026/04/15/louisiana-psc-aproves-fast-track-entergy-21b-proposal-tied-meta-data-center/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "transformer-lead-times",
+    "title": "Why transformers take years, not months",
+    "body": "Large power transformers that once shipped in under a year now have published lead times stretching past three years, driven by a global crunch on electrical steel, copper, and factory capacity. Developers who don't order early in a project can find their whole schedule hostage to a transformer they haven't received yet. This is exactly what the game's 'order transformer' action and slip events represent.",
+    "realAnchor": "U.S. power transformer supply shortage and multi-year lead times, 2025 to 2026",
+    "sourceUrl": "https://pv-magazine-usa.com/2026/05/11/u-s-transformer-market-faces-severe-supply-constraints-as-lead-times-extend-to-four-years/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "switchgear-lead-times",
+    "title": "The other long-lead item: switchgear",
+    "body": "Switchgear, the equipment that protects and switches electrical circuits, has seen its own lead times stretch from a few months before the AI data center boom to well over a year, with data-center-grade medium-voltage gear sometimes taking two to three years. Shortages here, alongside transformers, are a leading reason real projects slip their delivery dates.",
+    "realAnchor": "Switchgear lead-time extensions tied to the data center construction boom",
+    "sourceUrl": "https://www.gigaenergy.com/blog/lead-time-delays-for-data-centers",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "electrician-market",
+    "title": "The electrician shortage",
+    "body": "Electrical work makes up a large share of a data center's construction cost, and the trade is short-staffed nationwide. In hot markets, experienced data center electricians can earn total pay well over $200,000 a year, roughly three to four times a typical electrician's salary. The game's labor effects and crew mechanics reflect how real this bottleneck has become.",
+    "realAnchor": "Electrician labor shortage and elevated wages in data center construction markets",
+    "sourceUrl": "https://www.databank.com/resources/news/trade-jobs-more-lucrative-than-ever-as-data-centers-are-paying-electricians-enormous-salaries/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "tax-check",
+    "title": "The property tax check",
+    "body": "A real state industrial property tax exemption can cover up to 80 percent of new investment for up to ten years, with even larger exemptions for the biggest projects, but it requires state board and sometimes gubernatorial approval and is not automatic. Developers have to apply for it like any other permit, and it can be denied or scaled back.",
+    "realAnchor": "Louisiana Industrial Tax Exemption Program (ITEP) for large capital projects",
+    "sourceUrl": "https://www.opportunitylouisiana.gov/incentive/industrial-tax-exemption",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "equipment-rebate-law",
+    "title": "The equipment rebate law",
+    "body": "A real 2024 state law created a sales and use tax rebate on data center equipment and construction spending, covering half of the tax paid, for projects that meet minimum job and investment thresholds. The rebate runs for decades once approved. The game's capital stack assumes a similar one-time break is available if the player qualifies.",
+    "realAnchor": "Louisiana House Bill 827 (2024), the data center sales and use tax rebate",
+    "sourceUrl": "https://www.datacenterdynamics.com/en/news/louisiana-introduces-data-center-tax-breaks/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "water-registration",
+    "title": "Why water is a registration, not a permit",
+    "body": "In the real state this campaign is modeled on, a data center that wants to pump groundwater only has to register its wells and estimated usage with a state agency; it does not need an ongoing permit or usage cap unless regulators declare an emergency for that aquifer. That light-touch rule is a real source of local concern, and is why the game treats water as a one-time registration rather than a recurring fight.",
+    "realAnchor": "Louisiana's groundwater well registration rule for large industrial users",
+    "sourceUrl": "https://tulanewater.org/wp-content/uploads/2026/09/Issue-Brief-Louisiana-Data-Centers-and-Water-Management-FINAL.pdf",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "s-and-p-outlook",
+    "title": "What the rating agencies are watching",
+    "body": "A major credit rating agency has described the data center sector's outlook as broadly positive but increasingly exposed to permitting fights, grid bottlenecks, and local pushback that can delay projects enough to hurt a deal's credit quality. Separately, one large AI cloud company's debt insurance costs have spiked to levels considered financially distressed, a reminder that not every tenant in this boom is equally creditworthy.",
+    "realAnchor": "S&P Global Ratings' 2026 digital infrastructure credit outlook, and elevated CoreWeave CDS spreads",
+    "sourceUrl": "https://press.spglobal.com/2026-10-23-S-P-Global-Ratings-launches-interactive-North-America-data-center-dashboard",
+    "verifiedOn": "2026-11-06",
+    "needsVerification": true
+  },
+  {
+    "id": "build-to-suit-lease",
+    "title": "What build-to-suit really means here",
+    "body": "In this industry, a build-to-suit lease is signed before the building exists, locking in a tenant's specifications and often a residual value guarantee, long before a shovel hits dirt. That is very different from leasing an existing building, and it is why so much of the risk in this game happens before delivery day.",
+    "realAnchor": "Build-to-suit hyperscaler data center lease structures",
+    "sourceUrl": "https://www.cliffordchance.com/content/dam/cliffordchance/briefings/2026/07/The%20Data%20Center%20Lease%20Is%20the%20Bond.pdf",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "dsu-insurance",
+    "title": "Delay insurance at campus scale",
+    "body": "On real campuses this size, delay-in-start-up insurance limits can run from several hundred million to over a billion dollars, because a single storm or fire that pushes back delivery can cost more in lost rent and debt service than the physical repair itself. It has become one of the most expensive and contested parts of insuring a project like this.",
+    "realAnchor": "Delay-in-start-up (DSU) insurance limits on large data center campuses",
+    "sourceUrl": "https://hotalinginsurance.com/construction/data-center-construction-insurance-costs-what-developers-and-contractors-should-expect-in-2026",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "builders-risk",
+    "title": "Builder's risk, in the real world",
+    "body": "Builder's risk insurance covers physical damage to a project while it's under construction, like storm or fire damage to a half-built hall, but it does not cover the lost rent that follows. That's why real developers buy it alongside delay-in-start-up coverage, not instead of it, the same pairing the game uses.",
+    "realAnchor": "Builder's risk coverage as distinct from delay-in-start-up coverage in data center construction",
+    "sourceUrl": "https://www.marsh.com/en/industries/technology/insights/data-center-planning.html",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "crefc-rating-framework",
+    "title": "How rating agencies actually grade these deals",
+    "body": "Rating agencies mostly adapted their existing large-loan commercial mortgage frameworks to data centers, before some began publishing dedicated data center asset-backed securities methodologies. The market for rating these deals is still young and evolving fast, which is part of why the game's conversion and takeout tests are deliberately strict.",
+    "realAnchor": "Rating agency methodologies for data center CMBS and asset-backed securities",
+    "sourceUrl": "https://www.crefc.org/common/Uploaded%20files/Learn/DataCenters-eprimer-2026.02.25.pdf",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "gb200-rack",
+    "title": "The rack that changed cooling",
+    "body": "A real flagship AI server rack from a major chipmaker draws around 120 kilowatts, roughly ten times a typical air-cooled rack from a few years earlier, and needs direct liquid cooling to every chip just to run. That jump in power density is why the game treats liquid cooling as a separate, bigger decision than ordinary air cooling.",
+    "realAnchor": "Nvidia GB200 NVL72 rack power draw and liquid cooling requirements",
+    "sourceUrl": "https://www.spheron.network/blog/nvidia-gb200-nvl72-guide/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "server-depreciation",
+    "title": "The depreciation debate behind 'chip generation' events",
+    "body": "Large cloud companies have stretched how long they say their servers and chips last on the books, from three or four years to five or six, which lowers reported depreciation and raises reported profit. Critics argue the real useful life, especially for the newest AI chips, is much shorter. The game's chip generation event is a nod to that real tension between accounting life and actual obsolescence.",
+    "realAnchor": "Hyperscaler extensions of server and GPU useful-life assumptions for depreciation",
+    "sourceUrl": "https://wiresift.com/ai-server-depreciation",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "scope-creep",
+    "title": "Why guaranteed maximum price isn't a guarantee against everything",
+    "body": "Even under a guaranteed maximum price contract, undocumented scope changes, like a mid-project switch in cooling strategy, are a leading real-world cause of budget blowouts, because the original price was never built to cover them. Disputes over whose fault a given change was can average hundreds of thousands of dollars per project. The game's overrun event and GC choice are built around this exact failure mode.",
+    "realAnchor": "Scope creep and change-order disputes as a primary cause of GMP construction overruns",
+    "sourceUrl": "https://www.swktech.com/data-center-construction-budgets/",
+    "verifiedOn": "2026-11-06"
+  }
+]

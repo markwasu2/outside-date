@@ -1,0 +1,35 @@
+{
+  "id": "whale",
+  "halls": 4,
+  "hallMwIT": 25,
+  "maxMonths": 60,
+  "introText": "The Whale wants a four-hall campus in Richfield County, and it wants it before its outside date. You have land to option, permits to chase, a docket to win, power to line up, and a capital stack to close before the first shovel touches dirt.",
+  "castIds": [
+    "governor",
+    "utility_ceo",
+    "commissioner_friendly",
+    "commissioner_skeptical",
+    "ratepayer_lawyer",
+    "lenders_engineer",
+    "gc_foreman",
+    "union_manager",
+    "local_reporter"
+  ],
+  "scriptedEvents": [],
+  "docket": { "enabled": true },
+  "permitsRequired": ["air", "water", "building"],
+  "coachTips": false,
+  "difficulties": {
+    "easy": {
+      "forcedSetup": { "site": "megasite" },
+      "flags": { "siteOptionedAtStart": true },
+      "goodwillOverrides": { "commission": 15, "tenant": 10 }
+    },
+    "normal": {},
+    "hard": {
+      "forcedSetup": { "site": "farmland" },
+      "goodwillOverrides": { "commission": -15, "tenant": -10 },
+      "eventOddsMultipliers": { "supply_shock": 2 }
+    }
+  }
+}

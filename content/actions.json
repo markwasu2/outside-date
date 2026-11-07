@@ -1,0 +1,219 @@
+[
+  {
+    "id": "optionSite",
+    "track": "land",
+    "ap": 1,
+    "cash": "dynamic",
+    "label": "Option the site",
+    "help": "Locks land (cost set by the site choice at setup). Required before the pad stage. One time only.",
+    "handler": "optionSite"
+  },
+  {
+    "id": "fundExtensions",
+    "track": "land",
+    "ap": 1,
+    "cash": 8000000,
+    "label": "Fund road and school extensions",
+    "help": "Town +8. Skip it past month 12 and town takes a one-time -8.",
+    "handler": "fundExtensions"
+  },
+  {
+    "id": "filePermit",
+    "track": "regulation",
+    "ap": 1,
+    "cash": 0,
+    "label": "File a permit",
+    "help": "Starts that permit's decision clock.",
+    "handler": "filePermit",
+    "params": ["permitId"]
+  },
+  {
+    "id": "fileDocket",
+    "track": "regulation",
+    "ap": 1,
+    "cash": 0,
+    "label": "File the power docket",
+    "help": "Opens the power docket for a vote. Needs the interconnection study pending or done.",
+    "handler": "fileDocket",
+    "requires": ["studyPending"]
+  },
+  {
+    "id": "prepTestimony",
+    "track": "regulation",
+    "ap": 1,
+    "cash": 0,
+    "label": "Prepare testimony",
+    "help": "Raises the vote odds, up to a cap. Two months in a row costs commission -1.",
+    "handler": "prepTestimony",
+    "requires": ["docketOpen"]
+  },
+  {
+    "id": "answerDiscovery",
+    "track": "regulation",
+    "ap": 1,
+    "cash": 0,
+    "label": "Answer discovery",
+    "help": "Clears an outstanding discovery request before it slips the vote.",
+    "handler": "answerDiscovery",
+    "requires": ["docketOpen"]
+  },
+  {
+    "id": "meetIntervenor",
+    "track": "regulation",
+    "ap": 1,
+    "cash": 0,
+    "label": "Meet an intervenor",
+    "help": "Progress toward settling with one intervenor.",
+    "handler": "meetIntervenor",
+    "params": ["intervenorId"],
+    "requires": ["docketOpen"]
+  },
+  {
+    "id": "commissionStudy",
+    "track": "power",
+    "ap": 1,
+    "cash": 2000000,
+    "label": "Commission the interconnection study",
+    "help": "Starts the study clock that gates the docket filing.",
+    "handler": "commissionStudy"
+  },
+  {
+    "id": "orderTransformer",
+    "track": "power",
+    "ap": 1,
+    "cash": "dynamic",
+    "label": "Order the transformer",
+    "help": "Long lead time. Order it early.",
+    "handler": "orderLongLead",
+    "params": ["transformer"]
+  },
+  {
+    "id": "orderSwitchgear",
+    "track": "power",
+    "ap": 1,
+    "cash": "dynamic",
+    "label": "Order the switchgear",
+    "help": "Long lead time. Order it early.",
+    "handler": "orderLongLead",
+    "params": ["switchgear"]
+  },
+  {
+    "id": "cancelOrder",
+    "track": "power",
+    "ap": 0,
+    "cash": 0,
+    "label": "Cancel an order",
+    "help": "Refunds the deposit minus a cancellation fee.",
+    "handler": "cancelOrder",
+    "params": ["kind"],
+    "requires": ["orderPending"]
+  },
+  {
+    "id": "buyInsurance",
+    "track": "money",
+    "ap": 1,
+    "cash": 0,
+    "label": "Adjust insurance",
+    "help": "Turns builder's risk or delay-in-start-up cover on or off.",
+    "handler": "setInsurance",
+    "params": ["kind", "on"]
+  },
+  {
+    "id": "cureDraw",
+    "track": "money",
+    "ap": 1,
+    "cash": 0,
+    "label": "Cure a draw freeze",
+    "help": "Ends an active draw freeze so construction draws resume.",
+    "handler": "cureDraw",
+    "requires": ["flag:drawFrozen"]
+  },
+  {
+    "id": "priceTakeout",
+    "track": "money",
+    "ap": 1,
+    "cash": 0,
+    "label": "Price the takeout",
+    "help": "Runs the refinance and rating scene. Only once the takeout window is open.",
+    "handler": "priceTakeout"
+  },
+  {
+    "id": "confirmRackSchedule",
+    "track": "chips",
+    "ap": 0,
+    "cash": 0,
+    "label": "Confirm the rack schedule",
+    "help": "Reveals rack arrival windows on the ledger. One time only.",
+    "handler": "confirmRackSchedule"
+  },
+  {
+    "id": "readyLiquid",
+    "track": "chips",
+    "ap": 1,
+    "cash": "dynamic",
+    "label": "Ready liquid cooling",
+    "help": "Gets a hall ready for liquid-cooled racks (cost depends on tier).",
+    "handler": "readyLiquid",
+    "params": ["hallId"]
+  },
+  {
+    "id": "delaySwap",
+    "track": "chips",
+    "ap": 1,
+    "cash": 0,
+    "label": "Ask for a delay swap",
+    "help": "Asks the tenant to slide one hall's delivery and outside dates.",
+    "handler": "delaySwap",
+    "params": ["hallId"],
+    "requires": ["flag:rackScheduleConfirmed"]
+  },
+  {
+    "id": "advanceHall",
+    "track": "construction",
+    "ap": 1,
+    "cash": 0,
+    "label": "Advance construction",
+    "help": "Starts the next construction stage on a hall. Cost flows through draws.",
+    "handler": "advanceHall",
+    "params": ["hallId"]
+  },
+  {
+    "id": "importCrews",
+    "track": "construction",
+    "ap": 1,
+    "cash": 4000000,
+    "label": "Import crews",
+    "help": "Prevents a labor shortfall from slowing fitout, for 6 months.",
+    "handler": "importCrews"
+  },
+  {
+    "id": "standDown",
+    "track": "construction",
+    "ap": 0,
+    "cash": 0,
+    "label": "Stand down a hall",
+    "help": "Pauses one hall this month to save cash. Resumes free next month.",
+    "handler": "standDown",
+    "params": ["hallId"]
+  },
+  {
+    "id": "fixInspection",
+    "track": "construction",
+    "ap": 1,
+    "cash": 500000,
+    "label": "Fix an inspection",
+    "help": "Clears a failed inspection so the hall can resume.",
+    "handler": "fixInspection",
+    "params": ["hallId"]
+  },
+  {
+    "id": "visitCast",
+    "track": "any",
+    "ap": 1,
+    "cash": 0,
+    "label": "Visit a cast member",
+    "help": "+4 goodwill to one group. Once per group every 3 months.",
+    "handler": "visitCast",
+    "params": ["group"]
+  }
+]

@@ -1,0 +1,287 @@
+{
+  "cast": [
+    {
+      "id": "governor",
+      "name": "Governor Eleanor Voss",
+      "role": "Governor of Arcadia",
+      "goodwillGroup": "town",
+      "portrait": "governor",
+      "lines": {
+        "greeting": [
+          "Arcadia needs jobs. Let's see what you're building.",
+          "Good to see you. How's the site coming along?",
+          "I hear Millbrook's talking about you."
+        ],
+        "happy": [
+          "This is the kind of project Arcadia needs more of.",
+          "Good news travels fast. Nice work out there.",
+          "You're making this county proud."
+        ],
+        "worried": [
+          "I'm hearing some grumbling from Millbrook. Keep an eye on it.",
+          "A project this size can't afford a stumble right now.",
+          "Let's not let the timeline slip too far."
+        ],
+        "angry": [
+          "This isn't the project I was promised.",
+          "My office has taken calls about this. Fix it.",
+          "I can't keep defending delays I don't understand."
+        ]
+      }
+    },
+    {
+      "id": "utility_ceo",
+      "name": "Priya Natarajan",
+      "role": "CEO, Arcadia Public Power",
+      "goodwillGroup": "utility",
+      "portrait": "utility_ceo",
+      "lines": {
+        "greeting": [
+          "Let's talk megawatts.",
+          "Our grid planners have been asking about your load.",
+          "Good timing. I was just reviewing your interconnection file."
+        ],
+        "happy": [
+          "Your plant commitments are keeping our numbers honest.",
+          "This is a clean partnership. Let's keep it that way.",
+          "Our engineers like working with you."
+        ],
+        "worried": [
+          "A plant slip is not just your problem. It's ours too.",
+          "Unused capacity on our books makes the regulators nervous.",
+          "We need a firmer answer on your minimum charge."
+        ],
+        "angry": [
+          "You asked for power you aren't using. That costs us.",
+          "Our board is asking why your draw never matched your ask.",
+          "This relationship needs to be rebuilt."
+        ]
+      }
+    },
+    {
+      "id": "commissioner_friendly",
+      "name": "Commissioner Hank Odell",
+      "role": "Arcadia Utility Commission",
+      "goodwillGroup": "commission",
+      "portrait": "commissioner_friendly",
+      "lines": {
+        "greeting": [
+          "Good to see a well-prepared filing for once.",
+          "Walk me through your testimony.",
+          "The docket's quiet this week. Let's keep it that way."
+        ],
+        "happy": [
+          "This is a clean record. Nice work.",
+          "I'll be glad to put my name behind this vote.",
+          "You've answered every question we've asked. That matters."
+        ],
+        "worried": [
+          "The intervenors are circling. Settle what you can.",
+          "A messy record makes this a harder vote.",
+          "I need testimony, not promises."
+        ],
+        "angry": [
+          "This filing is a mess. I can't support it as is.",
+          "You're asking me to vote on incomplete information.",
+          "Come back when you've done the work."
+        ]
+      }
+    },
+    {
+      "id": "commissioner_skeptical",
+      "name": "Commissioner Dana Kwambai",
+      "role": "Arcadia Utility Commission",
+      "goodwillGroup": "commission",
+      "portrait": "commissioner_skeptical",
+      "lines": {
+        "greeting": [
+          "I've read your filing twice. Let's talk about page twelve.",
+          "I don't vote on vibes. Show me numbers.",
+          "Another data center. Convince me this one's different."
+        ],
+        "happy": [
+          "You answered my concerns directly. I respect that.",
+          "This is a better record than most that cross my desk.",
+          "Fine. You've earned a fair hearing."
+        ],
+        "worried": [
+          "Ratepayers will ask who pays if this goes sideways.",
+          "I'm not comfortable with how thin this testimony is.",
+          "This needs more than a promise to settle."
+        ],
+        "angry": [
+          "I warned you about discovery. Now it's cost you a vote.",
+          "This is exactly the kind of filing I vote against.",
+          "Don't bring me half an answer again."
+        ]
+      }
+    },
+    {
+      "id": "ratepayer_lawyer",
+      "name": "Lucia Byrne",
+      "role": "Counsel, Millbrook Ratepayers Alliance",
+      "goodwillGroup": "commission",
+      "portrait": "ratepayer_lawyer",
+      "lines": {
+        "greeting": [
+          "My clients want to know who pays if your plant sits idle.",
+          "I filed a discovery request. I expect a real answer.",
+          "Let's talk about who's holding the risk here."
+        ],
+        "happy": [
+          "You answered fair. I can settle on this record.",
+          "This is a reasonable allocation of risk. We're done here.",
+          "Appreciate the straight answer."
+        ],
+        "worried": [
+          "That discovery request isn't going to wait forever.",
+          "My clients are asking harder questions this month.",
+          "I'm not ready to settle yet."
+        ],
+        "angry": [
+          "You ignored a discovery deadline. That's on the record now.",
+          "My clients will not carry your stranded capacity.",
+          "We're taking this to a vote, not a settlement."
+        ]
+      }
+    },
+    {
+      "id": "lenders_engineer",
+      "name": "Marcus Teale",
+      "role": "Independent engineer, senior lender",
+      "goodwillGroup": "utility",
+      "portrait": "lenders_engineer",
+      "lines": {
+        "greeting": [
+          "Let's walk the site before I sign off on this draw.",
+          "Your schedule looks tight. Let's talk about it.",
+          "The lender wants my honest read, so here it is."
+        ],
+        "happy": [
+          "Progress matches the draw request. Easy sign-off.",
+          "This is a well-run job site.",
+          "No notes. Keep going."
+        ],
+        "worried": [
+          "Your builder's risk coverage better be current.",
+          "I'm seeing more pause days than I'd like.",
+          "The lender is watching this draw closely."
+        ],
+        "angry": [
+          "I can't certify this draw as submitted.",
+          "This gap between plan and progress is a problem.",
+          "The lender is going to ask hard questions about this."
+        ]
+      }
+    },
+    {
+      "id": "gc_foreman",
+      "name": "Foreman Ruth Calder",
+      "role": "General contractor's site foreman",
+      "goodwillGroup": "town",
+      "portrait": "gc_foreman",
+      "lines": {
+        "greeting": [
+          "Crew's on site. What do you need from me?",
+          "Pad's looking good. Steel's next.",
+          "Let's talk schedule."
+        ],
+        "happy": [
+          "Crew's ahead of plan. Nice change of pace.",
+          "This is as clean a job as I've run.",
+          "Tell the owner the crew appreciates it."
+        ],
+        "worried": [
+          "We're short-handed in fitout. That's going to show.",
+          "Weather's been rough. We're behind a bit.",
+          "I need a decision on the inspection fail soon."
+        ],
+        "angry": [
+          "We've been paused too many times. Crews are leaving.",
+          "I can't build what I don't have parts for.",
+          "This schedule isn't realistic anymore."
+        ]
+      }
+    },
+    {
+      "id": "union_manager",
+      "name": "Business Manager Ovidio Reyes",
+      "role": "Richfield County trades council",
+      "goodwillGroup": "town",
+      "portrait": "union_manager",
+      "lines": {
+        "greeting": [
+          "My members are counting on this job running steady.",
+          "Let's talk about the labor agreement.",
+          "Good crews are hard to hold onto. Keep that in mind."
+        ],
+        "happy": [
+          "Steady work, fair terms. My members are glad to be here.",
+          "This project's a good example for the county.",
+          "Appreciate you signing the agreement."
+        ],
+        "worried": [
+          "I'm hearing about crew shortages. That worries me.",
+          "Members need certainty, not stop and go.",
+          "Without more hands, fitout is going to drag."
+        ],
+        "angry": [
+          "You let this shortage run too long.",
+          "My members deserve better planning than this.",
+          "This is exactly what the agreement was supposed to prevent."
+        ]
+      }
+    },
+    {
+      "id": "local_reporter",
+      "name": "Sam Okafor",
+      "role": "Reporter, the Millbrook Clarion",
+      "goodwillGroup": "town",
+      "portrait": "local_reporter",
+      "lines": {
+        "greeting": [
+          "Got a few minutes? Readers want to know what's going up.",
+          "I'm working on a story about the campus. Care to comment?",
+          "Millbrook's talking about you. Want to get ahead of it?"
+        ],
+        "happy": [
+          "Good story to write, for once. Thanks for the access.",
+          "This profile is going to read well for you.",
+          "Nice to cover good news out here."
+        ],
+        "worried": [
+          "I'm getting questions I don't have good answers to.",
+          "This story could go either way. Help me get it right.",
+          "People are noticing the delays."
+        ],
+        "angry": [
+          "That subpoena story wrote itself. Not a good look.",
+          "I can't spin what the record shows.",
+          "Readers remember stories like this."
+        ]
+      }
+    }
+  ],
+  "intervenors": [
+    {
+      "id": "riverkeepers",
+      "name": "Riverkeepers of Arcadia",
+      "type": "environmental"
+    },
+    {
+      "id": "industrial_energy_users",
+      "name": "Arcadia Industrial Energy Users",
+      "type": "industrial customers"
+    },
+    {
+      "id": "commission_staff",
+      "name": "Commission Staff",
+      "type": "regulatory staff"
+    },
+    {
+      "id": "ratepayers_alliance",
+      "name": "Millbrook Ratepayers Alliance",
+      "type": "ratepayer advocacy"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "tutorial-edge5",
+  "halls": 1,
+  "hallMwIT": 5,
+  "maxMonths": 20,
+  "introText": "Call this the practice campus: one small hall, a tight clock, and every lesson the Whale campaign will later charge you full price for.",
+  "castIds": ["utility_ceo", "lenders_engineer", "gc_foreman"],
+  "scriptedEvents": [{ "cardId": "storm", "month": 7 }],
+  "scriptedEffects": [
+    { "month": 5, "effects": [{ "type": "orderSlip", "args": ["switchgear", 2] }] }
+  ],
+  "docket": { "enabled": false },
+  "permitsRequired": ["building"],
+  "skipTransformerOrder": true,
+  "tuningOverrides": {
+    "power": { "interimGridMW": 8 }
+  },
+  "lease": {
+    "firstDeliveryMonth": 14,
+    "outsideDateMonths": 4,
+    "lateRemedy": "liquidatedDamages"
+  },
+  "capital": {
+    "seniorLtc": 0.65,
+    "playerEquityCash": 8000000
+  },
+  "coachTips": true
+}
