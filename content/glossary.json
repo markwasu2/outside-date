@@ -1,5 +1,5 @@
 [
-  { "id": "build-to-suit", "term": "build-to-suit", "definition": "A building constructed to one tenant's specifications, under a lease signed before it is finished." },
+  { "id": "build-to-suit", "term": "build-to-suit", "definition": "A building constructed to one tenant's specifications, under a lease signed before it is finished.", "codexId": "build-to-suit-lease" },
   { "id": "delivery-date", "term": "delivery date", "definition": "The date you promised to hand a finished hall over to the tenant, ready for service." },
   { "id": "outside-date", "term": "outside date", "definition": "The last possible date to deliver before the tenant can walk away from that hall." },
   { "id": "liquidated-damages", "term": "liquidated damages", "definition": "A pre-agreed daily cash penalty you owe the tenant for every day a hall is late." },
@@ -11,8 +11,8 @@
   { "id": "discovery", "term": "discovery", "definition": "A formal request for documents or answers from you during a regulatory case." },
   { "id": "testimony", "term": "testimony", "definition": "Written or spoken evidence you file to support your case before a vote." },
   { "id": "interconnection-study", "term": "interconnection study", "definition": "The utility's engineering review of how your campus will connect to and affect the grid." },
-  { "id": "transformer", "term": "transformer", "definition": "A large piece of electrical equipment that steps power up or down; it can take years to build and ship." },
-  { "id": "switchgear", "term": "switchgear", "definition": "Equipment that switches and protects electrical circuits; another long-lead item you have to order early." },
+  { "id": "transformer", "term": "transformer", "definition": "A large piece of electrical equipment that steps power up or down; it can take years to build and ship.", "codexId": "transformer-lead-times" },
+  { "id": "switchgear", "term": "switchgear", "definition": "Equipment that switches and protects electrical circuits; another long-lead item you have to order early.", "codexId": "switchgear-lead-times" },
   { "id": "substation", "term": "substation", "definition": "The site facility that steps down grid power to a voltage your halls can use." },
   { "id": "minimum-monthly-charge", "term": "minimum monthly charge", "definition": "A fee you pay the utility for power capacity you reserved but are not yet using." },
   { "id": "pue", "term": "PUE", "definition": "Power usage effectiveness: total site power divided by power that reaches the computers. Lower is more efficient." },
@@ -29,15 +29,15 @@
   { "id": "draw", "term": "draw", "definition": "A request to pull funds from a committed loan or equity source to pay that month's bills." },
   { "id": "capitalized-interest", "term": "capitalized interest", "definition": "Loan interest added to the loan balance during construction instead of paid in cash." },
   { "id": "covenant", "term": "covenant", "definition": "A rule in a loan agreement that you must keep meeting or risk default." },
-  { "id": "dscr", "term": "DSCR", "definition": "Debt service coverage ratio: income divided by debt payments owed. Higher means more cushion." },
+  { "id": "dscr", "term": "DSCR", "definition": "Debt service coverage ratio: income divided by debt payments owed. Higher means more cushion.", "codexId": "the-bond" },
   { "id": "conversion", "term": "conversion", "definition": "The test a construction loan must pass to convert to cheaper, permanent financing." },
   { "id": "step-up", "term": "step-up", "definition": "A higher interest rate charged after a loan fails its conversion test." },
   { "id": "takeout", "term": "takeout", "definition": "Refinancing the construction loan with permanent debt once the project is stable." },
   { "id": "cap-rate", "term": "cap rate", "definition": "Capitalization rate: a property's yearly income divided by its value. Lower cap rate means higher value." },
   { "id": "noi", "term": "NOI", "definition": "Net operating income: rent collected minus the landlord's operating costs." },
   { "id": "equity-multiple", "term": "equity multiple", "definition": "What you get back divided by what you put in, in equity." },
-  { "id": "builders-risk", "term": "builder's risk", "definition": "Insurance that covers physical damage to a project while it is under construction." },
-  { "id": "dsu", "term": "delay in start-up (DSU)", "definition": "Insurance that covers lost income and extra costs caused by an insured construction delay." },
+  { "id": "builders-risk", "term": "builder's risk", "definition": "Insurance that covers physical damage to a project while it is under construction.", "codexId": "builders-risk" },
+  { "id": "dsu", "term": "delay in start-up (DSU)", "definition": "Insurance that covers lost income and extra costs caused by an insured construction delay.", "codexId": "dsu-insurance" },
   { "id": "deductible", "term": "deductible", "definition": "The amount you pay out of pocket on an insurance claim before coverage kicks in." },
   { "id": "gmp", "term": "GMP", "definition": "Guaranteed maximum price: a contract where the builder absorbs cost overruns past an agreed cap." },
   { "id": "cost-plus", "term": "cost-plus", "definition": "A contract where you pay the builder's actual costs plus a fee, overruns included." },
@@ -46,5 +46,5 @@
   { "id": "rack", "term": "rack", "definition": "A standardized frame holding rows of computing equipment." },
   { "id": "hyperscaler", "term": "hyperscaler", "definition": "A company that runs cloud or AI computing at a massive, global scale." },
   { "id": "dark-value", "term": "dark value", "definition": "The reduced value assigned to a hall that is unfinished or sitting empty at sale time." },
-  { "id": "rating-agency", "term": "rating agency", "definition": "A firm that grades how likely a loan or bond is to be repaid." }
+  { "id": "rating-agency", "term": "rating agency", "definition": "A firm that grades how likely a loan or bond is to be repaid.", "codexId": "crefc-rating-framework" }
 ]

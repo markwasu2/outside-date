@@ -291,6 +291,9 @@ export const GlossaryEntrySchema = z.object({
   id: z.string(),
   term: z.string(),
   definition: z.string().max(220),
+  // P9.4: optional link to a codex.json entry id, for <Term>'s "more" link. Not every term has
+  // a matching codex entry - absent means no link.
+  codexId: z.string().optional(),
 });
 export type GlossaryEntry = z.infer<typeof GlossaryEntrySchema>;
 export const GlossaryFileSchema = z.array(GlossaryEntrySchema);

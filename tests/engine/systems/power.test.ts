@@ -7,7 +7,9 @@ import { step } from '../../../src/engine/step';
 import { chance } from '../../../src/engine/rng';
 import type { GameState, MinChargeLevel, Setup } from '../../../src/engine/types';
 
-const content = loadContent();
+// events: [] so drawEvent never fires here; this file hand-computes exact study/order/energize
+// timing assertions that assume no event card interrupts a month (covered by events.test.ts).
+const content = { ...loadContent(), events: [] };
 const negotiation: NegotiationChoices = {
   lease: { firstDeliveryMonth: 38, lateRemedy: 'liquidatedDamages' },
   capital: { seniorIndex: 0, mezzIndex: 0, playerShareIndex: 0 },
@@ -16,8 +18,12 @@ const negotiation: NegotiationChoices = {
 };
 const setup: Setup = { site: 'megasite', hallTier: 'air', cooling: 'evaporative', gc: 'costPlus' };
 
+// Padded cash: this file's long runMonths sequences (up to 36 months) are testing power
+// system timing, not money/lose mechanics (covered by money.test.ts/loseCheck.test.ts); the
+// default starting cash is consumed by burn+insurance premiums well before then, which would
+// trip loseCheck's real `default` (cash < 0) lose condition.
 function freshState(seed = 1): GameState {
-  return createGame(content, 'whale', setup, negotiation, seed);
+  return { ...createGame(content, 'whale', setup, negotiation, seed), cash: 1_000_000_000 };
 }
 
 function runMonths(state: GameState, n: number): GameState {

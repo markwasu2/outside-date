@@ -7,7 +7,11 @@ import { step, resolveEvent } from '../../../src/engine/step';
 import { chance, createRng } from '../../../src/engine/rng';
 import type { GameState, Setup } from '../../../src/engine/types';
 
-const content = loadContent();
+// events: [] so drawEvent never fires here; this file hand-computes exact decision/vote timing
+// assertions that assume no event card interrupts a month (events are covered by events.test.ts).
+// The docketVoteFail choice flow is synthesized by regulation.ts itself, not content.events, so
+// it's unaffected by this override.
+const content = { ...loadContent(), events: [] };
 const negotiation: NegotiationChoices = {
   lease: { firstDeliveryMonth: 38, lateRemedy: 'liquidatedDamages' },
   capital: { seniorIndex: 0, mezzIndex: 0, playerShareIndex: 0 },
@@ -208,7 +212,9 @@ describe('regulation: the power docket', () => {
     const after = step(state, [], content).state;
     expect(after.docket.status).toBe('dead');
     expect(after.docket.failCount).toBe(2);
-    expect(after.phase).toBe('playing');
+    // loseCheck.tick (P3.9) ends the run here: a dead docket is itself a lose condition (4.14).
+    expect(after.phase).toBe('ended');
+    expect(after.outcome).toEqual({ kind: 'lose', reason: 'docketDead' });
   });
 
   it('appeal: reopens the docket, pushes voteMonth out by appealMonths, and adds the appeal bonus', () => {

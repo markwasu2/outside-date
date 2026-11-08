@@ -1,6 +1,8 @@
 import type { Content } from '../content/schemas';
+import type { Effect } from '../content/schemas';
 import type { GameState, LogEntry, PlannedAction } from './types';
 import { applyAction } from './actions';
+import { applyEffect } from './effects';
 import { ledger, dscr, runway } from './selectors';
 import { drawEvent, resolveChoice } from './systems/events';
 import { tick as powerTick } from './systems/power';
@@ -41,6 +43,43 @@ export function validateActions(state: GameState, actions: PlannedAction[], cont
   return apCost;
 }
 
+/** A one-line log description for a scenario-scripted effect, so the player (and any coach tip
+ * keyed off it, e.g. P8.1's "late switchgear" tip) has a visible signal that it happened. Only
+ * `orderSlip` is used by any scenario's `scriptedEffects` today; other effect types fall back to
+ * a generic description rather than going unlogged. */
+function describeScriptedEffect(effect: Effect): string {
+  if (effect.type === 'orderSlip') {
+    const [kind, months] = effect.args;
+    return `${String(kind)} order slipped ${String(months)} months.`;
+  }
+  return `Scripted effect: ${effect.type}.`;
+}
+
+/**
+ * A scenario's own `scriptedEffects` (e.g. tutorial-edge5's month-5 switchgear slip) are
+ * silent, no-choice effects - not event cards - so they're applied directly here rather than
+ * through `drawEvent`'s card machinery. Tracked in `scriptedDone` by a synthetic
+ * `scenarioEffect:<month>:<index>` id (distinct from any content card id) so each entry fires
+ * exactly once even if `step()` is ever called again for the same month.
+ */
+function applyScenarioScriptedEffects(state: GameState, content: Content): GameState {
+  const entries = content.scenarios[state.scenarioId]?.scriptedEffects ?? [];
+  let next = state;
+  entries.forEach((entry, i) => {
+    const id = `scenarioEffect:${entry.month}:${i}`;
+    if (next.month !== entry.month || next.scriptedDone.includes(id)) return;
+    for (const effect of entry.effects) {
+      next = applyEffect(next, effect, content);
+      next = {
+        ...next,
+        log: [...next.log, { month: next.month, kind: 'event', text: describeScriptedEffect(effect) }],
+      };
+    }
+    next = { ...next, scriptedDone: [...next.scriptedDone, id] };
+  });
+  return next;
+}
+
 /**
  * Advances the game by one month (PLAN.md 4.2): validate and apply the action plan, draw the
  * monthly event (stopping early if it needs a choice), then run the world tick (4.3).
@@ -60,13 +99,14 @@ export function step(
   for (const action of actions) {
     next = applyAction(next, action, content);
   }
+  next = applyScenarioScriptedEffects(next, content);
 
-  const pending = drawEvent(next, content);
-  if (pending) {
-    return { state: { ...next, phase: 'awaitingChoice', pending }, log: [] };
+  const drawn = drawEvent(next, content);
+  if (drawn.pending) {
+    return { state: drawn.state, log: [] };
   }
 
-  return runWorldTick(next, content);
+  return runWorldTick(drawn.state, content);
 }
 
 /** Applies a pending event's chosen branch (4.2 step 3), then runs the world tick. */
@@ -121,7 +161,16 @@ function runWorldTick(state: GameState, content: Content): { state: GameState; l
   next = loseCheckTick(next, content);
   if (next.phase !== 'playing') return { state: next, log: [] };
 
-  next = { ...next, month: next.month + 1, apUsedThisMonth: 0 };
+  // `owedAp(n)` (P3.7) pre-spends next month's AP budget via `flags.apOwedNextMonth` rather than
+  // a literal reset to 0, since the subpoena/town_hall/governor_visit cards' "comply"/"attend"/
+  // "host" choices cost the player 1 AP the month AFTER the choice, not this one.
+  const apOwed = typeof next.flags.apOwedNextMonth === 'number' ? next.flags.apOwedNextMonth : 0;
+  next = {
+    ...next,
+    month: next.month + 1,
+    apUsedThisMonth: apOwed,
+    flags: { ...next.flags, apOwedNextMonth: 0 },
+  };
 
   if (next.month >= next.maxMonths && next.phase === 'playing') {
     next = { ...next, phase: 'takeoutAvailable' };

@@ -137,10 +137,14 @@ function progressHall(state: GameState, content: Content, hall: Hall): { state: 
   const stageDef = content.tuning.stages.find((s) => s.id === stageId);
   if (!stageDef) throw new Error(`Unknown stage tuning for "${stageId}"`);
 
+  const extraFitout =
+    stageId === 'fitout' && typeof state.flags[`extraFitoutMonths:${hall.id}`] === 'number'
+      ? (state.flags[`extraFitoutMonths:${hall.id}`] as number)
+      : 0;
   const minMonths =
-    stageId === 'pad' && state.setup.site === 'farmland'
+    (stageId === 'pad' && state.setup.site === 'farmland'
       ? stageDef.minMonths + content.tuning.land.farmlandExtraPadMonths
-      : stageDef.minMonths;
+      : stageDef.minMonths) + extraFitout;
   const monthlyCost = Math.round((hall.costBudget * stageDef.costShare) / minMonths);
 
   const funded = tryFundAmount(state, monthlyCost);
@@ -149,7 +153,10 @@ function progressHall(state: GameState, content: Content, hall: Hall): { state: 
     return { state, hall };
   }
 
-  const increment = state.flags.laborShort ? 0.5 : 1;
+  // Derived (P3.7), not a literal flag: true while a `labor_shortfall` event card's effect
+  // (`labor(n)`) has set `laborShortUntilMonth` in the future.
+  const laborShort = typeof state.flags.laborShortUntilMonth === 'number' && state.month < state.flags.laborShortUntilMonth;
+  const increment = laborShort ? 0.5 : 1;
   const stageMonthsDone = hall.stageMonthsDone + increment;
   const costSpent = hall.costSpent + monthlyCost;
 
@@ -298,5 +305,52 @@ export function fundExtensions(
     cash: state.cash - actionDef.cash,
     goodwill: { ...state.goodwill, town: clampGoodwill(state.goodwill.town + 8) },
     flags: { ...state.flags, fundExtensionsDone: true },
+  };
+}
+
+/**
+ * 1 AP, fixed cash cost (operational, not a hard cost, so it bypasses `tryFundAmount`'s
+ * capital-stack waterfall, matching `fundExtensions`'s direct-cash pattern, P3.7 Decisions
+ * log): prevents `labor_shortfall` from drawing for `tuning.crews.importMonths`, and clears
+ * any shortage already in effect.
+ */
+export function importCrews(
+  state: GameState,
+  _params: Record<string, string | number> | undefined,
+  content: Content,
+  actionDef: { cash: number | 'dynamic' },
+): GameState {
+  if (typeof actionDef.cash !== 'number') throw new Error('importCrews expects a fixed cash cost');
+  if (state.cash < actionDef.cash) throw new Error('Insufficient cash to import crews');
+  return {
+    ...state,
+    cash: state.cash - actionDef.cash,
+    flags: {
+      ...state.flags,
+      importCrewsUntil: state.month + content.tuning.crews.importMonths,
+      laborShortUntilMonth: 0,
+    },
+  };
+}
+
+/**
+ * 1 AP, fixed cash cost (same direct-cash pattern as `importCrews`/`fundExtensions`): clears
+ * the `inspection_fail` event card's `hallPause` so the named hall can resume progress.
+ */
+export function fixInspection(
+  state: GameState,
+  params: Record<string, string | number> | undefined,
+  _content: Content,
+  actionDef: { cash: number | 'dynamic' },
+): GameState {
+  const hallId = requireHallId(params);
+  findHall(state, hallId);
+  if (typeof actionDef.cash !== 'number') throw new Error('fixInspection expects a fixed cash cost');
+  if (!state.flags[`inspectionFail:${hallId}`]) throw new Error(`Hall ${hallId} has no failed inspection to fix`);
+  if (state.cash < actionDef.cash) throw new Error('Insufficient cash to fix the inspection');
+  return {
+    ...state,
+    cash: state.cash - actionDef.cash,
+    flags: { ...state.flags, [`inspectionFail:${hallId}`]: false },
   };
 }

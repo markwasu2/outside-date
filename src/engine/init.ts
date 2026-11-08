@@ -252,5 +252,6 @@ export function createGame(
     permitsRequired,
     docketEnabled: scenario.docket?.enabled ?? true,
     skipTransformerOrder: scenario.skipTransformerOrder ?? false,
+    eventOddsMultipliers: difficulty?.eventOddsMultipliers ?? {},
   };
 }

@@ -7,19 +7,21 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
     "sim": "tsx src/sim/runSim.ts"
   },
   "dependencies": {
+    "immer": "^10.1.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "zustand": "^4.5.4",
     "zod": "^3.23.8",
-    "immer": "^10.1.1"
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@eslint/js": "latest",
+    "@playwright/test": "^1.65.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.4",

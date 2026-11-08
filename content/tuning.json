@@ -1,12 +1,12 @@
 {
-  "campaign": { "maxMonths": 60, "apPerMonth": 3, "startingCash": 40000000, "monthlyBurn": 4000000 },
+  "campaign": { "maxMonths": 60, "apPerMonth": 3, "startingCash": 300000000, "monthlyBurn": 1000000 },
   "campus": { "costPerMwIT": 15000000 },
   "land": { "megasite": 50000000, "farmland": 12000000, "farmlandExtraPadMonths": 4 },
   "stages": [
-    { "id": "pad", "costShare": 0.10, "minMonths": 2 },
-    { "id": "steel", "costShare": 0.25, "minMonths": 4 },
-    { "id": "shell", "costShare": 0.25, "minMonths": 4 },
-    { "id": "fitout", "costShare": 0.30, "minMonths": 5 },
+    { "id": "pad", "costShare": 0.10, "minMonths": 3 },
+    { "id": "steel", "costShare": 0.25, "minMonths": 6 },
+    { "id": "shell", "costShare": 0.25, "minMonths": 6 },
+    { "id": "fitout", "costShare": 0.30, "minMonths": 7 },
     { "id": "rfs", "costShare": 0.10, "minMonths": 2 }
   ],
   "tiers": {
@@ -37,7 +37,7 @@
   },
   "power": {
     "studyCost": 2000000, "studyMonthsMin": 12, "studyMonthsMax": 24,
-    "transformerLeadMonths": 36, "transformerDeposit": 8000000, "transformerBalance": 22000000,
+    "transformerLeadMonths": 24, "transformerDeposit": 8000000, "transformerBalance": 22000000,
     "switchgearLeadMin": 11, "switchgearLeadMax": 20, "switchgearDeposit": 3000000, "switchgearBalance": 9000000,
     "cancelFeeShare": 0.20,
     "substationBuildMonths": 3, "substationCapacityMW": 320, "interimGridMW": 32,

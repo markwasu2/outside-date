@@ -1,0 +1,459 @@
+[
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "confirmRackSchedule"
+      },
+      {
+        "actionId": "optionSite"
+      },
+      {
+        "actionId": "commissionStudy"
+      },
+      {
+        "actionId": "filePermit",
+        "params": {
+          "permitId": "air"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "fileDocket"
+      },
+      {
+        "actionId": "filePermit",
+        "params": {
+          "permitId": "water"
+        }
+      },
+      {
+        "actionId": "filePermit",
+        "params": {
+          "permitId": "building"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H1"
+        }
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H2"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H3"
+        }
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H4"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      },
+      {
+        "actionId": "meetIntervenor",
+        "params": {
+          "intervenorId": "riverkeepers"
+        }
+      },
+      {
+        "actionId": "meetIntervenor",
+        "params": {
+          "intervenorId": "commission_staff"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      },
+      {
+        "actionId": "meetIntervenor",
+        "params": {
+          "intervenorId": "riverkeepers"
+        }
+      },
+      {
+        "actionId": "meetIntervenor",
+        "params": {
+          "intervenorId": "commission_staff"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      },
+      {
+        "actionId": "answerDiscovery"
+      },
+      {
+        "actionId": "meetIntervenor",
+        "params": {
+          "intervenorId": "industrial_energy_users"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      },
+      {
+        "actionId": "meetIntervenor",
+        "params": {
+          "intervenorId": "industrial_energy_users"
+        }
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H1"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      },
+      {
+        "actionId": "answerDiscovery"
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H2"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H3"
+        }
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H4"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      },
+      {
+        "actionId": "answerDiscovery"
+      },
+      {
+        "actionId": "filePermit",
+        "params": {
+          "permitId": "air"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      },
+      {
+        "actionId": "answerDiscovery"
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "prepTestimony"
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H1"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H2"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H3"
+        }
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H4"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H1"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H2"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H3"
+        }
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H4"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H1"
+        }
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H2"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": [
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H3"
+        }
+      },
+      {
+        "actionId": "advanceHall",
+        "params": {
+          "hallId": "H4"
+        }
+      }
+    ]
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  },
+  {
+    "kind": "step",
+    "actions": []
+  }
+]

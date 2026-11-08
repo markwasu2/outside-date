@@ -7,7 +7,9 @@ import { step } from '../../../src/engine/step';
 import { tryFundAmount } from '../../../src/engine/systems/construction';
 import type { GameState, Setup } from '../../../src/engine/types';
 
-const content = loadContent();
+// events: [] so drawEvent never fires here; this file hand-computes exact interest/PIK/burn
+// timing assertions that assume no event card interrupts a month (covered by events.test.ts).
+const content = { ...loadContent(), events: [] };
 const negotiation: NegotiationChoices = {
   lease: { firstDeliveryMonth: 38, lateRemedy: 'liquidatedDamages' },
   capital: { seniorIndex: 0, mezzIndex: 0, playerShareIndex: 0 },

@@ -6,7 +6,9 @@ import { applyAction } from '../../../src/engine/actions';
 import { step } from '../../../src/engine/step';
 import type { GameState, Setup } from '../../../src/engine/types';
 
-const content = loadContent();
+// events: [] so drawEvent never fires here; this file hand-computes exact progress/cost/timing
+// assertions that assume no event card interrupts a month (events are covered by events.test.ts).
+const content = { ...loadContent(), events: [] };
 const negotiation: NegotiationChoices = {
   lease: { firstDeliveryMonth: 38, lateRemedy: 'liquidatedDamages' },
   capital: { seniorIndex: 0, mezzIndex: 0, playerShareIndex: 0 },
@@ -15,8 +17,12 @@ const negotiation: NegotiationChoices = {
 };
 const setup: Setup = { site: 'megasite', hallTier: 'air', cooling: 'evaporative', gc: 'costPlus' };
 
+// Padded cash: this file's long runMonths sequences (up to 17 months) are testing stage
+// gating/timing, not money/lose mechanics (covered by money.test.ts/insurance.test.ts/
+// loseCheck.test.ts); the default starting cash is consumed by burn+insurance premiums well
+// before 17 months, which would trip loseCheck's real `default` (cash < 0) lose condition.
 function freshState(): GameState {
-  return createGame(content, 'whale', setup, negotiation, 11);
+  return { ...createGame(content, 'whale', setup, negotiation, 11), cash: 1_000_000_000 };
 }
 
 function grantPermit(state: GameState, id: 'building' | 'water' | 'air' | 'wetlands'): GameState {
@@ -35,12 +41,16 @@ function runMonths(state: GameState, n: number): GameState {
 }
 
 describe('construction: stage minimums', () => {
-  it("content/tuning.json's stage minMonths sum to 17 (megasite, no extra pad months)", () => {
+  it("content/tuning.json's stage minMonths sum to 24 (megasite, no extra pad months)", () => {
+    // P5.3 balance pass (see Decisions log, 2026-11-08): stretched from the original sum-17
+    // (pad:2/steel:4/shell:4/fitout:5/rfs:2) to sum-24 (pad:3/steel:6/shell:6/fitout:7/rfs:2),
+    // which spreads each hall's cost-share draw over more months and reduced the sudden-cliff
+    // cash-fallback dynamic that was driving near-universal bankruptcy.
     const total = content.tuning.stages.reduce((sum, s) => sum + s.minMonths, 0);
-    expect(total).toBe(17);
+    expect(total).toBe(24);
   });
 
-  it('a hall needs at least 17 active months to reach delivery (megasite)', () => {
+  it('a hall needs at least 24 active months to reach delivery (megasite)', () => {
     let state = freshState();
     state = applyAction(state, { actionId: 'optionSite' }, content);
     state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H1' } }, content); // pad
@@ -66,9 +76,9 @@ describe('construction: stage minimums', () => {
     expect(hall.delivered).toBe(true);
     expect(hall.deliveredMonth).not.toBeNull();
     expect(hall.stageIndex).toBe(5);
-    // 17 active-progress months, each starting with its own advanceHall call (1 AP each),
-    // so at least 17 months of calendar time elapsed to reach delivery.
-    expect(state.month).toBeGreaterThanOrEqual(17);
+    // 24 active-progress months, each starting with its own advanceHall call (1 AP each),
+    // so at least 24 months of calendar time elapsed to reach delivery.
+    expect(state.month).toBeGreaterThanOrEqual(24);
   });
 });
 

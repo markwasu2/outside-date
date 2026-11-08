@@ -222,6 +222,9 @@ export interface GameState {
   permitsRequired: PermitId[];
   docketEnabled: boolean;
   skipTransformerOrder: boolean;
+  // Difficulty-derived per-card odds multipliers (e.g. hard's `supply_shock: 2`), read by
+  // events.ts's cardOdds (see PLAN.md Decisions log, P5.1).
+  eventOddsMultipliers: Record<string, number>;
 }
 
 export interface PlannedAction {

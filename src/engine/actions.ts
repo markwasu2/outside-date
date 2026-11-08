@@ -1,5 +1,5 @@
 import type { ActionDef, Content } from '../content/schemas';
-import type { GameState, PlannedAction } from './types';
+import type { GameState, GoodwillGroup, PlannedAction } from './types';
 import { KNOWN_ACTION_HANDLERS } from '../content/load';
 import {
   optionSite,
@@ -7,6 +7,8 @@ import {
   standDown,
   readyLiquid,
   fundExtensions,
+  importCrews,
+  fixInspection,
 } from './systems/construction';
 import {
   filePermit,
@@ -19,9 +21,7 @@ import { commissionStudy, orderLongLead, cancelOrder } from './systems/power';
 import { cureDraw } from './systems/money';
 import { confirmRackSchedule, delaySwap } from './systems/lease';
 import { setInsurance } from './systems/insurance';
-
-/** Thrown when an action's handler exists in the registry but has no real implementation yet. */
-export class NotImplemented extends Error {}
+import { priceTakeoutAction } from './systems/takeout';
 
 type ActionHandler = (
   state: GameState,
@@ -30,9 +30,37 @@ type ActionHandler = (
   actionDef: ActionDef,
 ) => GameState;
 
-function notImplemented(name: string): ActionHandler {
-  return () => {
-    throw new NotImplemented(`Action handler "${name}" is not implemented yet (Phase 3)`);
+function clampGoodwill(value: number): number {
+  return Math.min(100, Math.max(0, value));
+}
+
+const GOODWILL_GROUPS: GoodwillGroup[] = ['town', 'commission', 'utility', 'tenant'];
+
+/**
+ * 1 AP, free: +4 goodwill to one group, once per group every 3 months. A generic cross-group
+ * action with no natural system-file home (not regulation-specific, not lease-specific, etc.),
+ * so it's implemented directly here rather than delegated to a `systems/*.ts` module (P3.7
+ * Decisions log).
+ */
+function visitCast(
+  state: GameState,
+  params: Record<string, string | number> | undefined,
+  _content: Content,
+): GameState {
+  const group = params?.['group'];
+  if (typeof group !== 'string' || !(GOODWILL_GROUPS as string[]).includes(group)) {
+    throw new Error('This action requires a "group" param of "town", "commission", "utility", or "tenant"');
+  }
+  const flagKey = `visitCastLast:${group}`;
+  const last = state.flags[flagKey];
+  if (typeof last === 'number' && state.month - last < 3) {
+    throw new Error(`Cast visits to "${group}" are on cooldown for ${3 - (state.month - last)} more month(s)`);
+  }
+  const groupKey = group as GoodwillGroup;
+  return {
+    ...state,
+    goodwill: { ...state.goodwill, [groupKey]: clampGoodwill(state.goodwill[groupKey] + 4) },
+    flags: { ...state.flags, [flagKey]: state.month },
   };
 }
 
@@ -55,15 +83,15 @@ export const actionHandlers: Record<(typeof KNOWN_ACTION_HANDLERS)[number], Acti
   cancelOrder,
   setInsurance,
   cureDraw,
-  priceTakeout: notImplemented('priceTakeout'),
+  priceTakeout: priceTakeoutAction,
   confirmRackSchedule,
   readyLiquid,
   delaySwap,
   advanceHall,
-  importCrews: notImplemented('importCrews'),
+  importCrews,
   standDown,
-  fixInspection: notImplemented('fixInspection'),
-  visitCast: notImplemented('visitCast'),
+  fixInspection,
+  visitCast,
 };
 
 /** Looks up an action's content definition and applies its handler. */

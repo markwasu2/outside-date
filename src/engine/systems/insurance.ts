@@ -52,6 +52,24 @@ export function applyStormDamage(state: GameState, content: Content, hallId: str
   return { ...next, flags: { ...next.flags, drawFreeze: true } };
 }
 
+/**
+ * The fitout fire card's mechanic (events.json's `fitout_fire` note): like storm damage but
+ * using `tuning.events.fireDamage`, -2 months of progress (not -1), insuredDelayMonths +2 (not
+ * +1) when builder's risk is in force, and explicitly no draw freeze.
+ */
+export function applyFireDamage(state: GameState, content: Content, hallId: string): GameState {
+  const hall = findHall(state, hallId);
+  const damage = content.tuning.events.fireDamage;
+  const hasBuildersRisk = state.insurance.buildersRisk;
+  const cashCost = hasBuildersRisk ? Math.min(damage, content.tuning.insurance.deductible) : damage;
+
+  return replaceHall({ ...state, cash: state.cash - cashCost }, hallId, {
+    ...hall,
+    stageMonthsDone: Math.max(0, hall.stageMonthsDone - 2),
+    insuredDelayMonths: hasBuildersRisk ? hall.insuredDelayMonths + 2 : hall.insuredDelayMonths,
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Action handler
 // ---------------------------------------------------------------------------
