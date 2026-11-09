@@ -46,3 +46,19 @@ test('event card shows what the policy paid and the deductible', async ({ page }
   await expect(claim).toContainText('Policy paid');
   await expect(claim).toContainText('Deductible you paid');
 });
+
+// UX 12: the DSU choice shows its stakes in setup - an OFF warning box with the uninsured
+// example (LDs, abated rent, outside date), flipping to the ON box when the checkbox is ticked.
+test('wizard: the insurance screen shows what DSU off costs', async ({ page }) => {
+  await startWhaleToForecast(page);
+  await page.getByRole('button', { name: 'Next: Capital stack' }).click();
+  await page.getByRole('button', { name: 'Next: Power' }).click();
+  await page.getByRole('button', { name: 'Next: Insurance' }).click();
+  const off = page.getByTestId('dsu-stakes-off');
+  await expect(off).toBeVisible();
+  await expect(off).toContainText('liquidated damages');
+  await expect(off).toContainText('outside date');
+  await page.getByTestId('dsu-toggle').check();
+  await expect(page.getByTestId('dsu-stakes-on')).toBeVisible();
+  await expect(page.getByTestId('dsu-stakes-off')).toHaveCount(0);
+});

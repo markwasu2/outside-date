@@ -129,6 +129,8 @@ export function SetupWizard() {
       return (
         <InsuranceScreen
           content={wizard.content}
+          scenarioId={scenarioId}
+          setup={setup}
           negotiation={wizard.negotiation}
           onChange={(insurance) => setNegotiation((n) => ({ ...n, insurance }))}
           onBack={() => setStep('power')}

@@ -699,3 +699,32 @@ stays one quiet line. Desktop only.
 | balance grid | skipped: pure refactor + read-only UI; takeout math unchanged (503 vitest incl. perfect-play/state-equality confirm) |
 | full suite green | done: 503 vitest, 43 playwright, eslint, tsc, vite build |
 | screenshot inspected | done: docs/screenshots/ux11/score-panel-desktop-1440.png |
+
+# UX 12 - DSU stakes visible in setup
+
+## The change (UI only)
+
+Queue item: leaving DSU insurance off by default cost one playthrough ~$49.5M,
+and the setup screen showed only a vague checkbox line. The insurance screen
+now spells out the stakes, computed from live tuning + scenario so the numbers
+stay true: the monthly premium, what DSU pays per covered late month (burn,
+LDs at ~$2.3M/month on a 25 MW hall, rent abatement stopped at ~$3.0M/month),
+and a worked 3-month example ($6.8M LDs + $9.0M abated rent). A colored box
+under the checkbox flips with the choice: OFF (amber) warns that every
+uninsured late month is yours and the tenant can walk past the outside date;
+ON (green) states what shifts to the insurer. SetupWizard passes scenarioId and
+setup so the math matches the chosen scenario/tier. Default still off - the
+change is visibility, not the default. Also replaced two legacy em dashes in
+the screen's headings per the no-em-dash rule.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| choice visible with real numbers | done: premium, per-hall LD/rent figures from tuning + scenario |
+| OFF consequence on screen before start | done: amber box with LD + abated rent + outside-date walk risk (screenshot) |
+| ON state also explicit | done: green box, same example shifted to the insurer (screenshot) |
+| e2e | done: new playwright test (off box, flip to on), 44 passed |
+| balance grid | skipped: UI-only, no engine/content-tuning/bot change |
+| full suite green | done: 503 vitest, 44 playwright, eslint, tsc, vite build |
+| screenshots inspected | done: docs/screenshots/ux12/ (off + on, desktop 1440) |
