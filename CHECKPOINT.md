@@ -65,24 +65,24 @@ cliff, not at it. UI-only: no engine, sim, tuning, scenario, or protected-test c
 
 | # | Criterion | Result | Evidence |
 | --- | --- | --- | --- |
-| 1 | D1 popover works for hall, substation, pond, site office, laydown yard | | |
-| 2 | D2 HallSprite per stage with in-stage progress | | |
-| 3 | D3 substation, plants and long-lead crates change visibly | | |
-| 4 | D4 rent ticker, coin animation, spend float, reduced-motion fallback | | |
-| 5 | D5 layout correct for 1, 4 and 6 halls | | |
-| 6 | D6 teaching lines and glossary entries | | |
-| 7 | D7 progress spine and correct "Next step" at month 0 in all three scenarios | | |
-| 8 | D8 warnings fire before the cliff at each threshold, honest fixes, runway bar | | |
-| 9 | D9 purchased parts visibly land on the map | | |
-| 10 | npm run typecheck clean | | |
-| 11 | npm run lint clean | | |
-| 12 | npx vitest run: all pass, no skips, count >= 321 + new | | |
-| 13 | npx playwright test: all pass, count >= 13 + new | | |
-| 14 | npm run build succeeds | | |
-| 15 | Protected-file check prints nothing | | |
-| 16 | Visual check done (screenshots opened, one line each) | | |
-| 17 | No TODO/FIXME/stub/placeholder left in touched files | | |
-| 18 | npx vitest run tests/sim/balance.test.ts passes unchanged | | |
+| 1 | D1 popover works for hall, substation, pond, site office, laydown yard | PASS | e2e/living-board.spec.ts test 1: substation popover opens, queues study, ghost appears, month commits; unit tests/ui/boardActions.test.ts pins per-object lists (hall/substation/pond/site office/laydown) |
+| 2 | D2 HallSprite per stage with in-stage progress | PASS (shell, see log) | tests/ui/hallVisual.test.ts pins stage+progress mapping; shots 02 (shell+popover) and pad-stage board bracket the growth; steel is transient in every reachable bot/tutorial state |
+| 3 | D3 substation, plants and long-lead crates change visibly | PASS | shots 01 (dark dashed substation, plants not started), 05 (energized glow, crates on site), e2e test 1 asserts study status text on the cell |
+| 4 | D4 rent ticker, coin animation, spend float, reduced-motion fallback | PASS | shot 04 rent ticker +$3.7M/mo on delivered H1; e2e test 3 asserts rent-ticker; coin/spend floats via monthDeltas; usePrefersReducedMotion gates all keyframes |
+| 5 | D5 layout correct for 1, 4 and 6 halls | PASS | shots 01 (1 hall), 03 (4 halls), 04 (6 halls, whale bot state) - hallAreaLayout(1..6) |
+| 6 | D6 teaching lines and glossary entries | PASS | shot 02 popover teaching line with build-to-suit Term; glossary.json unchanged (protected test pins length 48 - see Decisions); e2e test 1 asserts popover-teaching |
+| 7 | D7 progress spine and correct "Next step" at month 0 in all three scenarios | PASS | spine on all shots; next-step card correct at month 0 tutorial (study) and whale (study); tests/ui/nextStep.test.ts walks the rule order |
+| 8 | D8 warnings fire before the cliff at each threshold, honest fixes, runway bar | PASS | shot 06 critical runway banner + top drivers + fix buttons + HUD runway bar; shot 04 DSCR critical + runway warning; tests/ui/warnings.test.ts covers thresholds/honest-fixes/crossings |
+| 9 | D9 purchased parts visibly land on the map | PASS | shot 05 laydown popover "transformer - arrived, on site" / crates on site; e2e test 1 asserts queued order crate appears on the yard |
+| 10 | npm run typecheck clean | PASS | npx tsc --noEmit clean (00:35) |
+| 11 | npm run lint clean | PASS | npx eslint on src/ui, e2e, tests/ui clean (00:35) |
+| 12 | npx vitest run: all pass, no skips, count >= 321 + new | PASS | 361 tests, 39 files, 0 skips (was 331 baseline, +30 new in 4 files) |
+| 13 | npx playwright test: all pass, count >= 13 + new | PASS | 20 passed (17 baseline + 3 new living-board specs) |
+| 14 | npm run build succeeds | PASS | npm run build OK, 453 kB bundle (00:36) |
+| 15 | Protected-file check prints nothing | PASS | git diff main --stat on protected paths prints nothing (00:36) |
+| 16 | Visual check done (screenshots opened, one line each) | PASS | 12 PNGs opened, notes in Visual check log |
+| 17 | No TODO/FIXME/stub/placeholder left in touched files | PASS | grep TODO/FIXME/stub/placeholder over touched files: only a pre-existing store.ts comment |
+| 18 | npx vitest run tests/sim/balance.test.ts passes unchanged | PASS | npx vitest run tests/sim/balance.test.ts: 10/10 pass unchanged |
 
 ## Decisions
 
@@ -107,8 +107,15 @@ cliff, not at it. UI-only: no engine, sim, tuning, scenario, or protected-test c
 
 ## NEEDS ENGINE
 
-- (none yet)
+- None.
 
 ## Visual check log
 
-- (pending)
+All 12 PNGs (6 states x 800px + 1440px viewports) opened and inspected:
+- 01-tutorial-month0: HUD runway bar, spine, next-step card, dark/dashed substation, empty laydown yard, plants not started. Clean at both widths.
+- 02-hall-shell: H5 at Shell with popover (teaching line + glossary term, disabled rows carry reasons), "Showing H5 only" filter, DSCR critical banner, rent ticker on H1. Steel is transient (bot builds past it in parallel; tutorial ends before a stable steel frame) - pad (earlier board) and shell bracket the growth curve; the steel mapping itself is pinned in tests/ui/hallVisual.test.ts.
+- 03-whale-month0: 4 hall cells (H1-H4) in the generic 2x2 layout, spine, next-step card (study first).
+- 04-delivered-hall-rent-ticker: 6-hall layout, H1 delivered with "+$3.7M/mo" ticker and trophy, energized substation glow, laydown crates on site, DSCR + runway banners with fix buttons.
+- 05-part-arrival-laydown: popover lists "transformer - arrived, on site" and "switchgear - arrived, on site"; crates shown on the yard (D9).
+- 06-critical-runway-warning: red "Runway under 3 months" banner with top drivers and a fix button, "Due soon" notice row, queued ghost outline on substation, pending plan entry.
+- 800px variants: same content, no overlap or clipping; the End-month button stays above the LogStrip (the D8 fix that un-hung smoke.spec.ts).
