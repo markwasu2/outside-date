@@ -1,3 +1,24 @@
+# UX 2: plain-language definitions at first use (cold-playthrough queue, item 2)
+
+Branch `ux2-jargon-definitions` off main ebc87a3. The cold player never tapped a glossary
+popover, so docket, outside date, LTC, PIK, DSCR and pad months stayed undefined. Fix: a
+Gloss component (wraps Term, keeps the popover) that appends a short inline parenthetical
+the first time a term appears in a run, then renders plain. Seen ids are UI-only
+(seenGlosses, cleared by newGame/loadGame) - no save-shape change.
+
+## Done criteria
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | inline plain-language definition at first use for docket, outside date, LTC, PIK, DSCR, pad months | PASS | src/ui/Gloss.tsx; first-use sites: SetupScreen (pad months), LeaseScreen (outside date), CapitalScreen (LTC/PIK legends + DSCR), PowerScreen + ProgressSpine (docket), GoalStrip (outside date) |
+| 2 | gloss shows once per run, then plain Term with popover | PASS | mount-time snapshot in Gloss; tests/ui/gloss.test.ts (3 tests incl. id-resolves-to-glossary check) |
+| 3 | pad-months glossary entry added (Term needs it) | PASS | content/glossary.json; load.test.ts count 68 -> 69 |
+| 4 | no engine/state-shape change (no save bump, no migration) | PASS | UI + content-string diff only; seenGlosses is UI-only store state |
+| 5 | typecheck/lint/vitest/playwright/build green | PASS | vitest 480, playwright 41 (1 assertion updated for the gloss parenthetical), tsc/eslint/build clean |
+| 6 | screenshots visually inspected | PASS | docs/screenshots/ux2/: setup-sites, capital, power at 1440px |
+
+Grid: not run - no engine, bot or balance change (one glossary content string, no tuning).
+
 # UX 1: persistent goal sentence (cold-playthrough queue, item 1)
 
 Branch `ux1-goal-sentence` off main 7d7879e. A cold player reached step 28 unable to say how

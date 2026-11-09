@@ -3,6 +3,7 @@ import { formatDollars } from '../../engine/format';
 import type { SiteDef, SiteMapTheme } from '../../content/schemas';
 import { resolveSite, sitesFor } from '../../content/sites';
 import type { CoolingChoice, GcContract, HallTier, Setup } from '../../engine/types';
+import { Gloss } from '../Gloss';
 import { useStore } from '../store';
 import { previewState } from './preview';
 
@@ -141,7 +142,14 @@ function SiteCards({ sites, selected, onPick }: { sites: SiteDef[]; selected: st
                 <br />
                 <span style={{ color: '#555', fontSize: '0.8rem' }}>
                   Land {formatDollars(site.landCost)}
-                  {site.extraPadMonths > 0 ? ` · +${site.extraPadMonths} pad months` : ' · no extra pad months'}
+                  {site.extraPadMonths > 0 ? (
+                    <>
+                      {' · +'}{site.extraPadMonths}{' '}
+                      <Gloss id="pad-months" gloss="months to prep the ground before construction">pad months</Gloss>
+                    </>
+                  ) : (
+                    ' · no extra pad months'
+                  )}
                   {site.permits.length > 0 ? ` · needs ${site.permits.join(', ')}` : ''}
                   {` · study ${site.studyMonthsMin}-${site.studyMonthsMax} mo`}
                 </span>

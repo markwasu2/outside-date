@@ -38,7 +38,8 @@ describe('loadContent', () => {
     expect(content.actions.length).toBeGreaterThan(0);
     // Phase 3: +2 events (water_damage, theft), +7 glossary (levers, forecast), +4 codex (real claim cases).
     expect(content.events.length).toBe(32);
-    expect(content.glossary.length).toBe(68);
+    // UX 2 (2026-11-09): +1 glossary (pad-months, for the first-use inline gloss).
+    expect(content.glossary.length).toBe(69);
     expect(content.codex.length).toBe(36);
     expect(content.cast.cast.length).toBe(10);
     expect(content.cast.intervenors.length).toBe(4);

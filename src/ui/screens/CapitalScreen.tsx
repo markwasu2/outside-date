@@ -3,7 +3,7 @@ import type { DifficultyId, NegotiationChoices } from '../../engine/init';
 import { formatDollars, formatMonths } from '../../engine/format';
 import { dscr, runway } from '../../engine/selectors';
 import type { Setup } from '../../engine/types';
-import { Term } from '../Term';
+import { Gloss } from '../Gloss';
 import { previewState, withAllHallsDelivered } from './preview';
 
 interface Props {
@@ -53,7 +53,10 @@ export function CapitalScreen({ content, scenarioId, difficultyId, setup, negoti
     <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 640, margin: '0 auto' }}>
       <h2>Capital stack</h2>
 
-      <strong>Senior loan</strong>
+      <strong>Senior loan</strong>{' '}
+      <span style={{ fontSize: '0.8rem', color: '#777' }}>
+        each option: % <Gloss id="ltc" gloss="loan-to-cost: the share of total cost the loan funds">LTC</Gloss> @ rate
+      </span>
       <div style={{ display: 'flex', gap: '0.5rem', margin: '0.25rem 0 1rem' }}>
         {capital.seniorOptions.map((opt, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxWidth: 180 }}>
@@ -72,7 +75,10 @@ export function CapitalScreen({ content, scenarioId, difficultyId, setup, negoti
         ))}
       </div>
 
-      <strong>Mezzanine</strong>
+      <strong>Mezzanine</strong>{' '}
+      <span style={{ fontSize: '0.8rem', color: '#777' }}>
+        % of budget @ <Gloss id="pik" gloss="paid-in-kind: interest added to the loan balance, not paid in cash">PIK</Gloss>
+      </span>
       <div style={{ display: 'flex', gap: '0.5rem', margin: '0.25rem 0 1rem' }}>
         {capital.mezzOptions.map((opt, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxWidth: 180 }}>
@@ -126,7 +132,7 @@ export function CapitalScreen({ content, scenarioId, difficultyId, setup, negoti
         Your check: <strong>{formatDollars(yourCheck)}</strong> &nbsp; Partner's check: {formatDollars(partnerCheck)}
       </p>
       <p>
-        Starting runway: <strong>{formatMonths(startingRunway)}</strong> &nbsp; Projected <Term id="dscr">DSCR</Term> at full
+        Starting runway: <strong>{formatMonths(startingRunway)}</strong> &nbsp; Projected <Gloss id="dscr" gloss="income divided by debt payments">DSCR</Gloss> at full
         delivery: <strong>{Number.isFinite(dscrAtFullDelivery) ? dscrAtFullDelivery.toFixed(2) : '\u221e'}</strong>
       </p>
 

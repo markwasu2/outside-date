@@ -2,7 +2,7 @@ import type { Content, Scenario } from '../../content/schemas';
 import type { NegotiationChoices } from '../../engine/init';
 import { formatDollars, formatMonth } from '../../engine/format';
 import type { LateRemedy } from '../../engine/types';
-import { Term } from '../Term';
+import { Gloss } from '../Gloss';
 
 interface Props {
   content: Content;
@@ -93,7 +93,7 @@ export function LeaseScreen({ content, scenario, negotiation, onChange, onBack, 
       </svg>
 
       <p style={{ color: '#555', fontSize: '0.85rem' }}>
-        Each hall has its own <Term id="outside-date">outside date</Term>, {scenario.lease?.outsideDateMonths ?? lease.outsideDateMonths} months after its
+        Each hall has its own <Gloss id="outside-date" gloss="the deadline before the tenant can walk">outside date</Gloss>, {scenario.lease?.outsideDateMonths ?? lease.outsideDateMonths} months after its
         delivery date — miss both and the tenant can walk away from that hall.
       </p>
 
