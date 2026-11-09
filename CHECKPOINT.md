@@ -1,3 +1,21 @@
+# UX 8: report card Time reason counts halls like the HUD (queue item 8)
+
+Branch `ux8-hall-count-reconcile` off main ed1fe1f. HUD said "Halls 3/4" while the report
+card's Time row read "4 of 4 missed" - "missed" lumped late deliveries in with halls that
+never delivered. Fix: timeExplain separates "X of N delivered late" from "Y of N never
+delivered (graded against ...)", matching the HUD's delivered count.
+
+## Done criteria
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | Time reason distinguishes late vs never delivered | PASS | src/ui/reportCardExplain.ts timeExplain; tests/ui/reportCardExplain.test.ts (3 tests) |
+| 2 | all-on-time message unchanged | PASS | same tests |
+| 3 | no engine/state-shape change | PASS | UI copy only |
+| 4 | gates green; screenshot inspected | PASS | vitest 488, playwright 42, tsc/eslint/build clean; docs/screenshots/ux8/time-row-1440.png (same greedy-bot run: "4 of 6 delivered late and 1 of 6 never delivered") |
+
+Grid: not run - no engine, bot or balance change.
+
 # UX 7: ending headline consistent with the score (queue item 7)
 
 Branch `ux7-ending-framing` off main 63aa203. A 0.74x takeout headlined "You win: you scraped
