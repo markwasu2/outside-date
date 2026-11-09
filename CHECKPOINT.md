@@ -521,3 +521,29 @@ previews, global palette/typography (first pass touches the board only).
 | balance grid | skipped: UI-only, no engine/content-tuning/bot change |
 | full suite green | done: 488 vitest, 42 playwright, eslint, tsc, vite build |
 | screenshots inspected | done: docs/screenshots/gfx1/ desktop 1440 (early + mid), phone 390 |
+
+# UX 6 - event notice cards with stakes
+
+## The change (UI only)
+
+Playthrough finding: big events (discovery slips, goodwill penalties, rate rises)
+were one small log line. Now every no-choice event card and every warning lands as
+a visible, dismissible card (bottom-left, max 3, auto-dismiss after 9s) with title,
+body and a stakes line - the hiring-fair modal's shape. Choice events still open the
+full EventModal; notice cards never block the month loop. describeEffect gained
+branches for every no-choice effect type (labor half-speed, senior/cap rate bps,
+order and study slips, hall cost/pause/progress, storm/fire/small-loss damage, draw
+freeze), so only genuinely custom types fall back to "Has consequences". Cards sit
+over the log strip and fade on their own so one can never permanently cover a
+gameplay control (the first top-right placement deadlocked an e2e End month click).
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| no-choice events surface as cards with stakes | done: screenshot shows draw-freeze warning, town-hall event, "Rates move up" with "Stakes: Senior debt rate +25 bps, Exit cap rate +15 bps" |
+| choice events unchanged (full modal) | done: modal path untouched, pending-title filter keeps cards from duplicating the modal |
+| cards cannot deadlock gameplay | done: bottom-left over log + 9s auto-dismiss; qa-fixes-2 deadlock reproduced then fixed |
+| balance grid | skipped: UI-only, no engine/content-tuning/bot change |
+| full suite green | done: 491 vitest, 42 playwright, eslint, tsc, vite build |
+| screenshot inspected | done: docs/screenshots/ux6/notice-cards-desktop-1440.png (desktop 1440; phone-width checks dropped per user) |
