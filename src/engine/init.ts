@@ -1,5 +1,6 @@
 import type { Content } from '../content/schemas';
 import { mergeTuning } from '../content/load';
+import { resolveSite, siteTuningOverride } from '../content/sites';
 import { createRng } from './rng';
 import { buildCloseTable } from './closing';
 import type {
@@ -9,6 +10,7 @@ import type {
   Setup,
   LateRemedy,
   MinChargeLevel,
+  Month,
   PermitId,
   PermitState,
   RiskRow,
@@ -83,11 +85,18 @@ export function createGame(
     ...(difficulty?.forcedSetup?.site ? { site: difficulty.forcedSetup.site } : {}),
   };
 
+  // Phase 4 (pillar A): resolve the chosen site and merge its overrides last (study-month
+  // range, interim grid MW, anything explicit), matching resolveContent's order so init math
+  // and tick math see one tuning.
+  const site = resolveSite(content, scenarioId, effectiveSetup.site, tuning);
+  tuning = mergeTuning(tuning, siteTuningOverride(site));
+  const effectiveSiteId = site.id;
+  const effectiveSetupResolved: Setup = { ...effectiveSetup, site: effectiveSiteId };
+
   // --- Cost basis -----------------------------------------------------
   const tierMult = tuning.tiers[effectiveSetup.hallTier].costMult;
   const gcMult = effectiveSetup.gc === 'gmp' ? tuning.gc.gmpPremium : 1;
-  const landCost =
-    effectiveSetup.site === 'megasite' ? tuning.land.megasite : tuning.land.farmland;
+  const landCost = site.landCost;
   const coolingCapex = tuning.cooling[effectiveSetup.cooling].capex;
 
   const halls: Hall[] = [];
@@ -196,6 +205,12 @@ export function createGame(
       goodwill[key] = Math.min(100, Math.max(0, goodwill[key] + delta));
     }
   }
+  // Phase 4 (pillar A): the site's own starting goodwill (the town loves a quiet farm sale,
+  // grumbles about quarry blasting).
+  for (const [group, delta] of Object.entries(site.goodwill)) {
+    const key = group as GoodwillGroup;
+    goodwill[key] = Math.min(100, Math.max(0, goodwill[key] + delta));
+  }
 
   if (forecastChoice.monthOffset > 0) {
     goodwill.tenant = Math.min(100, Math.max(0, goodwill.tenant - tuning.forecast.lateCallGoodwillPerMonth * forecastChoice.monthOffset));
@@ -209,11 +224,11 @@ export function createGame(
     costToYou: 0,
   }));
 
-  // --- Permits required for this scenario -----------------------------
+  // --- Permits required for this scenario + site (Phase 4: the site adds its own) ---------
   const permitsRequired: PermitId[] = [
     ...new Set([
       ...((scenario.permitsRequired ?? ['air', 'water', 'building']) as PermitId[]),
-      ...(effectiveSetup.site === 'farmland' ? ['wetlands' as PermitId] : []),
+      ...site.permits,
     ]),
   ];
 
@@ -222,10 +237,22 @@ export function createGame(
     // Capitalized into the loan on the first senior draw (money.ts), so totalDebt is still 0 at close.
     commitmentFeeDue: commitmentFee,
     plantBOffsetMonths: negotiation.power.plantBOffset,
-    ...(effectiveSetup.site === 'farmland'
-      ? { farmlandExtraPadMonths: tuning.land.farmlandExtraPadMonths }
-      : {}),
     ...(difficulty?.flags ?? {}),
+  };
+
+  // --- Phase 4 (pillar A): the site incentive, one effect applied at close ----------------
+  // cashGrant: cash in hand at close (and a closing-table source line via flags.siteIncentiveCash).
+  // permitFastTrack: the named permit starts granted (decisionMonth 0), skipping its months and
+  // its denial risk.
+  const siteCashGrant = site.incentive.kind === 'cashGrant' ? site.incentive.amount : 0;
+  if (siteCashGrant > 0) flags.siteIncentiveCash = siteCashGrant;
+  const initialPermits = (): Record<PermitId, PermitState> => {
+    const permits = emptyPermits();
+    if (site.incentive.kind === 'permitFastTrack') {
+      const id = site.incentive.permitId;
+      permits[id] = { id, status: 'granted', decisionMonth: 0 };
+    }
+    return permits;
   };
 
   const state: GameState = {
@@ -239,11 +266,11 @@ export function createGame(
     apUsedThisMonth: 0,
     phase: 'playing',
     pending: null,
-    setup: effectiveSetup,
-    cash: workingCapital,
+    setup: effectiveSetupResolved,
+    cash: workingCapital + siteCashGrant,
     monthlyBurn: tuning.campaign.monthlyBurn,
     goodwill,
-    permits: emptyPermits(),
+    permits: initialPermits(),
     docket: {
       status: 'none',
       filedMonth: null,
@@ -313,7 +340,13 @@ export function createGame(
     claims: [],
     closing: [],
     totalCostToDate: 0,
-    log: [{ month: 0, kind: 'milestone', text: `Campaign "${scenarioId}" started.` }],
+    log: [
+      { month: 0, kind: 'milestone', text: `Campaign "${scenarioId}" started.` },
+      { month: 0, kind: 'milestone', text: `Site: ${site.name}.` },
+      ...(site.incentive.label
+        ? [{ month: 0 as Month, kind: 'milestone' as const, text: `Site incentive: ${site.incentive.label}.` }]
+        : []),
+    ],
     outcome: null,
     takeout: null,
     permitsRequired,

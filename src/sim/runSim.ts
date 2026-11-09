@@ -28,6 +28,8 @@ interface CliArgs {
   scenario: string;
   difficulty: DifficultyId;
   json: boolean;
+  /** Phase 4: force a site id (overrides the bot's pickSite policy), for per-site grid runs. */
+  site?: string;
 }
 
 /** Minimal `--key value` / `--flag` parser (P5.2); no CLI-parsing library is a dependency yet. */
@@ -59,6 +61,7 @@ function parseArgs(argv: string[]): CliArgs {
     scenario: opts.scenario ?? 'whale',
     difficulty,
     json,
+    site: opts.site,
   };
 }
 
@@ -80,7 +83,10 @@ export function playOneGame(
   onMonth?: (state: GameState) => void,
 ): { state: GameState; lastEventTitle: string | null } {
   const rng = new BotRng(seed);
-  let state = createGame(content, scenarioId, bot.setup, bot.negotiation, seed, difficulty);
+  // Phase 4 (pillar A): the bot's site policy picks the ground; without one, the fixed
+  // `setup.site` stands (pinned setups like the tutorial balance sim).
+  const setup = bot.pickSite ? { ...bot.setup, site: bot.pickSite(content, scenarioId, rng) } : bot.setup;
+  let state = createGame(content, scenarioId, setup, bot.negotiation, seed, difficulty);
   let lastEventTitle: string | null = null;
   let guard = 0;
   const maxIterations = state.maxMonths * 4 + 200;
@@ -140,8 +146,11 @@ function nodeProcess(): { argv: string[] } | undefined {
 
 function main(): void {
   const args = parseArgs((nodeProcess()?.argv ?? []).slice(2));
-  const bot = BOTS[args.bot];
-  if (!bot) throw new Error(`Unknown bot "${args.bot}". Known bots: ${Object.keys(BOTS).join(', ')}`);
+  const base = BOTS[args.bot];
+  if (!base) throw new Error(`Unknown bot "${args.bot}". Known bots: ${Object.keys(BOTS).join(', ')}`);
+  const bot: Bot = args.site
+    ? { ...base, setup: { ...base.setup, site: args.site }, pickSite: undefined }
+    : base;
 
   const content = loadContent();
   if (!content.scenarios[args.scenario]) {

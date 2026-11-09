@@ -1,5 +1,7 @@
-import type { Content } from '../../content/schemas';
+import type { Content, SiteDef } from '../../content/schemas';
+import { sitesFor } from '../../content/sites';
 import { applyAction } from '../../engine/actions';
+import { resolveSite } from '../../content/sites';
 import type { NegotiationChoices } from '../../engine/init';
 import { runway } from '../../engine/selectors';
 import { costToCompleteShortfall, leverQuote } from '../../engine/systems/capital';
@@ -36,8 +38,59 @@ export interface Bot {
   id: string;
   setup: Setup;
   negotiation: NegotiationChoices;
+  /** Phase 4 (pillar A): the bot's site-selection policy, returning a site id from
+   * content/sites.json for this scenario. Optional: callers that pin a fixed setup (the
+   * tutorial balance sim, store debug hooks) omit it and keep `setup.site` as passed. */
+  pickSite?(content: Content, scenarioId: string, rng: BotRng): string;
   chooseActions(state: GameState, content: Content, rng: BotRng): PlannedAction[];
   chooseEvent(state: GameState, pending: PendingEvent, rng: BotRng): string;
+}
+
+// ---------------------------------------------------------------------------
+// Phase 4 (pillar A): site-pick policies. Each policy is a real, explainable rule over the
+// scenario's three sites, so the balance grid shows which ground each archetype prefers.
+// ---------------------------------------------------------------------------
+
+/** Greedy: the cheapest land, full stop. */
+export function pickCheapestSite(content: Content, scenarioId: string): string {
+  const sites = sitesFor(content, scenarioId);
+  const best = [...sites].sort((a, b) => a.landCost - b.landCost)[0];
+  return best?.id ?? 'megasite';
+}
+
+/** Careful: the shortest worst-case path to power - longest study plus extra pad months -
+ * tie-broken by fewer extra permits, then cheaper land. */
+export function pickFastestSite(content: Content, scenarioId: string): string {
+  const sites = sitesFor(content, scenarioId);
+  const best = [...sites].sort(
+    (a, b) =>
+      a.studyMonthsMax + a.extraPadMonths - (b.studyMonthsMax + b.extraPadMonths) ||
+      a.permits.length - b.permits.length ||
+      a.landCost - b.landCost,
+  )[0];
+  return best?.id ?? 'megasite';
+}
+
+/** Competent: the best risk-adjusted basis - land plus a price on each extra pad month and
+ * each worst-case study month, net of any cash grant. */
+export function pickValueSite(content: Content, scenarioId: string): string {
+  const PAD_MONTH_COST = 3_000_000;
+  const STUDY_MONTH_COST = 1_500_000;
+  const value = (site: SiteDef): number =>
+    site.landCost +
+    site.extraPadMonths * PAD_MONTH_COST +
+    site.studyMonthsMax * STUDY_MONTH_COST -
+    (site.incentive.kind === 'cashGrant' ? site.incentive.amount : 0);
+  const sites = sitesFor(content, scenarioId);
+  const best = [...sites].sort((a, b) => value(a) - value(b))[0];
+  return best?.id ?? 'megasite';
+}
+
+/** Random: any of the three sites, on the bot's own RNG stream. */
+export function pickRandomSite(content: Content, scenarioId: string, rng: BotRng): string {
+  const sites = sitesFor(content, scenarioId);
+  if (sites.length === 0) return 'megasite';
+  return rng.pick(sites).id;
 }
 
 /**
@@ -176,8 +229,8 @@ function projectedFinishMonth(state: GameState, content: Content, hall: GameStat
     const stageDef = content.tuning.stages.find((s) => s.id === stageId);
     if (!stageDef) continue;
     const minMonths =
-      stageId === 'pad' && state.setup.site === 'farmland'
-        ? stageDef.minMonths + content.tuning.land.farmlandExtraPadMonths
+      stageId === 'pad'
+        ? stageDef.minMonths + resolveSite(content, state.scenarioId, state.setup.site, content.tuning).extraPadMonths
         : stageDef.minMonths;
     const banked = i === hall.stageIndex ? hall.stageMonthsDone : 0;
     month += Math.max(0, minMonths - banked);

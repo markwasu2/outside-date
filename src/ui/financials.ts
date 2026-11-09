@@ -1,5 +1,6 @@
 import type { Content } from '../content/schemas';
 import { latestClosing } from '../engine/closing';
+import { resolveSite } from '../content/sites';
 import { resolveContent } from '../engine/resolve';
 import { dscr, forwardNoi } from '../engine/selectors';
 import type { GameState } from '../engine/types';
@@ -78,8 +79,9 @@ export function buildSourcesAndUses(state: GameState, content: Content): Sources
     const line = (l: { label: string; amount: number }): SourcesUsesLine => ({ label: l.label, termId: CLOSING_TERMS[l.label] ?? null, amount: l.amount });
     return { sources: closing.sources.map(line), uses: closing.uses.map(line), sourcesTotal: closing.sourcesTotal, usesTotal: closing.usesTotal };
   }
-  const { tuning } = resolveContent(state, content);
-  const land = tuning.land[state.setup.site];
+  const resolved = resolveContent(state, content);
+  const { tuning } = resolved;
+  const land = resolveSite(resolved, state.scenarioId, state.setup.site, tuning).landCost;
   const halls = state.halls.reduce((sum, h) => sum + h.costBudget, 0);
   const cooling = tuning.cooling[state.setup.cooling].capex;
   const powerEquip =

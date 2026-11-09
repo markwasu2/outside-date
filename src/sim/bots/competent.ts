@@ -9,6 +9,7 @@ import {
   fillAp,
   fixInspectionCandidates,
   importCrewsActiveCandidate,
+  pickValueSite,
   readyLiquidCandidates,
   requiredPermitCandidates,
   unsettledIntervenorCandidates,
@@ -102,4 +103,4 @@ function chooseEvent(_state: GameState, pending: PendingEvent): string {
   }
 }
 
-export const competentBot: Bot = { id: 'competent', setup, negotiation, chooseActions, chooseEvent };
+export const competentBot: Bot = { id: 'competent', setup, negotiation, pickSite: (content, scenarioId) => pickValueSite(content, scenarioId), chooseActions, chooseEvent };

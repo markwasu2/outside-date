@@ -2,6 +2,7 @@ import type { Content } from '../../content/schemas';
 import { formatDollars, formatMonth, formatMonths } from '../../engine/format';
 import { allLeverQuotes } from '../../engine/systems/capital';
 import { resolveContent } from '../../engine/resolve';
+import { resolveSite } from '../../content/sites';
 import { dscr, forwardNoi, ledger, runway } from '../../engine/selectors';
 import type { GameState } from '../../engine/types';
 import { netMonthlyBurn } from '../components/Hud';
@@ -73,7 +74,7 @@ export function projectedFitoutMonth(state: GameState, content: Content, hallInd
     const stageDef = resolved.tuning.stages[s];
     if (!stageDef) continue;
     let min = stageDef.minMonths;
-    if (s === 0 && state.setup.site === 'farmland') min += resolved.tuning.land.farmlandExtraPadMonths;
+    if (s === 0) min += resolveSite(resolved, state.scenarioId, state.setup.site, resolved.tuning).extraPadMonths;
     const done = s === hall.stageIndex ? hall.stageMonthsDone : 0;
     months += Math.max(0, min - done);
   }

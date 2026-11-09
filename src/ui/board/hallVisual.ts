@@ -1,5 +1,6 @@
 import type { Content } from '../../content/schemas';
 import { resolveContent } from '../../engine/resolve';
+import { resolveSite } from '../../content/sites';
 import { STAGES, type GameState, type Hall, type StageId } from '../../engine/types';
 
 /**
@@ -29,9 +30,8 @@ export interface HallVisual {
  */
 export function stageMinMonths(state: GameState, content: Content): number[] {
   const resolved = resolveContent(state, content);
-  return resolved.tuning.stages.map((s) =>
-    s.id === 'pad' && state.setup.site === 'farmland' ? s.minMonths + resolved.tuning.land.farmlandExtraPadMonths : s.minMonths,
-  );
+  const extraPad = resolveSite(resolved, state.scenarioId, state.setup.site, resolved.tuning).extraPadMonths;
+  return resolved.tuning.stages.map((s) => (s.id === 'pad' ? s.minMonths + extraPad : s.minMonths));
 }
 
 export function hallVisual(hall: Hall, stageMin: number[]): HallVisual {

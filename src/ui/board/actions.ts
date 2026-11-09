@@ -1,6 +1,7 @@
 import { applyAction } from '../../engine/actions';
 import { formatDollars } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
+import { resolveSite } from '../../content/sites';
 import type { ActionDef, Content } from '../../content/schemas';
 import type { GameState, GoodwillGroup, PlannedAction } from '../../engine/types';
 
@@ -23,7 +24,7 @@ export interface ActionRow {
 /** Resolves a 'dynamic' cash cost to a concrete number where it's actually deterministic given
  * current state (see store.ts/Decisions log); returns null when it genuinely varies/unknown. */
 export function dynamicCash(def: ActionDef, state: GameState, content: Content): number | null {
-  if (def.id === 'optionSite') return content.tuning.land[state.setup.site];
+  if (def.id === 'optionSite') return resolveSite(content, state.scenarioId, state.setup.site, content.tuning).landCost;
   if (def.id === 'orderTransformer') return content.tuning.power.transformerDeposit;
   if (def.id === 'orderSwitchgear') return content.tuning.power.switchgearDeposit;
   if (def.id === 'readyLiquid') {
@@ -130,8 +131,11 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
 
   if (objectId === 'pond') {
     const rows: ActionRow[] = [row(content, state, 'filePermit', 'File water permit', { permitId: 'water' })];
-    if (state.setup.site === 'farmland') {
-      rows.push(row(content, state, 'filePermit', 'File wetlands permit', { permitId: 'wetlands' }));
+    // Phase 4 (pillar A): the wetland slot offers the site's own extra water-side permits.
+    const site = resolveSite(content, state.scenarioId, state.setup.site, content.tuning);
+    for (const permitId of site.permits) {
+      if (permitId === 'water') continue;
+      rows.push(row(content, state, 'filePermit', `File ${permitId} permit`, { permitId }));
     }
     return rows;
   }

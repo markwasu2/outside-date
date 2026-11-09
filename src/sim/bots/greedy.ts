@@ -1,7 +1,7 @@
 import type { Content } from '../../content/schemas';
 import type { NegotiationChoices } from '../../engine/init';
 import type { GameState, PendingEvent, PlannedAction, Setup } from '../../engine/types';
-import { advanceHallCandidates, type Bot, fillAp, fixInspectionCandidates, importCrewsActiveCandidate, readyLiquidCandidates, requiredPermitCandidates, unsettledIntervenorCandidates } from './shared';
+import { advanceHallCandidates, type Bot, fillAp, fixInspectionCandidates, importCrewsActiveCandidate, pickCheapestSite, readyLiquidCandidates, requiredPermitCandidates, unsettledIntervenorCandidates } from './shared';
 
 /**
  * Earliest delivery option, max leverage (highest senior LTC and mezz share), no DSU,
@@ -93,4 +93,4 @@ function chooseEvent(_state: GameState, pending: PendingEvent): string {
   }
 }
 
-export const greedyBot: Bot = { id: 'greedy', setup, negotiation, chooseActions, chooseEvent };
+export const greedyBot: Bot = { id: 'greedy', setup, negotiation, pickSite: (content, scenarioId) => pickCheapestSite(content, scenarioId), chooseActions, chooseEvent };

@@ -9,6 +9,7 @@ import {
   fillAp,
   fixInspectionCandidates,
   importCrewsActiveCandidate,
+  pickFastestSite,
   readyLiquidCandidates,
   requiredPermitCandidates,
   unsettledIntervenorCandidates,
@@ -99,4 +100,4 @@ function chooseEvent(_state: GameState, pending: PendingEvent): string {
   }
 }
 
-export const carefulBot: Bot = { id: 'careful', setup, negotiation, chooseActions, chooseEvent };
+export const carefulBot: Bot = { id: 'careful', setup, negotiation, pickSite: (content, scenarioId) => pickFastestSite(content, scenarioId), chooseActions, chooseEvent };

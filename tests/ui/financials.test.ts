@@ -35,15 +35,21 @@ function commit(state: GameState, actionIds: string[] = []): GameState {
   return step(state, actionIds.map((actionId) => ({ actionId })), content).state;
 }
 
+/** Phase 4 (pillar A): the site's cash grant rides along as extra working capital and a
+ * matching sources line, so the reconciliation below is grant-aware. */
+function siteGrant(state: GameState): number {
+  return typeof state.flags.siteIncentiveCash === 'number' ? state.flags.siteIncentiveCash : 0;
+}
+
 describe('financials: sources and uses at close (D1)', () => {
   it('reconciles for every scenario at month 0: sources === uses === budget + working capital', () => {
     for (const scenarioId of ['whale', 'millbrook-relay', 'tutorial-edge5']) {
       const state = fresh(scenarioId);
       const su = buildSourcesAndUses(state, content);
       expect(su.sourcesTotal, scenarioId).toBe(su.usesTotal);
-      expect(su.usesTotal, scenarioId).toBe(state.budgetAtClose + state.equity.calledTotal);
+      expect(su.usesTotal, scenarioId).toBe(state.budgetAtClose + state.equity.calledTotal + siteGrant(state));
       expect(su.sourcesTotal, scenarioId).toBe(
-        state.debt.seniorCommitment + state.debt.mezzCommitment + state.equity.committedTotal,
+        state.debt.seniorCommitment + state.debt.mezzCommitment + state.equity.committedTotal + siteGrant(state),
       );
     }
   });
@@ -60,7 +66,7 @@ describe('financials: sources and uses at close (D1)', () => {
         const su = buildSourcesAndUses(state, content);
         expect(su.sourcesTotal, `${JSON.stringify(setup)} ${difficultyId}`).toBe(su.usesTotal);
         expect(su.usesTotal, `${JSON.stringify(setup)} ${difficultyId}`).toBe(
-          state.budgetAtClose + state.equity.calledTotal,
+          state.budgetAtClose + state.equity.calledTotal + siteGrant(state),
         );
       }
     }
@@ -80,7 +86,9 @@ describe('financials: sources and uses at close (D1)', () => {
         content.tuning.power.switchgearBalance,
     );
     expect(line('Liquid-ready fitout')).toBe(0); // air tier
-    expect(line('Working capital')).toBe(state.equity.calledTotal);
+    expect(line('Working capital')).toBe(state.equity.calledTotal + siteGrant(state));
+    // Phase 4: the megasite's shovel-ready grant shows as its own source line.
+    expect(su.sources.find((l) => l.label.startsWith('Site incentive'))?.amount).toBe(8_000_000);
   });
 
   it('excludes the transformer for skipTransformerOrder scenarios (tutorial), on resolved tuning', () => {
@@ -102,7 +110,7 @@ describe('financials: snapshot builder (D1)', () => {
     expect(snap.sourcesUses).not.toBeNull();
     expect(snap.dscr).toBeNull();
     expect(snap.forwardNoi).toBe(0);
-    expect(snap.cash).toBe(185_000_000);
+    expect(snap.cash).toBe(185_000_000 + 8_000_000); // working capital + the megasite's $8M grant
     expect(snap.seniorDrawn).toBe(0);
     expect(snap.drivers.reduce((s, d) => s + d.amount, 0)).toBe(snap.netMonthlyBurn);
   });
@@ -199,7 +207,7 @@ function snap1Cash(snaps: { cash: number }[]): number {
   return snaps[1]?.cash ?? 0;
 }
 
-describe('save migration (v1 -> v2 -> v3)', () => {
+describe('save migration (v1 -> v2 -> v3 -> v4)', () => {
   const base = {
     state: fresh('tutorial-edge5'),
     lastNegotiation: negotiation,
@@ -210,14 +218,28 @@ describe('save migration (v1 -> v2 -> v3)', () => {
   it('migrates a v1 save by adding an empty snapshot series', () => {
     const migrated = migrateSave({ ...base, version: 1 });
     expect(migrated).not.toBeNull();
-    expect(migrated?.version).toBe(3);
+    expect(migrated?.version).toBe(4);
     expect(migrated?.financialSnapshots).toEqual([]);
     expect(migrated?.dismissedCoachTips).toEqual(['hud']);
   });
 
-  it('passes a v3 save through unchanged', () => {
-    const v3 = { ...base, version: 3, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
-    expect(migrateSave(v3)).toBe(v3);
+  it('passes a v4 save through unchanged', () => {
+    const v4 = { ...base, version: 4, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
+    expect(migrateSave(v4)).toBe(v4);
+  });
+
+  it('migrates a v3 save to v4, mapping the legacy two-value site onto the scenario\'s sites (Phase 4)', () => {
+    // A v3 save holds the legacy two-value union member (createGame now normalizes to real site
+    // ids, so the fixture writes the legacy id back in by hand).
+    const legacyState = { ...base.state, setup: { ...base.state.setup, site: 'megasite' } };
+    const v3 = { ...base, state: legacyState, version: 3, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
+    const migrated = migrateSave(v3);
+    expect(migrated?.version).toBe(4);
+    expect(migrated?.state.setup.site).toBe('edge5-campus');
+    // A save already on a current site id keeps it (the whale kept its legacy ids).
+    const whaleState = { ...base.state, scenarioId: 'whale', setup: { ...base.state.setup, site: 'farmland' } };
+    const migratedWhale = migrateSave({ ...base, state: whaleState, version: 3 });
+    expect(migratedWhale?.state.setup.site).toBe('farmland');
   });
 
   it('backfills the Phase 3 fields when migrating a v2 save', () => {
@@ -227,7 +249,7 @@ describe('save migration (v1 -> v2 -> v3)', () => {
     delete oldDebt.bridgeDrawn; delete oldDebt.bridgeAccruedPik; delete oldDebt.bridgeRate;
     const v2 = { ...base, state: { ...oldState, debt: oldDebt }, version: 2, financialSnapshots: [] };
     const migrated = migrateSave(v2);
-    expect(migrated?.version).toBe(3);
+    expect(migrated?.version).toBe(4);
     expect(migrated?.state.forecast).toEqual({
       cost: base.state.budgetAtClose,
       month: Math.min(...base.state.halls.map((h) => h.deliveryMonth)),
@@ -239,7 +261,7 @@ describe('save migration (v1 -> v2 -> v3)', () => {
   });
 
   it('rejects unknown versions and garbage', () => {
-    expect(migrateSave({ ...base, version: 4 })).toBeNull();
+    expect(migrateSave({ ...base, version: 99 })).toBeNull();
     expect(migrateSave(null)).toBeNull();
     expect(migrateSave('nope')).toBeNull();
   });

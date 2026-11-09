@@ -4,7 +4,7 @@ import { loadContent } from '../../src/content/load';
 import { getRemedies } from '../../src/ui/screens/LeaseScreen';
 import { MEZZ_HINTS, PLAYER_SHARE_HINTS, SENIOR_HINTS } from '../../src/ui/screens/CapitalScreen';
 import { MIN_CHARGE_HINTS, PLANT_B_OFFSET_HINTS } from '../../src/ui/screens/PowerScreen';
-import { COOLINGS, GCS, SITES, TIERS } from '../../src/ui/screens/SetupScreen';
+import { COOLINGS, GCS, TIERS } from '../../src/ui/screens/SetupScreen';
 
 // UI-polish item 5: every SetupWizard option needs a hand-written tradeoff hint under 90 chars.
 const content = loadContent();
@@ -18,11 +18,23 @@ function expectAllUnder90(hints: string[]) {
 }
 
 describe('SetupWizard tradeoff hints (item 5)', () => {
-  it('Setup screen: site/hall tier/cooling/GC options each have a note under 90 chars', () => {
-    expectAllUnder90(SITES.map((o) => o.note));
+  it('Setup screen: hall tier/cooling/GC options each have a note under 90 chars', () => {
     expectAllUnder90(TIERS.map((o) => o.note));
     expectAllUnder90(COOLINGS.map((o) => o.note));
     expectAllUnder90(GCS.map((o) => o.note));
+  });
+
+  it('Setup screen: every site card carries a plain-word tradeoff and an incentive label (Phase 4)', () => {
+    // Site tradeoffs moved out of the static SITES list into content/sites.json (Phase 4,
+    // pillar A): longer prose than the 90-char one-liners, but still one plain sentence.
+    for (const [scenarioId, sites] of Object.entries(content.sites)) {
+      expect(sites).toHaveLength(3);
+      for (const site of sites) {
+        expect(site.summary.length, `${scenarioId}/${site.id} summary`).toBeGreaterThan(0);
+        expect(site.summary.includes('\u2014'), `${scenarioId}/${site.id} em dash`).toBe(false);
+        expect(site.incentive.label.length, `${scenarioId}/${site.id} incentive`).toBeGreaterThan(0);
+      }
+    }
   });
 
   it('Lease screen: late-remedy options each have a note under 90 chars', () => {
