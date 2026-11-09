@@ -1,7 +1,7 @@
 import type { Content } from '../../content/schemas';
 import type { NegotiationChoices } from '../../engine/init';
 import type { GameState, PendingEvent, PlannedAction, Setup } from '../../engine/types';
-import { advanceHallCandidates, type Bot, fillAp, fixInspectionCandidates, importCrewsActiveCandidate, pickCheapestSite, readyLiquidCandidates, requiredPermitCandidates, unsettledIntervenorCandidates } from './shared';
+import { advanceHallCandidates, type Bot, fillAp, fixInspectionCandidates, importCrewsActiveCandidate, pickCheapestSite, readyLiquidCandidates, requiredPermitCandidates, unsettledIntervenorCandidates, marketCandidates } from './shared';
 
 /**
  * Earliest delivery option, max leverage (highest senior LTC and mezz share), no DSU,
@@ -47,6 +47,9 @@ function chooseActions(state: GameState, content: Content): PlannedAction[] {
   candidates.push(...advanceHallCandidates(state));
   candidates.push(...readyLiquidCandidates(state));
   candidates.push(...importCrewsActiveCandidate(state));
+  // Phase 5 (pillar K): greedy ignores the market until it hurts - no second-sourcing, a
+  // 2x spot buy only as a last-minute scramble, and it dumps the GMP premium when cash runs short.
+  candidates.push(...marketCandidates(state, content, { secondSourceIndex: Infinity, spotWhenLateWithin: 2, gcSwitch: 'toCostPlusWhenTight' }));
   // Lowest priority ("skips discovery when busy"): bureaucratic docket upkeep, tried last so
   // it's the first to lose out once AP runs out.
   if (state.docket.discoveryOutstanding) candidates.push({ actionId: 'answerDiscovery' });

@@ -53,3 +53,56 @@ Millbrook after (before): careful normal 84.5 (81.1), competent 70.5 (55.3), gre
   schedule kills it. Thematically intended (short-sighted archetype) but stark.
 - Careful hard on whale 27.6% (was 31.6): hard forces farmland; acceptable, no band pins it.
 - Greedy multiple ceiling raised 1.7 -> 2.0 in balance.test.ts (documented, measured 1.92x).
+
+---
+
+# Phase 5: Living Markets (pillar K)
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| markets block in tuning (demand index per category, monthly drift, scenario+difficulty shocks, supplier options table) | done: tuning.json `markets` (drift 0.004/mo; shockChance easy .05 / normal .10 / hard .16, shock 3-9%; leadElasticity 0.5; spotPriceMult 2, spotLeadMonths T4/S2; slotGraceMonths 3; altSupplier transformer 17mo/1.35x, switchgear 8-14mo/1.3x; gcSwitchCost $3M), zod schema in schemas.ts |
+| GameState.markets {equipmentIndex, laborIndex, contractorIndex} advanced in step.ts each tick | done: init 1.0 each; marketsTick first in runWorldTick on a derived rng stream (seed+month), main stream untouched |
+| orderLongLead reads index for lead time and price | done: price x index, lead x (1 + elasticity*(index-1)) |
+| slots can be lost if payment lags | done: balance unfunded slotGraceMonths past arrival -> slot lost, deposit forfeited, warning log |
+| spot-buy action | done: spotBuy, full index-scaled ~2x price up front, no queue |
+| second-sourcing (second order, cancel fee, first arrival wins) | done: secondSource (alt supplier, cancel-fee-share deposit); first arrival cancels the loser with fee |
+| labor reads laborIndex | done: importCrews cost x laborIndex; labor_shortfall odds x laborIndex |
+| GC choice becomes mid-game switch with transition cost | done: switchGc flips gmp/costPlus at gcSwitchCost x contractorIndex |
+| bots need a policy for each | done: careful (second-source at index 1.05, no spot, to GMP when hot), competent (1.15, spot within 6mo of outside), greedy (never second-source, spot within 2mo, to cost-plus when tight), random (all in universe) |
+| UI: Market strip with three indexes + rising note | done: HUD strip E/L/C x.xx, "lead times are rising" at equipment >= 1.05 |
+| UI: order dialog with standard/spot/second-supplier options | done: substation popover rows, index-priced labels |
+| UI: booked slots as crates in laydown yard with countdown | done: supplier-tagged crates, red "slot lost in N mo" past arrival |
+| save v4 -> v5 with migration | done: SAVE_VERSION 5, upgradeV4 seeds indexes 1.0, tags orders supplier standard, reconstructs price from deposit + book balance |
+| 1000-seed before/after grids, bands hold | done: see below; careful normal 75.0 (top of 60-75 band), competent 73.2 in 65-80, greedy 50.7 < careful, multiple ceiling 2.0 holds; balance.test.ts comments updated with measured numbers |
+| no TODO/FIXME; vitest + typecheck + lint + full playwright + build green | done: 458 vitest, 36 playwright (incl. tutorial on non-default site via living-board/millbrook specs), lint, tsc, vite build |
+
+## After grid (1000 seeds, whale; Phase 4 after in parens)
+
+| bot | easy | normal | hard |
+|-----|------|--------|------|
+| random | 0.0 (0.0) | 0.0 (0.0) | 0.0 (0.0) |
+| greedy | 66.9 (67.0) | 50.7 (50.8) | 50.6 (51.0) |
+| careful | 99.4 (97.4) | 75.0 (65.2) | 28.6 (27.6) |
+| competent | 95.8 (95.7) | 73.2 (73.5) | 44.7 (44.8) |
+
+Multiples normal: greedy 1.92, careful 1.65, competent 1.50. Millbrook normal per site
+(rail-yard/riverbend-farm/depot-flats): greedy 23.0/6.0/32.7, careful 82.3/5.3/85.7,
+competent 56.8/4.9/72.4. Millbrook report-card e2e re-pinned 1.58x -> 1.66x (careful
+second-sources the hot transformer market).
+
+## Screenshots (visually inspected)
+
+- /downloads/p5-map-strip-1440.png: HUD market strip "Markets: E 1.00x - L 1.00x - C 1.00x" on a fresh tutorial
+- /downloads/p5-order-dialog.png: substation popover at M6 with indexes drifted to 1.02x; standard "Order the switchgear (1 AP, $510K)" beside "Spot-buy the switchgear ($3.1M, 2mo)"
+- /downloads/p5-crate-1440.png / p5-crate-800.png: booked switchgear crate in the laydown yard with countdown at both widths
+
+## Tensions
+
+- Careful normal landed exactly at the 75.0% band top: its second-source policy converts
+  market shocks from campaign-killers into a premium. Intended, but no headroom; if a future
+  change lifts careful further, either the band or the policy threshold (1.05) moves.
+- The market tick draws from a derived rng stream (seed*2654435761 + month*40503 + 7) so the
+  pinned main-stream tests and perfect-play fixture are untouched.
+- load.test.ts counts unchanged: no events/glossary/codex rows added, actions still uncounted.

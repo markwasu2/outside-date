@@ -22,6 +22,29 @@ export const CoolingTuningSchema = z.object({
 export const PermitTuningSchema = z.object({ months: z.number().int(), baseOdds: z.number() });
 export const LowMedHighNumberSchema = z.object({ low: z.number(), medium: z.number(), high: z.number() });
 
+/** Phase 5 (pillar K): the living-markets block. Three demand indexes (equipment, labor,
+ * contractors) drift monthly and jump on difficulty-scaled shocks; order lead times and prices,
+ * crew import cost and shortfall odds, and the GC switch cost all read them. */
+export const MarketsTuningSchema = z.object({
+  driftPerMonth: z.number(),
+  shockChancePerMonth: z.object({ easy: z.number(), normal: z.number(), hard: z.number() }),
+  shockMin: z.number(),
+  shockMax: z.number(),
+  /** lead multiplier = 1 + leadElasticity * (index - 1); 0.5 means lead moves half as fast as price. */
+  leadElasticity: z.number(),
+  spotPriceMult: z.number(),
+  spotLeadMonths: z.object({ transformer: z.number().int(), switchgear: z.number().int() }),
+  /** Months a booked slot survives an unpaid balance after its arrival month before the
+   * supplier gives it away (deposit forfeited). */
+  slotGraceMonths: z.number().int(),
+  altSupplier: z.object({
+    transformer: z.object({ leadMonths: z.number().int(), priceMult: z.number(), label: z.string() }),
+    switchgear: z.object({ leadMin: z.number().int(), leadMax: z.number().int(), priceMult: z.number(), label: z.string() }),
+  }),
+  gcSwitchCost: z.number().int(),
+});
+export type MarketsTuning = z.infer<typeof MarketsTuningSchema>;
+
 export const TuningSchema = z.object({
   campaign: z.object({
     maxMonths: z.number().int(),
@@ -97,6 +120,7 @@ export const TuningSchema = z.object({
     slipMonths: LowMedHighNumberSchema,
     minChargePerMwMonth: LowMedHighNumberSchema,
   }),
+  markets: MarketsTuningSchema,
   capital: z.object({
     seniorOptions: z.array(z.object({ ltc: z.number(), rate: z.number() })),
     mezzOptions: z.array(z.object({ share: z.number(), rate: z.number() })),

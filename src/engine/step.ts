@@ -6,6 +6,7 @@ import { applyEffect } from './effects';
 import { ledger, dscr, runway } from './selectors';
 import { drawEvent, resolveChoice } from './systems/events';
 import { resolveContent } from './resolve';
+import { tick as marketsTick } from './systems/markets';
 import { tick as powerTick } from './systems/power';
 import { tick as regulationTick } from './systems/regulation';
 import { tick as constructionTick } from './systems/construction';
@@ -128,7 +129,7 @@ export function resolveEvent(
 }
 
 /**
- * World tick (4.3, binding order). Each call below is currently a no-op pass-through
+ * World tick (4.3, binding order). Phase 5 added markets.tick at the head. Each call below is currently a no-op pass-through
  * (Phase 3 fills in the real logic); the order and module mapping is fixed here so Phase 3
  * tasks only need to edit the called module, never step.ts's orchestration:
  *   1-4  power.tick       — long-lead arrivals, study completion, substation, plants + energize
@@ -144,6 +145,9 @@ export function resolveEvent(
  */
 function runWorldTick(state: GameState, content: Content): { state: GameState; log: LogEntry[] } {
   let next = state;
+  // Phase 5 (pillar K): markets move first so this month's orders, crew imports and GC
+  // switches all price off the fresh indexes.
+  next = marketsTick(next, content);
   next = powerTick(next, content);
   // Generic (not regulation-specific) early exit: a system's tick can itself need a mid-tick
   // player choice (e.g. regulation's docket vote appeal/redesign, P3.2 Decisions log) by setting

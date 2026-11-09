@@ -354,5 +354,36 @@
       "startMonth": 6,
       "toleranceShare": 0.02
     }
+  },
+  "markets": {
+    "driftPerMonth": 0.004,
+    "shockChancePerMonth": {
+      "easy": 0.05,
+      "normal": 0.1,
+      "hard": 0.16
+    },
+    "shockMin": 0.03,
+    "shockMax": 0.09,
+    "leadElasticity": 0.5,
+    "spotPriceMult": 2.0,
+    "spotLeadMonths": {
+      "transformer": 4,
+      "switchgear": 2
+    },
+    "slotGraceMonths": 3,
+    "altSupplier": {
+      "transformer": {
+        "leadMonths": 17,
+        "priceMult": 1.35,
+        "label": "Second supplier"
+      },
+      "switchgear": {
+        "leadMin": 8,
+        "leadMax": 14,
+        "priceMult": 1.3,
+        "label": "Second supplier"
+      }
+    },
+    "gcSwitchCost": 3000000
   }
 }

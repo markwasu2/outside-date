@@ -13,6 +13,7 @@ import {
   readyLiquidCandidates,
   requiredPermitCandidates,
   unsettledIntervenorCandidates,
+  marketCandidates,
 } from './shared';
 
 /**
@@ -66,6 +67,10 @@ function chooseActions(state: GameState, content: Content): PlannedAction[] {
   candidates.push(...readyLiquidCandidates(state));
   candidates.push(...importCrewsActiveCandidate(state));
   candidates.push(...delaySwapCandidates(state, content));
+  // Phase 5 (pillar K): competent reads the market - second-sources when the equipment index
+  // is clearly hot, spot-buys only when the outside date cannot absorb a standard queue, and
+  // pays for GMP certainty in a hot contractor market.
+  candidates.push(...marketCandidates(state, content, { secondSourceIndex: 1.15, spotWhenLateWithin: 6, gcSwitch: 'toGmpWhenHot' }));
   return fillAp(state, content, candidates, state.apPerMonth - state.apUsedThisMonth);
 }
 

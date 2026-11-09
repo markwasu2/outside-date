@@ -320,3 +320,63 @@ export function tailRiskInsuranceCandidates(state: GameState, content: Content, 
   }
   return [];
 }
+
+/**
+ * Phase 5 (pillar K): market-aware candidates. Every archetype reacts to the living markets
+ * instead of ordering blind; the thresholds ARE the archetype's personality:
+ *   - secondSourceIndex: equipment index at which a pending standard order gets a parallel
+ *     second-supplier order (lower = more insurance-minded)
+ *   - spotWhenLateWithin: months before the first outside date at which a missing order is
+ *     spot-bought at 2x instead of queued standard (Infinity = never spot)
+ *   - gcSwitch: 'toGmpWhenHot' flips cost-plus to GMP when the contractor index runs hot;
+ *     'toCostPlusWhenTight' dumps the GMP premium when the runway is short
+ */
+export interface MarketPolicy {
+  secondSourceIndex: number;
+  spotWhenLateWithin: number;
+  gcSwitch: 'toGmpWhenHot' | 'toCostPlusWhenTight' | 'never';
+}
+
+export function marketCandidates(state: GameState, content: Content, policy: MarketPolicy): PlannedAction[] {
+  const out: PlannedAction[] = [];
+  const index = state.markets.equipmentIndex;
+  const kinds: Array<'transformer' | 'switchgear'> = state.skipTransformerOrder ? ['switchgear'] : ['transformer', 'switchgear'];
+
+  // The schedule anchor for "late": the earliest outside date among undelivered halls.
+  const outsideMonths = state.halls
+    .filter((h) => !h.terminated && h.deliveredMonth === null)
+    .map((h) => h.outsideMonth)
+    .filter((m): m is number => m !== null);
+  const firstOutside = outsideMonths.length > 0 ? Math.min(...outsideMonths) : null;
+
+  for (const kind of kinds) {
+    const orders = state.power.orders.filter((o) => o.kind === kind);
+    const arrived = orders.some((o) => o.arrived);
+    if (arrived) continue;
+    const pending = orders.filter((o) => !o.arrived);
+    if (pending.length === 0) {
+      // No order at all (never placed, or the slot was lost): spot-buy when the schedule
+      // cannot absorb a standard queue, otherwise order standard.
+      const standardLead =
+        kind === 'transformer' ? content.tuning.power.transformerLeadMonths : content.tuning.power.switchgearLeadMax;
+      // (Re-ordering standard after a lost slot is the archetype's base rule's job: with no
+      // pending order of the kind left, its usual order candidate fires again on its own.)
+      const late = firstOutside !== null && state.month + standardLead > firstOutside - policy.spotWhenLateWithin;
+      if (late && policy.spotWhenLateWithin < Infinity) out.push({ actionId: 'spotBuy', params: { kind } });
+      continue;
+    }
+    // Second-source a pending standard slot when the market runs past the archetype's nerve.
+    if (index >= policy.secondSourceIndex && pending.some((o) => o.supplier === 'standard') && !pending.some((o) => o.supplier === 'alt')) {
+      out.push({ actionId: 'secondSource', params: { kind } });
+    }
+  }
+
+  // GC switch: the contractor market makes the setup choice revisitable.
+  if (policy.gcSwitch === 'toGmpWhenHot' && state.setup.gc === 'costPlus' && state.markets.contractorIndex >= 1.15) {
+    out.push({ actionId: 'switchGc' });
+  }
+  if (policy.gcSwitch === 'toCostPlusWhenTight' && state.setup.gc === 'gmp' && runway(state, content) < 4) {
+    out.push({ actionId: 'switchGc' });
+  }
+  return out;
+}

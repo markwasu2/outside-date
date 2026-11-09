@@ -55,7 +55,7 @@ function objectHasQueuedAction(objectId: string, plan: PlannedAction[], hallIds:
   }
   switch (objectId) {
     case 'substation':
-      return plan.some((a) => ['commissionStudy', 'orderTransformer', 'orderSwitchgear', 'cancelOrder'].includes(a.actionId));
+      return plan.some((a) => ['commissionStudy', 'orderTransformer', 'orderSwitchgear', 'cancelOrder', 'spotBuy', 'secondSource'].includes(a.actionId));
     case 'pond':
       return plan.some(
         (a) => a.actionId === 'filePermit' && (a.params?.['permitId'] === 'water' || a.params?.['permitId'] === 'wetlands'),
@@ -308,22 +308,34 @@ export function MapGrid() {
         {power.orders.length === 0 && <div style={{ color: '#6d4c41', fontSize: '0.65rem' }}>empty</div>}
         {power.orders.map((o) => {
           const flash = (deltas.arrivedOrders.includes(o.kind) || deltas.newOrders.includes(o.kind)) && !reducedMotion;
+          // Phase 5 (pillar K): a booked slot is a crate you can lose - past its arrival month
+          // with the balance unpaid, the crate turns red and counts down the grace window.
+          const overdue = !o.arrived && draft.month >= o.arrivalMonth;
+          const graceLeft = overdue ? Math.max(0, o.arrivalMonth + content.tuning.markets.slotGraceMonths - draft.month) : 0;
           return (
             <div
               key={`${o.kind}-${o.orderedMonth}`}
               className={flash ? 'board-arrival-flash' : undefined}
-              title={o.arrived ? `${o.kind}: on site` : `${o.kind}: arrives ${formatMonth(o.arrivalMonth)}`}
+              data-testid={`crate-${o.kind}-${o.supplier}`}
+              title={
+                o.arrived
+                  ? `${o.kind}: on site`
+                  : overdue
+                    ? `${o.kind}: balance unpaid - the slot is lost in ${graceLeft}mo`
+                    : `${o.kind} (${o.supplier === 'alt' ? 'second supplier' : o.supplier === 'spot' ? 'spot' : 'standard'}): arrives ${formatMonth(o.arrivalMonth)}`
+              }
               style={{
                 marginTop: 3,
                 padding: '1px 4px',
                 borderRadius: 3,
-                background: o.arrived ? '#c8e6c9' : '#fff3e0',
-                border: '1px solid #a1887f',
+                background: o.arrived ? '#c8e6c9' : overdue ? '#ffcdd2' : '#fff3e0',
+                border: `1px solid ${overdue ? '#c62828' : '#a1887f'}`,
                 fontSize: '0.65rem',
               }}
             >
               {'\u{1F4E6}'} {o.kind}
-              {o.arrived ? ' on site' : ` (${Math.max(0, o.arrivalMonth - draft.month)}mo)`}
+              {o.supplier !== 'standard' && !o.arrived ? ` (${o.supplier === 'alt' ? '2nd' : 'spot'})` : ''}
+              {o.arrived ? ' on site' : overdue ? ` - slot lost in ${graceLeft}mo` : ` (${Math.max(0, o.arrivalMonth - draft.month)}mo)`}
             </div>
           );
         })}

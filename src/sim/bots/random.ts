@@ -42,6 +42,11 @@ function chooseActions(state: GameState, content: Content, rng: BotRng): Planned
     { actionId: 'orderSwitchgear' },
     { actionId: 'cancelOrder', params: { kind: 'transformer' } },
     { actionId: 'cancelOrder', params: { kind: 'switchgear' } },
+    // Phase 5 (pillar K): the market actions are in the random universe too.
+    { actionId: 'spotBuy', params: { kind: 'transformer' } },
+    { actionId: 'spotBuy', params: { kind: 'switchgear' } },
+    { actionId: 'secondSource', params: { kind: 'transformer' } },
+    { actionId: 'switchGc' },
     { actionId: 'fileDocket' },
     { actionId: 'answerDiscovery' },
     { actionId: 'prepTestimony' },

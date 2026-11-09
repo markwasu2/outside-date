@@ -164,10 +164,38 @@ export function buildRows(tab: TrackTab, state: GameState, content: Content, sel
         action: { actionId: 'orderSwitchgear' },
       },
     ];
+    // Phase 5 (pillar K): spot buy and second-supplier rows mirror the substation order
+    // dialog, priced off the live equipment index by cashLabel's probe.
+    const spotBuy = findDef(content, 'spotBuy');
+    const secondSource = findDef(content, 'secondSource');
+    for (const kind of ['transformer', 'switchgear'] as const) {
+      if (kind === 'transformer' && state.skipTransformerOrder) continue;
+      const orders = state.power.orders.filter((o) => o.kind === kind);
+      if (orders.length === 0) {
+        rows.push({
+          key: `spotBuy:${kind}`,
+          label: `Spot-buy the ${kind}`,
+          help: spotBuy.help,
+          ap: spotBuy.ap,
+          cashLabel: cashLabel(spotBuy, state, content, { kind }),
+          action: { actionId: 'spotBuy', params: { kind } },
+        });
+      }
+      if (orders.some((o) => o.supplier === 'standard' && !o.arrived) && !orders.some((o) => o.supplier === 'alt')) {
+        rows.push({
+          key: `secondSource:${kind}`,
+          label: `Second supplier for the ${kind}`,
+          help: secondSource.help,
+          ap: secondSource.ap,
+          cashLabel: cashLabel(secondSource, state, content, { kind }),
+          action: { actionId: 'secondSource', params: { kind } },
+        });
+      }
+    }
     for (const order of state.power.orders) {
       rows.push({
-        key: `cancelOrder:${order.kind}`,
-        label: `Cancel ${order.kind} order`,
+        key: `cancelOrder:${order.kind}${order.supplier !== 'standard' ? `:${order.supplier}` : ''}`,
+        label: `Cancel ${order.kind} order${order.supplier === 'alt' ? ' (second supplier)' : order.supplier === 'spot' ? ' (spot)' : ''}`,
         help: cancelOrder.help,
         ap: cancelOrder.ap,
         cashLabel: cashLabel(cancelOrder, state, content),

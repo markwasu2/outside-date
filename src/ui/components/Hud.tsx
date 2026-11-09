@@ -347,6 +347,22 @@ export function Hud() {
       </div>
       </StatExplainer>
 
+      {/* Phase 5 (pillar K): the living-markets strip - the three demand indexes, with a
+          plain-language note once equipment lead times are meaningfully hot. Passive text with
+          a title tooltip, no role=button. */}
+      <div
+        data-testid="hud-markets"
+        title="Demand indexes for equipment, labor and contractors. 1.00x is book price; a hotter market raises long-lead prices and lead times, crew costs, and the GC switch cost."
+        style={{ whiteSpace: 'nowrap' }}
+      >
+        Markets: E {draft.markets.equipmentIndex.toFixed(2)}x · L {draft.markets.laborIndex.toFixed(2)}x · C {draft.markets.contractorIndex.toFixed(2)}x
+        {draft.markets.equipmentIndex >= 1.05 && (
+          <span data-testid="hud-markets-rising" style={{ marginLeft: 6, color: '#b26a00' }}>
+            Lead times are rising
+          </span>
+        )}
+      </div>
+
       <StatExplainer id="dscrHeadroom" autoOpen={firstEligibleExplainer === 'dscrHeadroom'}>
       <div title={dscrHeadroomTooltip(d, content.tuning.covenant.dscrTrigger, forwardNoiValue, content.tuning.covenant.forcedTestMonth)}>
         DSCR headroom: {headroomText}

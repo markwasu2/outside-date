@@ -132,6 +132,8 @@ function scriptedDue(state: GameState, card: EventCard): boolean {
 function cardOdds(state: GameState, card: EventCard, content: Content): number {
   const base = card.odds ?? 0;
   let odds = base;
+  // Phase 5 (pillar K): a hot labor market makes shortfalls more likely.
+  if (card.id === 'labor_shortfall') odds = base * state.markets.laborIndex;
   if (card.id === 'labor_shortfall') {
     odds = state.flags.plaSigned ? 0.05 : base;
     if (typeof state.flags.hiringFairUntil === 'number' && state.month < state.flags.hiringFairUntil) {

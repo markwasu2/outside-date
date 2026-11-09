@@ -36,7 +36,7 @@ describe('boardActionsForObject', () => {
   it('substation lists one cancel entry per open order, none once arrived', () => {
     const state = freshState();
     expect(ids('substation', state)).not.toContain('cancelOrder');
-    state.power.orders.push({ kind: 'transformer', orderedMonth: state.month, arrivalMonth: state.month + 18, deposit: 0, arrived: false });
+    state.power.orders.push({ kind: 'transformer', orderedMonth: state.month, arrivalMonth: state.month + 18, deposit: 0, arrived: false, supplier: 'standard', price: 0 });
     expect(ids('substation', state).filter((id) => id === 'cancelOrder')).toHaveLength(1);
     state.power.orders[0]!.arrived = true;
     expect(ids('substation', state)).not.toContain('cancelOrder');
@@ -81,8 +81,8 @@ describe('laydownOrders', () => {
   it('mirrors the open long-lead orders with arrival months', () => {
     const state = freshState();
     expect(laydownOrders(state)).toHaveLength(0);
-    state.power.orders.push({ kind: 'transformer', orderedMonth: 1, arrivalMonth: 24, deposit: 0, arrived: false });
-    expect(laydownOrders(state)).toEqual([{ kind: 'transformer', arrivalMonth: 24, arrived: false }]);
+    state.power.orders.push({ kind: 'transformer', orderedMonth: 1, arrivalMonth: 24, deposit: 0, arrived: false, supplier: 'standard', price: 0 });
+    expect(laydownOrders(state)).toEqual([{ kind: 'transformer', arrivalMonth: 24, arrived: false, supplier: 'standard', price: 0 }]);
   });
 });
 

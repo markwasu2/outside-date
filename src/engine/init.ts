@@ -330,6 +330,7 @@ export function createGame(
       dsu: negotiation.insurance.dsu,
     },
     market: { capRateModifier: 0, outlookCut: false },
+    markets: { equipmentIndex: 1, laborIndex: 1, contractorIndex: 1 },
     flags,
     firedOnce: [],
     scriptedDone: [],

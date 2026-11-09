@@ -59,6 +59,8 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
     // $4M rebate), so it carries far less debt and a rescued campaign dilutes less; the
     // price it pays is schedule (median first delivery month 41 vs 37-38) and a win rate
     // still 14 points under careful. High-risk/high-reward is the farmland design.
+    // Phase 5 (2026-11-09) measured: greedy 50.7% / 1.92x. Greedy never second-sources and
+    // only spot-buys inside 2 months of outside date, so living markets barely touch it.
     expect(report.equityMultiple.median).toBeLessThanOrEqual(2.0);
   });
 
@@ -66,6 +68,10 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
   // Phase 4 measured: careful 65.2% / 1.28x (careful's fastest-site policy picks
   // quarry-ridge; win rate in band, multiple lower because quarry-ridge has no cash
   // grant - that is the megasite's edge).
+  // Phase 5 (2026-11-09) measured: careful 75.0% / 1.65x, top of band. Careful's market
+  // policy second-sources the transformer once the equipment index reaches 1.05, so market
+  // shocks that stretch lead times cost it the second-source premium instead of the
+  // campaign. Easy 99.4%, hard 28.6% (1000 seeds, whale).
   it('careful: win rate 60-75%, median multiple 1.4-1.8x', () => {
     const report = runBot('careful');
     expect(report.winRate).toBeGreaterThanOrEqual(0.6);
@@ -83,6 +89,7 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
     expect(report.winRate).toBeLessThanOrEqual(0.8);
     // Phase 3: median floor 1.8 -> 1.3. Measured 70.5% / 1.50x on normal (was 75.0% / 1.95x), same lever cost as above.
     // Phase 4 measured: 73.5% / 1.48x (competent's value policy prices uncured permits and picks quarry-ridge).
+    // Phase 5 measured: 73.2% / 1.50x (competent second-sources at index 1.15 and spot-buys within 6 months of outside date; markets net out near zero).
     expect(report.equityMultiple.median).toBeGreaterThanOrEqual(1.3);
     expect(report.equityMultiple.median).toBeLessThanOrEqual(2.4);
   });
@@ -105,7 +112,7 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
     expect(report.docketFailedFirstVoteRate).toBeLessThanOrEqual(0.3);
   });
 
-  it('competent/hard: win rate 40-55% (Phase 3 measured 50.3%, Phase 4 measured 44.8%)', () => {
+  it('competent/hard: win rate 40-55% (Phase 3 measured 50.3%, Phase 4 measured 44.8%, Phase 5 measured 44.7%)', () => {
     const report = runBot('competent', 'whale', 'hard');
     expect(report.winRate).toBeGreaterThanOrEqual(0.4);
     expect(report.winRate).toBeLessThanOrEqual(0.55);

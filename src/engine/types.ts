@@ -63,12 +63,27 @@ export interface Docket {
   failCount: number;
 }
 
+export type SupplierId = 'standard' | 'alt' | 'spot';
+
 export interface LongLeadOrder {
   kind: 'transformer' | 'switchgear';
   orderedMonth: Month;
   arrivalMonth: Month;
   arrived: boolean;
   deposit: Dollars;
+  /** Phase 5 (pillar K): which supplier holds the slot, and the full contract price
+   * (deposit + balance) as quoted at order time, index-adjusted. */
+  supplier: SupplierId;
+  price: Dollars;
+}
+
+/** Phase 5 (pillar K): living demand indexes. 1.0 is the book price; they drift up monthly
+ * and jump on shocks. Equipment drives long-lead price/lead, labor drives crew cost and
+ * shortfall odds, contractor drives the GC switch cost. */
+export interface MarketsState {
+  equipmentIndex: number;
+  laborIndex: number;
+  contractorIndex: number;
 }
 
 export interface PowerPlant {
@@ -299,6 +314,7 @@ export interface GameState {
   equity: EquityState;
   insurance: Insurance;
   market: { capRateModifier: number; outlookCut: boolean };
+  markets: MarketsState;
   flags: Record<string, boolean | number>; // e.g. importCrewsUntil, rebateUnlocked, askAccepted
   firedOnce: string[]; // event ids that are once-only and have fired
   scriptedDone: string[];

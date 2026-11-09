@@ -13,6 +13,7 @@ import {
   readyLiquidCandidates,
   requiredPermitCandidates,
   unsettledIntervenorCandidates,
+  marketCandidates,
 } from './shared';
 
 /**
@@ -67,6 +68,9 @@ function chooseActions(state: GameState, content: Content): PlannedAction[] {
   candidates.push(...readyLiquidCandidates(state));
   candidates.push(...importCrewsActiveCandidate(state));
   candidates.push(...delaySwapCandidates(state, content));
+  // Phase 5 (pillar K): the careful archetype buys schedule insurance - second-sources as
+  // soon as the equipment market warms, pays the GMP premium when contractors run hot.
+  candidates.push(...marketCandidates(state, content, { secondSourceIndex: 1.05, spotWhenLateWithin: Infinity, gcSwitch: 'toGmpWhenHot' }));
   return fillAp(state, content, candidates, state.apPerMonth - state.apUsedThisMonth);
 }
 

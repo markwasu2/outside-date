@@ -311,5 +311,38 @@
     "label": "Recap mid-construction",
     "help": "Raise the senior loan for a fee and a higher rate. Once per game.",
     "handler": "recap"
+  },
+  {
+    "id": "spotBuy",
+    "track": "power",
+    "ap": 1,
+    "cash": "dynamic",
+    "label": "Spot-buy equipment",
+    "help": "No queue: full price up front at about 2x book, delivered fast.",
+    "handler": "spotBuy",
+    "params": [
+      "kind"
+    ]
+  },
+  {
+    "id": "secondSource",
+    "track": "power",
+    "ap": 1,
+    "cash": "dynamic",
+    "label": "Second-source the order",
+    "help": "A parallel order with another supplier; first to arrive wins, the loser cancels for a fee.",
+    "handler": "secondSource",
+    "params": [
+      "kind"
+    ]
+  },
+  {
+    "id": "switchGc",
+    "track": "construction",
+    "ap": 1,
+    "cash": "dynamic",
+    "label": "Switch general contractor",
+    "help": "Flip between GMP and cost-plus mid-game for a transition cost.",
+    "handler": "switchGc"
   }
 ]
