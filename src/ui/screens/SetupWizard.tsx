@@ -61,6 +61,7 @@ export function SetupWizard() {
           onScenarioChange={setScenarioId}
           onDifficultyChange={setDifficultyId}
           onNewGame={() => setStep('setup')}
+          onQuickStart={start}
           onTutorial={startTutorial}
         />
       );
