@@ -52,3 +52,42 @@ export const STAGE_ART: Record<string, TileArt> = {
   rfs: { bg: '#e8b84b', icon: '\u2705', label: 'RFS', img: hallRfsImg }, // ✅
   delivered: { bg: '#f2c94c', icon: '\u{1F3C6}', label: 'Delivered', img: hallDeliveredImg }, // 🏆
 };
+
+/** Graphics pass 2 (user ask: vehicles, cooling/electrical equipment, delivery trucks):
+ * small isometric sprites overlaid where the work, gear and deliveries actually are. */
+import vehicleExcavatorImg from '../assets/art/vehicle-excavator.png';
+import vehicleCraneImg from '../assets/art/vehicle-crane.png';
+import vehicleTruckImg from '../assets/art/vehicle-truck.png';
+import equipCoolingTowerImg from '../assets/art/equip-cooling-tower.png';
+import equipDryCoolerImg from '../assets/art/equip-dry-cooler.png';
+import equipHybridChillerImg from '../assets/art/equip-hybrid-chiller.png';
+import equipTransformerImg from '../assets/art/equip-transformer.png';
+import equipSwitchgearImg from '../assets/art/equip-switchgear.png';
+import truckDeliveryImg from '../assets/art/truck-delivery.png';
+
+/** Construction vehicle per active stage: excavator moves earth on the pad, the crane swings
+ * steel and shell panels, trucks feed fitout and RFS. Rendered only while the stage is active. */
+export const VEHICLE_ART: Record<string, { img: string; label: string }> = {
+  pad: { img: vehicleExcavatorImg, label: 'Excavator at work' },
+  steel: { img: vehicleCraneImg, label: 'Crane at work' },
+  shell: { img: vehicleCraneImg, label: 'Crane at work' },
+  fitout: { img: vehicleTruckImg, label: 'Crew trucks on site' },
+  rfs: { img: vehicleTruckImg, label: 'Crew trucks on site' },
+};
+
+/** Cooling equipment reflects the setup choice: evaporative towers, dry air coolers, or a
+ * hybrid chiller plant. Shown in the power corner once construction has begun. */
+export const COOLING_ART: Record<string, { img: string; label: string }> = {
+  evaporative: { img: equipCoolingTowerImg, label: 'Evaporative cooling towers' },
+  dry: { img: equipDryCoolerImg, label: 'Dry air coolers' },
+  hybrid: { img: equipHybridChillerImg, label: 'Hybrid chiller plant' },
+};
+
+/** Power gear once it has arrived on site (laydown yard orders). */
+export const EQUIP_ART: Record<'transformer' | 'switchgear', { img: string; label: string }> = {
+  transformer: { img: equipTransformerImg, label: 'Transformer on site' },
+  switchgear: { img: equipSwitchgearImg, label: 'Switchgear on site' },
+};
+
+/** Delivery truck flashed in the laydown yard the month an order arrives. */
+export const DELIVERY_TRUCK = { img: truckDeliveryImg, label: 'Delivery arrived' };

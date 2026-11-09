@@ -595,3 +595,32 @@ only per the user's call; phone-width layout is explicitly out of scope.
 | HUD still readable | done: wraps to two compact lines; all stats and buttons visible |
 | balance grid | skipped: UI-only, no engine/content-tuning/bot change |
 | full suite green | done: 499 vitest, 42 playwright, eslint, tsc, vite build |
+
+# GFX 2 - vehicles, equipment, deliveries
+
+## The change (UI only)
+
+User ask: "Graphic for construction vehicles, graphic for electric cooling, trucks.
+Supplies." Nine new isometric sprites in the reference style (src/assets/art/,
+256px): excavator, tower crane, flatbed truck, cooling tower, dry air cooler,
+hybrid chiller plant, transformer, switchgear, delivery truck. Rendered where they
+mean something: a stage's vehicle (excavator on pad, crane on steel/shell, trucks
+on fitout/RFS) appears on a hall only while its stage is actively being worked;
+the Plants corner shows the transformer and switchgear once the gear is on site
+(arrived or already installed at the substation) plus the cooling plant matching
+the setup choice (evaporative towers / dry coolers / hybrid chiller); a delivery
+truck flashes in the laydown yard the month an order arrives. Crate chips, captions
+and all overlays unchanged. hallVisual flags gain `active` (stageActive), a pure
+addition. Desktop only.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| vehicles where work is happening | done: queued advances show cranes on H5/H6 shell stages (screenshot); idle halls show none |
+| cooling gear reflects the setup choice | done: evaporative/dry/hybrid sprite in the Plants corner, tooltip names it |
+| electrical gear once on site | done: transformer + switchgear chips appear on arrival and stay once installed |
+| trucks on arrival | done: delivery truck flashes in the yard on the arrival month (screenshot, switchgear arrival Y2 M2) |
+| balance grid | skipped: UI-only, no engine/content-tuning/bot change |
+| full suite green | done: 499 vitest (hallVisual flag test updated), 42 playwright, eslint, tsc, vite build |
+| screenshots inspected | done: docs/screenshots/gfx2/ (board + delivery truck, desktop 1440) |

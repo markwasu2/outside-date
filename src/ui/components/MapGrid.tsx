@@ -9,6 +9,7 @@ import { STAGES } from '../../engine/types';
 import type { PlannedAction } from '../../engine/types';
 import { STAGE_ART, TILE_ART, type TileArt } from '../art';
 import { LEGEND_ENTRIES, hallCaption, pondStateWords, substationStateWords } from '../board/legibility';
+import { COOLING_ART, DELIVERY_TRUCK, EQUIP_ART } from '../art';
 import { useStore } from '../store';
 import { usePrefersReducedMotion } from '../board/boardStyles';
 import { monthDeltas } from '../board/deltas';
@@ -456,6 +457,17 @@ export function MapGrid() {
         title="Laydown yard"
       >
         <ArtLayer img={TILE_ART.laydownYard.img} />
+        {/* GFX 2: a delivery truck flashes in the yard the month an order arrives. */}
+        {deltas.arrivedOrders.length > 0 && (
+          <img
+            src={DELIVERY_TRUCK.img}
+            alt={DELIVERY_TRUCK.label}
+            title={`${DELIVERY_TRUCK.label}: ${deltas.arrivedOrders.join(', ')}`}
+            data-testid="delivery-truck"
+            className={reducedMotion ? undefined : 'board-arrival-flash'}
+            style={{ position: 'absolute', bottom: 4, right: 4, width: 64, borderRadius: 6, border: '1px solid #a1887f', background: '#fffdf8', pointerEvents: 'none' }}
+          />
+        )}
         <div style={ART_CHIP}>
           {TILE_ART.laydownYard.icon} {TILE_ART.laydownYard.label}
           {/* Phase 7 (scarcity pack): the yard holds a fixed number of crates; show the load. */}
@@ -558,6 +570,35 @@ export function MapGrid() {
         title="Power plants"
       >
         <div>{'\u{1F50C}'} Plants</div>
+        {/* GFX 2: the gear that is actually on site - arrived long-lead orders plus the cooling
+            plant the setup chose. Small sprites with tooltips; chips keep the words. */}
+        <div style={{ display: 'flex', gap: 4, marginTop: 3, position: 'relative' }}>
+          {(['transformer', 'switchgear'] as const).map((kind) =>
+            power.orders.some((o) => o.kind === kind && o.arrived) || power.substationStatus !== 'none' ? (
+              <img
+                key={kind}
+                src={EQUIP_ART[kind].img}
+                alt={EQUIP_ART[kind].label}
+                title={
+                  power.substationStatus !== 'none' && !power.orders.some((o) => o.kind === kind && o.arrived)
+                    ? `${EQUIP_ART[kind].label} - installed at the substation`
+                    : EQUIP_ART[kind].label
+                }
+                data-testid={`equip-${kind}`}
+                style={{ width: 34, height: 34, borderRadius: 4, border: '1px solid #8d6e63', background: '#fffdf8' }}
+              />
+            ) : null,
+          )}
+          {COOLING_ART[draft.setup.cooling] && (
+            <img
+              src={COOLING_ART[draft.setup.cooling]!.img}
+              alt={COOLING_ART[draft.setup.cooling]!.label}
+              title={COOLING_ART[draft.setup.cooling]!.label}
+              data-testid="equip-cooling"
+              style={{ width: 34, height: 34, borderRadius: 4, border: '1px solid #8d6e63', background: '#fffdf8' }}
+            />
+          )}
+        </div>
         {power.plants.map((p) => {
           const online = p.onlineMonth !== null && p.onlineMonth <= draft.month;
           const planned = p.plannedOnlineMonth !== null;
