@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
 import { formatDollars } from '../../engine/format';
+import { applyAction } from '../../engine/actions';
+import { resolveContent } from '../../engine/resolve';
 import type { ActionDef, Content } from '../../content/schemas';
 import type { GameState, GoodwillGroup, PlannedAction } from '../../engine/types';
 import { checkAction, useStore } from '../store';
@@ -44,9 +46,29 @@ function dynamicCash(def: ActionDef, state: GameState, content: Content): number
   return null;
 }
 
-function cashLabel(def: ActionDef, state: GameState, content: Content): string {
+/**
+ * QA pass 2, finding 6: row labels used to come straight from actions.json and base tuning, so
+ * the tutorial showed whale prices ($50.0M site option, $2.0M study, $3.0M switchgear) while
+ * the engine actually charges the scenario-resolved cost - and, for the site option, whatever
+ * the funding waterfall leaves to cash ($0 on the tutorial's capital stack). For any action
+ * with a cash cost, dry-run it against current state (the same probe-and-apply pattern
+ * store.ts's checkAction uses; the probe copy is discarded, no rng leaks into real state) and
+ * show the real cash delta. Falls back to the scenario-resolved static price when the action
+ * isn't currently legal - the row's disabled reason already explains why.
+ */
+function cashLabel(def: ActionDef, state: GameState, content: Content, params?: Record<string, string | number>): string {
+  const resolved = resolveContent(state, content);
+  if (def.cash === 'dynamic' || def.id === 'commissionStudy' || (typeof def.cash === 'number' && def.cash > 0)) {
+    try {
+      const after = applyAction(state, { actionId: def.id, ...(params ? { params } : {}) }, resolved);
+      const delta = state.cash - after.cash;
+      if (delta >= 0) return formatDollars(delta);
+    } catch {
+      // Not currently legal (missing prereq, insufficient cash): the static label still applies.
+    }
+  }
   if (def.cash !== 'dynamic') return formatDollars(def.cash);
-  const amount = dynamicCash(def, state, content);
+  const amount = dynamicCash(def, state, resolved);
   return amount === null ? 'varies' : formatDollars(amount);
 }
 
@@ -258,7 +280,7 @@ export function buildRows(tab: TrackTab, state: GameState, content: Content, sel
         label: `Ready liquid cooling: ${hallId}`,
         help: readyLiquid.help,
         ap: readyLiquid.ap,
-        cashLabel: cashLabel(readyLiquid, state, content),
+        cashLabel: cashLabel(readyLiquid, state, content, { hallId }),
         action: { actionId: 'readyLiquid', params: { hallId } },
       });
       rows.push({
@@ -364,6 +386,12 @@ export function TracksPanel() {
   const visitCastDef = findDef(content, 'visitCast');
   const hallIds = state.halls.map((h) => h.id);
   const filterLabel = hallFilterLabel(selectedHallId, hallIds);
+  // QA pass 2, finding 4: once the takeout window opens, "End month" by itself silently did
+  // nothing (store.ts's endMonth only commits a queued priceTakeout), and the only cue was one
+  // row on the Money tab. Surface a prominent finish button here and disable End month with a
+  // hint until the takeout is queued.
+  const takeoutOpen = state.phase === 'takeoutAvailable';
+  const takeoutQueued = plan.some((a) => a.actionId === 'priceTakeout');
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', fontFamily: 'sans-serif', fontSize: '0.85rem' }}>
@@ -477,7 +505,33 @@ export function TracksPanel() {
             <button onClick={() => removeAction(i)}>remove</button>
           </div>
         ))}
-        <button onClick={endMonth} style={{ marginTop: '0.5rem', width: '100%', padding: '0.5rem' }}>
+        {takeoutOpen && !takeoutQueued && (
+          <button
+            data-testid="price-takeout-banner"
+            onClick={() => queueAction({ actionId: 'priceTakeout' })}
+            style={{
+              marginTop: '0.5rem',
+              width: '100%',
+              padding: '0.5rem',
+              background: '#2e7d32',
+              color: '#fff',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
+          >
+            Price the takeout to finish the campaign
+          </button>
+        )}
+        <button
+          onClick={endMonth}
+          disabled={takeoutOpen && !takeoutQueued}
+          title={
+            takeoutOpen && !takeoutQueued
+              ? 'The takeout window is open - price the takeout (above, or the Money tab) to finish the campaign'
+              : undefined
+          }
+          style={{ marginTop: '0.5rem', width: '100%', padding: '0.5rem' }}
+        >
           End month
         </button>
       </div>

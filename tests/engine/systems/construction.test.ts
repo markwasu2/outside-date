@@ -236,3 +236,20 @@ describe('construction: optionSite / fundExtensions / readyLiquid', () => {
     ).toThrow(/never need liquid readiness/);
   });
 });
+
+// qa-fixes-2 finding #5: importCrews stayed legal (and re-charged $4.0M) every month while
+// crews were already active. The handler now refuses the double-buy until the current import
+// runs out.
+describe('importCrews: already-active guard (qa-fixes-2 finding #5)', () => {
+  it('rejects a second import while crews are active, then allows re-import after expiry', () => {
+    const state = freshState();
+    const first = applyAction(state, { actionId: 'importCrews' }, content);
+    expect(first.flags.importCrewsUntil).toBe(state.month + content.tuning.crews.importMonths);
+
+    expect(() => applyAction(first, { actionId: 'importCrews' }, content)).toThrow(/already imported/);
+
+    const expired = { ...first, month: first.flags.importCrewsUntil as number };
+    const again = applyAction(expired, { actionId: 'importCrews' }, content);
+    expect(again.flags.importCrewsUntil).toBe(expired.month + content.tuning.crews.importMonths);
+  });
+});

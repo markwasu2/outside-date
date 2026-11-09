@@ -49,7 +49,21 @@ export function applyStormDamage(state: GameState, content: Content, hallId: str
   });
 
   if (state.insurance.dsu) return next;
-  return { ...next, flags: { ...next.flags, drawFreeze: true } };
+  // QA pass 2, finding 3: same silent-freeze fix as effects.ts's drawFreeze handler - the
+  // storm sets the flag directly here, so it logs its own start line (Hud.tsx carries the
+  // persistent indicator).
+  return {
+    ...next,
+    flags: { ...next.flags, drawFreeze: true },
+    log: [
+      ...next.log,
+      {
+        month: state.month,
+        kind: 'warning',
+        text: 'Lender draw freeze: construction draws are paused until you cure it (Money tab).',
+      },
+    ],
+  };
 }
 
 /**

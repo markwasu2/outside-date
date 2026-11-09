@@ -192,7 +192,21 @@ export const effectHandlers: Record<EffectType, EffectHandler> = {
 
   drawFreeze: (state, args) => {
     if (args[0] !== 'untilCured') throw new Error(`Unsupported drawFreeze arg: ${String(args[0])}`);
-    return { ...state, flags: { ...state.flags, drawFreeze: true } };
+    // QA pass 2, finding 3: a draw freeze used to start silently - no log line, no HUD cue,
+    // and the player only noticed when construction stopped moving. Log its start (Hud.tsx
+    // adds the persistent indicator).
+    return {
+      ...state,
+      flags: { ...state.flags, drawFreeze: true },
+      log: [
+        ...state.log,
+        {
+          month: state.month,
+          kind: 'warning',
+          text: 'Lender draw freeze: construction draws are paused until you cure it (Money tab).',
+        },
+      ],
+    };
   },
 
   orderSlip: (state, args) => {

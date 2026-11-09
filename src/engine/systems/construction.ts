@@ -337,6 +337,14 @@ export function importCrews(
   actionDef: { cash: number | 'dynamic' },
 ): GameState {
   if (typeof actionDef.cash !== 'number') throw new Error('importCrews expects a fixed cash cost');
+  // QA pass 2, finding 5: while crews were already imported the action stayed legal and
+  // re-charged the full price every month for zero added effect (one UI test run bought it
+  // monthly and burned ~$90M). Refuse the double-buy; the UI's checkAction shows this reason
+  // on the disabled row, and the bots' probe-and-apply simply skips the candidate.
+  const activeUntil = state.flags.importCrewsUntil;
+  if (typeof activeUntil === 'number' && state.month < activeUntil) {
+    throw new Error(`Crews are already imported and active for ${activeUntil - state.month} more month(s)`);
+  }
   if (state.cash < actionDef.cash) throw new Error('Insufficient cash to import crews');
   return {
     ...state,

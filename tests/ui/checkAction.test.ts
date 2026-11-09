@@ -56,3 +56,28 @@ describe('checkAction: zero-AP action dedup (item 1)', () => {
     if (!second.ok) expect(second.reason).not.toBe('Already queued this month');
   });
 });
+
+// qa-fixes-2 finding #1: the tutorial starts at exactly $8.0M cash and "Fund road and school
+// extensions" costs exactly $8.0M - the handler's own `cash < cost` check passes, and the
+// player defaults on the spot at end of month. checkAction now refuses any queue that cuts
+// cash and leaves under one month of runway.
+describe('checkAction: cash-runway guard (qa-fixes-2 finding #1)', () => {
+  it('rejects the tutorial fundExtensions trap at exactly $8.0M cash', () => {
+    const tutorial = createGame(content, 'tutorial-edge5', setup, negotiation, 1);
+    expect(tutorial.cash).toBe(8_000_000);
+    const result = checkAction(tutorial, content, [], { actionId: 'fundExtensions' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toContain('runway');
+  });
+
+  it('still allows the same action when it leaves a healthy runway', () => {
+    const state = freshState();
+    expect(checkAction(state, content, [], { actionId: 'fundExtensions' }).ok).toBe(true);
+  });
+
+  it('never blocks zero-cash actions, even at zero runway', () => {
+    const tutorial = createGame(content, 'tutorial-edge5', setup, negotiation, 1);
+    const broke = { ...tutorial, cash: 0 };
+    expect(checkAction(broke, content, [], { actionId: 'confirmRackSchedule' }).ok).toBe(true);
+  });
+});

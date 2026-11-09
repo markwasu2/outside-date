@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { BOTS, runOneGame } from '../../src/sim/runSim';
 import { aggregate } from '../../src/sim/report';
+import { DEFAULT_NEGOTIATION, DEFAULT_SETUP } from '../../src/ui/defaultGame';
 
 /**
  * P5.3 regression guard: 1000 seeds per bot against the whale scenario, normal difficulty
@@ -97,10 +98,22 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
     expect(report.winRate).toBeLessThanOrEqual(0.95);
   });
 
-  it('tutorial-edge5: the guided careful path wins at least half of runs', () => {
-    const bot = BOTS['careful']!;
+  // QA pass 2, finding 2: this test used to run the careful bot's own high-end setup
+  // (liquid tier / hybrid cooling / GMP / DSU on) against the tutorial scenario, while the
+  // UI's Tutorial button actually starts with DEFAULT_SETUP/DEFAULT_NEGOTIATION
+  // (air/evaporative/cost-plus, senior index 1, no DSU, seed 1 - see SetupWizard.tsx's
+  // startTutorial). The sim was grading a tutorial nobody plays: under the real UI setup the
+  // old tuning won 55% of runs at a 0.39x median, almost all of them sub-1.0x "scraped"
+  // takeouts. The bot's one-time choices are now pinned to the UI defaults (the shared
+  // src/ui/defaultGame.ts module, not a copy), and the scenario was retuned
+  // (content/scenarios/tutorial-edge5.json: fitout 4->3 months, monthlyBurn 200k->150k,
+  // land.megasite override $50M->$20M) to clear the bar below.
+  it('tutorial-edge5: the guided careful path wins >=60% of runs at a >=1.0x median multiple under the UI defaults', () => {
+    const base = BOTS['careful']!;
+    const bot = { ...base, id: 'careful-tutorial-ui', setup: DEFAULT_SETUP, negotiation: DEFAULT_NEGOTIATION };
     const results = Array.from({ length: 200 }, (_, i) => runOneGame(bot, content, 'tutorial-edge5', 'normal', SEED + i));
     const report = aggregate(results);
-    expect(report.winRate).toBeGreaterThanOrEqual(0.5);
+    expect(report.winRate).toBeGreaterThanOrEqual(0.6);
+    expect(report.equityMultiple.median).toBeGreaterThanOrEqual(1.0);
   });
 });

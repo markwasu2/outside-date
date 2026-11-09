@@ -2,11 +2,11 @@
   {
     "id": "storm",
     "title": "Storm off the gulf",
-    "body": "A late-season storm tracks over Richfield County and sits on your site for a day. Crews pull back until the water clears.",
+    "body": "A late-season storm tracks over Richfield County and sits on your site for a day. Crews pull back until the water clears. Without delay-in-start-up cover, the lender freezes construction draws until you cure the paperwork.",
     "bodyVariants": [
-      "The rain comes sideways for a day and the site turns to mud. Crews stand down until it drains.",
-      "A storm parks over Richfield County and the cranes go quiet. One of the halls loses ground to the weather.",
-      "Lightning on the horizon, water on the pad. The crew chief calls it before lunch."
+      "The rain comes sideways for a day and the site turns to mud. Crews stand down until it drains. Unless you carry delay-in-start-up cover, the lender holds construction draws until the freeze is cured.",
+      "A storm parks over Richfield County and the cranes go quiet. One of the halls loses ground to the weather. The lender freezes construction draws until the claim is cured, unless delay-in-start-up cover is active.",
+      "Lightning on the horizon, water on the pad. The crew chief calls it before lunch. Expect the lender to freeze construction draws until cured unless you carry delay-in-start-up cover."
     ],
     "art": "storm",
     "odds": 0.28,
@@ -14,7 +14,7 @@
     "seasonMonths": [5, 9],
     "requires": ["anyHallStageIn:pad|steel|shell"],
     "effects": [{ "type": "stormDamage", "args": [] }],
-    "note": "Per rules 4.11: pick one hall in pad/steel/shell (seeded). stageMonthsDone = max(0, stageMonthsDone - 1). Damage = tuning.events.stormDamage, builder's risk covers all but the deductible; without it, cash pays it all. insuredDelayMonths +1 only if builder's risk was in force. Also sets a 1-month draw freeze unless DSU is active."
+    "note": "Per rules 4.11: pick one hall in pad/steel/shell (seeded). stageMonthsDone = max(0, stageMonthsDone - 1). Damage = tuning.events.stormDamage, builder's risk covers all but the deductible; without it, cash pays it all. insuredDelayMonths +1 only if builder's risk was in force. Also sets a draw freeze until cured (the cureDraw action lifts it) unless DSU is active. Card text fixed in the qa-fixes-2 pass: this note used to say '1-month' and the card never mentioned the lender, while the code has always frozen draws until cured."
   },
   {
     "id": "supply_shock",

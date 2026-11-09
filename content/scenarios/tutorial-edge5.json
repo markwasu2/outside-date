@@ -38,6 +38,9 @@
   ],
   "skipTransformerOrder": true,
   "tuningOverrides": {
+    "land": {
+      "megasite": 20000000
+    },
     "power": {
       "interimGridMW": 8,
       "studyCost": 500000,
@@ -67,7 +70,7 @@
       },
       {
         "id": "fitout",
-        "minMonths": 4,
+        "minMonths": 3,
         "costShare": 0.34
       },
       {
@@ -77,7 +80,7 @@
       }
     ],
     "campaign": {
-      "monthlyBurn": 200000
+      "monthlyBurn": 150000
     },
     "insurance": {
       "buildersRiskMonthly": 100000,
