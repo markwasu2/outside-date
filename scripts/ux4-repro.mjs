@@ -1,4 +1,4 @@
-/* global localStorage, window, document */
+/* global console, localStorage, window, document */
 import { chromium } from 'playwright';
 const browser = await chromium.launch();
 const page = await browser.newPage();

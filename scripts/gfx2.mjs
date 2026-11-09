@@ -1,4 +1,4 @@
-/* global localStorage, window */
+/* global console, localStorage, window */
 // GFX 2 shot 1: mid-game board - vehicle on an active stage, equipment row, cooling gear.
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';

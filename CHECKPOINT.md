@@ -818,3 +818,11 @@ Transient notices hide while a choice modal is pending.
 | lint | src/tests/e2e clean; npm lint reveals 18 baseline screenshot-script errors, separate maintenance PR next |
 | visual check | docs/screenshots/cold2/help-dock.png, 1280x720 |
 | balance grid | skipped: UI layout only |
+
+# Screenshot-script lint baseline
+
+Declared console in the screenshot helpers that use it, and removed unused
+window globals from two helpers. No game, engine or script behavior changed.
+Full npm lint is green again. Previous fix-4 tests (508 unit, 48 e2e), typecheck
+and build apply unchanged; no runtime files touched. Balance grid and visual
+checks are not applicable to comments declaring script globals.
