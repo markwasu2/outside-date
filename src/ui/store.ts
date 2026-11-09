@@ -11,6 +11,7 @@ import type { GameState, PlannedAction, Setup } from '../engine/types';
 import { BotRng } from '../sim/rng';
 import { BOTS, playOneGame } from '../sim/runSim';
 import { SAVE_VERSION, saveGame, type SaveFile } from './save';
+import { appendSnapshot, buildFinancialSnapshot, type FinancialSnapshot } from './financials';
 import { playSound } from './sound';
 import { newCrossings, warnings } from './board/warnings';
 
@@ -74,8 +75,8 @@ function playTransitionSounds(before: GameState, after: GameState, planContent: 
 
 /** The six track tabs the TracksPanel renders (P6.5); the 'any' track (visitCast) gets its own always-visible section. */
 export type TrackTab = 'land' | 'regulation' | 'power' | 'money' | 'chips' | 'construction';
-/** The one floating panel (P6.2's "floating ledger drawer"); TracksPanel's own tab switching is local UI state, not store state. */
-export type OpenPanel = 'ledger';
+/** The floating panels (P6.2's "floating ledger drawer", Phase 2 D1's Financials drawer); TracksPanel's own tab switching is local UI state, not store state. */
+export type OpenPanel = 'ledger' | 'financials';
 /** 'start' is the Phase 7 title/setup/negotiation wizard (src/ui/screens/SetupWizard.tsx, which
  * owns its own internal step as local state - only "are we in the wizard or in a real game"
  * needs to live in the shared store); 'game' is the Phase 6 UI shell. */
@@ -257,6 +258,17 @@ interface UIStore {
    * `playSound` call site reads. */
   muted: boolean;
   toggleMuted: () => void;
+  /** Phase 2 (D1): one financial snapshot per committed month (month 0 = close), appended by
+   * every state-committing action and persisted in the save file (SAVE_VERSION 2). */
+  financialSnapshots: FinancialSnapshot[];
+  /** Phase 2 (D2): stat explainer ids already seen this run - same UI-only seen-flag pattern
+   * as seenBoardObjects (cleared by newGame/loadGame). */
+  seenExplainers: string[];
+  markExplainerSeen: (id: string) => void;
+  /** Phase 2 (D4/D5): the codex overlay's Stakeholders view is addressed by the reserved
+   * selected id 'stakeholders'; `codexStakeholderFocus` names the role to highlight (set by
+   * who-holds chips via openCodex's second argument). */
+  codexStakeholderFocus: string | null;
 
   selectHall: (hallId: string | null) => void;
   setOpenPanel: (panel: OpenPanel | null) => void;
@@ -267,7 +279,7 @@ interface UIStore {
   undo: () => void;
   endMonth: () => void;
   dismissCoachTip: (id: string) => void;
-  openCodex: (entryId?: string) => void;
+  openCodex: (entryId?: string, stakeholderFocus?: string) => void;
   closeCodex: () => void;
   /** Phase 10 (P10.1): load a save (from localStorage via the Title screen's Continue, or from
    * an imported file) as the active game. */
@@ -313,6 +325,11 @@ export const useStore = create<UIStore>((set, get) => ({
   codexSelectedId: null,
   muted: true,
   toggleMuted: () => set((s) => ({ muted: !s.muted })),
+  financialSnapshots: [],
+  seenExplainers: [],
+  markExplainerSeen: (id) =>
+    set((s) => (s.seenExplainers.includes(id) ? s : { seenExplainers: [...s.seenExplainers, id] })),
+  codexStakeholderFocus: null,
 
   selectHall: (hallId) => set({ selectedHallId: hallId }),
   setBoardPopover: (objectId) => set({ boardPopover: objectId }),
@@ -322,8 +339,9 @@ export const useStore = create<UIStore>((set, get) => ({
   setOpenPanel: (panel) => set((s) => ({ openPanel: s.openPanel === panel ? null : panel })),
   setScreen: (screen) => set({ screen }),
   dismissCoachTip: (id) => set((s) => ({ dismissedCoachTips: [...s.dismissedCoachTips, id] })),
-  openCodex: (entryId) => set({ codexOpen: true, codexSelectedId: entryId ?? null }),
-  closeCodex: () => set({ codexOpen: false, codexSelectedId: null }),
+  openCodex: (entryId, stakeholderFocus) =>
+    set({ codexOpen: true, codexSelectedId: entryId ?? null, codexStakeholderFocus: stakeholderFocus ?? null }),
+  closeCodex: () => set({ codexOpen: false, codexSelectedId: null, codexStakeholderFocus: null }),
   clearError: () => set({ error: null }),
 
   queueAction: (action) => {
@@ -386,14 +404,28 @@ export const useStore = create<UIStore>((set, get) => ({
       // of real clicks; see Decisions log).
       if (state.phase === 'takeoutAvailable') {
         const next = foldPlan(state, c, plan);
-        set({ state: next, prevState: state, plan: [], draft: next, error: null });
+        set((s) => ({
+          state: next,
+          prevState: state,
+          plan: [],
+          draft: next,
+          error: null,
+          financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(next, c)),
+        }));
         playTransitionSounds(state, next, c, muted);
         get().autosave();
         return;
       }
       const result = step(state, plan, c);
       const next = applyWarningCrossings(state, result.state, c, muted);
-      set({ state: next, prevState: state, plan: [], draft: next, error: null });
+      set((s) => ({
+        state: next,
+        prevState: state,
+        plan: [],
+        draft: next,
+        error: null,
+        financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(next, c)),
+      }));
       playSound('turn', muted);
       playTransitionSounds(state, next, c, muted);
       get().autosave();
@@ -426,7 +458,14 @@ export const useStore = create<UIStore>((set, get) => ({
       return;
     }
     const next = applyWarningCrossings(state, result.state, c, muted);
-    set({ state: next, prevState: state, draft: next, plan: [], error: null });
+    set((s) => ({
+      state: next,
+      prevState: state,
+      draft: next,
+      plan: [],
+      error: null,
+      financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(next, c)),
+    }));
     playTransitionSounds(state, next, c, muted);
     get().autosave();
   },
@@ -439,7 +478,13 @@ export const useStore = create<UIStore>((set, get) => ({
     if (state.phase !== 'awaitingChoice' || !state.pending) return;
     try {
       const result = resolveEvent(state, choiceId, c);
-      set({ state: result.state, draft: result.state, plan: [], error: null });
+      set((s) => ({
+        state: result.state,
+        draft: result.state,
+        plan: [],
+        error: null,
+        financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(result.state, c)),
+      }));
       get().autosave();
     } catch (e) {
       set({ error: humanizeActionError(e instanceof Error ? e.message : String(e)) });
@@ -464,6 +509,9 @@ export const useStore = create<UIStore>((set, get) => ({
       dismissedCoachTips: [],
       lastNegotiation: negotiation,
       lastDifficultyId: difficultyId,
+      financialSnapshots: [buildFinancialSnapshot(next, c)],
+      seenExplainers: [],
+      codexStakeholderFocus: null,
     });
     get().autosave();
   },
@@ -484,6 +532,15 @@ export const useStore = create<UIStore>((set, get) => ({
       dismissedCoachTips: save.dismissedCoachTips,
       lastNegotiation: save.lastNegotiation,
       lastDifficultyId: save.lastDifficultyId,
+      // Migrated v1 saves carry an empty series; seed it from the loaded state so the drawer
+      // has a current month even before the next commit (its month-0 row is unrecoverable -
+      // the sources/uses table then falls back to a recompute note in the drawer).
+      financialSnapshots:
+        save.financialSnapshots.length > 0
+          ? save.financialSnapshots
+          : [buildFinancialSnapshot(save.state, content)],
+      seenExplainers: [],
+      codexStakeholderFocus: null,
     });
   },
 
@@ -491,8 +548,8 @@ export const useStore = create<UIStore>((set, get) => ({
    * state-committing actions above, right after their own `set()`, so it always reads the
    * just-committed values rather than a stale snapshot. */
   autosave: () => {
-    const { state, lastNegotiation, lastDifficultyId, dismissedCoachTips } = get();
-    saveGame({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips });
+    const { state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots } = get();
+    saveGame({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots });
   },
 }));
 
