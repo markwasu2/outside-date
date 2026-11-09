@@ -122,13 +122,15 @@ test('Whale campaign runs via the competent bot debug hook and shows the report 
   await page.goto('/');
   await page.waitForFunction(() => typeof (window as unknown as { __debugRunBot?: unknown }).__debugRunBot === 'function');
 
-  // Seed 2: confirmed via `playOneGame` directly (not asserted blind) to be a competent-bot win
-  // with a priced takeout, so this test exercises the full report card (grades + risk table),
-  // not just the no-takeout-loss branch `tests/engine/systems/loseCheck.test.ts` already covers.
+  // Seed 3: confirmed via `playOneGame` directly (not asserted blind) to be a competent-bot win
+  // with a priced takeout (2.03x under Phase 4's quarry-ridge site pick; seed 2 became a loss
+  // when bots started choosing their ground), so this test exercises the full report card
+  // (grades + risk table), not just the no-takeout-loss branch
+  // `tests/engine/systems/loseCheck.test.ts` already covers.
   await page.evaluate(() => {
     (
       window as unknown as { __debugRunBot: (botId: string, scenarioId: string, difficulty: string, seed: number) => void }
-    ).__debugRunBot('competent', 'whale', 'normal', 2);
+    ).__debugRunBot('competent', 'whale', 'normal', 3);
   });
 
   await finishEndedFlow(page);
