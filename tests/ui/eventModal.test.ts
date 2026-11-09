@@ -31,6 +31,29 @@ describe('EventModal: describeEffect (finding #2)', () => {
     expect(describeEffect(effect)).toContain('+6');
   });
 
+  // Fix 13 (playtest-fixes): the_ask's "Say yes"/"Say no" used to fall through to "Has
+  // consequences" since addAskHalls/declineAsk aren't cash/goodwill/owedAp.
+  it('describes addAskHalls with the real stakes of saying yes to the_ask', () => {
+    const effect: Effect = { type: 'addAskHalls', args: [] };
+    expect(describeEffect(effect)).not.toBe('Has consequences');
+    expect(describeEffect(effect)).toContain('2 more halls');
+  });
+
+  it('describes declineAsk with the tenant goodwill cost of saying no to the_ask', () => {
+    const effect: Effect = { type: 'declineAsk', args: [] };
+    expect(describeEffect(effect)).toBe('Tenant goodwill -20');
+  });
+
+  it('builds a stakes preview line on the real the_ask content card for both choices', () => {
+    const card = content.events.find((e) => e.id === 'the_ask');
+    expect(card).toBeDefined();
+    const yesText = describeChoiceEffects('yes', card ?? null);
+    const noText = describeChoiceEffects('no', card ?? null);
+    expect(yesText).not.toBe('');
+    expect(yesText).not.toBe('Has consequences');
+    expect(noText).toBe('Tenant goodwill -20');
+  });
+
   it('falls back to a neutral description for effect types it cannot describe specifically', () => {
     const effect: Effect = { type: 'hallProgress', args: ['H1', 1] };
     expect(describeEffect(effect)).toBe('Has consequences');

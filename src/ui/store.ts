@@ -3,9 +3,9 @@ import { create } from 'zustand';
 import type { ActionDef, Content } from '../content/schemas';
 import { loadContent } from '../content/load';
 import { applyAction } from '../engine/actions';
-import { formatDollars } from '../engine/format';
+import { formatDollars, formatMonth } from '../engine/format';
 import { createGame, type DifficultyId, type NegotiationChoices } from '../engine/init';
-import { runway } from '../engine/selectors';
+import { dscr, ledger, runway } from '../engine/selectors';
 import { fastForward as engineFastForward, resolveEvent, step, totalApCost } from '../engine/step';
 import type { GameState, PlannedAction, Setup } from '../engine/types';
 import { BOTS, playOneGame } from '../sim/runSim';
@@ -18,6 +18,29 @@ const WARNING_RUNWAY_MONTHS = 3;
 
 function deliveredCount(state: GameState): number {
   return state.halls.filter((h) => h.delivered).length;
+}
+
+/** Fix 14 (playtest-fixes): human-readable reason for why `engineFastForward` (engine/step.ts)
+ * stopped without advancing even one month, mirroring that function's own three guard conditions
+ * in the same order (due-soon ledger entry, thin runway, thin DSCR headroom) so the reason given
+ * always matches the one that actually fired. Exported for tests. `state`/`content` here are the
+ * already-stopped state fast-forward returned, same as what the engine's guard itself read. */
+export function fastForwardStopReason(state: GameState, content: Content): string {
+  const dueSoon = ledger(state, content)
+    .filter((entry) => entry.month - state.month <= 1 && entry.month >= state.month)
+    .sort((a, b) => a.month - b.month)[0];
+  if (dueSoon) {
+    return `Fast-forward stopped: "${dueSoon.label}" is due ${formatMonth(dueSoon.month)} - use End month to step past it.`;
+  }
+  const months = runway(state, content);
+  if (months < 3) {
+    return `Fast-forward stopped: runway is under 3 months (${Math.max(0, Math.round(months))}mo) - use End month to continue one at a time.`;
+  }
+  const coverage = dscr(state, content);
+  if (Number.isFinite(coverage) && coverage - content.tuning.covenant.dscrTrigger < 0.1) {
+    return 'Fast-forward stopped: DSCR headroom is critically thin - use End month to continue one at a time.';
+  }
+  return 'Fast-forward stopped for this month - use End month to continue.';
 }
 
 /** P10.3: fires the 'milestone' sound (a hall newly delivered, or the campaign newly ending in a
@@ -79,6 +102,35 @@ export function foldPlan(state: GameState, planContent: Content, plan: PlannedAc
   return working;
 }
 
+/** Fix 5 (playtest-fixes): engine/content validation errors are plain `Error`/`ActionError`
+ * messages written for developers (e.g. `This action requires a valid "permitId" param`,
+ * `step() called while phase is "awaitingChoice", expected "playing"`), never with a player
+ * audience in mind. Rewrites the handful of these that read as raw/dev-facing into a
+ * player-facing sentence; anything else (most engine messages are already full, readable
+ * sentences, e.g. "Insufficient cash to commission the study") passes through unchanged. Every
+ * catch block in this store runs its caught message through this before setting `error`, so no
+ * raw thrown-error text ever reaches the UI. */
+export function humanizeActionError(message: string): string {
+  if (/^step\(\) called while phase is/.test(message)) {
+    return 'The game is waiting on your answer to an event - resolve it before ending the month.';
+  }
+  if (/^resolveEvent\(\) called with no pending event/.test(message)) {
+    return "There's no event waiting for a response right now.";
+  }
+  const paramMatch = message.match(/requires an? (?:valid )?"(\w+)" param/);
+  if (paramMatch && paramMatch[1]) {
+    const label = paramMatch[1].replace(/([A-Z])/g, ' $1').toLowerCase();
+    return `Pick a ${label} before queuing this action.`;
+  }
+  if (/^Unknown action id/.test(message)) {
+    return "That action isn't available right now.";
+  }
+  if (/^Unknown effect type|^Unsupported |^Unknown condition atom|^Expected a .* arg/.test(message)) {
+    return 'Something went wrong applying that action. Try a different one.';
+  }
+  return message;
+}
+
 /**
  * UI-polish item 1: zero-AP actions (`cancelOrder`, `confirmRackSchedule`, `standDown`) have no AP
  * budget to cap how many times they can be queued in one month engine-side, so without this check
@@ -135,7 +187,7 @@ export function checkAction(
     }
     return { ok: true };
   } catch (e) {
-    return { ok: false, reason: e instanceof Error ? e.message : String(e) };
+    return { ok: false, reason: humanizeActionError(e instanceof Error ? e.message : String(e)) };
   }
 }
 
@@ -273,6 +325,16 @@ export const useStore = create<UIStore>((set, get) => ({
 
   endMonth: () => {
     const { state, content: c, plan, muted } = get();
+    // Fix 12 (playtest-fixes): a pending event modal must be resolved before the month can end -
+    // `step()` throws otherwise. The modal-pending UI (TracksPanel's End month button) is already
+    // disabled in this state, but a click that lands between React's state update and the
+    // re-render (e.g. a fast double-click) can still reach here; guard explicitly instead of
+    // relying only on the disabled attribute, and skip straight to a friendly error rather than
+    // round-tripping through step()'s throw.
+    if (state.phase === 'awaitingChoice') {
+      set({ error: humanizeActionError('step() called while phase is "awaitingChoice", expected "playing"') });
+      return;
+    }
     try {
       // P10.5 bug fix: `step()` only runs during 'playing' (by design - the monthly world tick
       // shouldn't fire once the takeout window is open) and throws otherwise. The only action
@@ -296,14 +358,33 @@ export const useStore = create<UIStore>((set, get) => ({
       playTransitionSounds(state, result.state, c, muted);
       get().autosave();
     } catch (e) {
-      set({ error: e instanceof Error ? e.message : String(e) });
+      set({ error: humanizeActionError(e instanceof Error ? e.message : String(e)) });
     }
   },
 
   fastForward: () => {
     const { state, content: c, plan, muted } = get();
     if (plan.length > 0) return;
+    // Fix 12 (playtest-fixes): fast-forward is a no-op while a modal is pending (engine's own
+    // `fastForward` loop condition is `phase === 'playing'`), which silently does nothing and
+    // reads as a freeze. Guard explicitly with a visible reason instead.
+    if (state.phase === 'awaitingChoice') {
+      set({ error: 'Resolve the pending event before fast-forwarding.' });
+      return;
+    }
     const result = engineFastForward(state, c);
+    // Fix 14 (playtest-fixes): `engineFastForward` (engine/step.ts) correctly refuses to skip over
+    // an imminent ledger milestone, a thin runway, or thin DSCR headroom - by design, so the player
+    // doesn't blow past something that needs attention. Confirmed this is not a state/engine bug:
+    // `step()` (End month) always advances fine from the exact same state. But when the guard stops
+    // it before even one month passes, the UI gave zero feedback, so repeated clicks looked exactly
+    // like a frozen game (reported as a "fast-forward freeze" around Y3). Surface why it stopped,
+    // using the same `ledger()`/`runway()`/`dscr()` reads the engine's own guard uses, instead of
+    // silently no-opping.
+    if (result.state.month === state.month && result.state.phase === 'playing') {
+      set({ error: fastForwardStopReason(result.state, c) });
+      return;
+    }
     set({ state: result.state, draft: result.state, plan: [], error: null });
     playTransitionSounds(state, result.state, c, muted);
     get().autosave();
@@ -311,12 +392,16 @@ export const useStore = create<UIStore>((set, get) => ({
 
   resolveEventChoice: (choiceId) => {
     const { state, content: c } = get();
+    // Fix 12 (playtest-fixes): guards a double dispatch (e.g. two rapid clicks on event-choice
+    // buttons before React removes the modal) from reaching `resolveEvent()`, which throws when
+    // there's no pending event - the first click already resolved it, so the second is a no-op.
+    if (state.phase !== 'awaitingChoice' || !state.pending) return;
     try {
       const result = resolveEvent(state, choiceId, c);
       set({ state: result.state, draft: result.state, plan: [], error: null });
       get().autosave();
     } catch (e) {
-      set({ error: e instanceof Error ? e.message : String(e) });
+      set({ error: humanizeActionError(e instanceof Error ? e.message : String(e)) });
     }
   },
 

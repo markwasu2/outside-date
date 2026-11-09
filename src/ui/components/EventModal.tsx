@@ -21,6 +21,18 @@ const DOCKET_VOTE_FAIL_CARD = {
  * cash/goodwill/owedAp) fall back to a neutral "Has consequences" rather than leaking the raw
  * effect JSON or crashing on an unexpected args shape. */
 export function describeEffect(effect: Effect): string {
+  // Fix 13 (playtest-fixes): `the_ask`'s choices use two custom effect types
+  // (`addAskHalls`/`declineAsk`, src/engine/effects.ts) that carry no args for the generic
+  // branches below to read - without this they fell through to the neutral "Has consequences"
+  // fallback, which is how "Say yes"/"Say no" ended up showing no real stakes. The numbers here
+  // mirror events.json's own documented note for this card (2 halls / -20 tenant goodwill), not
+  // tuning, since they're fixed scripted-event outcomes rather than a tunable.
+  if (effect.type === 'addAskHalls') {
+    return 'Adds 2 more halls (same terms), new delivery dates, scales debt/equity commitments';
+  }
+  if (effect.type === 'declineAsk') {
+    return 'Tenant goodwill -20';
+  }
   if (effect.type === 'owedAp') {
     const n = effect.args[0];
     return typeof n === 'number' ? `Costs ${n} AP next month` : 'Has consequences';

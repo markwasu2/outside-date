@@ -138,6 +138,12 @@ export function MapGrid() {
   );
 }
 
+/** Fix 3 (playtest-fixes): grid items default to `min-width: auto` / `min-height: auto`, which
+ * means their min-content size (driven by unwrapped text like "Substation" or "Orders: 2") can
+ * force a 1fr track wider/taller than its fair share, squeezing a neighboring track below its own
+ * content's needs and causing that neighbor's text to overflow outside its cell - at narrow
+ * widths this is what made the Substation panel's text bleed into the hall labels. Pinning
+ * min-width/min-height to 0 and clipping overflow keeps every cell inside its own grid area. */
 const cellStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
@@ -146,4 +152,7 @@ const cellStyle: CSSProperties = {
   textAlign: 'center',
   borderRadius: 4,
   padding: 2,
+  minWidth: 0,
+  minHeight: 0,
+  overflow: 'hidden',
 };
