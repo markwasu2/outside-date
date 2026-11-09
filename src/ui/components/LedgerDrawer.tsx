@@ -1,25 +1,62 @@
 import { formatMonth } from '../../engine/format';
 import { ledger } from '../../engine/selectors';
-import type { GameState } from '../../engine/types';
+import type { GameState, PermitId } from '../../engine/types';
 import { useStore } from '../store';
-
-/** Red if overdue and not yet resolved, amber if due within 2 months, else the default color. */
-function riskColor(state: GameState, entry: { month: number; kind: string; label: string }): string {
-  const overdueUnresolved =
-    entry.month < state.month &&
-    ((entry.kind === 'hallDelivery' && !hallFor(state, entry.label, ' delivery')?.delivered) ||
-      (entry.kind === 'hallOutside' &&
-        !hallFor(state, entry.label, ' outside date')?.delivered &&
-        !hallFor(state, entry.label, ' outside date')?.terminated));
-  if (overdueUnresolved) return '#c62828';
-  if (entry.month - state.month <= 2 && entry.month >= state.month) return '#b8860b';
-  return '#333';
-}
 
 function hallFor(state: GameState, label: string, suffix: string) {
   if (!label.endsWith(suffix)) return undefined;
   const id = label.slice(0, label.length - suffix.length);
   return state.halls.find((h) => h.id === id);
+}
+
+/** Permit-decision ledger labels are built by selectors.ts's `ledger()` as `${permitId} permit
+ * decision` - strip that known suffix to recover the permit id, mirroring `hallFor` above. */
+function permitIdFor(label: string): string | undefined {
+  const suffix = ' permit decision';
+  if (!label.endsWith(suffix)) return undefined;
+  return label.slice(0, label.length - suffix.length);
+}
+
+/** QA finding #4 fix: entry kinds whose resolution state we can actually check (as opposed to
+ * just the entry's own due month). Kept as an explicit set rather than inferring "the other
+ * kinds" so adding resolution tracking here never silently changes behavior for kinds this fix
+ * wasn't asked to touch (orderArrival/plantOnline/conversionTest/takeoutWindow keep their
+ * original date-only overdue behavior below). */
+const RESOLUTION_TRACKED_KINDS = new Set(['hallDelivery', 'hallOutside', 'permit', 'docketVote', 'discovery', 'studyDone']);
+
+/** Whether the underlying milestone behind a tracked-kind entry has actually resolved, independent
+ * of whether its target month has passed. Only meaningful for kinds in `RESOLUTION_TRACKED_KINDS`.
+ * Exported so tests/ui can cover the QA finding #4 fix without rendering the component. */
+export function isResolved(state: GameState, entry: { kind: string; label: string }): boolean {
+  if (entry.kind === 'hallDelivery') return !!hallFor(state, entry.label, ' delivery')?.delivered;
+  if (entry.kind === 'hallOutside') {
+    const hall = hallFor(state, entry.label, ' outside date');
+    return !!hall?.delivered || !!hall?.terminated;
+  }
+  if (entry.kind === 'permit') {
+    const id = permitIdFor(entry.label);
+    const permit = id && id in state.permits ? state.permits[id as PermitId] : undefined;
+    return permit ? permit.status !== 'pending' : false;
+  }
+  if (entry.kind === 'docketVote') return state.docket.status !== 'open';
+  if (entry.kind === 'discovery') return !state.docket.discoveryOutstanding;
+  if (entry.kind === 'studyDone') return state.power.studyStatus === 'done';
+  return false;
+}
+
+/** True once an entry's month has passed AND (for tracked kinds) it's still unresolved. Untracked
+ * kinds keep the original "past its month = overdue" behavior, unchanged by this fix. */
+function isOverdueUnresolved(state: GameState, entry: { month: number; kind: string; label: string }): boolean {
+  if (entry.month >= state.month) return false;
+  if (!RESOLUTION_TRACKED_KINDS.has(entry.kind)) return true;
+  return !isResolved(state, entry);
+}
+
+/** Red if overdue and not yet resolved, amber if due within 2 months, else the default color. */
+function riskColor(state: GameState, entry: { month: number; kind: string; label: string }): string {
+  if (isOverdueUnresolved(state, entry)) return '#c62828';
+  if (entry.month - state.month <= 2 && entry.month >= state.month) return '#b8860b';
+  return '#333';
 }
 
 function isSlipped(state: GameState, entry: { month: number; kind: string; label: string }): boolean {
@@ -29,10 +66,12 @@ function isSlipped(state: GameState, entry: { month: number; kind: string; label
 
 /** P10.4: color (riskColor) is never the only signal for an entry's urgency - every non-default
  * color also gets a text suffix, so a colorblind player still knows an item is overdue vs. due
- * soon just from the label. */
-function urgencyText(state: GameState, entry: { month: number; kind: string; label: string }, slipped: boolean): string {
+ * soon just from the label. QA finding #4 fix: for the resolution-tracked kinds, only genuinely
+ * unresolved past-due entries read "(overdue)" now - a granted permit, a passed vote, a finished
+ * study, etc. stop being mislabeled forever once resolved. Exported for tests/ui. */
+export function urgencyText(state: GameState, entry: { month: number; kind: string; label: string }, slipped: boolean): string {
   if (slipped) return ' (overdue)';
-  if (entry.month < state.month) return ' (overdue)';
+  if (isOverdueUnresolved(state, entry)) return ' (overdue)';
   if (entry.month - state.month <= 2 && entry.month >= state.month) return ' (due soon)';
   return '';
 }
