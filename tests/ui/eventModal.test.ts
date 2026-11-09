@@ -55,7 +55,7 @@ describe('EventModal: describeEffect (finding #2)', () => {
   });
 
   it('falls back to a neutral description for effect types it cannot describe specifically', () => {
-    const effect: Effect = { type: 'hallProgress', args: ['H1', 1] };
+    const effect: Effect = { type: 'materializeRisk', args: ['risk', 100] };
     expect(describeEffect(effect)).toBe('Has consequences');
   });
 
@@ -96,8 +96,8 @@ describe('EventModal: describeChoiceEffects (finding #2)', () => {
           id: 'c1',
           label: 'Choice',
           effects: [
-            { type: 'hallProgress', args: ['H1', 1] },
-            { type: 'hallCostPct', args: ['H1', 1] },
+            { type: 'materializeRisk', args: ['a', 1] },
+            { type: 'materializeRisk', args: ['b', 2] },
           ],
         },
       ],
