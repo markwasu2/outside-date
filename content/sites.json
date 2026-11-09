@@ -3,16 +3,24 @@
     {
       "id": "megasite",
       "name": "Richfield Megasite",
-      "summary": "Graded and shovel-ready: the priciest land, but no extra permits and no extra pad months. The state pays an $8.0M shovel-ready grant at close.",
+      "summary": "Graded and shovel-ready: the priciest land, but no extra permits and no extra pad months. The state pays a $12.0M shovel-ready grant at close.",
       "landCost": 50000000,
       "extraPadMonths": 0,
       "permits": [],
       "studyMonthsMin": 12,
       "studyMonthsMax": 24,
       "interimGridMW": 32,
-      "incentive": { "kind": "cashGrant", "amount": 8000000, "label": "State shovel-ready grant: $8.0M cash at close" },
+      "incentive": {
+        "kind": "cashGrant",
+        "amount": 12000000,
+        "label": "State shovel-ready grant: $12.0M cash at close"
+      },
       "goodwill": {},
-      "mapTheme": { "ground": "#d7ccc8", "pond": false, "poles": 0 },
+      "mapTheme": {
+        "ground": "#d7ccc8",
+        "pond": false,
+        "poles": 0
+      },
       "replaces": "megasite"
     },
     {
@@ -21,28 +29,50 @@
       "summary": "Cheap ground with a pond: $38.0M less land, but it needs a wetlands permit and four extra pad months. The county pays a $4.0M ag-transition rebate, and the town likes keeping the fields quiet.",
       "landCost": 12000000,
       "extraPadMonths": 4,
-      "permits": ["wetlands"],
+      "permits": [
+        "wetlands"
+      ],
       "studyMonthsMin": 12,
       "studyMonthsMax": 24,
       "interimGridMW": 32,
-      "incentive": { "kind": "cashGrant", "amount": 4000000, "label": "County ag-transition rebate: $4.0M cash at close" },
-      "goodwill": { "town": 6 },
-      "mapTheme": { "ground": "#c5e1a5", "pond": true, "poles": 0 },
+      "incentive": {
+        "kind": "cashGrant",
+        "amount": 4000000,
+        "label": "County ag-transition rebate: $4.0M cash at close"
+      },
+      "goodwill": {
+        "town": 6
+      },
+      "mapTheme": {
+        "ground": "#c5e1a5",
+        "pond": true,
+        "poles": 0
+      },
       "replaces": "farmland"
     },
     {
       "id": "quarry-ridge",
       "name": "Quarry Ridge",
-      "summary": "A worked-out quarry under the transmission line: blasting adds two pad months and the town grumbles, but the interconnection study runs only 6 to 12 months, the interim grid is twice as big, and the building permit is already cured.",
-      "landCost": 30000000,
+      "summary": "A worked-out quarry under the transmission line: blasting adds two pad months and the town grumbles, but the interconnection study runs 9 to 15 months, the interim grid is twice as big, and the building permit is already cured.",
+      "landCost": 36000000,
       "extraPadMonths": 2,
       "permits": [],
-      "studyMonthsMin": 6,
-      "studyMonthsMax": 12,
+      "studyMonthsMin": 9,
+      "studyMonthsMax": 15,
       "interimGridMW": 64,
-      "incentive": { "kind": "permitFastTrack", "permitId": "building", "label": "Building permit already cured at close" },
-      "goodwill": { "town": -5 },
-      "mapTheme": { "ground": "#bcaaa4", "pond": false, "poles": 4 }
+      "incentive": {
+        "kind": "permitFastTrack",
+        "permitId": "building",
+        "label": "Building permit already cured at close"
+      },
+      "goodwill": {
+        "town": -8
+      },
+      "mapTheme": {
+        "ground": "#bcaaa4",
+        "pond": false,
+        "poles": 4
+      }
     }
   ],
   "millbrook-relay": [
@@ -56,9 +86,17 @@
       "studyMonthsMin": 6,
       "studyMonthsMax": 10,
       "interimGridMW": 12,
-      "incentive": { "kind": "cashGrant", "amount": 2500000, "label": "Brownfield redevelopment grant: $2.5M cash at close" },
+      "incentive": {
+        "kind": "cashGrant",
+        "amount": 2500000,
+        "label": "Brownfield redevelopment grant: $2.5M cash at close"
+      },
       "goodwill": {},
-      "mapTheme": { "ground": "#d7ccc8", "pond": false, "poles": 2 },
+      "mapTheme": {
+        "ground": "#d7ccc8",
+        "pond": false,
+        "poles": 2
+      },
       "replaces": "megasite"
     },
     {
@@ -67,13 +105,25 @@
       "summary": "The cheap option: $11.0M less than the yard, but a wetlands permit and three extra pad months on a clock that is already tight. The easement pays $1.5M and the town approves.",
       "landCost": 7000000,
       "extraPadMonths": 3,
-      "permits": ["wetlands"],
+      "permits": [
+        "wetlands"
+      ],
       "studyMonthsMin": 6,
       "studyMonthsMax": 10,
       "interimGridMW": 12,
-      "incentive": { "kind": "cashGrant", "amount": 1500000, "label": "Farmland preservation easement: $1.5M cash at close" },
-      "goodwill": { "town": 6 },
-      "mapTheme": { "ground": "#c5e1a5", "pond": true, "poles": 0 },
+      "incentive": {
+        "kind": "cashGrant",
+        "amount": 1500000,
+        "label": "Farmland preservation easement: $1.5M cash at close"
+      },
+      "goodwill": {
+        "town": 6
+      },
+      "mapTheme": {
+        "ground": "#c5e1a5",
+        "pond": true,
+        "poles": 0
+      },
       "replaces": "farmland"
     },
     {
@@ -86,9 +136,19 @@
       "studyMonthsMin": 4,
       "studyMonthsMax": 8,
       "interimGridMW": 20,
-      "incentive": { "kind": "permitFastTrack", "permitId": "building", "label": "Building permit already cured at close" },
-      "goodwill": { "town": -3 },
-      "mapTheme": { "ground": "#e0d2b0", "pond": false, "poles": 3 }
+      "incentive": {
+        "kind": "permitFastTrack",
+        "permitId": "building",
+        "label": "Building permit already cured at close"
+      },
+      "goodwill": {
+        "town": -3
+      },
+      "mapTheme": {
+        "ground": "#e0d2b0",
+        "pond": false,
+        "poles": 3
+      }
     }
   ],
   "tutorial-edge5": [
@@ -102,9 +162,17 @@
       "studyMonthsMin": 2,
       "studyMonthsMax": 3,
       "interimGridMW": 8,
-      "incentive": { "kind": "cashGrant", "amount": 1000000, "label": "County small-campus grant: $1.0M cash at close" },
+      "incentive": {
+        "kind": "cashGrant",
+        "amount": 1000000,
+        "label": "County small-campus grant: $1.0M cash at close"
+      },
       "goodwill": {},
-      "mapTheme": { "ground": "#d7ccc8", "pond": false, "poles": 2 },
+      "mapTheme": {
+        "ground": "#d7ccc8",
+        "pond": false,
+        "poles": 2
+      },
       "replaces": "megasite"
     },
     {
@@ -113,13 +181,25 @@
       "summary": "Cheaper ground with a pond: $8.0M less land and a $1.0M easement payment, but a wetlands permit and two extra pad months on a short clock.",
       "landCost": 12000000,
       "extraPadMonths": 2,
-      "permits": ["wetlands"],
+      "permits": [
+        "wetlands"
+      ],
       "studyMonthsMin": 2,
       "studyMonthsMax": 3,
       "interimGridMW": 8,
-      "incentive": { "kind": "cashGrant", "amount": 1000000, "label": "Meadow easement payment: $1.0M cash at close" },
-      "goodwill": { "town": 5 },
-      "mapTheme": { "ground": "#c5e1a5", "pond": true, "poles": 0 },
+      "incentive": {
+        "kind": "cashGrant",
+        "amount": 1000000,
+        "label": "Meadow easement payment: $1.0M cash at close"
+      },
+      "goodwill": {
+        "town": 5
+      },
+      "mapTheme": {
+        "ground": "#c5e1a5",
+        "pond": true,
+        "poles": 0
+      },
       "replaces": "farmland"
     },
     {
@@ -132,9 +212,17 @@
       "studyMonthsMin": 1,
       "studyMonthsMax": 2,
       "interimGridMW": 12,
-      "incentive": { "kind": "permitFastTrack", "permitId": "building", "label": "Building permit already cured at close" },
+      "incentive": {
+        "kind": "permitFastTrack",
+        "permitId": "building",
+        "label": "Building permit already cured at close"
+      },
       "goodwill": {},
-      "mapTheme": { "ground": "#e0d2b0", "pond": false, "poles": 3 }
+      "mapTheme": {
+        "ground": "#e0d2b0",
+        "pond": false,
+        "poles": 3
+      }
     }
   ]
 }

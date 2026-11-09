@@ -76,10 +76,14 @@ export function pickFastestSite(content: Content, scenarioId: string): string {
 export function pickValueSite(content: Content, scenarioId: string): string {
   const PAD_MONTH_COST = 3_000_000;
   const STUDY_MONTH_COST = 1_500_000;
+  // An uncured permit is a filing window, a denial risk, and a re-file loop; the value bot
+  // prices that, which is what keeps it off the cheap-but-permitted farmland/riverbend sites.
+  const PERMIT_COST = 10_000_000;
   const value = (site: SiteDef): number =>
     site.landCost +
     site.extraPadMonths * PAD_MONTH_COST +
-    site.studyMonthsMax * STUDY_MONTH_COST -
+    site.studyMonthsMax * STUDY_MONTH_COST +
+    site.permits.length * PERMIT_COST -
     (site.incentive.kind === 'cashGrant' ? site.incentive.amount : 0);
   const sites = sitesFor(content, scenarioId);
   const best = [...sites].sort((a, b) => value(a) - value(b))[0];
