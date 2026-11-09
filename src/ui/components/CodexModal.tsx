@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useStore } from '../store';
 
@@ -15,6 +15,17 @@ export function CodexModal() {
   const closeCodex = useStore((s) => s.closeCodex);
   const [query, setQuery] = useState('');
 
+  // UI-polish item 3: Esc closes the codex overlay whenever it's open - purely informational, so
+  // unlike EventModal there's never a pending choice to protect.
+  useEffect(() => {
+    if (!codexOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeCodex();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [codexOpen, closeCodex]);
+
   if (!codexOpen) return null;
 
   const selected = selectedId ? content.codex.find((c) => c.id === selectedId) : undefined;
@@ -23,6 +34,8 @@ export function CodexModal() {
 
   return (
     <div
+      role="presentation"
+      onClick={closeCodex}
       style={{
         position: 'fixed',
         inset: 0,
@@ -34,6 +47,7 @@ export function CodexModal() {
       }}
     >
       <div
+        onClick={(e) => e.stopPropagation()}
         style={{
           background: '#fff',
           borderRadius: 8,

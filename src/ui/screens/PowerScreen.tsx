@@ -17,6 +17,19 @@ const MIN_CHARGES: { id: MinChargeLevel; label: string }[] = [
   { id: 'high', label: 'High' },
 ];
 
+/** UI-polish item 5: hand-written hints from `tuning.power`'s `minChargePerMwMonth`/`slipOdds`
+ * and `plantBOffsetOptions` - each under 90 characters. */
+export const MIN_CHARGE_HINTS: Record<MinChargeLevel, string> = {
+  low: 'Cheapest minimum bill, but by far the highest odds of a plant slip.',
+  medium: 'Balances the minimum bill against moderate plant-slip risk.',
+  high: 'Priciest minimum bill, but buys the lowest odds of a plant slip.',
+};
+export const PLANT_B_OFFSET_HINTS: Record<number, string> = {
+  0: 'No delay: Plant B comes online with Plant A.',
+  6: 'A modest 6-month delay to Plant B coming online.',
+  12: 'The longest delay - halls may need bridge power before Plant B.',
+};
+
 /** P7.5. The "mini timeline" is necessarily an estimate pre-game: plants only get a real
  * `plannedOnlineMonth` once the docket actually passes (`regulation.ts`), which hasn't happened
  * yet at month 0. Uses `docket.monthsToVote + power.plantBuildMonths` as the first-try-win
@@ -46,34 +59,38 @@ export function PowerScreen({ scenarioId, negotiation, onChange, onBack, onNext 
       <strong>Minimum charge</strong>
       <div style={{ display: 'flex', gap: '0.5rem', margin: '0.25rem 0 1rem' }}>
         {MIN_CHARGES.map((opt) => (
-          <button
-            key={opt.id}
-            onClick={() => onChange({ ...negotiation.power, minCharge: opt.id })}
-            style={{
-              fontWeight: negotiation.power.minCharge === opt.id ? 'bold' : 'normal',
-              border: negotiation.power.minCharge === opt.id ? '2px solid #000' : '1px solid #999',
-              padding: '0.4rem 0.8rem',
-            }}
-          >
-            {opt.label} (${power.minChargePerMwMonth[opt.id] / 1000}K/MW/mo, {(power.slipOdds[opt.id] * 100).toFixed(0)}% plant-slip odds)
-          </button>
+          <div key={opt.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxWidth: 200 }}>
+            <button
+              onClick={() => onChange({ ...negotiation.power, minCharge: opt.id })}
+              style={{
+                fontWeight: negotiation.power.minCharge === opt.id ? 'bold' : 'normal',
+                border: negotiation.power.minCharge === opt.id ? '2px solid #000' : '1px solid #999',
+                padding: '0.4rem 0.8rem',
+              }}
+            >
+              {opt.label} (${power.minChargePerMwMonth[opt.id] / 1000}K/MW/mo, {(power.slipOdds[opt.id] * 100).toFixed(0)}% plant-slip odds)
+            </button>
+            <span style={{ fontSize: '0.7rem', color: '#666' }}>{MIN_CHARGE_HINTS[opt.id]}</span>
+          </div>
         ))}
       </div>
 
       <strong>Plant B offset</strong>
       <div style={{ display: 'flex', gap: '0.5rem', margin: '0.25rem 0 1rem' }}>
         {power.plantBOffsetOptions.map((offset) => (
-          <button
-            key={offset}
-            onClick={() => onChange({ ...negotiation.power, plantBOffset: offset })}
-            style={{
-              fontWeight: negotiation.power.plantBOffset === offset ? 'bold' : 'normal',
-              border: negotiation.power.plantBOffset === offset ? '2px solid #000' : '1px solid #999',
-              padding: '0.4rem 0.8rem',
-            }}
-          >
-            +{offset}mo
-          </button>
+          <div key={offset} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxWidth: 180 }}>
+            <button
+              onClick={() => onChange({ ...negotiation.power, plantBOffset: offset })}
+              style={{
+                fontWeight: negotiation.power.plantBOffset === offset ? 'bold' : 'normal',
+                border: negotiation.power.plantBOffset === offset ? '2px solid #000' : '1px solid #999',
+                padding: '0.4rem 0.8rem',
+              }}
+            >
+              +{offset}mo
+            </button>
+            <span style={{ fontSize: '0.7rem', color: '#666' }}>{PLANT_B_OFFSET_HINTS[offset]}</span>
+          </div>
         ))}
       </div>
 

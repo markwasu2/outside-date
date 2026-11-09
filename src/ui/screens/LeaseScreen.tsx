@@ -11,7 +11,7 @@ interface Props {
   onNext: () => void;
 }
 
-const REMEDIES: { id: LateRemedy; label: string; note: string }[] = [
+export const REMEDIES: { id: LateRemedy; label: string; note: string }[] = [
   { id: 'liquidatedDamages', label: 'Liquidated damages', note: 'Pay a fixed daily penalty per late, undelivered hall, capped at a number of months.' },
   { id: 'abatement', label: 'Abatement', note: 'Owe a month of future rent credit per late month instead of a cash penalty.' },
 ];

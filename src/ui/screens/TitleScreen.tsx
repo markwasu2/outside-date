@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 
 import type { DifficultyId } from '../../engine/init';
+import type { Scenario } from '../../content/schemas';
 import { loadSavedGame, parseImportedSave } from '../save';
 import { useStore } from '../store';
 
@@ -14,6 +15,26 @@ interface Props {
 }
 
 const DIFFICULTIES: DifficultyId[] = ['easy', 'normal', 'hard'];
+
+/** UI-polish item 6: a one-line summary of a scenario's `difficulties[id]` preset (see
+ * content/scenarios/whale.json's `easy`/`normal`/`hard` blocks), built from the preset's own
+ * forcedSetup/goodwillOverrides/eventOddsMultipliers fields so it can never drift from the data
+ * - rather than three hand-pinned strings that would silently go stale if tuning changes. */
+export function describeDifficulty(preset: NonNullable<Scenario['difficulties']>[DifficultyId] | undefined): string {
+  if (!preset) return 'No overrides - the scenario\u2019s defaults apply.';
+  const parts: string[] = [];
+  if (preset.forcedSetup?.site) parts.push(`forces the ${preset.forcedSetup.site} site`);
+  if (preset.goodwillOverrides) {
+    const bits = Object.entries(preset.goodwillOverrides).map(([g, v]) => `${v > 0 ? '+' : ''}${v} ${g} goodwill`);
+    parts.push(bits.join(', '));
+  }
+  if (preset.eventOddsMultipliers) {
+    const bits = Object.entries(preset.eventOddsMultipliers).map(([id, m]) => `${id} odds \u00d7${m}`);
+    parts.push(bits.join(', '));
+  }
+  if (parts.length === 0) return 'No overrides - the scenario\u2019s defaults apply.';
+  return `${parts.join('; ')}.`;
+}
 
 /** P7.1/P8.1/P9.3/P10.1. Continue (P10.1) loads the autosave `loadSavedGame()` finds in
  * localStorage, disabled with a reason when there isn't one. Import (P10.1) reads an exported
@@ -80,6 +101,9 @@ export function TitleScreen({ scenarioId, difficultyId, onScenarioChange, onDiff
           ))}
         </select>
       </label>
+      <p style={{ maxWidth: 480, textAlign: 'center', color: '#666', fontSize: '0.8rem', margin: 0 }}>
+        {describeDifficulty(content.scenarios[scenarioId]?.difficulties?.[difficultyId])}
+      </p>
 
       <div style={{ display: 'flex', gap: '0.5rem' }}>
         <button onClick={onNewGame} style={{ padding: '0.5rem 1.5rem' }}>
