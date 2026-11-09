@@ -104,7 +104,7 @@ describe('conversion: pass', () => {
 
 describe('conversion: fail', () => {
   it('sets stepUpActive, increments conversionFailedCount, materializes the refinancing risk row', () => {
-    const state = deliverAllHalls(withDebt(freshState(10), { seniorDrawn: 2_000_000_000 }));
+    const state = deliverAllHalls(withDebt(freshState(10), { seniorDrawn: 2_200_000_000 }));
     expect(dscr(state, content)).toBeLessThan(content.tuning.covenant.dscrTrigger);
 
     const next = tick(state, content);
@@ -116,7 +116,7 @@ describe('conversion: fail', () => {
   });
 
   it('retests every month after a failure, incrementing conversionFailedCount each time', () => {
-    let state = deliverAllHalls(withDebt(freshState(10), { seniorDrawn: 2_000_000_000 }));
+    let state = deliverAllHalls(withDebt(freshState(10), { seniorDrawn: 2_200_000_000 }));
     state = tick(state, content);
     expect(state.debt.conversionFailedCount).toBe(1);
 

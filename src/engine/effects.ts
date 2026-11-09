@@ -294,14 +294,16 @@ export const effectHandlers: Record<EffectType, EffectHandler> = {
   addAskHalls: (state, _args, content) => {
     const template = state.halls[0];
     if (!template) return state;
-    const lastDelivery = Math.max(...state.halls.map((h) => h.deliveryMonth));
     const tierMult = content.tuning.tiers[state.setup.hallTier].costMult;
     const gcMult = state.setup.gc === 'gmp' ? content.tuning.gc.gmpPremium : 1;
     const costBudget = Math.round(template.mwIT * content.tuning.campus.costPerMwIT * tierMult * gcMult);
 
     const newHalls = [
-      buildAskHall(state, content, state.halls.length + 1, lastDelivery + 9, costBudget),
-      buildAskHall(state, content, state.halls.length + 2, lastDelivery + 12, costBudget),
+      // Delivery dates are relative to the ask month, not the last original hall: the old
+      // lastDelivery+9/+12 landed at months 59/62, past any realistic completion inside a
+      // 60-month campaign, which made saying yes an automatic loss.
+      buildAskHall(state, content, state.halls.length + 1, state.month + 26, costBudget),
+      buildAskHall(state, content, state.halls.length + 2, state.month + 30, costBudget),
     ];
     const addedBudget = newHalls.reduce((sum, h) => sum + h.costBudget, 0);
     const budgetAtClose = state.budgetAtClose;

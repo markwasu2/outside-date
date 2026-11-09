@@ -1,6 +1,7 @@
 import type { ActionDef, Content } from '../content/schemas';
 import type { GameState, GoodwillGroup, PlannedAction } from './types';
 import { KNOWN_ACTION_HANDLERS } from '../content/load';
+import { resolveContent } from './resolve';
 import {
   optionSite,
   advanceHall,
@@ -96,6 +97,7 @@ export const actionHandlers: Record<(typeof KNOWN_ACTION_HANDLERS)[number], Acti
 
 /** Looks up an action's content definition and applies its handler. */
 export function applyAction(state: GameState, action: PlannedAction, content: Content): GameState {
+  content = resolveContent(state, content);
   const def = content.actions.find((a) => a.id === action.actionId);
   if (!def) throw new Error(`Unknown action id: "${action.actionId}"`);
   const handler = actionHandlers[def.handler as (typeof KNOWN_ACTION_HANDLERS)[number]];

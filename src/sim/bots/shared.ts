@@ -94,7 +94,10 @@ export function fillAp(
 /** One `filePermit` candidate per scenario-required permit not yet filed or granted. */
 export function requiredPermitCandidates(state: GameState): PlannedAction[] {
   return state.permitsRequired
-    .filter((id) => state.permits[id].status === 'none')
+    // A denied permit must be re-filed - the engine allows it (filePermit only rejects
+    // pending/granted), and treating 'denied' as terminal froze construction until default
+    // in ~1/5 of runs, far above the intended permit-denial cost of a few lost months.
+    .filter((id) => state.permits[id].status === 'none' || state.permits[id].status === 'denied')
     .map((id) => ({ actionId: 'filePermit', params: { permitId: id } }));
 }
 

@@ -1,5 +1,6 @@
 import type { Content } from '../content/schemas';
 import type { GameState, Hall } from './types';
+import { resolveContent } from './resolve';
 
 /** Total outstanding debt (senior principal + capitalized interest, mezz principal + PIK). */
 export function totalDebt(state: GameState): number {
@@ -67,6 +68,37 @@ function monthlyOutflow(state: GameState, content: Content): number {
   let outflow = state.monthlyBurn;
   if (state.insurance.buildersRisk) outflow += content.tuning.insurance.buildersRiskMonthly;
   if (state.insurance.dsu) outflow += content.tuning.insurance.dsuMonthly;
+
+  // Utility minimum charge (4.7), mirroring power.ts's chargeMinimum: payable on plant capacity
+  // that is online or committed (a planned online month is set once the plant starts, and the
+  // charge is unavoidable from then on - a committed step-up the old runway hid entirely), minus
+  // capacity already used by delivered halls.
+  const level = state.power.minCharge;
+  if (level) {
+    const pue = content.tuning.cooling[state.setup.cooling].pue;
+    const committedGridMW = state.power.plants.reduce(
+      (sum, p) => (p.onlineMonth !== null || p.plannedOnlineMonth !== null ? sum + p.mwGrid : sum),
+      0,
+    );
+    const usedByDelivered = state.halls
+      .filter((h) => h.delivered && !h.terminated)
+      .reduce((sum, h) => sum + h.mwIT * pue, 0);
+    const unusedMW = Math.max(0, committedGridMW - usedByDelivered);
+    outflow += Math.round(content.tuning.power.minChargePerMwMonth[level] * unusedMW);
+  }
+
+  // Liquidated-damages accrual on halls currently past their delivery month (4.9), mirroring
+  // lease.ts: real monthly cash until the cap, unless DSU covers the delay. The old runway
+  // ignored LDs, so a late project read as healthier than it was.
+  if (state.lease && state.lease.lateRemedy === 'liquidatedDamages') {
+    for (const h of state.halls) {
+      if (h.delivered || h.terminated) continue;
+      if (state.month <= h.deliveryMonth || state.month > h.outsideMonth) continue;
+      if (h.ldMonthsAccrued >= content.tuning.lease.ldCapMonths) continue;
+      if (state.insurance.dsu && h.insuredDelayMonths > 0) continue;
+      outflow += Math.round(content.tuning.lease.ldPerDayPer25MW * (h.mwIT / 25) * 30);
+    }
+  }
   return outflow;
 }
 
@@ -79,6 +111,7 @@ function monthlyInflow(state: GameState, content: Content): number {
 
 /** Runway in months: cash divided by net monthly burn, or Infinity if inflow covers outflow. */
 export function runway(state: GameState, content: Content): number {
+  content = resolveContent(state, content);
   const net = monthlyOutflow(state, content) - monthlyInflow(state, content);
   if (net <= 0) return Infinity;
   return state.cash / net;

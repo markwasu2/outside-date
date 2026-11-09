@@ -16,20 +16,50 @@
     "local_reporter"
   ],
   "scriptedEvents": [],
-  "docket": { "enabled": true },
-  "permitsRequired": ["air", "water", "building"],
+  "docket": {
+    "enabled": true
+  },
+  "permitsRequired": [
+    "air",
+    "water",
+    "building"
+  ],
   "coachTips": false,
   "difficulties": {
     "easy": {
-      "forcedSetup": { "site": "megasite" },
-      "flags": { "siteOptionedAtStart": true },
-      "goodwillOverrides": { "commission": 15, "tenant": 10 }
+      "forcedSetup": {
+        "site": "megasite"
+      },
+      "flags": {
+        "siteOptionedAtStart": true
+      },
+      "goodwillOverrides": {
+        "commission": 15,
+        "tenant": 10
+      },
+      "tuningOverrides": {
+        "campaign": {
+          "startingCash": 215000000
+        }
+      }
     },
     "normal": {},
     "hard": {
-      "forcedSetup": { "site": "farmland" },
-      "goodwillOverrides": { "commission": -15, "tenant": -10 },
-      "eventOddsMultipliers": { "supply_shock": 2 }
+      "forcedSetup": {
+        "site": "farmland"
+      },
+      "goodwillOverrides": {
+        "commission": -15,
+        "tenant": -10
+      },
+      "eventOddsMultipliers": {
+        "supply_shock": 2
+      },
+      "tuningOverrides": {
+        "campaign": {
+          "startingCash": 205000000
+        }
+      }
     }
   }
 }

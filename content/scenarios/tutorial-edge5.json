@@ -4,16 +4,89 @@
   "hallMwIT": 5,
   "maxMonths": 20,
   "introText": "Call this the practice campus: one small hall, a tight clock, and every lesson the Whale campaign will later charge you full price for.",
-  "castIds": ["utility_ceo", "lenders_engineer", "gc_foreman"],
-  "scriptedEvents": [{ "cardId": "storm", "month": 7 }],
-  "scriptedEffects": [
-    { "month": 5, "effects": [{ "type": "orderSlip", "args": ["switchgear", 2] }] }
+  "castIds": [
+    "utility_ceo",
+    "lenders_engineer",
+    "gc_foreman"
   ],
-  "docket": { "enabled": false },
-  "permitsRequired": ["building"],
+  "scriptedEvents": [
+    {
+      "cardId": "storm",
+      "month": 7
+    }
+  ],
+  "scriptedEffects": [
+    {
+      "month": 5,
+      "effects": [
+        {
+          "type": "orderSlip",
+          "args": [
+            "switchgear",
+            2
+          ]
+        }
+      ]
+    }
+  ],
+  "docket": {
+    "enabled": false
+  },
+  "permitsRequired": [
+    "building"
+  ],
   "skipTransformerOrder": true,
   "tuningOverrides": {
-    "power": { "interimGridMW": 8 }
+    "power": {
+      "interimGridMW": 8,
+      "studyCost": 500000,
+      "studyMonthsMin": 2,
+      "studyMonthsMax": 3,
+      "switchgearLeadMin": 2,
+      "switchgearLeadMax": 3,
+      "switchgearDeposit": 500000,
+      "switchgearBalance": 1000000,
+      "substationBuildMonths": 1
+    },
+    "stages": [
+      {
+        "id": "pad",
+        "minMonths": 1,
+        "costShare": 0.12
+      },
+      {
+        "id": "steel",
+        "minMonths": 3,
+        "costShare": 0.22
+      },
+      {
+        "id": "shell",
+        "minMonths": 3,
+        "costShare": 0.22
+      },
+      {
+        "id": "fitout",
+        "minMonths": 4,
+        "costShare": 0.34
+      },
+      {
+        "id": "rfs",
+        "minMonths": 1,
+        "costShare": 0.1
+      }
+    ],
+    "campaign": {
+      "monthlyBurn": 200000
+    },
+    "insurance": {
+      "buildersRiskMonthly": 100000,
+      "dsuMonthly": 0,
+      "deductible": 500000
+    },
+    "events": {
+      "stormDamage": 1000000,
+      "fireDamage": 1000000
+    }
   },
   "lease": {
     "firstDeliveryMonth": 14,

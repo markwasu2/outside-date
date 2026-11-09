@@ -5,19 +5,22 @@ import { BOTS, runOneGame } from '../../src/sim/runSim';
 import { aggregate } from '../../src/sim/report';
 
 /**
- * P5.3 regression guard: 200 seeds per bot against the whale scenario, normal difficulty
- * (plus two small competent-bot spot checks on hard/easy difficulty).
+ * P5.3 regression guard: 1000 seeds per bot against the whale scenario, normal difficulty
+ * (plus two competent-bot checks on hard/easy difficulty), asserting the original PLAN
+ * section 8 balance targets.
  *
- * Bands below are the section 8 targets WHERE MET, and WIDENED bands (with a small margin
- * around the actually-achieved numbers) where section 8's original targets were missed after
- * the P5.3 tuning pass - see PLAN.md's Decisions log (2026-11-08, P5.3 entries) for the full
- * before/after numbers, the root cause (the `startingCash`/`equity.calledTotal` coupling in
- * `init.ts`, which a content-only tuning pass cannot fully correct), and the explicit
- * acknowledgment that this invokes P5.3's own "widen the failing band... log the gap and why,
- * and continue" escape clause. `random`'s band was NOT widened - it already meets the original
- * section 8 target.
+ * The bands below are the UNWIDENED section 8 targets, restored after the engine fixes that
+ * made them reachable (see PLAN.md's Decisions log, 2026-11-08 balance-fix entries: the
+ * capital-stack/working-capital coupling in init.ts, unfunded power/liquid costs in
+ * budgetAtClose, uncapped senior interest capitalization, the ask's grid capacity and
+ * delivery dates, the buildersRisk senior-draw gate, and bots re-filing denied permits).
+ * The earlier widened bands measured a game where construction silently fell through to
+ * cash and a bot that gave up after one permit denial; they are retired, not relaxed.
+ *
+ * 1000 seeds because at 200 the win rates flap +/-4 points run to run, which is wider than
+ * some band edges.
  */
-const RUNS = 200;
+const RUNS = 1000;
 const SEED = 1;
 const content = loadContent();
 
@@ -27,64 +30,71 @@ function runBot(botId: keyof typeof BOTS, scenario = 'whale', difficulty: 'easy'
   return aggregate(results);
 }
 
-describe('P5.3 balance regression guard (widened bands, see Decisions log)', () => {
-  it('random: win rate < 10%, median equity multiple < 0.5x (original target, met)', () => {
+describe('P5.3 balance regression guard (section 8 targets)', () => {
+  it('random: win rate < 10%, median equity multiple < 0.5x', () => {
     const report = runBot('random');
     expect(report.winRate).toBeLessThan(0.1);
     expect(report.equityMultiple.median).toBeLessThan(0.5);
   });
 
-  it('greedy: win rate and median multiple (widened band, target 30-45% / 1.2-1.6x missed)', () => {
+  it('greedy: win rate 30-45%, median multiple 1.2-1.6x', () => {
     const report = runBot('greedy');
-    expect(report.winRate).toBeGreaterThanOrEqual(0);
-    expect(report.winRate).toBeLessThanOrEqual(0.1);
-    expect(report.equityMultiple.median).toBeGreaterThanOrEqual(0.3);
-    expect(report.equityMultiple.median).toBeLessThanOrEqual(0.6);
+    expect(report.winRate).toBeGreaterThanOrEqual(0.3);
+    expect(report.winRate).toBeLessThanOrEqual(0.45);
+    expect(report.equityMultiple.median).toBeGreaterThanOrEqual(1.2);
+    expect(report.equityMultiple.median).toBeLessThanOrEqual(1.6);
   });
 
-  it('careful: win rate and median multiple (widened band, target 60-75% / 1.4-1.8x missed)', () => {
+  it('careful: win rate 60-75%, median multiple 1.4-1.8x', () => {
     const report = runBot('careful');
-    expect(report.winRate).toBeGreaterThanOrEqual(0);
-    expect(report.winRate).toBeLessThanOrEqual(0.15);
-    expect(report.equityMultiple.median).toBeGreaterThanOrEqual(0.3);
-    expect(report.equityMultiple.median).toBeLessThanOrEqual(0.7);
+    expect(report.winRate).toBeGreaterThanOrEqual(0.6);
+    expect(report.winRate).toBeLessThanOrEqual(0.75);
+    expect(report.equityMultiple.median).toBeGreaterThanOrEqual(1.4);
+    expect(report.equityMultiple.median).toBeLessThanOrEqual(1.8);
   });
 
-  it('competent: win rate and median multiple (widened band, target 65-80% / 1.8-2.4x missed)', () => {
+  it('competent: win rate 65-80%, median multiple 1.8-2.4x', () => {
     const report = runBot('competent');
-    expect(report.winRate).toBeGreaterThanOrEqual(0);
-    expect(report.winRate).toBeLessThanOrEqual(0.1);
-    expect(report.equityMultiple.median).toBeGreaterThanOrEqual(-0.3);
-    expect(report.equityMultiple.median).toBeLessThanOrEqual(0.2);
+    expect(report.winRate).toBeGreaterThanOrEqual(0.65);
+    expect(report.winRate).toBeLessThanOrEqual(0.8);
+    expect(report.equityMultiple.median).toBeGreaterThanOrEqual(1.8);
+    expect(report.equityMultiple.median).toBeLessThanOrEqual(2.4);
   });
 
-  it('competent: median month of first delivery is 36 to 42 (original target, met)', () => {
+  it('competent: median month of first delivery is 36 to 42', () => {
     const report = runBot('competent');
     expect(report.firstDeliveryMonth.median).not.toBeNull();
     expect(report.firstDeliveryMonth.median as number).toBeGreaterThanOrEqual(36);
     expect(report.firstDeliveryMonth.median as number).toBeLessThanOrEqual(42);
   });
 
-  it('competent: at least 30% of runs pay some LDs (original target, met)', () => {
+  it('competent: at least 30% of runs pay some LDs', () => {
     const report = runBot('competent');
     expect(report.ldPaid.shareWithAnyLd).toBeGreaterThanOrEqual(0.3);
   });
 
-  it('competent: docket fails the first vote in 15 to 30% of runs (original target, met)', () => {
+  it('competent: docket fails the first vote in 15 to 30% of runs', () => {
     const report = runBot('competent');
-    expect(report.docketFailedFirstVoteRate).toBeGreaterThanOrEqual(0.1);
+    expect(report.docketFailedFirstVoteRate).toBeGreaterThanOrEqual(0.15);
     expect(report.docketFailedFirstVoteRate).toBeLessThanOrEqual(0.3);
   });
 
-  it('competent/hard: win rate (widened band, target 40-55% missed, see anomaly note in Decisions log)', () => {
+  it('competent/hard: win rate 40-55%', () => {
     const report = runBot('competent', 'whale', 'hard');
-    expect(report.winRate).toBeGreaterThanOrEqual(0.1);
-    expect(report.winRate).toBeLessThanOrEqual(0.5);
+    expect(report.winRate).toBeGreaterThanOrEqual(0.4);
+    expect(report.winRate).toBeLessThanOrEqual(0.55);
   });
 
-  it('competent/easy: win rate (widened band, target 85-95% missed)', () => {
+  it('competent/easy: win rate 85-95%', () => {
     const report = runBot('competent', 'whale', 'easy');
-    expect(report.winRate).toBeGreaterThanOrEqual(0);
-    expect(report.winRate).toBeLessThanOrEqual(0.5);
+    expect(report.winRate).toBeGreaterThanOrEqual(0.85);
+    expect(report.winRate).toBeLessThanOrEqual(0.95);
+  });
+
+  it('tutorial-edge5: the guided careful path wins at least half of runs', () => {
+    const bot = BOTS['careful']!;
+    const results = Array.from({ length: 200 }, (_, i) => runOneGame(bot, content, 'tutorial-edge5', 'normal', SEED + i));
+    const report = aggregate(results);
+    expect(report.winRate).toBeGreaterThanOrEqual(0.5);
   });
 });
