@@ -1,8 +1,9 @@
+import type { Content } from '../../content/schemas';
 import type { NegotiationChoices } from '../../engine/init';
 import { formatDollars } from '../../engine/format';
-import { useStore } from '../store';
 
 interface Props {
+  content: Content;
   negotiation: NegotiationChoices;
   onChange: (insurance: NegotiationChoices['insurance']) => void;
   onBack: () => void;
@@ -11,8 +12,7 @@ interface Props {
 
 /** P7.6. Builder's risk is always on (lenders require it, per `init.ts`'s `insurance.buildersRisk:
  * true`); the only real choice here is DSU. */
-export function InsuranceScreen({ negotiation, onChange, onBack, onStart }: Props) {
-  const content = useStore((s) => s.content);
+export function InsuranceScreen({ content, negotiation, onChange, onBack, onStart }: Props) {
   const { insurance } = content.tuning;
 
   return (

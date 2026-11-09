@@ -10,6 +10,7 @@ import { LeaseScreen } from './LeaseScreen';
 import { PowerScreen } from './PowerScreen';
 import { SetupScreen } from './SetupScreen';
 import { TitleScreen } from './TitleScreen';
+import { resolveWizardConfiguration } from './setupWizardConfig';
 
 type Step = 'title' | 'setup' | 'lease' | 'capital' | 'power' | 'insurance';
 
@@ -30,10 +31,11 @@ export function SetupWizard() {
   const [difficultyId, setDifficultyId] = useState<DifficultyId>('normal');
   const [setup, setSetup] = useState<Setup>(DEFAULT_SETUP);
   const [negotiation, setNegotiation] = useState<NegotiationChoices>(DEFAULT_NEGOTIATION);
+  const wizard = resolveWizardConfiguration(content, scenarioId, setup, negotiation, difficultyId);
 
   function start() {
     const seed = Math.floor(Math.random() * 1_000_000_000);
-    newGame(scenarioId, setup, negotiation, seed, difficultyId);
+    newGame(scenarioId, setup, wizard.negotiation, seed, difficultyId);
   }
 
   // P8.1: Tutorial skips the 5-screen negotiation wizard entirely - tutorial-edge5's own
@@ -72,7 +74,9 @@ export function SetupWizard() {
     case 'lease':
       return (
         <LeaseScreen
-          negotiation={negotiation}
+          content={wizard.content}
+          scenario={wizard.scenario}
+          negotiation={wizard.negotiation}
           onChange={(lease) => setNegotiation((n) => ({ ...n, lease }))}
           onBack={() => setStep('setup')}
           onNext={() => setStep('capital')}
@@ -81,10 +85,11 @@ export function SetupWizard() {
     case 'capital':
       return (
         <CapitalScreen
+          content={wizard.content}
           scenarioId={scenarioId}
           difficultyId={difficultyId}
           setup={setup}
-          negotiation={negotiation}
+          negotiation={wizard.negotiation}
           onChange={(capital) => setNegotiation((n) => ({ ...n, capital }))}
           onBack={() => setStep('lease')}
           onNext={() => setStep('power')}
@@ -93,8 +98,9 @@ export function SetupWizard() {
     case 'power':
       return (
         <PowerScreen
+          content={wizard.content}
           scenarioId={scenarioId}
-          negotiation={negotiation}
+          negotiation={wizard.negotiation}
           onChange={(power) => setNegotiation((n) => ({ ...n, power }))}
           onBack={() => setStep('capital')}
           onNext={() => setStep('insurance')}
@@ -103,7 +109,8 @@ export function SetupWizard() {
     case 'insurance':
       return (
         <InsuranceScreen
-          negotiation={negotiation}
+          content={wizard.content}
+          negotiation={wizard.negotiation}
           onChange={(insurance) => setNegotiation((n) => ({ ...n, insurance }))}
           onBack={() => setStep('power')}
           onStart={start}
