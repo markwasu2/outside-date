@@ -129,11 +129,12 @@ export function createGame(
       fromAsk: false,
     });
   }
-  // Phase 8: on a pond site the pond takes a whole hall position - the latest-delivery hall,
-  // whose schedule has the most slack to absorb the mitigation route.
+  // Phase 8/10: on a pond site the pond takes a whole hall position - the earliest-delivery
+  // hall, so the mitigation route is urgent from month 1 instead of an afterthought for the
+  // last hall (measured on 1000-seed grids: win rates hold, the teeth land on the schedule
+  // that matters).
   if (site.pondTakesHall && halls.length > 0) {
-    const last = halls[halls.length - 1]!;
-    halls[halls.length - 1] = { ...last, pondBlocked: true };
+    halls[0] = { ...halls[0]!, pondBlocked: true };
   }
 
   // Budget at close includes the power equipment and liquid-ready fitout that tryFundAmount

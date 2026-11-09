@@ -143,7 +143,8 @@ describe('construction reads the site', () => {
   it('farmland still blocks the pad until wetlands is granted', () => {
     const farm = createGame(content, 'whale', whaleOn('farmland'), negotiation, 7);
     const optioned = applyAction(farm, { actionId: 'optionSite' }, content);
-    expect(() => applyAction(optioned, { actionId: 'advanceHall', params: { hallId: 'H1' } }, content)).toThrow(
+    // H2: H1's own block is the pond (Phase 8/10), which throws before the prereq check.
+    expect(() => applyAction(optioned, { actionId: 'advanceHall', params: { hallId: 'H2' } }, content)).toThrow(
       /prerequisites not met/,
     );
   });

@@ -122,11 +122,12 @@ describe('scarcity pack (Phase 7)', () => {
         Object.entries(state.permits).map(([id, p]) => [id, { ...p, status: 'granted' as const }]),
       ) as typeof state.permits,
     };
-    state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H1', pad: 'near' } }, content);
+    // H1 sits on the pond until the mitigation (Phase 8/10), so use the buildable halls.
     state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H2', pad: 'near' } }, content);
-    expect(state.halls.find((h) => h.id === 'H2')?.pad).toBe('near');
-    state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H3' } }, content);
-    expect(state.halls.find((h) => h.id === 'H3')?.pad).toBe('far');
+    state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H3', pad: 'near' } }, content);
+    expect(state.halls.find((h) => h.id === 'H3')?.pad).toBe('near');
+    state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H4' } }, content);
+    expect(state.halls.find((h) => h.id === 'H4')?.pad).toBe('far');
   });
 });
 
@@ -143,11 +144,11 @@ describe('the pond takes a hall (Phase 8)', () => {
     };
   }
 
-  it('farmland starts with exactly one pond-blocked hall: the latest-delivery one', () => {
+  it('farmland starts with exactly one pond-blocked hall: the earliest-delivery one', () => {
     const state = farmlandState();
     const blocked = state.halls.filter((h) => h.pondBlocked);
     expect(blocked.length).toBe(1);
-    expect(blocked[0]!.deliveryMonth).toBe(Math.max(...state.halls.map((h) => h.deliveryMonth)));
+    expect(blocked[0]!.deliveryMonth).toBe(Math.min(...state.halls.map((h) => h.deliveryMonth)));
     // Non-pond sites are untouched.
     expect(freshState().halls.every((h) => !h.pondBlocked)).toBe(true);
   });

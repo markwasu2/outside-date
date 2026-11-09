@@ -27,9 +27,9 @@ test('phase 7 farmland pad choice shot', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
 
   // Farmland: both near pads are back (Phase 8 moved the pond's cost to a hall position);
-  // the far row owns up to the extra pad months.
+  // the far row owns up to the extra pad months. H2: H1 sits on the pond (Phase 10).
   await startCampaign(page, 'farmland');
-  await page.getByText('H1', { exact: true }).click();
+  await page.getByText('H2', { exact: true }).click();
   const popover = page.getByTestId('map-popover');
   await expect(popover.getByTestId('popover-action').filter({ hasText: 'near pad' })).toContainText('2 of 2 left');
   await expect(popover.getByTestId('popover-action').filter({ hasText: 'far pad' })).toContainText('+2mo pad');
