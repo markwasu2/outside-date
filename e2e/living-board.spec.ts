@@ -102,3 +102,15 @@ test('Whale: a delivered hall shows its rent ticker on the board', async ({ page
   await expect(page.getByTestId('rent-ticker').first()).toBeVisible();
   await expect(page.locator('[role="button"][title="H1: Delivered"]')).toBeVisible();
 });
+
+test('water permit has a labelled route from the site office and dry field', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('quick-start').click();
+  await expect(page.getByTestId('map-pond-slot')).toContainText('Water permit');
+  await page.getByRole('button', { name: /Site office/ }).click();
+  const popover = page.getByTestId('map-popover');
+  await expect(popover.getByTestId('popover-action').filter({ hasText: 'File water permit' })).toBeVisible();
+  await page.screenshot({ path: 'docs/screenshots/cold2/water-route.png' });
+  await popover.getByTestId('popover-action').filter({ hasText: 'File water permit' }).click();
+  await expect(page.getByTestId('queued-ghost').first()).toBeVisible();
+});

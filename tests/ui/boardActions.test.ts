@@ -66,6 +66,8 @@ describe('boardActionsForObject', () => {
   });
 
   it('the site office offers permits, docket actions, and goodwill visits', () => {
+    const rows = boardActionsForObject('siteOffice', freshState(), content);
+    expect(rows.some((r) => r.label === 'File water permit' && r.action.params?.permitId === 'water')).toBe(true);
     const list = ids('siteOffice', freshState());
     for (const id of ['filePermit', 'fileDocket', 'prepTestimony', 'answerDiscovery', 'visitCast']) {
       expect(list).toContain(id);

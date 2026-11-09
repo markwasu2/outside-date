@@ -228,6 +228,7 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
     const rows: ActionRow[] = [
       row(content, state, 'filePermit', 'File air permit', { permitId: 'air' }),
       row(content, state, 'filePermit', 'File building permit', { permitId: 'building' }),
+      row(content, state, 'filePermit', 'File water permit', { permitId: 'water' }),
       row(content, state, 'fileDocket', findDef(content, 'fileDocket').label),
       row(content, state, 'prepTestimony', findDef(content, 'prepTestimony').label),
       row(content, state, 'answerDiscovery', findDef(content, 'answerDiscovery').label),
@@ -282,7 +283,7 @@ export function boardObjectTagline(objectId: string, state: GameState): { before
       };
     case 'siteOffice':
       return {
-        before: 'Your trailer on site. Air and building permits, the ',
+        before: 'Your trailer on site. Air, building and water permits, the ',
         termId: 'docket',
         term: 'docket',
         after: ', and cast visits run through here.',

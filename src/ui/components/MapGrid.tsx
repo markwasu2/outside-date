@@ -146,7 +146,7 @@ function objectHasQueuedAction(objectId: string, plan: PlannedAction[], hallIds:
     case 'siteOffice':
       return plan.some(
         (a) =>
-          (a.actionId === 'filePermit' && (a.params?.['permitId'] === 'air' || a.params?.['permitId'] === 'building')) ||
+          (a.actionId === 'filePermit' && ['air', 'building', 'water'].includes(String(a.params?.['permitId']))) ||
           ['fileDocket', 'prepTestimony', 'answerDiscovery', 'meetIntervenor', 'visitCast'].includes(a.actionId),
       );
     default:
@@ -303,13 +303,13 @@ export function MapGrid() {
           position: 'relative',
           ...cellStyle,
         }}
-        title={siteTheme.pond ? 'Pond' : 'Low field'}
+        title={siteTheme.pond ? 'Pond - water and wetlands permits' : 'Low field - water permit'}
       >
         {siteTheme.pond && <ArtLayer img={TILE_ART.pond.img} />}
         <span style={siteTheme.pond ? ART_CHIP : { position: 'relative' }}>
           {siteTheme.pond ? `${TILE_ART.pond.icon} ${TILE_ART.pond.label}` : '\u{1F33E} Low field'}
         </span>
-        {siteTheme.pond && <span style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{pondStateWords(draft)}</span>}
+        <span style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{siteTheme.pond ? pondStateWords(draft) : 'Water permit'}</span>
         {objectHasQueuedAction('pond', plan, hallIds) && <QueuedGhost />}
       </div>
 
