@@ -10,10 +10,18 @@ export function timeExplain(state: GameState): string {
   if (state.halls.length === 0) return 'No halls to deliver.';
   const offset = monthCallOffset(state);
   const onTime = state.halls.filter((h) => h.deliveredMonth !== null && h.deliveredMonth <= h.deliveryMonth + offset).length;
+  const late = state.halls.filter((h) => h.deliveredMonth !== null && h.deliveredMonth > h.deliveryMonth + offset).length;
   const total = state.halls.length;
+  const never = total - onTime - late;
   const call = offset === 0 ? 'the lease date' : `your call (${offset > 0 ? `${offset} months after` : `${-offset} months before`} the lease date)`;
   if (onTime === total) return `Every hall delivered on or before ${call}.`;
-  return `${total - onTime} of ${total} hall${total > 1 ? 's' : ''} missed ${call}.`;
+  // UX queue item 8: "missed" used to lump late deliveries in with halls that never delivered,
+  // so the HUD could say 3/4 delivered while the report card read "4 of 4 missed". Name the
+  // two cases the way the HUD counts them.
+  const parts: string[] = [];
+  if (late > 0) parts.push(`${late} of ${total} delivered late`);
+  if (never > 0) parts.push(`${never} of ${total} never delivered`);
+  return `${parts.join(' and ')} (graded against ${call}).`;
 }
 
 export function costExplain(state: GameState): string {
