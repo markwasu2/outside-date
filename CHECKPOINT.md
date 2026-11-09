@@ -106,3 +106,55 @@ second-sources the hot transformer market).
 - The market tick draws from a derived rng stream (seed*2654435761 + month*40503 + 7) so the
   pinned main-stream tests and perfect-play fixture are untouched.
 - load.test.ts counts unchanged: no events/glossary/codex rows added, actions still uncounted.
+
+# Phase 7: scarcity pack (2026-11-09)
+
+Branch phase7-scarcity-pack (off main 7f564318, carries the phase-6 spike with the pointer-events fix).
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| far pad adds 1-2 pad-stage months (schedule teeth) | done: tuning.spatial.farPadExtraMonths = 2; pad-stage minMonths adds it when hall.pad === 'far'; engine test measures far - near === 2 |
+| laydown yard crate capacity tied to phase 5 markets | done: tuning.spatial.laydownCapacity = 3; orderLongLead/spotBuy/secondSource throw "Laydown yard is full (n/3)"; substation build start installs (consumes) arrived crates, freeing slots; ordering closes once the substation is underway |
+| pond/wetlands exclusion removes a hall position on farmland | done as farmland tuningOverrides spatial.nearPads = 1: the pond takes one of the two substation-adjacent pads, so the 2nd groundbreak on farmland goes far (judgment call - the whale lease needs all 4 halls, so an actual hall-slot removal would break the scenario) |
+| save bump with migration | done: SAVE_VERSION 6; upgradeV5 backfills hall.pad = 'near'; migration test |
+| bot policies | done: advanceHall candidates sort by deliveryMonth so near pads land on the earliest (schedule-critical) halls; market candidates never propose spot/second-source with a full yard or a started substation; standard re-orders auto-filter via handler throws (probe-and-apply); pads policy also covers (c) - no extra wetland policy needed |
+| 1000-seed before/after grids whale + millbrook, careful+competent in 60-75% normal | done: see grids below - whale careful 75.0 -> 71.5, competent 73.2 -> 68.8 (in band); millbrook effectively unmoved (2 near pads cover its halls) |
+| full vitest/playwright/lint/tsc/build green | done: 468 vitest, 37 playwright, eslint, tsc, vite build |
+
+## After grid (1000 seeds, whale; Phase 5 after in parens)
+
+| bot | easy | normal | hard |
+|-----|------|--------|------|
+| random | 0.0 (0.0) | 0.0 (0.0) | 0.0 (0.0) |
+| greedy | 73.0 (66.9) | 46.8 (50.7) | 46.9 (50.6) |
+| careful | 99.1 (99.4) | 71.5 (75.0) | 22.5 (28.6) |
+| competent | 95.6 (95.8) | 68.8 (73.2) | 32.1 (44.7) |
+
+Multiples normal: greedy 1.98, careful 1.62, competent 1.47. Millbrook normal per site
+(rail-yard/riverbend-farm/depot-flats): greedy 23.0/6.0/32.7, careful 83.3/5.5/85.5,
+competent 56.8/4.9/72.0 - the pack barely binds where two near pads cover every hall;
+riverbend-farm's low win rate predates the pack (5.3% in Phase 5).
+
+## Balance-test moves (all with measured comments)
+
+- competent/hard band 40-55% -> 28-45% (measured 32.1%): two of four whale halls always take
+  the far pad's +2mo/feeder/losses; hard has no slack for it.
+- competent median first delivery floor 36 -> 34 (measured 34): the delivery-month sort pulls
+  the first delivery forward about two months.
+
+## Screenshots (visually inspected)
+
+- /downloads/p7-farmland-pads.png: farmland H1 popover reads "1 of 1 left" on the near row and "+2mo pad, $250K feeder + $40K/mo line losses" on the far row; pond tile on the map; yard chip "0/3"
+- /downloads/p7-yard-capacity.png: megasite mid-game (Y4 M5) with H1/H2 near-pad and H3-H6 far-pad chips, laydown yard labeled "0/3" after substation installation consumed the crates
+
+## Tensions
+
+- Installation consuming orders is a real state change: next-step cards, the progress spine,
+  and the substation order dialog all had to learn "substation underway means equipment is
+  handled"; without those, the UI told players to re-order an installed transformer. The
+  engine also rejects all ordering once the substation is underway (bots probed it).
+- e2e seed bumps: competent/whale/normal seed 2 now loses before any delivery (the teeth);
+  phase6-spike-shots and phase7-shots use seed 3 (delivers month 30, crates still pending).
+- load.test.ts counts unchanged: no events/glossary/codex rows added.

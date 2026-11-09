@@ -72,6 +72,9 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
   // policy second-sources the transformer once the equipment index reaches 1.05, so market
   // shocks that stretch lead times cost it the second-source premium instead of the
   // campaign. Easy 99.4%, hard 28.6% (1000 seeds, whale).
+  // Phase 7 (2026-11-09) measured: careful 71.5% / 1.62x (1000 seeds, whale normal). Two of
+  // four whale halls take the far pad now (+2 pad months, feeder cost, line losses); the
+  // delivery-month sort puts the near pads on the earliest halls. Easy 99.1%, hard 22.5%.
   it('careful: win rate 60-75%, median multiple 1.4-1.8x', () => {
     const report = runBot('careful');
     expect(report.winRate).toBeGreaterThanOrEqual(0.6);
@@ -90,6 +93,7 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
     // Phase 3: median floor 1.8 -> 1.3. Measured 70.5% / 1.50x on normal (was 75.0% / 1.95x), same lever cost as above.
     // Phase 4 measured: 73.5% / 1.48x (competent's value policy prices uncured permits and picks quarry-ridge).
     // Phase 5 measured: 73.2% / 1.50x (competent second-sources at index 1.15 and spot-buys within 6 months of outside date; markets net out near zero).
+    // Phase 7 measured: 68.8% / 1.47x (1000 seeds, whale normal): far-pad schedule teeth and line losses on two of four halls.
     expect(report.equityMultiple.median).toBeGreaterThanOrEqual(1.3);
     expect(report.equityMultiple.median).toBeLessThanOrEqual(2.4);
   });
