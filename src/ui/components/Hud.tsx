@@ -287,9 +287,13 @@ export function Hud() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        // UX 4: wrap instead of forcing the page wider than the window - at ~1280px the old
+        // single-row HUD overflowed ~155px and clipped the Export save button off the right edge.
+        flexWrap: 'wrap',
+        rowGap: '0.25rem',
         padding: '0.5rem 1rem',
         borderBottom: '1px solid #ccc',
-        gap: '1.5rem',
+        gap: '0.75rem',
         fontFamily: 'sans-serif',
         fontSize: '0.9rem',
       }}

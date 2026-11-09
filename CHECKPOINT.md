@@ -574,3 +574,24 @@ icons. Desktop only, per the user's call to drop phone layout.
 | balance grid | skipped: UI-only, no engine/content-tuning/bot change |
 | full suite green | done: 499 vitest (8 new), 42 playwright, eslint, tsc, vite build |
 | screenshots inspected | done: docs/screenshots/ux-legibility/ (captions + legend open, desktop 1440) |
+
+# UX 4 - desktop layout fits the window
+
+## The change (UI only)
+
+Playthrough finding: the main screen scrolled sideways and the Export save button
+was clipped off the right edge. The HUD was a single nowrap flex row whose
+intrinsic width (~1435px) exceeded a 1280px window. It now wraps (flexWrap, tighter
+gaps), so at 1280x800 the page's scrollWidth equals the viewport (verified:
+1435 -> 1280) and Export save, Sound and Fast forward are fully visible. Desktop
+only per the user's call; phone-width layout is explicitly out of scope.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| no sideways scroll at 1280 desktop | done: document scrollWidth 1435 -> 1280 = clientWidth |
+| Export save fully visible | done: screenshot docs/screenshots/ux4/desktop-1280-fixed.png |
+| HUD still readable | done: wraps to two compact lines; all stats and buttons visible |
+| balance grid | skipped: UI-only, no engine/content-tuning/bot change |
+| full suite green | done: 499 vitest, 42 playwright, eslint, tsc, vite build |
