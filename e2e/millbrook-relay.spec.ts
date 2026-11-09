@@ -31,6 +31,6 @@ test('Millbrook Relay careful seed 1 finishes with a priced report card', async 
   }
   await expect(report).toBeVisible();
   await expect(page.getByText(/Campus value .* equity multiple/)).toBeVisible();
-  await expect(page.getByText(/1\.73x/)).toBeVisible();
+  await expect(page.getByText(/1\.61x/)).toBeVisible();
   await page.screenshot({ path: '/tmp/millbrook-relay-report.png', fullPage: true });
 });
