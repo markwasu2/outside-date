@@ -14,6 +14,8 @@ export type HallVisualStage = 'notStarted' | StageId | 'delivered';
 export interface HallVisualFlags {
   paused: boolean;
   terminated: boolean;
+  /** Stage is actively being worked this month (GFX 2: shows the stage's vehicle sprite). */
+  active: boolean;
 }
 
 export interface HallVisual {
@@ -35,7 +37,7 @@ export function stageMinMonths(state: GameState, content: Content): number[] {
 }
 
 export function hallVisual(hall: Hall, stageMin: number[]): HallVisual {
-  const flags: HallVisualFlags = { paused: hall.pausedThisMonth, terminated: hall.terminated };
+  const flags: HallVisualFlags = { paused: hall.pausedThisMonth, terminated: hall.terminated, active: hall.stageActive };
   if (hall.delivered) {
     return { stage: 'delivered', progress0to1: 1, flags };
   }

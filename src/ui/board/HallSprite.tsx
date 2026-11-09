@@ -1,5 +1,5 @@
 import { formatDollars } from '../../engine/format';
-import { STAGE_ART } from '../art';
+import { STAGE_ART, VEHICLE_ART } from '../art';
 import type { HallVisual } from './hallVisual';
 
 /**
@@ -160,6 +160,28 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
             </span>
           ))}
         </div>
+      )}
+
+      {/* GFX 2: the stage's construction vehicle while crews are actively working it */}
+      {underConstruction && visual.flags.active && VEHICLE_ART[stage] && (
+        <img
+          src={VEHICLE_ART[stage]!.img}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          title={VEHICLE_ART[stage]!.label}
+          data-testid="stage-vehicle"
+          style={{
+            position: 'absolute',
+            bottom: 6,
+            right: 2,
+            width: '30%',
+            borderRadius: 4,
+            border: '1px solid rgba(141,110,99,0.7)',
+            background: '#fffdf8',
+            pointerEvents: 'none',
+          }}
+        />
       )}
 
       {/* keep the stage icon whisper-small in a corner so the tile still reads at a glance */}

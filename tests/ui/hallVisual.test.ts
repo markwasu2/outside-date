@@ -26,7 +26,7 @@ describe('hallVisual', () => {
     const v = hallVisual(state.halls[0]!, stageMinMonths(state, content));
     expect(v.stage).toBe('notStarted');
     expect(v.progress0to1).toBe(0);
-    expect(v.flags).toEqual({ paused: false, terminated: false });
+    expect(v.flags).toEqual({ paused: false, terminated: false, active: false });
   });
 
   it('progress within a stage is stageMonthsDone / that stage minMonths, clamped to 0..1', () => {
