@@ -104,8 +104,11 @@ export function LogStrip() {
         padding: '0.4rem 1rem',
         fontFamily: 'sans-serif',
         fontSize: '0.75rem',
-        maxHeight: expanded ? '40vh' : 'auto',
-        overflowY: expanded ? 'auto' : 'visible',
+        // Phase 1: collapsed now has a real cap too - warning log entries carry detail lines
+        // (D8), and an uncapped strip grew tall enough to squeeze the main area until the
+        // TracksPanel's End-month button painted under this strip and lost its clicks.
+        maxHeight: expanded ? '40vh' : '96px',
+        overflowY: 'auto',
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>

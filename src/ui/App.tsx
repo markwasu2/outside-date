@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 
+import { BoardStyles } from './board/boardStyles';
+import { ProgressSpine } from './board/ProgressSpine';
+import { WarningBanner } from './board/WarningBanner';
 import { CoachTip } from './components/CoachTip';
 import { CodexModal } from './components/CodexModal';
 import { EventModal } from './components/EventModal';
@@ -75,12 +78,20 @@ export function App() {
         <EndedFlow />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+          <BoardStyles />
           <Hud />
+          <ProgressSpine />
+          <WarningBanner />
           <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-            <div style={{ flex: 2, minWidth: 0 }}>
+            {/* Phase 1: minHeight: 0 on both wrappers. The progress spine + warning banner took
+             * vertical space the layout used to give the main area; without letting these flex
+             * items shrink below their content height, the TracksPanel's bottom section (End
+             * month) painted past the main area and under the LogStrip, which then intercepted
+             * clicks (found via the tutorial smoke test timing out on the End-month click). */}
+            <div style={{ flex: 2, minWidth: 0, minHeight: 0 }}>
               <MapGrid />
             </div>
-            <div style={{ flex: 1, minWidth: 280, borderLeft: '1px solid #ccc' }}>
+            <div style={{ flex: 1, minWidth: 280, minHeight: 0, borderLeft: '1px solid #ccc' }}>
               <TracksPanel />
             </div>
           </div>
