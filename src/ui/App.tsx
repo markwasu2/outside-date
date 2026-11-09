@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { BoardStyles } from './board/boardStyles';
+import { GoalStrip } from './board/GoalStrip';
 import { ProgressSpine } from './board/ProgressSpine';
 import { WarningBanner } from './board/WarningBanner';
 import { CoachTip } from './components/CoachTip';
@@ -81,6 +82,7 @@ export function App() {
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
           <BoardStyles />
           <Hud />
+          <GoalStrip />
           <ProgressSpine />
           <WarningBanner />
           <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
