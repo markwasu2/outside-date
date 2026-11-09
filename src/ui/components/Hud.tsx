@@ -6,6 +6,7 @@ import { dscr, forwardNoi, hallGrossRent, runway } from '../../engine/selectors'
 import type { GameState, GoodwillGroup } from '../../engine/types';
 import { totalApCost } from '../../engine/step';
 import { exportSaveToFile, SAVE_VERSION } from '../save';
+import { usePrefersReducedMotion } from '../board/boardStyles';
 import { useStore } from '../store';
 import { CastHover } from './CastHover';
 
@@ -162,11 +163,22 @@ function runwayColor(months: number): string {
   return '#c62828'; // red
 }
 
+/** Phase 1 (D8): the HUD runway bar shares the warnings.ts thresholds - green at/above 9,
+ * amber 6..9, deep orange 3..6, red under 3 - so the bar and the banner never disagree. */
+export function runwayBarColor(months: number): string {
+  if (months >= 9) return '#2e7d32';
+  if (months >= 6) return '#b8860b';
+  if (months >= 3) return '#e65100';
+  return '#c62828';
+}
+
 export function Hud() {
   const draft = useStore((s) => s.draft);
   const plan = useStore((s) => s.plan);
   const content = useStore((s) => s.content);
   const state = useStore((s) => s.state);
+  const prevState = useStore((s) => s.prevState);
+  const reducedMotion = usePrefersReducedMotion();
   const lastNegotiation = useStore((s) => s.lastNegotiation);
   const lastDifficultyId = useStore((s) => s.lastDifficultyId);
   const dismissedCoachTips = useStore((s) => s.dismissedCoachTips);
@@ -217,6 +229,28 @@ export function Hud() {
     ? Math.min(...activeHalls.map((h) => h.outsideMonth))
     : null;
 
+  // Phase 1 (D4): at End month the cash number counts up/down from the previously committed
+  // value instead of snapping - instant under prefers-reduced-motion or while a plan preview is
+  // showing (then draft.cash already reflects uncommitted actions).
+  const [displayCash, setDisplayCash] = useState(draft.cash);
+  useEffect(() => {
+    const from =
+      prevState && state.month > prevState.month && plan.length === 0 && !reducedMotion ? prevState.cash : draft.cash;
+    if (from === draft.cash) {
+      setDisplayCash(draft.cash);
+      return;
+    }
+    let raf = 0;
+    const start = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / 600);
+      setDisplayCash(Math.round(from + (draft.cash - from) * p));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [draft.cash, state.month, prevState, plan.length, reducedMotion]);
+
   const canFastForward = plan.length === 0 && draft.phase === 'playing';
 
   const handleFastForward = () => {
@@ -256,7 +290,7 @@ export function Hud() {
         ))}
       </div>
 
-      <div>Cash: {formatDollars(draft.cash)}</div>
+      <div data-testid="hud-cash">Cash: {formatDollars(displayCash)}</div>
 
       {/* QA pass 2, finding 8: the tooltip used to omit the utility minimum charge and
           liquidated-damages accrual terms even though runway()'s number includes both.
@@ -264,6 +298,21 @@ export function Hud() {
           the month-over-month change, so a bad month shows WHY, not just the headline figure. */}
       <div title={runwayTooltip} style={{ color: runwayColor(months) }}>
         Runway: {formatMonths(months)}
+        {/* Phase 1 (D8): runway as a bar at the same thresholds as the warnings banner. */}
+        <span
+          data-testid="runway-bar"
+          style={{ display: 'inline-block', width: 56, height: 6, background: '#e0e0e0', borderRadius: 3, marginLeft: 6, verticalAlign: 'middle' }}
+        >
+          <span
+            style={{
+              display: 'block',
+              height: '100%',
+              borderRadius: 3,
+              width: `${Math.max(0, Math.min(1, months / 12)) * 100}%`,
+              background: runwayBarColor(months),
+            }}
+          />
+        </span>
       </div>
 
       <div title={dscrHeadroomTooltip(d, content.tuning.covenant.dscrTrigger, forwardNoiValue, content.tuning.covenant.forcedTestMonth)}>

@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 
+import { BoardStyles } from './board/boardStyles';
+import { ProgressSpine } from './board/ProgressSpine';
+import { WarningBanner } from './board/WarningBanner';
 import { CoachTip } from './components/CoachTip';
 import { CodexModal } from './components/CodexModal';
 import { EventModal } from './components/EventModal';
@@ -75,7 +78,10 @@ export function App() {
         <EndedFlow />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+          <BoardStyles />
           <Hud />
+          <ProgressSpine />
+          <WarningBanner />
           <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
             <div style={{ flex: 2, minWidth: 0 }}>
               <MapGrid />

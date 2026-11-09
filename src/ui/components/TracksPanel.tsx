@@ -1,10 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { formatDollars } from '../../engine/format';
-import { applyAction } from '../../engine/actions';
-import { resolveContent } from '../../engine/resolve';
-import type { ActionDef, Content } from '../../content/schemas';
+import type { Content } from '../../content/schemas';
 import type { GameState, GoodwillGroup, PlannedAction } from '../../engine/types';
+import { cashLabel, findDef } from '../board/actions';
 import { checkAction, useStore } from '../store';
 import type { TrackTab } from '../store';
 import { CastPortrait, INTERVENOR_REP } from '../portraits';
@@ -32,51 +30,8 @@ interface Row {
   portraitName?: string;
 }
 
-/** Resolves a 'dynamic' cash cost to a concrete number where it's actually deterministic given
- * current state (see store.ts/Decisions log); returns null when it genuinely varies/unknown. */
-function dynamicCash(def: ActionDef, state: GameState, content: Content): number | null {
-  if (def.id === 'optionSite') return content.tuning.land[state.setup.site];
-  if (def.id === 'orderTransformer') return content.tuning.power.transformerDeposit;
-  if (def.id === 'orderSwitchgear') return content.tuning.power.switchgearDeposit;
-  if (def.id === 'readyLiquid') {
-    if (state.setup.hallTier === 'liquid') return content.tuning.chips.liquidReadyCost;
-    if (state.setup.hallTier === 'hybrid') return content.tuning.chips.hybridLiquidReadyCost;
-    return null;
-  }
-  return null;
-}
-
-/**
- * QA pass 2, finding 6: row labels used to come straight from actions.json and base tuning, so
- * the tutorial showed whale prices ($50.0M site option, $2.0M study, $3.0M switchgear) while
- * the engine actually charges the scenario-resolved cost - and, for the site option, whatever
- * the funding waterfall leaves to cash ($0 on the tutorial's capital stack). For any action
- * with a cash cost, dry-run it against current state (the same probe-and-apply pattern
- * store.ts's checkAction uses; the probe copy is discarded, no rng leaks into real state) and
- * show the real cash delta. Falls back to the scenario-resolved static price when the action
- * isn't currently legal - the row's disabled reason already explains why.
- */
-function cashLabel(def: ActionDef, state: GameState, content: Content, params?: Record<string, string | number>): string {
-  const resolved = resolveContent(state, content);
-  if (def.cash === 'dynamic' || def.id === 'commissionStudy' || (typeof def.cash === 'number' && def.cash > 0)) {
-    try {
-      const after = applyAction(state, { actionId: def.id, ...(params ? { params } : {}) }, resolved);
-      const delta = state.cash - after.cash;
-      if (delta >= 0) return formatDollars(delta);
-    } catch {
-      // Not currently legal (missing prereq, insufficient cash): the static label still applies.
-    }
-  }
-  if (def.cash !== 'dynamic') return formatDollars(def.cash);
-  const amount = dynamicCash(def, state, resolved);
-  return amount === null ? 'varies' : formatDollars(amount);
-}
-
-function findDef(content: Content, id: string): ActionDef {
-  const def = content.actions.find((a) => a.id === id);
-  if (!def) throw new Error(`Unknown action id: "${id}"`);
-  return def;
-}
+// Phase 1 (D1): `cashLabel`/`dynamicCash`/`findDef` moved to src/ui/board/actions.ts so the map
+// popovers and this panel share one implementation (imported above).
 
 /** Exported so tests/ui can cover row-building (e.g. the QA finding #1 docketAmendment filter)
  * without rendering the component. */
@@ -371,6 +326,17 @@ function describeAction(action: PlannedAction, content: Content): string {
 
 export function TracksPanel() {
   const [tab, setTab] = useState<TrackTab>('land');
+  // Phase 1 (D8): a warning-fix button can ask this panel to switch tabs (e.g. "Cure the draw
+  // freeze (Money tab)"). The request lives in the store because the banner renders far away
+  // from this component; adopt it once and clear it.
+  const requestedTab = useStore((s) => s.requestedTab);
+  const requestTab = useStore((s) => s.requestTab);
+  useEffect(() => {
+    if (requestedTab) {
+      setTab(requestedTab);
+      requestTab(null);
+    }
+  }, [requestedTab, requestTab]);
   const state = useStore((s) => s.state);
   const content = useStore((s) => s.content);
   const plan = useStore((s) => s.plan);

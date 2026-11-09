@@ -11,6 +11,7 @@ import type { GameState, PlannedAction, Setup } from '../engine/types';
 import { BOTS, playOneGame } from '../sim/runSim';
 import { SAVE_VERSION, saveGame, type SaveFile } from './save';
 import { playSound } from './sound';
+import { newCrossings, warnings } from './board/warnings';
 
 /** P10.3: months-of-runway threshold below which `playWarningIfNeeded` beeps on a fresh crossing
  * into the danger zone - matches `Hud.tsx`'s own "< 3 = red" runway color threshold. */
@@ -41,6 +42,19 @@ export function fastForwardStopReason(state: GameState, content: Content): strin
     return 'Fast-forward stopped: DSCR headroom is critically thin - use End month to continue one at a time.';
   }
   return 'Fast-forward stopped for this month - use End month to continue.';
+}
+
+/** Phase 1 (D8): fires each threshold warning once per crossing - diffs the warnings() lists
+ * before/after a committed month (same pattern as playTransitionSounds), appends a 'warning' log
+ * entry per new crossing, and plays the existing warning sound once if anything crossed. Returns
+ * the state to commit (unchanged when nothing crossed). */
+function applyWarningCrossings(before: GameState, after: GameState, planContent: Content, muted: boolean): GameState {
+  if (before.month === after.month) return after;
+  const crossings = newCrossings(warnings(before, planContent), warnings(after, planContent));
+  if (crossings.length === 0) return after;
+  playSound('warning', muted);
+  const entries = crossings.map((w) => ({ month: after.month, kind: 'warning' as const, text: w.title, detail: w.detail }));
+  return { ...after, log: [...after.log, ...entries] };
 }
 
 /** P10.3: fires the 'milestone' sound (a hall newly delivered, or the campaign newly ending in a
@@ -202,6 +216,22 @@ interface UIStore {
   selectedHallId: string | null;
   openPanel: OpenPanel | null;
   error: string | null;
+  /** Phase 1 (D1): which map object's context popover is open (a hall id, 'substation', 'pond',
+   * 'siteOffice', 'laydownYard' or 'powerPlants'); null = closed. */
+  boardPopover: string | null;
+  /** Phase 1 (D4/D9): the previously committed state, kept so the board can diff month-over-month
+   * (construction-spend floats, rent coin animation, arrival highlights) without any engine
+   * change. null before the first committed month of a run. */
+  prevState: GameState | null;
+  /** Phase 1 (D6): map objects whose "what this is" teaching line has been seen this run - same
+   * pattern as dismissedCoachTips (UI-only, cleared by newGame/loadGame). */
+  seenBoardObjects: string[];
+  /** Phase 1 (D8): a warning-fix button can ask the TracksPanel to switch to a tab (its tab state
+   * is local to the panel); the panel adopts and clears this on render. */
+  requestedTab: TrackTab | null;
+  setBoardPopover: (objectId: string | null) => void;
+  markBoardObjectSeen: (objectId: string) => void;
+  requestTab: (tab: TrackTab | null) => void;
   /** Phase 7: which top-level screen to show. Starts on 'start' (title/wizard); `newGame` always
    * flips it to 'game', so any caller of `newGame` lands in the real UI without a second call. */
   screen: Screen;
@@ -270,6 +300,10 @@ export const useStore = create<UIStore>((set, get) => ({
   selectedHallId: null,
   openPanel: null,
   error: null,
+  boardPopover: null,
+  prevState: null,
+  seenBoardObjects: [],
+  requestedTab: null,
   screen: 'start',
   dismissedCoachTips: [],
   lastNegotiation: DEFAULT_NEGOTIATION,
@@ -280,6 +314,10 @@ export const useStore = create<UIStore>((set, get) => ({
   toggleMuted: () => set((s) => ({ muted: !s.muted })),
 
   selectHall: (hallId) => set({ selectedHallId: hallId }),
+  setBoardPopover: (objectId) => set({ boardPopover: objectId }),
+  markBoardObjectSeen: (objectId) =>
+    set((s) => (s.seenBoardObjects.includes(objectId) ? s : { seenBoardObjects: [...s.seenBoardObjects, objectId] })),
+  requestTab: (tab) => set({ requestedTab: tab }),
   setOpenPanel: (panel) => set((s) => ({ openPanel: s.openPanel === panel ? null : panel })),
   setScreen: (screen) => set({ screen }),
   dismissCoachTip: (id) => set((s) => ({ dismissedCoachTips: [...s.dismissedCoachTips, id] })),
@@ -347,15 +385,16 @@ export const useStore = create<UIStore>((set, get) => ({
       // of real clicks; see Decisions log).
       if (state.phase === 'takeoutAvailable') {
         const next = foldPlan(state, c, plan);
-        set({ state: next, plan: [], draft: next, error: null });
+        set({ state: next, prevState: state, plan: [], draft: next, error: null });
         playTransitionSounds(state, next, c, muted);
         get().autosave();
         return;
       }
       const result = step(state, plan, c);
-      set({ state: result.state, plan: [], draft: result.state, error: null });
+      const next = applyWarningCrossings(state, result.state, c, muted);
+      set({ state: next, prevState: state, plan: [], draft: next, error: null });
       playSound('turn', muted);
-      playTransitionSounds(state, result.state, c, muted);
+      playTransitionSounds(state, next, c, muted);
       get().autosave();
     } catch (e) {
       set({ error: humanizeActionError(e instanceof Error ? e.message : String(e)) });
@@ -385,8 +424,9 @@ export const useStore = create<UIStore>((set, get) => ({
       set({ error: fastForwardStopReason(result.state, c) });
       return;
     }
-    set({ state: result.state, draft: result.state, plan: [], error: null });
-    playTransitionSounds(state, result.state, c, muted);
+    const next = applyWarningCrossings(state, result.state, c, muted);
+    set({ state: next, prevState: state, draft: next, plan: [], error: null });
+    playTransitionSounds(state, next, c, muted);
     get().autosave();
   },
 
@@ -415,6 +455,10 @@ export const useStore = create<UIStore>((set, get) => ({
       selectedHallId: null,
       openPanel: null,
       error: null,
+      boardPopover: null,
+      prevState: null,
+      seenBoardObjects: [],
+      requestedTab: null,
       screen: 'game',
       dismissedCoachTips: [],
       lastNegotiation: negotiation,
@@ -431,6 +475,10 @@ export const useStore = create<UIStore>((set, get) => ({
       selectedHallId: null,
       openPanel: null,
       error: null,
+      boardPopover: null,
+      prevState: null,
+      seenBoardObjects: [],
+      requestedTab: null,
       screen: 'game',
       dismissedCoachTips: save.dismissedCoachTips,
       lastNegotiation: save.lastNegotiation,
