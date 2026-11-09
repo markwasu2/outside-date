@@ -94,3 +94,9 @@ export const EQUIP_ART: Record<'transformer' | 'switchgear', { img: string; labe
 
 /** Delivery truck flashed in the laydown yard the month an order arrives. */
 export const DELIVERY_TRUCK = { img: truckDeliveryImg, label: 'Delivery arrived' };
+
+import substationPlannedImg from '../assets/art/substation-planned.png';
+import substationBuildingImg from '../assets/art/substation-building.png';
+
+/** Physical substation state, not the study status: empty surveyed plot, active build, complete. */
+export const SUBSTATION_ART = { none: substationPlannedImg, building: substationBuildingImg, done: tileSubstationImg };

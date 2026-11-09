@@ -26,3 +26,27 @@ test('setup site previews use the same illustrated board assets and keep theme c
   await expect(page.getByTestId('site-card-farmland').getByTestId('site-preview-pond')).toHaveAttribute('data-pond','true');
   await page.screenshot({ path: 'docs/screenshots/cold2/art-setup.png', fullPage: true });
 });
+
+test('substation illustration follows physical build state, not just a completed study', async ({ page }) => {
+  await page.goto('/'); await page.getByTestId('quick-start').click();
+  const sub = page.getByTestId('map-substation');
+  await expect(sub).toHaveAttribute('data-build-state','none');
+  const planned = await sub.locator('img').getAttribute('src');
+  await page.evaluate(async () => {
+    const { useStore } = await import('/src/ui/store.ts'); const s = useStore.getState();
+    const next = structuredClone(s.state); next.power.studyStatus = 'done';
+    next.power.substationStatus = 'building'; next.power.substationDoneMonth = next.month + 2;
+    useStore.setState({state:next,draft:next});
+  });
+  await expect(sub).toHaveAttribute('data-build-state','building');
+  expect(await sub.locator('img').getAttribute('src')).not.toBe(planned);
+  await expect(sub.getByRole('progressbar')).toBeVisible();
+  await page.screenshot({ path: 'docs/screenshots/cold2/art-substation.png' });
+  await page.evaluate(async () => {
+    const { useStore } = await import('/src/ui/store.ts'); const s = useStore.getState();
+    const next = structuredClone(s.state); next.power.substationStatus = 'done';
+    useStore.setState({state:next,draft:next});
+  });
+  await expect(sub).toHaveAttribute('data-build-state','done');
+  await expect(sub.getByRole('progressbar')).toHaveCount(0);
+});

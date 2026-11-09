@@ -7,7 +7,7 @@ import { pondMitigated } from '../../engine/systems/construction';
 import { resolveSite } from '../../content/sites';
 import { STAGES } from '../../engine/types';
 import type { PlannedAction } from '../../engine/types';
-import { STAGE_ART, TILE_ART, type TileArt } from '../art';
+import { STAGE_ART, TILE_ART, SUBSTATION_ART, type TileArt } from '../art';
 import { LEGEND_ENTRIES, hallCaption, pondStateWords, substationStateWords } from '../board/legibility';
 import { COOLING_ART, DELIVERY_TRUCK, EQUIP_ART } from '../art';
 import { useStore } from '../store';
@@ -543,10 +543,12 @@ export function MapGrid() {
           ...(substationEnergized && !reducedMotion ? { animation: 'boardGlowPulse 2.4s ease-in-out infinite' } : {}),
           ...cellStyle,
         }}
+        data-testid="map-substation"
+        data-build-state={power.substationStatus}
         title="Substation"
       >
         <ArtLayer
-          img={TILE_ART.substation.img}
+          img={SUBSTATION_ART[power.substationStatus]}
           dimmed={power.studyStatus === 'none' && power.substationStatus === 'none'}
         />
         <div style={ART_CHIP}>
@@ -561,6 +563,13 @@ export function MapGrid() {
         {power.substationStatus === 'building' && (
           <div style={ART_CHIP}>
             {'\u{1F3D7}\uFE0F'} done {power.substationDoneMonth !== null ? formatMonth(power.substationDoneMonth) : 'soon'}
+          </div>
+        )}
+        {power.substationStatus === 'building' && (
+          <div role="progressbar" aria-label="Substation construction" aria-valuemin={0} aria-valuemax={100}
+            aria-valuenow={Math.round(Math.max(0, Math.min(1, 1 - ((power.substationDoneMonth ?? draft.month) - draft.month) / resolveContent(draft, content).tuning.power.substationBuildMonths)) * 100)}
+            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 6, background: '#d7c9ac', pointerEvents: 'none' }}>
+            <div style={{ width: `${Math.round(Math.max(0, Math.min(1, 1 - ((power.substationDoneMonth ?? draft.month) - draft.month) / resolveContent(draft, content).tuning.power.substationBuildMonths)) * 100)}%`, height: '100%', background: '#397a55' }} />
           </div>
         )}
         {objectHasQueuedAction('substation', plan, hallIds) && <QueuedGhost />}
