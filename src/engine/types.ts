@@ -15,6 +15,9 @@ export type MinChargeLevel = 'low' | 'medium' | 'high';
 
 export interface Hall {
   id: string; // 'H1'..'H6'
+  /** Phase 6 (spatial spike): which pad the hall broke ground on. Undefined on pre-spike
+   * saves; treated as 'near' everywhere (those halls were always adjacent). */
+  pad?: 'near' | 'far';
   mwIT: number; // 25 in the Whale campaign
   stageIndex: number; // index into STAGES of the CURRENT stage, -1 = not started, 5 = complete
   stageActive: boolean; // a stage has been started and is accruing progress

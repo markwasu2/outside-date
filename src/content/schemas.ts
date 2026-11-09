@@ -45,6 +45,19 @@ export const MarketsTuningSchema = z.object({
 });
 export type MarketsTuning = z.infer<typeof MarketsTuningSchema>;
 
+/** Phase 6 (spatial spike): pad placement. `nearPads` halls can break ground adjacent to the
+ * substation; the rest trench a feeder (one-time cost) and eat monthly line losses once
+ * delivered. This is a SPIKE block - see SPIKE.md before building on it. */
+export const SpatialTuningSchema = z.object({
+  /** How many halls fit on pads adjacent to the substation. */
+  nearPads: z.number().int(),
+  /** One-time feeder trench cost for a far-pad hall, charged at groundbreak. */
+  farFeederCost: z.number().int(),
+  /** Monthly line losses for a delivered far-pad hall. */
+  farLineLossPerMonth: z.number().int(),
+});
+export type SpatialTuning = z.infer<typeof SpatialTuningSchema>;
+
 export const TuningSchema = z.object({
   campaign: z.object({
     maxMonths: z.number().int(),
@@ -121,6 +134,7 @@ export const TuningSchema = z.object({
     minChargePerMwMonth: LowMedHighNumberSchema,
   }),
   markets: MarketsTuningSchema,
+  spatial: SpatialTuningSchema,
   capital: z.object({
     seniorOptions: z.array(z.object({ ltc: z.number(), rate: z.number() })),
     mezzOptions: z.array(z.object({ share: z.number(), rate: z.number() })),

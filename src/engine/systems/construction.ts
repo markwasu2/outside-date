@@ -304,6 +304,27 @@ export function advanceHall(
   if (!stagePrereqsMet(state, content, hall, stageId)) {
     throw new Error(`Hall ${hallId} cannot start stage "${stageId}": prerequisites not met`);
   }
+  // Phase 6 (spatial spike): groundbreak fixes the hall's pad. Near pads (adjacent to the
+  // substation, count limited by tuning.spatial.nearPads) are free; far pads trench a feeder
+  // at groundbreak and pay monthly line losses once delivered. No pad param picks a near pad
+  // while one is free, so bots and old saves keep working unchanged.
+  if (hall.stageIndex === -1) {
+    const spatial = content.tuning.spatial;
+    const nearTaken = state.halls.filter((h) => h.id !== hallId && h.stageIndex >= 0 && (h.pad ?? 'near') === 'near').length;
+    const requested = params?.['pad'];
+    // No explicit choice: near while one is free, otherwise far. An explicit near request on
+    // full pads is the only error case.
+    const pad = requested === 'far' ? 'far' : requested === 'near' || nearTaken < spatial.nearPads ? 'near' : 'far';
+    if (requested === 'near' && nearTaken >= spatial.nearPads) {
+      throw new Error(`All ${spatial.nearPads} near pads are taken; ${hallId} must break ground on a far pad`);
+    }
+    if (pad === 'far') {
+      const funded = tryFundAmount(state, spatial.farFeederCost);
+      if (!funded.funded) throw new Error('Insufficient funding to trench the feeder for a far pad');
+      return replaceHall(funded.state, hallId, { ...hall, pad: 'far', stageIndex: 0, stageActive: true, stageMonthsDone: 0 });
+    }
+    return replaceHall(state, hallId, { ...hall, pad: 'near', stageIndex: 0, stageActive: true, stageMonthsDone: 0 });
+  }
   return replaceHall(state, hallId, { ...hall, stageIndex: targetStageIndex, stageActive: true, stageMonthsDone: 0 });
 }
 

@@ -385,5 +385,10 @@
       }
     },
     "gcSwitchCost": 3000000
+  },
+  "spatial": {
+    "nearPads": 2,
+    "farFeederCost": 250000,
+    "farLineLossPerMonth": 40000
   }
 }

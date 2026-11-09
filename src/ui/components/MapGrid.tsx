@@ -242,9 +242,11 @@ export function MapGrid() {
           const late = !hall.delivered && !hall.terminated && draft.month > hall.outsideMonth;
           const failedInspection = !!draft.flags[`inspectionFail:${hall.id}`];
           // D4: the rent ticker reads the committed state every render (not just month deltas).
+          // Phase 6 (spatial spike): the rent ticker nets out a far pad's line losses.
           const rent =
             hall.delivered && !hall.terminated
-              ? hallGrossRent(state, content, hall) * (1 - content.tuning.lease.landlordCostShare)
+              ? hallGrossRent(state, content, hall) * (1 - content.tuning.lease.landlordCostShare) -
+                ((hall.pad ?? 'near') === 'far' ? content.tuning.spatial.farLineLossPerMonth : 0)
               : null;
           const arrivalFlash = deltas.deliveredHalls.includes(hall.id) && !reducedMotion;
           return (
@@ -266,6 +268,33 @@ export function MapGrid() {
             >
               <div style={{ position: 'absolute', top: 1, left: 3, fontSize: '0.7rem', zIndex: 2 }}>
                 <strong>{hall.id}</strong>
+              </div>
+              {/* Phase 6 (spatial spike): the pad chip. Unbroken halls are unplaced; broken
+                  ground fixes near (adjacent to the substation, free) or far (feeder + line
+                  losses). */}
+              <div
+                data-testid={`pad-${hall.id}`}
+                style={{
+                  position: 'absolute',
+                  top: 1,
+                  right: 3,
+                  fontSize: '0.6rem',
+                  zIndex: 2,
+                  padding: '0 3px',
+                  borderRadius: 3,
+                  background:
+                    hall.stageIndex === -1 ? '#eceff1' : (hall.pad ?? 'near') === 'near' ? '#c8e6c9' : '#ffe0b2',
+                  border: `1px solid ${hall.stageIndex === -1 ? '#b0bec5' : (hall.pad ?? 'near') === 'near' ? '#2e7d32' : '#e65100'}`,
+                }}
+                title={
+                  hall.stageIndex === -1
+                    ? `${hall.id}: pad not chosen yet - near pads are limited`
+                    : (hall.pad ?? 'near') === 'near'
+                      ? `${hall.id}: near pad, adjacent to the substation`
+                      : `${hall.id}: far pad - feeder trenched, line losses monthly`
+                }
+              >
+                {hall.stageIndex === -1 ? 'unplaced' : (hall.pad ?? 'near') === 'near' ? 'near pad' : 'far pad'}
               </div>
               <HallSprite
                 visual={visual}
