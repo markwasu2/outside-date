@@ -8,6 +8,7 @@ import { createGame, type DifficultyId, type NegotiationChoices } from '../engin
 import { dscr, ledger, runway } from '../engine/selectors';
 import { fastForward as engineFastForward, resolveEvent, step, totalApCost } from '../engine/step';
 import type { GameState, PlannedAction, Setup } from '../engine/types';
+import { BotRng } from '../sim/rng';
 import { BOTS, playOneGame } from '../sim/runSim';
 import { SAVE_VERSION, saveGame, type SaveFile } from './save';
 import { playSound } from './sound';
@@ -514,6 +515,42 @@ if (import.meta.env.DEV && typeof window !== 'undefined') {
     const bot = BOTS[botId];
     if (!bot) throw new Error(`__debugRunBot: unknown bot "${botId}". Known bots: ${Object.keys(BOTS).join(', ')}`);
     const { state } = playOneGame(bot, content, scenarioId, difficulty, seed);
+    useStore.setState({
+      state,
+      draft: state,
+      plan: [],
+      selectedHallId: null,
+      openPanel: null,
+      error: null,
+      screen: 'game',
+    });
+  };
+
+  // Phase 1 (D4): e2e/screenshot coverage needs a still-playing state with a delivered hall
+  // (the tutorial ends the moment its only hall delivers, so a delivered-hall board can never
+  // be seen there). Runs the same step/resolveEvent loop as runSim.ts's playOneGame - src/sim
+  // is zero-diff protected, so the loop is mirrored here with a stop-at-first-delivery
+  // condition - then lands it in the store like __debugRunBot does.
+  (
+    window as unknown as {
+      __debugBotToFirstDelivery?: (botId: string, scenarioId: string, difficulty: DifficultyId, seed: number) => void;
+    }
+  ).__debugBotToFirstDelivery = (botId, scenarioId, difficulty, seed) => {
+    const bot = BOTS[botId];
+    if (!bot) throw new Error(`__debugBotToFirstDelivery: unknown bot "${botId}". Known bots: ${Object.keys(BOTS).join(', ')}`);
+    const rng = new BotRng(seed);
+    let state = createGame(content, scenarioId, bot.setup, bot.negotiation, seed, difficulty);
+    let guard = 0;
+    const maxIterations = state.maxMonths * 4 + 200;
+    while (state.phase === 'playing' && !state.halls.some((h) => h.delivered)) {
+      guard += 1;
+      if (guard > maxIterations) throw new Error(`__debugBotToFirstDelivery: exceeded iteration guard (seed ${seed})`);
+      const actions = bot.chooseActions(state, content, rng);
+      state = step(state, actions, content).state;
+      while (state.phase === 'awaitingChoice' && state.pending) {
+        state = resolveEvent(state, bot.chooseEvent(state, state.pending, rng), content).state;
+      }
+    }
     useStore.setState({
       state,
       draft: state,

@@ -414,7 +414,13 @@ export function MapGrid() {
       )}
 
       {boardPopover && popoverPos && (
-        <MapPopover objectId={boardPopover} left={popoverPos.left} top={popoverPos.top} onClose={() => setBoardPopover(null)} />
+        <MapPopover
+          key={boardPopover}
+          objectId={boardPopover}
+          left={popoverPos.left}
+          top={popoverPos.top}
+          onClose={() => setBoardPopover(null)}
+        />
       )}
     </div>
   );

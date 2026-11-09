@@ -38,6 +38,10 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
   const queueAction = useStore((s) => s.queueAction);
   const seen = useStore((s) => s.seenBoardObjects.includes(objectId));
   const markBoardObjectSeen = useStore((s) => s.markBoardObjectSeen);
+  // Capture the first-open value: the effect below marks the object seen in the same beat, and
+  // rendering the teaching line off the live store value would hide it immediately.
+  const wasSeenAtOpen = useRef(seen);
+  const showTeaching = !wasSeenAtOpen.current;
 
   // D6: opening the popover consumes the teaching line for this run.
   useEffect(() => {
@@ -106,7 +110,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
             x
           </button>
         </div>
-        {!seen && (
+        {showTeaching && (
           <div data-testid="popover-teaching" style={{ color: '#555', marginBottom: 6, lineHeight: 1.3 }}>
             {tagline.before}
             {tagline.termId && <Term id={tagline.termId}>{tagline.term}</Term>}
