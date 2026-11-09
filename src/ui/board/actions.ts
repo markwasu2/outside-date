@@ -146,6 +146,11 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
     const index = state.markets.equipmentIndex;
     const markets = resolveContent(state, content).tuning.markets;
     const power = resolveContent(state, content).tuning.power;
+    // Phase 7 (scarcity pack): installation consumes the orders and ordering closes, so the
+    // dialog collapses to the study row once the substation is underway.
+    if (state.power.substationStatus !== 'none') {
+      return [row(content, state, 'commissionStudy', findDef(content, 'commissionStudy').label)];
+    }
     const rows: ActionRow[] = [
       row(content, state, 'commissionStudy', findDef(content, 'commissionStudy').label),
       row(content, state, 'orderTransformer', findDef(content, 'orderTransformer').label),

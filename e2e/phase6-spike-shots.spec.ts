@@ -44,7 +44,8 @@ test('phase 6 spike shots', async ({ page }) => {
       'competent',
       'whale',
       'normal',
-      2,
+      // Phase 7: seed 2 now loses before any delivery (the pack's teeth); seed 3 delivers.
+      3,
     ),
   );
   await page.getByTestId('map-root').waitFor();
