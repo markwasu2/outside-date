@@ -52,7 +52,7 @@ test('tutorial: substation popover queues the study from the map, and the month 
   await page
     .getByTestId('map-popover')
     .getByTestId('popover-action')
-    .filter({ hasText: 'switchgear' })
+    .filter({ hasText: 'Order the switchgear' })
     .click();
   await expect(page.getByRole('button', { name: /Laydown yard/ })).toContainText('switchgear');
 });
