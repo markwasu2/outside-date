@@ -1,7 +1,7 @@
 import type { Content } from '../../content/schemas';
 import type { NegotiationChoices } from '../../engine/init';
 import type { GameState, PendingEvent, PlannedAction, Setup } from '../../engine/types';
-import { advanceHallCandidates, capitalCandidates, type Bot, fillAp, fixInspectionCandidates, importCrewsActiveCandidate, readyLiquidCandidates, requiredPermitCandidates, unsettledIntervenorCandidates } from './shared';
+import { advanceHallCandidates, type Bot, fillAp, fixInspectionCandidates, importCrewsActiveCandidate, readyLiquidCandidates, requiredPermitCandidates, unsettledIntervenorCandidates } from './shared';
 
 /**
  * Earliest delivery option, max leverage (highest senior LTC and mezz share), no DSU,
@@ -29,7 +29,6 @@ const negotiation: NegotiationChoices = {
 function chooseActions(state: GameState, content: Content): PlannedAction[] {
   const candidates: PlannedAction[] = [];
   candidates.push({ actionId: 'confirmRackSchedule' });
-  candidates.push(...capitalCandidates(state, content, ['equityCall', 'bridgeLoan']));
   if (state.flags.drawFreeze) candidates.push({ actionId: 'cureDraw' });
   candidates.push(...fixInspectionCandidates(state));
   if (state.month === 1 && state.insurance.buildersRisk) {

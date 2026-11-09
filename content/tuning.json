@@ -217,7 +217,7 @@
         "feeRate": 0.02
       },
       "mezzTopUp": {
-        "maxShareOfCost": 0.001,
+        "maxShareOfCost": 0.0007,
         "maxUses": 1,
         "cooldownMonths": 3,
         "ltcCap": 0.8,
@@ -234,7 +234,7 @@
       "recap": {
         "minMonth": 12,
         "minSpentShare": 0.3,
-        "raiseShareOfCost": 0.001,
+        "raiseShareOfCost": 0.0007,
         "feeRate": 0.015,
         "rateStep": 0.0075,
         "ltcCap": 0.78
