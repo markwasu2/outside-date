@@ -299,6 +299,10 @@ export function advanceHall(
   const hall = findHall(state, hallId);
   if (hall.terminated || hall.delivered) throw new Error(`Hall ${hallId} is already delivered or terminated`);
   if (hall.stageActive) throw new Error(`Hall ${hallId} already has an active stage`);
+  // Phase 8: a pond-blocked hall cannot break ground until the wetlands mitigation finishes.
+  if (hall.pondBlocked && !pondMitigated(state)) {
+    throw new Error(`Hall ${hallId} sits on the pond: run the wetlands mitigation first`);
+  }
   // stageIndex already points at the next-to-start stage once a prior stage completes
   // (progressHall advances it on completion); -1 is the "not started" sentinel for pad.
   const targetStageIndex = hall.stageIndex === -1 ? 0 : hall.stageIndex;
@@ -329,6 +333,44 @@ export function advanceHall(
     return replaceHall(state, hallId, { ...hall, pad: 'near', stageIndex: 0, stageActive: true, stageMonthsDone: 0 });
   }
   return replaceHall(state, hallId, { ...hall, stageIndex: targetStageIndex, stageActive: true, stageMonthsDone: 0 });
+}
+
+/** Phase 8: true once the wetlands mitigation has finished (the done month has arrived). */
+export function pondMitigated(state: GameState): boolean {
+  return typeof state.flags.pondMitigationDoneMonth === 'number' && state.month >= state.flags.pondMitigationDoneMonth;
+}
+
+/** Phase 8: the winnable route through the pond. Costs real money and real months; needs the
+ * wetlands permit granted first. Funded through the construction waterfall like the feeder. */
+export function mitigateWetlands(
+  state: GameState,
+  _params: Record<string, string | number> | undefined,
+  content: Content,
+): GameState {
+  const blocked = state.halls.find((h) => h.pondBlocked);
+  if (!blocked) throw new Error('No hall position sits on the pond');
+  if (typeof state.flags.pondMitigationDoneMonth === 'number') {
+    throw new Error('The wetlands mitigation is already underway or done');
+  }
+  if (state.permits['wetlands']?.status !== 'granted') {
+    throw new Error('The wetlands mitigation needs the wetlands permit granted first');
+  }
+  const wetlands = content.tuning.wetlands;
+  const funded = tryFundAmount(state, wetlands.mitigationCost);
+  if (!funded.funded) throw new Error('Insufficient funding for the wetlands mitigation');
+  const doneMonth = state.month + wetlands.mitigationMonths;
+  return {
+    ...funded.state,
+    flags: { ...funded.state.flags, pondMitigationDoneMonth: doneMonth },
+    log: [
+      ...funded.state.log,
+      {
+        month: state.month,
+        kind: 'milestone' as const,
+        text: `Wetlands mitigation funded: the pond drains and ${blocked.id}'s position opens in ${wetlands.mitigationMonths} months.`,
+      },
+    ],
+  };
 }
 
 export function standDown(

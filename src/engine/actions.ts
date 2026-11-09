@@ -12,6 +12,7 @@ import {
   importCrews,
   fixInspection,
   switchGc,
+  mitigateWetlands,
 } from './systems/construction';
 import {
   filePermit,
@@ -135,6 +136,7 @@ export const actionHandlers: Record<(typeof KNOWN_ACTION_HANDLERS)[number], Acti
   mezzTopUp,
   scopeDown,
   recap,
+  mitigateWetlands,
 };
 
 /** One-line log text for an applied action, with the same param suffixes the plan list shows. */

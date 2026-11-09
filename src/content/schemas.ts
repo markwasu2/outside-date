@@ -141,6 +141,12 @@ export const TuningSchema = z.object({
   }),
   markets: MarketsTuningSchema,
   spatial: SpatialTuningSchema,
+  /** Phase 8: the wetlands mitigation route - what it costs and how long it takes to win back
+   * the hall position a pond site took. */
+  wetlands: z.object({
+    mitigationCost: z.number().int(),
+    mitigationMonths: z.number().int(),
+  }),
   capital: z.object({
     seniorOptions: z.array(z.object({ ltc: z.number(), rate: z.number() })),
     mezzOptions: z.array(z.object({ share: z.number(), rate: z.number() })),
@@ -560,6 +566,9 @@ export const SiteDefSchema = z.object({
   mapTheme: SiteMapThemeSchema,
   /** Anything else the site needs to override; merged last, after scenario/difficulty overrides. */
   tuningOverrides: TuningOverrideSchema.optional(),
+  /** Phase 8: the site's pond takes a whole hall position (the latest-delivery hall) until the
+   * player funds the wetlands mitigation route (tuning.wetlands). */
+  pondTakesHall: z.boolean().optional(),
   /** The legacy two-value site union member this site replaces, for v3 save migration and for
    * callers (older tests, UI defaults) that still pass 'megasite'/'farmland'. */
   replaces: z.enum(['megasite', 'farmland']).optional(),

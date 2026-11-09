@@ -129,6 +129,12 @@ export function createGame(
       fromAsk: false,
     });
   }
+  // Phase 8: on a pond site the pond takes a whole hall position - the latest-delivery hall,
+  // whose schedule has the most slack to absorb the mitigation route.
+  if (site.pondTakesHall && halls.length > 0) {
+    const last = halls[halls.length - 1]!;
+    halls[halls.length - 1] = { ...last, pondBlocked: true };
+  }
 
   // Budget at close includes the power equipment and liquid-ready fitout that tryFundAmount
   // pays for anyway; excluding them left ~$66M of spend outside the capital stack, so

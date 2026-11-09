@@ -1,5 +1,5 @@
 import type { Content } from '../../content/schemas';
-import { formatMonth } from '../../engine/format';
+import { formatDollars, formatMonth } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
 import type { GameState } from '../../engine/types';
 
@@ -66,6 +66,18 @@ export function nextStep(state: GameState, content: Content): NextStep {
       why: `The lead time is ${resolved.tuning.power.transformerLeadMonths} months - longer than the path to your first pad. Every month you wait pushes energization a month.`,
       objectId: 'substation',
       actionId: 'orderTransformer',
+    };
+  }
+
+  // 3b. Phase 8: a hall position under the pond is schedule-critical once the wetlands permit
+  // allows the mitigation - every month waited is a month off the pond hall's slack.
+  if (state.halls.some((h) => h.pondBlocked) && typeof state.flags.pondMitigationDoneMonth !== 'number') {
+    const wetlands = resolved.tuning.wetlands;
+    return {
+      title: 'Mitigate the wetlands pond',
+      why: `The pond took a hall position. The mitigation costs ${formatDollars(wetlands.mitigationCost)} and ${wetlands.mitigationMonths} months, and it needs the wetlands permit granted first.`,
+      objectId: state.halls.find((h) => h.pondBlocked)!.id,
+      actionId: 'mitigateWetlands',
     };
   }
 

@@ -344,5 +344,14 @@
     "label": "Switch general contractor",
     "help": "Flip between GMP and cost-plus mid-game for a transition cost.",
     "handler": "switchGc"
+  },
+  {
+    "id": "mitigateWetlands",
+    "track": "land",
+    "ap": 1,
+    "cash": 6000000,
+    "label": "Mitigate the wetlands pond",
+    "help": "Drains and offsets the pond so the hall position it took can be built. Needs the wetlands permit; takes 4 months.",
+    "handler": "mitigateWetlands"
   }
 ]

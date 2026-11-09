@@ -26,7 +26,7 @@
     {
       "id": "farmland",
       "name": "Oxbow Bend Farmland",
-      "summary": "Cheap ground with a pond: $38.0M less land, but it needs a wetlands permit and four extra pad months, and the pond takes one of the two substation-adjacent pads. The county pays a $4.0M ag-transition rebate, and the town likes keeping the fields quiet.",
+      "summary": "Cheap ground with a pond: $38.0M less land, but it needs a wetlands permit and four extra pad months, and the pond swallows a whole hall position until a $6.0M, 4-month wetlands mitigation drains it. The county pays a $4.0M ag-transition rebate, and the town likes keeping the fields quiet.",
       "landCost": 12000000,
       "extraPadMonths": 4,
       "permits": [
@@ -49,11 +49,7 @@
         "poles": 0
       },
       "replaces": "farmland",
-      "tuningOverrides": {
-        "spatial": {
-          "nearPads": 1
-        }
-      }
+      "pondTakesHall": true
     },
     {
       "id": "quarry-ridge",

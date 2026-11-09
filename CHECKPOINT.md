@@ -158,3 +158,51 @@ riverbend-farm's low win rate predates the pack (5.3% in Phase 5).
 - e2e seed bumps: competent/whale/normal seed 2 now loses before any delivery (the teeth);
   phase6-spike-shots and phase7-shots use seed 3 (delivers month 30, crates still pending).
 - load.test.ts counts unchanged: no events/glossary/codex rows added.
+
+# Phase 8: the pond takes a hall (2026-11-09)
+
+Branch phase8-pond-hall (off main 984bd2e). User's call on the phase-7 judgment flag: make the
+wetlands exclusion harsher - a real hall-position loss on farmland - but keep a winnable route.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| pond/wetlands exclusion removes a real hall position on farmland | done: SiteDef.pondTakesHall; farmland sets it; init marks the latest-delivery hall (H4) pondBlocked; advanceHall throws until the mitigation finishes |
+| a winnable route (hack) through it | done: mitigateWetlands action (1 AP, $6.0M through the construction waterfall, 4 months, needs the wetlands permit granted) sets flags.pondMitigationDoneMonth; tuning.wetlands holds both knobs |
+| supersedes the phase-7 nearPads:1 nudge | done: farmland tuningOverride removed; site summary rewritten; phase-7 farmland test updated |
+| save bump with migration | done: SAVE_VERSION 7; upgradeV6 backfills hall.pondBlocked=false; migration test |
+| bot policy for the route | done: mitigateWetlandsCandidate fires for careful/competent/greedy the month the wetlands permit lands; advanceHallCandidates skip the blocked hall until the mitigation is done |
+| 1000-seed grids whale + millbrook, careful+competent in 60-75% normal | done: whale careful 71.5, competent 68.8 (unchanged - both policies pick quarry-ridge); millbrook identical; farmland itself winnable: careful 23.0%, competent 29.5% (see below) |
+| full vitest/playwright/lint/tsc/build green | done: 472 vitest, 38 playwright, eslint, tsc, vite build |
+
+## After grid (1000 seeds, whale; Phase 7 after in parens)
+
+| bot | easy | normal | hard |
+|-----|------|--------|------|
+| random | 0.0 (0.0) | 0.0 (0.0) | 0.0 (0.0) |
+| greedy | 73.0 (73.0) | 47.1 (46.8) | 47.3 (46.9) |
+| careful | 99.1 (99.1) | 71.5 (71.5) | 23.8 (22.5) |
+| competent | 95.6 (95.6) | 68.8 (68.8) | 30.3 (32.1) |
+
+Whale per-site normal: careful megasite 87.3 / farmland 23.0 / quarry-ridge 71.5; competent
+74.4 / 29.5 / 68.8. Farmland median first delivery 42 (vs 33 megasite) - the mitigation months
+plus the pre-existing +4 pad months are the tax on the cheapest land in the game. Millbrook
+per-site normal unchanged (rail-yard/riverbend-farm/depot-flats): greedy 23.0/6.0/32.7,
+careful 83.3/5.5/85.5, competent 56.8/4.9/72.0.
+
+## Screenshots (visually inspected)
+
+- /downloads/p8-pond-blocked.png: farmland month 0 - H4 chip reads "pond"; its popover offers
+  "Mitigate the wetlands pond ($6.0M, 4mo, then H4 can break ground)", disabled with the reason
+  "The wetlands mitigation needs the wetlands permit granted first" until the permit lands.
+
+## Tensions
+
+- The blocked hall is the latest-delivery one (H4): most schedule slack for the route, and the
+  delivery-month-sorted advance candidates start it last anyway.
+- Next-step card nudges the mitigation once a hall is pond-blocked; the substation card order
+  is unchanged.
+- Millbrook's pond sites were left alone: with a one-hall lease, pondTakesHall would make the
+  mitigation mandatory rather than a route. Farmland (whale) carries the mechanic.
+- load.test.ts counts unchanged: actions.json grew by one (actions are only count-bounded > 0).

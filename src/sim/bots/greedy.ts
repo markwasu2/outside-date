@@ -1,7 +1,8 @@
 import type { Content } from '../../content/schemas';
 import type { NegotiationChoices } from '../../engine/init';
 import type { GameState, PendingEvent, PlannedAction, Setup } from '../../engine/types';
-import { advanceHallCandidates, type Bot, fillAp, fixInspectionCandidates, importCrewsActiveCandidate, pickCheapestSite, readyLiquidCandidates, requiredPermitCandidates, unsettledIntervenorCandidates, marketCandidates } from './shared';
+import { advanceHallCandidates,
+  mitigateWetlandsCandidate, type Bot, fillAp, fixInspectionCandidates, importCrewsActiveCandidate, pickCheapestSite, readyLiquidCandidates, requiredPermitCandidates, unsettledIntervenorCandidates, marketCandidates } from './shared';
 
 /**
  * Earliest delivery option, max leverage (highest senior LTC and mezz share), no DSU,
@@ -44,6 +45,7 @@ function chooseActions(state: GameState, content: Content): PlannedAction[] {
   }
   if (state.docketEnabled && state.docket.status === 'none') candidates.push({ actionId: 'fileDocket' });
   candidates.push(...requiredPermitCandidates(state));
+  candidates.push(...mitigateWetlandsCandidate(state));
   candidates.push(...advanceHallCandidates(state));
   candidates.push(...readyLiquidCandidates(state));
   candidates.push(...importCrewsActiveCandidate(state));
