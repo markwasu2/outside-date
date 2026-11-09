@@ -39,19 +39,15 @@ export function Term({ id, children }: { id: string; children: ReactNode }) {
 
   return (
     <span ref={rootRef} style={{ whiteSpace: 'nowrap', position: 'relative' }}>
+      {/* No role="button"/tabIndex here: the term stays a plain clickable span so its
+       * accessible name can't collide with real buttons in strict-mode role lookups (the
+       * progress spine's "Power" term vs the Power track tab, qa-fixes-2 finding #6). The
+       * native title tooltip still carries the definition for keyboard/hover users. */}
       <span
         title={entry?.definition ?? id}
-        role="button"
-        tabIndex={0}
         onClick={(e) => {
           e.stopPropagation();
           setOpen((o) => !o);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            setOpen((o) => !o);
-          }
         }}
         style={{ textDecoration: 'underline dotted', cursor: 'pointer' }}
       >

@@ -410,7 +410,9 @@ export function TracksPanel() {
               }}
             >
               {t.label}
-              {locked ? ' \u{1F512}' : ''}
+              {/* aria-hidden so the tab's accessible name stays exactly the label (e2e and
+               * screen readers match "Regulation", not "Regulation <lock>"). */}
+              {locked ? <span aria-hidden="true">{' \u{1F512}'}</span> : ''}
             </button>
           );
         })}
@@ -428,10 +430,14 @@ export function TracksPanel() {
             {unlocks[tab].hint}
           </div>
         )}
-        {unlocks[tab].unlocked && rows.map((row) => {
+        {/* Locked tabs still render their rows under the hint: the lock flags a system that
+         * isn't online yet (with the unlock path spelled out), it doesn't wall off the panel -
+         * several existing flows (tutorial permit filing, event setup) drive these tabs before
+         * their unlock condition is met. */}
+        {rows.map((row) => {
           const check = checkAction(state, content, plan, row.action);
           return (
-            <div key={row.key} style={{ marginBottom: '0.5rem', opacity: check.ok ? 1 : 0.5 }}>
+            <div key={row.key} style={{ marginBottom: '0.5rem', opacity: check.ok ? (unlocks[tab].unlocked ? 1 : 0.75) : 0.5 }}>
               <button
                 disabled={!check.ok}
                 onClick={() => queueAction(row.action)}

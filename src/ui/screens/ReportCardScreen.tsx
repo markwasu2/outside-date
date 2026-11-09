@@ -2,6 +2,8 @@ import { formatDollars, formatMonth } from '../../engine/format';
 import { totalDebt } from '../../engine/selectors';
 import type { GameState, GoodwillGroup, LogEntry } from '../../engine/types';
 import { GOODWILL_LABELS } from '../components/Hud';
+import { WhoHoldsChip } from '../components/WhoHoldsChip';
+import { CastPortrait } from '../portraits';
 import { communityExplain, costExplain, riskAllocationExplain, timeExplain, valueExplain } from '../reportCardExplain';
 import { useStore } from '../store';
 import { DEFAULT_NEGOTIATION, DEFAULT_SETUP } from './SetupWizard';
@@ -88,6 +90,36 @@ function TutorialEndBanner() {
   );
 }
 
+/** Phase 2 (D5): "who you worked with" - the scenario's cast with their roles and your final
+ * goodwill with each group, closing the loop on the people the campaign touched. */
+function WhoYouWorkedWith() {
+  const draft = useStore((s) => s.draft);
+  const content = useStore((s) => s.content);
+  const scenario = content.scenarios[draft.scenarioId];
+  const members = content.cast.cast.filter((m) => (scenario?.castIds ?? []).includes(m.id));
+  if (members.length === 0) return null;
+  return (
+    <div data-testid="who-you-worked-with">
+      <h2>Who you worked with</h2>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+        {members.map((m) => (
+          <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 6, border: '1px solid #ddd', borderRadius: 6, padding: '0.3rem 0.5rem' }}>
+            <CastPortrait portrait={m.portrait} name={m.name} size={28} />
+            <div>
+              <div style={{ fontSize: '0.8rem' }}>
+                <strong>{m.name}</strong>
+              </div>
+              <div style={{ fontSize: '0.7rem', color: '#666' }}>
+                {m.role} - {GOODWILL_LABELS[m.goodwillGroup]} goodwill {draft.goodwill[m.goodwillGroup]}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** P9.2: the real report card screen, replacing Phase 6's placeholder `EndedSummary`. Five
  * letter grades with one-line reasons (reportCardExplain.ts mirrors reportCard.ts's own grading
  * rules in prose), the risk-allocation table (4.13: row/holder/materialized/cost to
@@ -164,6 +196,8 @@ export function ReportCardScreen() {
           )}
         </div>
 
+        <WhoYouWorkedWith />
+
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
           <button onClick={playAgain} style={{ padding: '0.5rem 1.5rem' }}>
             Play again
@@ -226,7 +260,10 @@ export function ReportCardScreen() {
             return (
               <tr key={row.id} style={{ borderBottom: '1px solid #eee' }}>
                 <td>{def?.label ?? row.id}</td>
-                <td>{row.holder}</td>
+                {/* Phase 2 (D5): who held it, as a chip linking to the Stakeholders view. */}
+                <td>
+                  <WhoHoldsChip holder={row.holder} />
+                </td>
                 <td>{row.materialized ? 'Yes' : 'No'}</td>
                 <td>{formatDollars(row.costToYou)}</td>
                 <td>{def?.mitigation ?? ''}</td>
@@ -235,6 +272,8 @@ export function ReportCardScreen() {
           })}
         </tbody>
       </table>
+
+      <WhoYouWorkedWith />
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '2rem' }}>
         <button onClick={playAgain} style={{ padding: '0.5rem 1.5rem' }}>

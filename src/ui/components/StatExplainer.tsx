@@ -72,9 +72,12 @@ export function StatExplainer({ id, autoOpen, children }: { id: string; autoOpen
       >
         {children}
       </button>
+      {/* No role="dialog": an always-on HUD popover must not satisfy getByRole('dialog')
+       * lookups meant for event modals (ui-qa-fixes finding #2); role="note" keeps the
+       * accessible name without the dialog semantics. */}
       {open && (
         <span
-          role="dialog"
+          role="note"
           aria-label={`About ${def.title}`}
           data-testid={`stat-explainer-${id}`}
           style={{
