@@ -306,8 +306,8 @@ export function MapGrid() {
         }}
         title={siteTheme.pond ? 'Pond - water and wetlands permits' : 'Low field - water permit'}
       >
-        {siteTheme.pond && <ArtLayer img={TILE_ART.pond.img} />}
-        <span style={siteTheme.pond ? ART_CHIP : { position: 'relative' }}>
+        <ArtLayer img={siteTheme.pond ? TILE_ART.pond.img : TILE_ART.dryField.img} />
+        <span style={ART_CHIP}>
           {siteTheme.pond ? `${TILE_ART.pond.icon} ${TILE_ART.pond.label}` : '\u{1F33E} Low field'}
         </span>
         <span style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{siteTheme.pond ? pondStateWords(draft) : 'Water permit'}</span>

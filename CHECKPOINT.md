@@ -855,3 +855,16 @@ on light chips above the art. The image is decorative and cannot capture input.
 | full gates | done: 512 vitest, 50 playwright, full lint, tsc, build |
 | balance grid | skipped: decorative art only |
 | caveat | full e2e needed a clean rerun after two time-limit interruptions; final 50/50 passed |
+
+# Art pass 2b - dry low field
+
+Dry sites now have an illustrated grass-and-survey field instead of a flat mustard
+rectangle. Pond sites keep their pond. The field's label and Water permit route
+remain on readable chips above the art; gameplay and hit targets are unchanged.
+
+| criterion | status |
+|---|---|
+| visual | done: dry field at 1280x720 inspected; water-route label clear |
+| theme distinction | done: e2e asserts dry-site data and visible illustration; pond tests retained |
+| full gates | done: 512 vitest, 51 playwright, full lint, tsc, build |
+| balance grid | skipped: decorative art only |
