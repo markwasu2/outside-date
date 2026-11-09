@@ -99,7 +99,7 @@ export function LeaseScreen({ content, scenario, negotiation, onChange, onBack, 
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem' }}>
         <button onClick={onBack}>Back</button>
-        <button onClick={onNext}>Next: Capital stack</button>
+        <button onClick={onNext}>Next: Forecast</button>
       </div>
     </div>
   );

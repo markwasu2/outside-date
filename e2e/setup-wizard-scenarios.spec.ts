@@ -15,6 +15,8 @@ test('Millbrook Relay wizard shows pinned lease and mezz terms plus resolved est
   await expect(page.getByText('The late remedy is fixed by this scenario as liquidated damages.')).toBeVisible();
   await expect(page.getByText(/outside date, 4 months after/)).toBeVisible();
 
+  await page.getByRole('button', { name: 'Next: Forecast' }).click();
+
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();
   await expect(page.getByRole('button', { name: 'None' })).toBeDisabled();
   await expect(page.getByText('Fixed by this scenario.')).toBeVisible();
@@ -35,6 +37,8 @@ test('Whale wizard keeps its lease and mezz choices open and shows base estimate
   await expect(page.getByRole('button', { name: /Y4 M3/ })).toBeEnabled();
   await expect(page.getByRole('button', { name: /Y4 M7/ })).toBeEnabled();
   await expect(page.getByText(/Delivery is fixed by this scenario/)).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Next: Forecast' }).click();
 
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();
   await expect(page.getByRole('button', { name: 'None' })).toBeEnabled();

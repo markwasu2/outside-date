@@ -91,7 +91,7 @@ export function ForecastScreen({ content, scenarioId, difficultyId, setup, negot
 
       <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
         <button onClick={onBack}>Back</button>
-        <button onClick={onNext} data-testid="forecast-next">Next: Capital</button>
+        <button onClick={onNext} data-testid="forecast-next">Next: Capital stack</button>
       </div>
     </div>
   );

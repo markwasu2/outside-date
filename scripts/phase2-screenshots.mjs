@@ -1,4 +1,4 @@
-/* global window, console */
+/* global console */
 // Phase 2 "Read the Deal" screenshot capture: the five required states at two viewport widths,
 // saved to docs/screenshots/phase2/. Run: node scripts/phase2-screenshots.mjs
 // (dev server must already be running on :5173).
