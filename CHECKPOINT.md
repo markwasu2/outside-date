@@ -673,3 +673,29 @@ MAX_VISIBLE. Pinned by two unit tests.
 | repeats still surface once | done: latest LD card still present |
 | balance grid | skipped: UI-only, no engine/content-tuning/bot change |
 | full suite green | done: 501 vitest (2 new dedupe tests), 42 playwright, eslint, tsc, vite build |
+
+# UX 11 - scoring rules surface early
+
+## The change
+
+Queue item: the scoring rules only appeared at the takeout; surface them early,
+tied to the goal line. takeout.ts gains an exported pure scorePreview() (the
+four components + total + greatMultiple, computable at any month); priceTakeout
+now uses it as its one source. GoalStrip gains a "How you are scored" toggle
+that opens a small panel with live component values (Power/30, Tenant/25,
+Coverage/30, Asset/15), what moves each, the score-to-cap-rate math (60 points
+= base rate, each point 0.025%), the price/equity chain, and the win tiers
+(Great 2.0x+, Good 1.0x+, below scraped). Collapsed by default so the strip
+stays one quiet line. Desktop only.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| rules visible before the takeout | done: panel on the goal strip from month 1, toggle collapsed by default |
+| live values, one source of truth | done: scorePreview shared by panel and priceTakeout; unit test pins panel math == takeout scores |
+| tied to the goal line | done: panel hangs off the goal strip, win tiers stated there |
+| e2e | done: new playwright test (toggle opens/closes, components + tiers present), 43 passed |
+| balance grid | skipped: pure refactor + read-only UI; takeout math unchanged (503 vitest incl. perfect-play/state-equality confirm) |
+| full suite green | done: 503 vitest, 43 playwright, eslint, tsc, vite build |
+| screenshot inspected | done: docs/screenshots/ux11/score-panel-desktop-1440.png |

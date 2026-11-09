@@ -76,13 +76,36 @@ export function repaymentWaterfall(state: GameState, campusValue: number): Repay
   return lines;
 }
 
-/** 4.13: prices the takeout, scores the campus, and sets the terminal win/lose outcome. */
-export function priceTakeout(state: GameState, content: Content): GameState {
+export interface ScorePreview {
+  power: number;
+  tenant: number;
+  coverage: number;
+  asset: number;
+  total: number;
+  greatMultiple: number;
+}
+
+/** UX 11: the four takeout score components, computable at any point so the scoring rules can
+ * surface early (the goal strip's "How you're scored" panel) instead of only at the takeout.
+ * Same math as priceTakeout - keep the two using this one source. */
+export function scorePreview(state: GameState, content: Content): ScorePreview {
   const power = powerScore(state, content);
   const tenant = tenantScore(state);
   const coverage = coverageScore(state, content);
   const asset = assetScore(state, content);
-  const total = power + tenant + coverage + asset;
+  return {
+    power,
+    tenant,
+    coverage,
+    asset,
+    total: power + tenant + coverage + asset,
+    greatMultiple: content.tuning.takeout.greatMultiple,
+  };
+}
+
+/** 4.13: prices the takeout, scores the campus, and sets the terminal win/lose outcome. */
+export function priceTakeout(state: GameState, content: Content): GameState {
+  const { power, tenant, coverage, asset, total } = scorePreview(state, content);
 
   const { baseCapRate, capRateSwing, darkValueShare, greatMultiple } = content.tuning.takeout;
   const capRate = baseCapRate + ((60 - total) / 40) * capRateSwing + state.market.capRateModifier;
