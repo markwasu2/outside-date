@@ -103,19 +103,17 @@
     {
       "id": "riverbend-farm",
       "name": "Riverbend Farm",
-      "summary": "The cheap option: $11.0M less than the yard, but a wetlands permit and three extra pad months on a clock that is already tight. The easement pays $1.5M and the town approves.",
+      "summary": "The cheap option: $11.0M less than the yard and the farmland easement comes with the wetlands sign-off already recorded, but the pad still needs three extra months on a clock that is already tight. The town approves.",
       "landCost": 7000000,
       "extraPadMonths": 3,
-      "permits": [
-        "wetlands"
-      ],
+      "permits": [],
       "studyMonthsMin": 6,
       "studyMonthsMax": 10,
       "interimGridMW": 12,
       "incentive": {
-        "kind": "cashGrant",
-        "amount": 1500000,
-        "label": "Farmland preservation easement: $1.5M cash at close"
+        "kind": "permitFastTrack",
+        "permitId": "wetlands",
+        "label": "Easement already recorded: the wetlands permit comes cured at close"
       },
       "goodwill": {
         "town": 6

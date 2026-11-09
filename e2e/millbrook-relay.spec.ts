@@ -32,6 +32,6 @@ test('Millbrook Relay careful seed 1 finishes with a priced report card', async 
   }
   await expect(report).toBeVisible();
   await expect(page.getByText(/Campus value .* equity multiple/)).toBeVisible();
-  await expect(page.getByText(/1\.66x/)).toBeVisible(); // Phase 3: 1.61x -> 1.64x (forecast sizing, lever bots); Phase 4: 1.58x; Phase 5: 1.66x (living markets: careful second-sources the hot transformer market)
+  await expect(page.getByText(/1\.58x/)).toBeVisible(); // Phase 3: 1.61x -> 1.64x (forecast sizing, lever bots); Phase 4: 1.58x; Phase 5: 1.66x (living markets: careful second-sources the hot transformer market); Phase 9: 1.58x (riverbend easement retune: careful's value policy now picks the cured-permit farm)
   await page.screenshot({ path: '/tmp/millbrook-relay-report.png', fullPage: true });
 });
