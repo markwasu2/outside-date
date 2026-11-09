@@ -785,3 +785,19 @@ was removed. The office's queued ghost includes water filings.
 | full gates | done: 507 vitest, 46 playwright, tsc, eslint, build |
 | visual check | done: docs/screenshots/cold2/water-route.png at 1280 desktop |
 | balance grid | skipped: UI routing only |
+
+# Cold playthrough 2, fix 3 - banner/card dedupe
+
+Threshold warnings are logged on crossing and were then shown twice: once in
+the banner with fix buttons and again in a transient notice card. Filter the
+notice display against the committed state's current warning titles. Banner
+owns active threshold warnings; log history remains, events and other warnings
+(including hall late charges) remain visible as cards.
+
+| criterion | status |
+|---|---|
+| one warning display | done: low-cash fixture shows banner, zero notice cards |
+| keep unrelated notices | done: unit test retains events and non-banner warnings |
+| full gates | done: 508 vitest, 47 playwright, tsc, eslint, build |
+| visual check | done: docs/screenshots/cold2/banner-dedupe.png, 1280 desktop |
+| balance grid | skipped: display filter only |
