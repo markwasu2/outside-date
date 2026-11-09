@@ -14,7 +14,7 @@ const content = { ...loadContent(), events: [] };
 const negotiation: NegotiationChoices = {
   lease: { firstDeliveryMonth: 42, lateRemedy: 'liquidatedDamages' },
   capital: { seniorIndex: 0, mezzIndex: 0, playerShareIndex: 0 },
-  power: { minCharge: 'low', plantBOffset: 0 },
+  power: { minCharge: 'medium', plantBOffset: 0 },
   insurance: { dsu: false },
 };
 const setup: Setup = { site: 'megasite', hallTier: 'air', cooling: 'evaporative', gc: 'costPlus' };

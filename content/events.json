@@ -26,9 +26,10 @@
       "Grid equipment is suddenly everyone's problem. A pending order of yours slips with the rest."
     ],
     "art": "supply_shock",
-    "odds": 0.05,
+    "odds": 0.1,
+    "once": true,
     "requires": ["orderPending:any"],
-    "effects": [{ "type": "orderSlip", "args": ["randomPending", 6] }],
+    "effects": [{ "type": "orderSlip", "args": ["randomPending", 8] }],
     "note": "\"randomPending\" selects uniformly among currently pending transformer/switchgear orders."
   },
   {

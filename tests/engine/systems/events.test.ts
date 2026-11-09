@@ -98,6 +98,22 @@ describe('events: season and window gating', () => {
 });
 
 describe('events: once-only cards never repeat', () => {
+  it('supply_shock fires once per campaign, then never again even if re-eligible', () => {
+    const content = withCards([forced('supply_shock')]);
+    let state = freshState();
+    state = {
+      ...state,
+      power: {
+        ...state.power,
+        orders: [{ kind: 'transformer', orderedMonth: 0, arrivalMonth: 10, arrived: false, deposit: 0 }],
+      },
+    };
+    const first = drawEvent(state, content);
+    expect(first.state.firedOnce).toContain('supply_shock');
+    const arrival = first.state.power.orders[0]!.arrivalMonth;
+    const second = drawEvent(first.state, content);
+    expect(second.state.power.orders[0]!.arrivalMonth).toBe(arrival);
+  });
   it('outlook_cut fires once, then never again even if re-eligible', () => {
     const content = withCards([forced('outlook_cut')]);
     const first = drawEvent(freshState({}, 30), content);
@@ -161,7 +177,7 @@ describe('events: per-card effects', () => {
     expect(next.flags.drawFreeze).toBe(true);
   });
 
-  it('supply_shock: slips a random pending order by 6 months', () => {
+  it('supply_shock: slips a random pending order by 8 months', () => {
     let state = freshState();
     state = {
       ...state,
@@ -171,7 +187,7 @@ describe('events: per-card effects', () => {
       },
     };
     const { state: next } = drawEvent(state, withCards([forced('supply_shock')]));
-    expect(next.power.orders[0]!.arrivalMonth).toBe(16);
+    expect(next.power.orders[0]!.arrivalMonth).toBe(18);
   });
 
   it('labor_shortfall: sets laborShortUntilMonth 3 months out while a hall is in fitout', () => {
