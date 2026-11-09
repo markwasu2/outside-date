@@ -2,6 +2,11 @@ import { configDefaults, defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  // P10.6: relative base so the built `dist/` works unmodified when served from a GitHub Pages
+  // project subpath (e.g. markwasu2.github.io/outside-date/) without hardcoding the repo name here
+  // - safe since the app has no client-side router (confirmed via grep: no react-router/history
+  // usage) to conflict with relative asset paths.
+  base: './',
   plugins: [react()],
   test: {
     globals: true,
