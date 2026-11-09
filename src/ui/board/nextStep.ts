@@ -1,7 +1,9 @@
 import type { Content } from '../../content/schemas';
 import { formatDollars, formatMonth } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
+import { leadWithIndex } from '../../engine/systems/markets';
 import type { GameState } from '../../engine/types';
+import { projectedFitoutMonth } from './warnings';
 
 /**
  * Phase 1 (D7): the single most useful next move, as a pure function of the committed state and
@@ -17,6 +19,21 @@ export interface NextStep {
   objectId: string;
   actionId?: string;
   params?: Record<string, string | number>;
+}
+
+/** UX 5: if an order placed this month would land after the first undelivered hall's
+ * projected fitout, say so in the next-step card itself - the same comparison the late-order
+ * warning runs, so the banner never recommends an order the warning then calls too late.
+ * `leadMonths` is the worst case (max for switchgear's rolled range). */
+function lateArrivalNote(state: GameState, content: Content, leadMonths: number): string {
+  const resolved = resolveContent(state, content);
+  const hallIndex = state.halls.findIndex((h) => !h.delivered && !h.terminated);
+  if (hallIndex < 0) return '';
+  const hall = state.halls[hallIndex]!;
+  const arrival = state.month + leadWithIndex(leadMonths, state.markets.equipmentIndex, resolved.tuning.markets.leadElasticity);
+  const fitout = projectedFitoutMonth(state, content, hallIndex);
+  if (arrival <= fitout) return '';
+  return ` Ordered today it arrives around ${formatMonth(arrival)}, after ${hall.id} reaches fitout (${formatMonth(fitout)}) - order it anyway, and plan to slow ${hall.id} or take the slip.`;
 }
 
 export function nextStep(state: GameState, content: Content): NextStep {
@@ -61,9 +78,14 @@ export function nextStep(state: GameState, content: Content): NextStep {
   const orderingOpen = power.substationStatus === 'none';
   const transformerOrder = power.orders.find((o) => o.kind === 'transformer');
   if (orderingOpen && !state.skipTransformerOrder && !transformerOrder) {
+    // UX queue item 5: the banner used to cheer "order now" even when even an immediate order
+    // landed after the first hall's projected fitout - and the red late-order warning fired
+    // the month after, which read as a contradiction. Quote the same lateness math the warning
+    // uses (warnings.ts's projectedFitoutMonth + the engine's leadWithIndex) so both surfaces
+    // tell one story: still order immediately, but know the arrival and the consequence now.
     return {
       title: 'Order the transformer',
-      why: `The lead time is ${resolved.tuning.power.transformerLeadMonths} months - longer than the path to your first pad. Every month you wait pushes energization a month.`,
+      why: `The lead time is ${resolved.tuning.power.transformerLeadMonths} months - longer than the path to your first pad. Every month you wait pushes energization a month.${lateArrivalNote(state, content, resolved.tuning.power.transformerLeadMonths)}`,
       objectId: 'substation',
       actionId: 'orderTransformer',
     };
@@ -86,7 +108,7 @@ export function nextStep(state: GameState, content: Content): NextStep {
   if (orderingOpen && !switchgearOrder) {
     return {
       title: 'Order the switchgear',
-      why: `Lead time runs ${resolved.tuning.power.switchgearLeadMin} to ${resolved.tuning.power.switchgearLeadMax} months and halls cannot energize without it.`,
+      why: `Lead time runs ${resolved.tuning.power.switchgearLeadMin} to ${resolved.tuning.power.switchgearLeadMax} months and halls cannot energize without it.${lateArrivalNote(state, content, resolved.tuning.power.switchgearLeadMax)}`,
       objectId: 'substation',
       actionId: 'orderSwitchgear',
     };

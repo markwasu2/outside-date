@@ -1,3 +1,24 @@
+# UX 5: next-step banner and late-order warning tell one story (queue item 5)
+
+Branch `ux5-banner-consistency` off main 0f50197. The banner said "Order the transformer" and
+the red warning called the order too late the month after - whiplash. On whale it is
+structural: fitout projection 15 < arrival 24, so the warning always followed the
+recommendation. Fix: the transformer/switchgear next-step cards append the same comparison the
+warning runs (warnings.ts's projectedFitoutMonth + the engine's leadWithIndex), disclosing the
+arrival month, the hall, and the consequence inside the recommendation itself.
+
+## Done criteria
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | banner never recommends an order the warning then calls too late | PASS | lateArrivalNote() in nextStep.ts shares the warning's math; card text verified live: "Ordered today it arrives around Y3 M3, after H1 reaches fitout (Y2 M6) - order it anyway, and plan to slow H1 or take the slip." |
+| 2 | same for switchgear (worst case = lead max) | PASS | same helper on the switchgear card |
+| 3 | recommendation unchanged when the order lands in time | PASS | tests/ui/nextStep.test.ts: short-lead content clone shows no note (8/8) |
+| 4 | no engine/state-shape change | PASS | UI copy only |
+| 5 | typecheck/lint/vitest/playwright/build green; screenshots inspected | PASS | vitest 482, playwright 42, tsc/eslint/build clean; docs/screenshots/ux5/board-800/1440.png |
+
+Grid: not run - no engine, bot or balance change.
+
 # UX 3: quick start / recommended setup (cold-playthrough queue, item 3)
 
 Branch `ux3-quick-start` off main b15f510. Six setup screens with no recommended path. Fix: a

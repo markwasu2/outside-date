@@ -50,6 +50,33 @@ describe('nextStep', () => {
     expect(step.actionId).toBe('orderTransformer');
   });
 
+  // UX queue item 5: the banner must quote the same lateness math as the red late-order
+  // warning, so it never recommends an order the warning then calls too late.
+  it('when even an immediate transformer order lands after fitout, the card says so', () => {
+    const state = freshState();
+    state.power.studyStatus = 'pending';
+    fileAllPermits(state);
+    // Shove the first hall months into construction so its projected fitout lands before the
+    // transformer's earliest possible arrival.
+    state.month = 30;
+    const hall = state.halls[0]!;
+    hall.stageIndex = 2; // shell
+    hall.stageMonthsDone = 0;
+    const step = nextStep(state, content);
+    expect(step.actionId).toBe('orderTransformer');
+    expect(step.why).toContain('Ordered today it arrives around');
+    expect(step.why).toContain(`after ${hall.id} reaches fitout`);
+  });
+
+  it('no lateness note when the order lands before the projected fitout', () => {
+    const state = freshState();
+    state.power.studyStatus = 'pending';
+    fileAllPermits(state);
+    const quickContent = JSON.parse(JSON.stringify(content)) as typeof content;
+    quickContent.tuning.power.transformerLeadMonths = 5;
+    expect(nextStep(state, quickContent).why).not.toContain('Ordered today');
+  });
+
   it('after the transformer, the switchgear order is next', () => {
     const state = freshState();
     state.power.studyStatus = 'pending';
