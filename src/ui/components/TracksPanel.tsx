@@ -50,7 +50,9 @@ function findDef(content: Content, id: string): ActionDef {
   return def;
 }
 
-function buildRows(tab: TrackTab, state: GameState, content: Content, selectedHallId: string | null): Row[] {
+/** Exported so tests/ui can cover row-building (e.g. the QA finding #1 docketAmendment filter)
+ * without rendering the component. */
+export function buildRows(tab: TrackTab, state: GameState, content: Content, selectedHallId: string | null): Row[] {
   const hallIds = state.halls.map((h) => h.id);
   const focusHallIds = selectedHallId && hallIds.includes(selectedHallId) ? [selectedHallId] : hallIds;
 
@@ -83,14 +85,22 @@ function buildRows(tab: TrackTab, state: GameState, content: Content, selectedHa
     const prepTestimony = findDef(content, 'prepTestimony');
     const answerDiscovery = findDef(content, 'answerDiscovery');
     const meetIntervenor = findDef(content, 'meetIntervenor');
-    const rows: Row[] = Object.keys(state.permits).map((id) => ({
-      key: `filePermit:${id}`,
-      label: `File ${id} permit`,
-      help: filePermit.help,
-      ap: filePermit.ap,
-      cashLabel: cashLabel(filePermit, state, content),
-      action: { actionId: 'filePermit', params: { permitId: id } },
-    }));
+    // QA finding #1 fix: `state.permits` also carries `docketAmendment` (event-driven-only, see
+    // engine/systems/regulation.ts's REGULATED_PERMIT_IDS), which isn't a valid `filePermit`
+    // target and used to render a row whose only "help" text was a raw validation error. Filter
+    // to the tuning-defined regulated permits (air/water/wetlands/building) instead of
+    // duplicating that id list here - `content.tuning.permits` is already the schema-validated
+    // source of truth for exactly those 4 ids.
+    const rows: Row[] = Object.keys(state.permits)
+      .filter((id) => id in content.tuning.permits)
+      .map((id) => ({
+        key: `filePermit:${id}`,
+        label: `File ${id} permit`,
+        help: filePermit.help,
+        ap: filePermit.ap,
+        cashLabel: cashLabel(filePermit, state, content),
+        action: { actionId: 'filePermit', params: { permitId: id } },
+      }));
     rows.push({
       key: 'fileDocket',
       label: fileDocket.label,
@@ -296,6 +306,18 @@ function buildRows(tab: TrackTab, state: GameState, content: Content, selectedHa
   return rows;
 }
 
+/** QA finding #3 fix: text for the "hall filter" banner shown when `selectedHallId` (set by
+ * clicking a hall's map cell, MapGrid.tsx) narrows the Chips/Construction tabs to a single hall's
+ * rows (see `buildRows`' own `focusHallIds`) - previously the only on-screen cue was the map
+ * cell's border style, with no text explaining why other halls' actions had disappeared. `null`
+ * means no hall-scoped filter is active (also true for the map's "substation" selection, which
+ * isn't a hall id and so never narrows these tabs). Exported so tests/ui can cover the text
+ * without rendering the component. */
+export function hallFilterLabel(selectedHallId: string | null, hallIds: string[]): string | null {
+  if (!selectedHallId || !hallIds.includes(selectedHallId)) return null;
+  return `Showing ${selectedHallId} only`;
+}
+
 const GOODWILL_GROUPS: GoodwillGroup[] = ['town', 'commission', 'utility', 'tenant'];
 
 function describeAction(action: PlannedAction, content: Content): string {
@@ -320,6 +342,7 @@ export function TracksPanel() {
   const content = useStore((s) => s.content);
   const plan = useStore((s) => s.plan);
   const selectedHallId = useStore((s) => s.selectedHallId);
+  const selectHall = useStore((s) => s.selectHall);
   const queueAction = useStore((s) => s.queueAction);
   const removeAction = useStore((s) => s.removeAction);
   const endMonth = useStore((s) => s.endMonth);
@@ -328,9 +351,30 @@ export function TracksPanel() {
 
   const rows = buildRows(tab, state, content, selectedHallId);
   const visitCastDef = findDef(content, 'visitCast');
+  const hallIds = state.halls.map((h) => h.id);
+  const filterLabel = hallFilterLabel(selectedHallId, hallIds);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', fontFamily: 'sans-serif', fontSize: '0.85rem' }}>
+      {filterLabel && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0.3rem 0.5rem',
+            background: '#eef2ff',
+            borderBottom: '1px solid #ccc',
+            fontSize: '0.75rem',
+            color: '#333',
+          }}
+        >
+          <span>{filterLabel}</span>
+          <button onClick={() => selectHall(null)} style={{ fontSize: '0.75rem', cursor: 'pointer' }}>
+            Show all
+          </button>
+        </div>
+      )}
       <div style={{ display: 'flex', borderBottom: '1px solid #ccc' }}>
         {TABS.map((t) => (
           <button
