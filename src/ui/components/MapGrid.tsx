@@ -234,6 +234,7 @@ export function MapGrid() {
       data-ground={siteTheme.ground}
       style={{
         position: 'relative',
+        isolation: 'isolate',
         display: 'grid',
         gridTemplateColumns: 'repeat(12, 1fr)',
         gridTemplateRows: 'repeat(8, 1fr)',
