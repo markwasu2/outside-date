@@ -9,7 +9,7 @@ Branch `phase3-money-that-moves`, base `1224076` (Phase 2). Not merged: row 6 is
 | 3 | Hazard rework | PASS | storm 28% and fire 22% of the hit hall's cost, water 0.4-1% and theft 0.2-0.6% inside a $5M deductible; tests in `capital.test.ts` |
 | 4 | Event cards show policy paid vs deductible; codex links real cases | PASS | `EventModal.tsx` claim breakdown; 4 codex entries with source URLs; e2e |
 | 5 | Banner financing fixes deep-link to the Capital tab | PASS | `warnings.ts`, `tests/ui/warnings.test.ts`, e2e |
-| 6 | Engine DSCR/NOI projection and amended closing table | PARTIAL | Closing table: DONE (`closing.ts`, amended on the_ask, Financials drawer reads it). Engine-owned DSCR/NOI projection that picks up delay swaps, lease amendments and rent relief: NOT DONE (`stabilizedNoi` exists in selectors; a full `projectNoiAndDscr` does not) |
+| 6 | Engine DSCR/NOI projection and amended closing table | PASS | `src/engine/projections.ts` (`projectNoiAndDscr`, picks up delay swaps, lease amendments and rent relief via `grossRentFor`, scope-down, lever debt), `tests/engine/projections.test.ts`, Capital tab shows it; closing table amended on the_ask and read by the Financials drawer |
 | 7 | Before/after 1000-seed grid, careful/competent 60-75% on normal, balance.test updated | PASS | `docs/phase3-baseline-grid.md`, `docs/phase3-after-grid.md`; normal: careful 71.0, competent 72.5, greedy 50.2 |
 | 8 | typecheck | PASS | `npx tsc --noEmit` clean |
 | 9 | lint | PASS | `npm run lint` clean |
@@ -20,26 +20,25 @@ Branch `phase3-money-that-moves`, base `1224076` (Phase 2). Not merged: row 6 is
 | 14 | Visual check at 800 and 1440 | PASS | `docs/screenshots/phase3/*.png`, all opened and inspected. Known cosmetic: at 800px the map halls draw over the event dialog backdrop (pre-existing stacking) |
 | 15 | No TODO/FIXME/stub in touched files | PASS | grep clean |
 
-## Grid (win %, 1000 seeds, whale)
-Baseline (main) vs after. Full table with median multiples, hazards and lever use in `docs/phase3-after-grid.md`.
-
+## Grid (win %, 1000 seeds, whale; baseline -> after). Full table: docs/phase3-after-grid.md
 | bot | easy | normal | hard |
 |---|---|---|---|
 | random | 0.0 / 0.0 | 0.0 / 0.0 | 0.0 / 0.0 |
-| greedy | 56.6 / 66.4 | 38.3 / 50.2 | 24.4 / 48.9 |
-| careful | 99.3 / 99.1 | 73.3 / 71.0 | 47.9 / 60.0 |
-| competent | 94.9 / 94.6 | 75.0 / 72.5 | 48.1 / 52.6 |
+| greedy | 56.6 / 65.2 | 38.3 / 50.7 | 24.4 / 50.1 |
+| careful | 99.3 / 95.6 | 73.3 / 66.4 | 47.9 / 31.6 |
+| competent | 94.9 / 93.8 | 75.0 / 70.5 | 48.1 / 43.9 |
 
-## Lever terms and hazard numbers
-Sizes are small (about 0.05-0.1% of cost per use) because the sim is a cash knife-edge: at 1% sizes careful hit 97%. Revisit with a human playtest.
-- Equity call: 2% fee, partner prices at 25% premium (you dilute), strain +1, max 1, cooldown 4.
-- Bridge: 14% PIK, 2% fee, repaid after senior and before mezz and equity.
-- Mezz top-up: only if LTC <= 80% and DSCR >= 1.3, 2% fee, +2 pts.
-- Scope-down: 6% fee, 40% salvage, tenant goodwill -12, cooldown 6.
-- Recap: month >= 12, >= 30% built, 1.5% fee, +75 bps, once.
-- Storm: odds .05 per month (about .15 per campaign), 33% of the hit hall (about $130M). Fire odds .004 at 22%. Water odds .035 and theft .025, both inside the $5M deductible.
+Median multiples on normal fell (careful 1.77 -> 1.29, competent 1.95 -> 1.50): that is the visible cost of the levers.
 
-## Remaining
-1. `projectNoiAndDscr` engine projection (delay swaps, lease amendments, rent relief).
-2. Partner strain should raise partner_dispute odds.
-3. Decide whether lever sizes should be larger with a different balance lever.
+## Lever terms (meaningful sizes) and hazards
+- Equity call: up to 50% of committed equity (about $26M), 2% fee, 25% premium so you dilute, max 1, cooldown 4, strain +1.
+- Bridge: up to 1.2% of cost (about $17M), 14% PIK, 2% fee, repaid after senior and before mezz and equity, strain +0.75.
+- Mezz top-up: up to 1% of cost, LTC <= 80%, DSCR >= 1.3, +2 pts, 2% fee, strain +0.75.
+- Scope-down: 6% fee, 40% salvage, tenant goodwill -12, strain +1.5. Recap: month >= 12, >= 30% built, 2% of cost, 1.5% fee, +75 bps, strain +1.5.
+- Closing lead time: equity 2 months, bridge 1, mezz 2, recap 3. Cash lands late, so bots must reach for levers at 3.5 months of runway, not at 1.
+- Partner dispute: odds = 0.2 x strain per month; concede costs 8 points of share and $20M, wait costs a month of delay and $10M; a dispute settles half the strain.
+- Storm .05/month (~.15 per campaign) at 33% of the hit hall; fire .004 at 22%; water .035 and theft .025 inside a $5M deductible.
+
+## Tensions
+- On hard, careful (31.6) is below greedy (50.1): careful's runway trigger borrows early and pays the dispute and PIK cost, while greedy takes no levers and no storm insurance. Normal ordering is right. Worth a follow-up on the hard ordering.
+- Normal lever-bot medians drop below the old multiple bands; bands were moved with measured numbers in `tests/sim/balance.test.ts`.

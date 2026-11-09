@@ -8,6 +8,7 @@ import type { TrackTab } from '../store';
 import { tabUnlocks } from '../tabUnlock';
 import { CastPortrait, INTERVENOR_REP } from '../portraits';
 import { CastHover } from './CastHover';
+import { projectNoiAndDscr } from '../../engine/projections';
 import { allLeverQuotes } from '../../engine/systems/capital';
 import { formatDollars } from '../../engine/format';
 
@@ -476,6 +477,14 @@ export function TracksPanel() {
             <div>
               Your call: {formatDollars(state.forecast.cost)} plus {(state.forecast.contingency * 100).toFixed(0)}% contingency. Spent so far{' '}
               {formatDollars(state.totalCostToDate)}. Your equity share: {(state.equity.playerShare * 100).toFixed(1)}%.
+            </div>
+            <div data-testid="capital-projection">
+              Projected coverage at full delivery:{' '}
+              {(() => {
+                const end = projectNoiAndDscr(state, content, 60).at(-1);
+                return end && Number.isFinite(end.dscr) ? `${end.dscr.toFixed(2)}x` : 'n/a';
+              })()}
+              , on today&apos;s dates, rents and debt.
             </div>
             <div data-testid="capital-strain">
               Partner strain {state.capital.partnerStrain.toFixed(1)}: more strain means more disputes.

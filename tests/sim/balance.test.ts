@@ -63,7 +63,7 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
     expect(report.winRate).toBeGreaterThanOrEqual(0.6);
     expect(report.winRate).toBeLessThanOrEqual(0.75);
     // Phase 3 (2026-11-09): median floor 1.4 -> 1.15. Measured at 1000 seeds on normal: careful
-    // 70.0% / 1.28x (was 73.3% / 1.77x). Capital levers are priced in the multiple: bridge PIK at
+    // 66.4% / 1.29x (was 73.3% / 1.77x). Capital levers are priced in the multiple: bridge PIK at
     // 14%, fees, and equity calls that dilute, so a rescued campaign pays for it at takeout.
     expect(report.equityMultiple.median).toBeGreaterThanOrEqual(1.15);
     expect(report.equityMultiple.median).toBeLessThanOrEqual(1.8);
@@ -73,7 +73,7 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
     const report = runBot('competent');
     expect(report.winRate).toBeGreaterThanOrEqual(0.65);
     expect(report.winRate).toBeLessThanOrEqual(0.8);
-    // Phase 3: median floor 1.8 -> 1.3. Measured 75.4% / 1.48x on normal (was 75.0% / 1.95x), same lever cost as above.
+    // Phase 3: median floor 1.8 -> 1.3. Measured 70.5% / 1.50x on normal (was 75.0% / 1.95x), same lever cost as above.
     expect(report.equityMultiple.median).toBeGreaterThanOrEqual(1.3);
     expect(report.equityMultiple.median).toBeLessThanOrEqual(2.4);
   });

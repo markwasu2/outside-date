@@ -248,7 +248,7 @@
         "scopeDown": 1.5,
         "recap": 1.5
       },
-      "disputeOddsPerStrain": 0.15,
+      "disputeOddsPerStrain": 0.2,
       "settledShare": 0.5
     },
     "closingMonths": {
