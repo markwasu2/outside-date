@@ -490,3 +490,34 @@ to 3.5 - millbrook recovered but whale normal careful 79.7, also over.
 | whale grids unchanged from phase 11 | done: the 1000-seed whale grid is identical to phase 11's after-grid (careful 74.5/32.1, competent 70.3/38.6, greedy 34.9/40.2) - whale's useful fires all have construction active |
 | full suite green | done: 472 vitest, 41 playwright, eslint, tsc, vite build |
 | no save bump, no UI change | engine/content untouched; one bot-policy gate |
+
+# GFX 1 - isometric board art, first pass
+
+## The change (UI only)
+
+The flat tile board becomes an illustrated isometric board in the style of the
+user-supplied reference (crane, steel frame, substation, pond, laydown). Eleven
+generated assets (480px, ~3.7MB total) in src/assets/art/: seven hall stages
+(not-started, pad, steel, shell, fit-out, rfs, delivered) and four fixed tiles
+(site office, pond, laydown yard, substation). HallSprite renders the stage
+illustration on an inset card with a bottom stage-progress strip; terminated
+halls dim+grayscale. MapGrid fixed tiles get a full-bleed ArtLayer image with
+text labels on light chips so every status line stays readable; the substation
+image dims+grayscales until the study is commissioned. All overlays (queued
+ghosts, pips, rent tickers, spend floats, coin bursts, corner icons) unchanged.
+
+Generated vs placeholder: generated = the 11 tiles above. Placeholder/unchanged =
+road tile (flat), low-field variant (flat), SiteMapPreview and setup-screen
+previews, global palette/typography (first pass touches the board only).
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| halls show stage art incl. progress strip | done: mid-game desktop shot shows delivered/shell stages + strips |
+| fixed tiles illustrated, labels readable | done: site office/laydown/substation chips legible in both shots |
+| substation dimmed pre-study | done: early shot shows grayscale+dashed substation |
+| decision readability kept | done: chips/pips/banners unchanged, popovers and clicks pass e2e |
+| balance grid | skipped: UI-only, no engine/content-tuning/bot change |
+| full suite green | done: 488 vitest, 42 playwright, eslint, tsc, vite build |
+| screenshots inspected | done: docs/screenshots/gfx1/ desktop 1440 (early + mid), phone 390 |
