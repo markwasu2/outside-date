@@ -3,6 +3,7 @@ import { formatDollars } from '../../engine/format';
 import type { SiteDef, SiteMapTheme } from '../../content/schemas';
 import { resolveSite, sitesFor } from '../../content/sites';
 import type { CoolingChoice, GcContract, HallTier, Setup } from '../../engine/types';
+import { STAGE_ART, TILE_ART } from '../art';
 import { Gloss } from '../Gloss';
 import { useStore } from '../store';
 import { previewState } from './preview';
@@ -68,37 +69,23 @@ export function SetupScreen({ scenarioId, difficultyId, setup, negotiation, onCh
 
 /** Phase 4 (pillar A): a miniature of the board's look under this site's theme - ground color,
  * pond or dry field, poles at the road - so the card previews the map, not just the numbers.
- * CSS/emoji only, matching MapGrid's sprite system. */
+ * Uses the same illustrated assets as the board; pole and pond clues stay site-specific. */
 export function SiteMapPreview({ theme }: { theme: SiteMapTheme }) {
+  const image = (src: string | undefined, key: string) => <img key={key} src={src} alt="" aria-hidden="true" draggable={false} style={{ width: '100%', height: '100%', objectFit: 'cover', minWidth: 0, borderRadius: 3 }} />;
   return (
-    <div
-      style={{
-        background: theme.ground,
-        borderRadius: 4,
-        padding: 2,
-        height: 72,
-        display: 'grid',
-        gridTemplateRows: '14px 1fr',
-        gap: 2,
-        boxSizing: 'border-box',
-      }}
-    >
-      <div
-        data-testid="site-preview-road"
-        style={{ background: '#d8c3a0', borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 3, fontSize: 10 }}
-      >
-        {Array.from({ length: theme.poles }, (_, i) => (
-          <span key={i}>{'\u{1F5FC}'}</span>
-        ))}
+    <div data-testid="site-art-preview" style={{ background: theme.ground, borderRadius: 5, padding: 3, height: 96, display: 'grid', gridTemplateRows: '20px 1fr', gap: 3, boxSizing: 'border-box', overflow: 'hidden' }}>
+      <div data-testid="site-preview-road" style={{ position: 'relative', overflow: 'hidden', borderRadius: 3 }}>
+        {image(TILE_ART.road.img, 'road')}
+        <span style={{ position: 'absolute', right: 2, top: 0, fontSize: 10, background: theme.poles ? '#fff8e1' : 'transparent' }}>
+          {Array.from({ length: theme.poles }, (_, i) => <span key={i}>{'\u{1F5FC}'}</span>)}
+        </span>
       </div>
-      <div style={{ display: 'flex', gap: 2, minHeight: 0 }}>
-        <div
-          data-testid="site-preview-pond"
-          data-pond={theme.pond ? 'true' : 'false'}
-          style={{ width: 20, borderRadius: 2, background: theme.pond ? '#8fb3a6' : '#c9b458' }}
-        />
-        <div style={{ flex: 1, borderRadius: 2, background: 'rgba(255, 255, 255, 0.35)' }} />
-        <div style={{ width: 26, borderRadius: 2, background: 'rgba(255, 255, 255, 0.2)' }} />
+      <div style={{ display: 'grid', gridTemplateColumns: '30px 1fr 30px', gap: 3, minHeight: 0 }}>
+        <div data-testid="site-preview-pond" data-pond={theme.pond ? 'true' : 'false'} style={{ minHeight: 0, overflow: 'hidden', borderRadius: 3 }}>
+          {image(theme.pond ? TILE_ART.pond.img : TILE_ART.dryField.img, 'field')}
+        </div>
+        {image(STAGE_ART.notStarted?.img, 'hall')}
+        {image(TILE_ART.substation.img, 'power')}
       </div>
     </div>
   );
@@ -123,7 +110,7 @@ function SiteCards({ sites, selected, onPick }: { sites: SiteDef[]; selected: st
               onClick={() => onPick(site.id)}
               style={{
                 display: 'grid',
-                gridTemplateColumns: '1fr 140px',
+                gridTemplateColumns: '1fr 170px',
                 gap: '0.5rem',
                 textAlign: 'left',
                 padding: '0.5rem',

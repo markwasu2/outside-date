@@ -868,3 +868,17 @@ remain on readable chips above the art; gameplay and hit targets are unchanged.
 | theme distinction | done: e2e asserts dry-site data and visible illustration; pond tests retained |
 | full gates | done: 512 vitest, 51 playwright, full lint, tsc, build |
 | balance grid | skipped: decorative art only |
+
+# Art pass 2c - illustrated setup previews
+
+Site cards now preview the actual illustrated board assets: road, pond or dry
+field, untouched hall pad and substation. Site-specific ground and pole clues
+remain. These are previews, not a claim that construction is already complete.
+
+| criterion | status |
+|---|---|
+| visual | done: full desktop setup screenshot inspected, site tradeoffs readable |
+| theme clues | done: pond and pole assertions retained, three illustrated previews asserted |
+| full gates | done: 512 vitest, 52 playwright (51 plus isolated long tutorial test), lint, tsc, build |
+| caveat | monolithic e2e hit execution time limit at long tutorial; isolated test passed in 12.5s |
+| balance grid | skipped: decorative setup UI only |
