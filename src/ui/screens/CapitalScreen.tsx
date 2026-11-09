@@ -1,12 +1,13 @@
+import type { Content } from '../../content/schemas';
 import type { DifficultyId, NegotiationChoices } from '../../engine/init';
 import { formatDollars, formatMonths } from '../../engine/format';
 import { dscr, runway } from '../../engine/selectors';
 import type { Setup } from '../../engine/types';
 import { Term } from '../Term';
-import { useStore } from '../store';
 import { previewState, withAllHallsDelivered } from './preview';
 
 interface Props {
+  content: Content;
   scenarioId: string;
   difficultyId: DifficultyId;
   setup: Setup;
@@ -32,9 +33,11 @@ export const PLAYER_SHARE_HINTS = ['Smallest check, smallest share of future pro
 
 /** P7.4. All numbers (stacked bar, checks, runway, DSCR) come from a real `previewState()` -
  * see `./preview.ts` - rather than re-deriving the capital-stack math here. */
-export function CapitalScreen({ scenarioId, difficultyId, setup, negotiation, onChange, onBack, onNext }: Props) {
-  const content = useStore((s) => s.content);
+export function CapitalScreen({ content, scenarioId, difficultyId, setup, negotiation, onChange, onBack, onNext }: Props) {
   const { capital } = content.tuning;
+  const scenario = content.scenarios[scenarioId];
+  const mezzPinned = scenario?.tuningOverrides?.capital?.mezzOptions?.length === 1 ||
+    scenario?.difficulties?.[difficultyId]?.tuningOverrides?.capital?.mezzOptions?.length === 1;
   const preview = previewState(content, scenarioId, setup, negotiation, difficultyId);
   const startingRunway = runway(preview, content);
   const dscrAtFullDelivery = dscr(withAllHallsDelivered(preview), content);
@@ -74,6 +77,7 @@ export function CapitalScreen({ scenarioId, difficultyId, setup, negotiation, on
         {capital.mezzOptions.map((opt, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxWidth: 180 }}>
             <button
+              disabled={mezzPinned}
               onClick={() => onChange({ ...negotiation.capital, mezzIndex: i })}
               style={{
                 fontWeight: negotiation.capital.mezzIndex === i ? 'bold' : 'normal',
@@ -83,7 +87,9 @@ export function CapitalScreen({ scenarioId, difficultyId, setup, negotiation, on
             >
               {opt.share === 0 ? 'None' : `${(opt.share * 100).toFixed(0)}% of budget @ ${(opt.rate * 100).toFixed(0)}% PIK`}
             </button>
-            <span style={{ fontSize: '0.7rem', color: '#666' }}>{MEZZ_HINTS[i]}</span>
+            <span style={{ fontSize: '0.7rem', color: '#666' }}>
+              {mezzPinned ? 'Fixed by this scenario.' : MEZZ_HINTS[i]}
+            </span>
           </div>
         ))}
       </div>

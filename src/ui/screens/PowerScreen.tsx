@@ -1,9 +1,10 @@
+import type { Content } from '../../content/schemas';
 import type { NegotiationChoices } from '../../engine/init';
 import { formatMonth } from '../../engine/format';
 import type { MinChargeLevel } from '../../engine/types';
-import { useStore } from '../store';
 
 interface Props {
+  content: Content;
   scenarioId: string;
   negotiation: NegotiationChoices;
   onChange: (power: NegotiationChoices['power']) => void;
@@ -34,8 +35,7 @@ export const PLANT_B_OFFSET_HINTS: Record<number, string> = {
  * `plannedOnlineMonth` once the docket actually passes (`regulation.ts`), which hasn't happened
  * yet at month 0. Uses `docket.monthsToVote + power.plantBuildMonths` as the first-try-win
  * estimate, labeled as such, rather than leaving the timeline blank. */
-export function PowerScreen({ scenarioId, negotiation, onChange, onBack, onNext }: Props) {
-  const content = useStore((s) => s.content);
+export function PowerScreen({ content, scenarioId, negotiation, onChange, onBack, onNext }: Props) {
   const scenario = content.scenarios[scenarioId];
   const { power, docket, lease } = content.tuning;
 
