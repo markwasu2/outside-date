@@ -547,3 +547,30 @@ gameplay control (the first top-right placement deadlocked an e2e End month clic
 | balance grid | skipped: UI-only, no engine/content-tuning/bot change |
 | full suite green | done: 491 vitest, 42 playwright, eslint, tsc, vite build |
 | screenshot inspected | done: docs/screenshots/ux6/notice-cards-desktop-1440.png (desktop 1440; phone-width checks dropped per user) |
+
+# UX legibility - stage captions, blockers, legend
+
+## The change (UI only)
+
+User ask: "built graphics should be understandable." Every hall tile now carries a
+caption line naming its stage in words plus what it is waiting on ("Steel frame -
+waiting on building permit", "Ready for service - waiting on power hookup",
+"Shell - ready", "Not started - ready to break ground"); the blocker projection
+(src/ui/board/legibility.ts) mirrors the engine's stagePrereqsMet read-only. The
+substation and pond tiles get a state word under their art (not started / study
+running / building / energized; open / needs wetlands permit / mitigation underway /
+mitigated), and the duplicated "study done"/"energized" text lines are folded into
+it. A collapsible Legend button at the road's right end explains the stage art,
+caption line, progress strip, pad chips, rent ticker, queued outline and warning
+icons. Desktop only, per the user's call to drop phone layout.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| hall tiles show stage in words + blocker | done: screenshot shows Delivered / RFS-waiting-on-power-hookup / Shell-ready captions |
+| legend explains chips, icons, stage art | done: collapsible panel, 10 entries, screenshot inspected (first placement was clipped by the road cell's overflow; remounted at map root) |
+| fixed tiles labeled by state | done: substation + pond state words; laydown already carries crate counts |
+| balance grid | skipped: UI-only, no engine/content-tuning/bot change |
+| full suite green | done: 499 vitest (8 new), 42 playwright, eslint, tsc, vite build |
+| screenshots inspected | done: docs/screenshots/ux-legibility/ (captions + legend open, desktop 1440) |
