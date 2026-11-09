@@ -4,6 +4,7 @@ import type { Content } from '../../content/schemas';
 import type { LogEntry } from '../../engine/types';
 import { describeEffect } from './EventModal';
 import { useStore } from '../store';
+import { warnings } from '../board/warnings';
 
 /** UX 6 (playthrough): big moments - a no-choice event card (discovery, goodwill swing, rate
  * shock) or a warning (unanswered discovery slipped the vote, road/school penalty) - used to be
@@ -37,6 +38,10 @@ export function noticeStakes(entry: LogEntry, content: Content): string | undefi
   return Array.from(new Set(card.effects.map(describeEffect))).join(', ');
 }
 
+export function isBannerDuplicate(notice: Pick<Notice, 'title' | 'warning'>, bannerTitles: Set<string>): boolean {
+  return notice.warning && bannerTitles.has(notice.title);
+}
+
 const MAX_VISIBLE = 3;
 
 /** A repeating monthly penalty (e.g. liquidated damages) logs an identical entry each month;
@@ -61,6 +66,7 @@ const NOTICE_TTL_MS = 9000;
 export function EventNotices() {
   const draft = useStore((s) => s.draft);
   const content = useStore((s) => s.content);
+  const state = useStore((s) => s.state);
   const [notices, setNotices] = useState<Notice[]>([]);
   const seenCount = useRef<number | null>(null);
 
@@ -106,7 +112,11 @@ export function EventNotices() {
     }
   }, [log, pendingTitle, content]);
 
-  if (!draft || notices.length === 0) return null;
+  // Threshold crossings remain in the log, but the banner already owns their live display
+  // and fix buttons. Never repeat that same warning in a transient card.
+  const bannerTitles = new Set(warnings(state, content).map((w) => w.title));
+  const visible = notices.filter((n) => !isBannerDuplicate(n, bannerTitles));
+  if (!draft || visible.length === 0) return null;
 
   return (
     <div
@@ -123,7 +133,7 @@ export function EventNotices() {
         pointerEvents: 'none',
       }}
     >
-      {notices.map((n) => (
+      {visible.map((n) => (
         <div
           key={n.key}
           data-testid="event-notice"

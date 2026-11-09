@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { loadContent } from '../../src/content/load';
 import type { LogEntry } from '../../src/engine/types';
-import { dedupeNotices, isNoticeEntry, noticeStakes, type Notice } from '../../src/ui/components/EventNotices';
+import { dedupeNotices, isBannerDuplicate, isNoticeEntry, noticeStakes, type Notice } from '../../src/ui/components/EventNotices';
 
 // UX 6 (playthrough): no-choice event cards and warnings must surface as visible cards with
 // stakes, modeled on the hiring-fair modal. These pin the entry filter and the stakes line.
@@ -55,5 +55,15 @@ describe('dedupeNotices', () => {
     const a = card('Late', 'month 44');
     const b = card('Late', 'month 45');
     expect(dedupeNotices([a, b])).toHaveLength(2);
+  });
+});
+
+
+describe('banner/card dedupe', () => {
+  it('hides a threshold warning already shown in the banner, but keeps events and other warnings', () => {
+    const titles = new Set(['Runway under 3 months']);
+    expect(isBannerDuplicate({ title: 'Runway under 3 months', warning: true }, titles)).toBe(true);
+    expect(isBannerDuplicate({ title: 'Runway under 3 months', warning: false }, titles)).toBe(false);
+    expect(isBannerDuplicate({ title: 'H1 missed delivery', warning: true }, titles)).toBe(false);
   });
 });

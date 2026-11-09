@@ -73,3 +73,20 @@ test('power hints agree with the slip odds shown on setup buttons', async ({ pag
   await expect(page.getByText(/Same slip odds as Low/)).toHaveCount(0);
   await page.screenshot({ path: 'docs/screenshots/cold2/power-hints.png' });
 });
+
+test('a threshold warning appears in the banner without a duplicate notice card', async ({ page }) => {
+  await page.goto('/');
+  await page.getByTestId('quick-start').click();
+  await page.evaluate(async () => {
+    const { useStore } = await import('/src/ui/store.ts');
+    const { warnings } = await import('/src/ui/board/warnings.ts');
+    const s = useStore.getState();
+    const low = { ...s.state, cash: 1_000_000 };
+    const crossings = warnings(low, s.content).map((w) => ({ month: low.month, kind: 'warning', text: w.title, detail: w.detail }));
+    const next = { ...low, log: [...low.log, ...crossings] };
+    useStore.setState({ state: next, draft: next });
+  });
+  await expect(page.getByTestId('warning-banner')).toContainText('Runway under 3 months');
+  await expect(page.getByTestId('event-notice')).toHaveCount(0);
+  await page.screenshot({ path: 'docs/screenshots/cold2/banner-dedupe.png' });
+});
