@@ -37,12 +37,18 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
     expect(report.equityMultiple.median).toBeLessThan(0.5);
   });
 
-  it('greedy: win rate 30-45%, median multiple 1.2-1.6x', () => {
+  it('greedy: win rate 30-45%, median multiple 1.2-1.7x', () => {
     const report = runBot('greedy');
     expect(report.winRate).toBeGreaterThanOrEqual(0.3);
     expect(report.winRate).toBeLessThanOrEqual(0.45);
     expect(report.equityMultiple.median).toBeGreaterThanOrEqual(1.2);
-    expect(report.equityMultiple.median).toBeLessThanOrEqual(1.6);
+    // Multiple ceiling 1.6 -> 1.7 (Decisions log, 2026-11-08 tutorial-runway-fixes): the
+    // construction cost-per-progress fix removed two overcharges (full monthly cost on
+    // half-progress shortfall months, plus the finish-month overshoot past minMonths), and
+    // the savings flow to equity multiples - most for the cost-plus greedy archetype
+    // (+0.07x median at 1000 seeds). The win-rate band, the actual difficulty target, is
+    // unchanged and still holds.
+    expect(report.equityMultiple.median).toBeLessThanOrEqual(1.7);
   });
 
   it('careful: win rate 60-75%, median multiple 1.4-1.8x', () => {
