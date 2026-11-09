@@ -32,15 +32,15 @@ cliff, not at it. UI-only: no engine, sim, tuning, scenario, or protected-test c
 
 | Deliverable | Done | Left |
 | --- | --- | --- |
-| D1 popovers | | everything |
-| D2 halls rise | | everything |
-| D3 power alive | | everything |
-| D4 revenue flows | | everything |
-| D5 generic layout | | everything |
-| D6 teaching | | everything |
-| D7 spine + next step | | everything |
-| D8 warnings | | everything |
-| D9 purchased parts land | | everything |
+| D1 popovers | implemented (actions.ts, MapPopover.tsx, MapGrid) | unit/e2e tests, visual check |
+| D2 halls rise | implemented (hallVisual.ts, HallSprite.tsx) | unit tests, visual check |
+| D3 power alive | implemented (substation states, plants cell, laydown crates, power line) | visual check |
+| D4 revenue flows | implemented (rent ticker, coin burst, spend float, cash count-up, reduced-motion) | e2e + visual check |
+| D5 generic layout | implemented (hallAreaLayout 1..6) | 6-hall render test, 800/1440px check |
+| D6 teaching | implemented (taglines + seenBoardObjects; existing glossary only - see Decisions) | tests |
+| D7 spine + next step | implemented (ProgressSpine.tsx, nextStep.ts) | unit tests, month-0 checks |
+| D8 warnings | implemented (warnings.ts, WarningBanner.tsx, HUD runway bar, once-per-crossing log+sound) | unit tests, visual check |
+| D9 purchased parts land | implemented (deltas.ts arrival flashes, crates on queue) | visual check |
 
 ## Output paths
 
@@ -51,9 +51,15 @@ cliff, not at it. UI-only: no engine, sim, tuning, scenario, or protected-test c
 
 ## Next three actions
 
-1. Extract shared action-label helpers into src/ui/board/actions.ts (TracksPanel reuses them).
-2. Build board layout + HallSprite + popover shell (D5/D2/D1).
-3. Add pure modules nextStep.ts and warnings.ts with unit tests (D7/D8).
+1. DIAGNOSE: e2e/smoke.spec.ts test 1 (tutorial real clicks) produces no output even past its
+   timeout since the board rewrite. Probe (node + playwright directly) shows basic month loop is
+   fast (~0.4s/month) and the game reaches Y2 M3 fine, so the hang is specific to the spec's own
+   loop (queueEveryLegalAction/dialog handling) - reproduce with the spec's exact logic, find the
+   stuck locator, fix UI-side (existing specs are zero-diff).
+2. Write tests: tests/ui/{hallVisual,nextStep,warnings,boardActions}.test.ts + e2e/living-board.spec.ts.
+3. Screenshots (done row 16), fill done table, open + merge PR (git push works via remote URL's
+   embedded token - do NOT pass an Authorization Bearer header, it fails; PAT file at
+   /home/sandbox/.vault/github-pat-markwasu2-outside-date-contents-pr-access-401511/password).
 
 ## Done criteria
 
@@ -80,7 +86,24 @@ cliff, not at it. UI-only: no engine, sim, tuning, scenario, or protected-test c
 
 ## Decisions
 
-- (none yet)
+- Glossary: spec asked to add entries to content/glossary.json (long-lead equipment, permit,
+  laydown yard), but protected tests/content/load.test.ts hard-codes glossary.length === 48, and
+  zero-diff on protected files + all-tests-passing outrank the additions. Teaching lines (D6)
+  reuse existing glossary entries only; glossary.json unchanged.
+- D6 "first hover or open": implemented as first OPEN (popover mount) marks the object seen; a
+  mouse user always hovers before clicking, so consuming on hover would mean the line never
+  shows. Seen state is UI-only store state (seenBoardObjects), cleared on newGame/loadGame.
+- Popover outside-click uses a document mousedown listener, not a backdrop overlay: a backdrop
+  swallowed the first click on the TracksPanel (broke e2e/ui-qa-fixes.spec.ts finding #3).
+- Popover has role="dialog" with aria-label; verify this does not confuse existing specs that
+  query getByRole('dialog') for the event modal.
+- Runway bar colors: >=9 green, 6-9 amber, 3-6 deep orange, <3 red (HUD text color keeps its
+  original 6/3 thresholds; bar matches warnings.ts 9/6/3 thresholds).
+- warnings.ts 'cash-one-month' rule only fires when the runway rule did not already fire critical
+  (avoids duplicate critical banners for the same situation).
+- D9 purchasables rendered from state: long-lead orders (crates, appear when queued via draft,
+  flash on arrival), plants (planned -> online), substation (building -> done), halls. No other
+  purchasable has a physical-footprint state to render from.
 
 ## NEEDS ENGINE
 
