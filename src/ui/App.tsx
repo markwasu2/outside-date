@@ -83,9 +83,11 @@ export function App() {
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
           <BoardStyles />
           <Hud />
+          <div id="stat-explainer-dock" style={{ flexShrink: 0, maxHeight: 150, overflowY: 'auto' }} />
           <GoalStrip />
           <ProgressSpine />
           <WarningBanner />
+          <EventNotices />
           <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
             {/* Phase 1: minHeight: 0 on both wrappers. The progress spine + warning banner took
              * vertical space the layout used to give the main area; without letting these flex
@@ -103,7 +105,6 @@ export function App() {
           <LedgerDrawer />
           <FinancialsDrawer />
           <EventModal />
-          <EventNotices />
           <CoachTip />
         </div>
       )}

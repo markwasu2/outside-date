@@ -116,20 +116,21 @@ export function EventNotices() {
   // and fix buttons. Never repeat that same warning in a transient card.
   const bannerTitles = new Set(warnings(state, content).map((w) => w.title));
   const visible = notices.filter((n) => !isBannerDuplicate(n, bannerTitles));
-  if (!draft || visible.length === 0) return null;
+  if (!draft || draft.phase === 'awaitingChoice' || visible.length === 0) return null;
 
   return (
     <div
       data-testid="event-notices"
       style={{
-        position: 'fixed',
-        left: 12,
-        bottom: 64,
-        zIndex: 40,
+        position: 'relative',
+        flexShrink: 0,
+        maxHeight: 120,
+        overflowY: 'auto',
+        padding: '4px 12px',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         gap: 8,
-        maxWidth: 320,
+        alignItems: 'flex-start',
         pointerEvents: 'none',
       }}
     >
@@ -139,6 +140,8 @@ export function EventNotices() {
           data-testid="event-notice"
           style={{
             pointerEvents: 'auto',
+            flex: '1 1 0',
+            minWidth: 0,
             background: n.warning ? '#fdf3e7' : '#f4f7f0',
             border: `1px solid ${n.warning ? '#d98e2b' : '#7fb069'}`,
             borderLeft: `4px solid ${n.warning ? '#d98e2b' : '#7fb069'}`,

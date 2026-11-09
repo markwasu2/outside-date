@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 
+import { createPortal } from 'react-dom';
+
 import { STAT_EXPLAINERS } from '../explainers';
 import { useStore } from '../store';
 
@@ -21,7 +23,8 @@ export function StatExplainer({ id, autoOpen, children }: { id: string; autoOpen
     if (autoOpen && !seen) setOpen(true);
   }, [autoOpen, seen]);
 
-  // Close on Esc or outside tap (same pattern as MapPopover).
+  // The reserved dock never covers controls. Close via Escape or Got it; an outside
+  // mousedown must not remove the row and shift a target before its click lands.
   useEffect(() => {
     if (!open) return;
     function onKeyDown(e: KeyboardEvent) {
@@ -31,17 +34,9 @@ export function StatExplainer({ id, autoOpen, children }: { id: string; autoOpen
         markSeen(id);
       }
     }
-    function onMouseDown(e: MouseEvent) {
-      if (rootRef.current && e.target instanceof Node && !rootRef.current.contains(e.target)) {
-        setOpen(false);
-        markSeen(id);
-      }
-    }
     window.addEventListener('keydown', onKeyDown, true);
-    document.addEventListener('mousedown', onMouseDown);
     return () => {
       window.removeEventListener('keydown', onKeyDown, true);
-      document.removeEventListener('mousedown', onMouseDown);
     };
   }, [open, id, markSeen]);
 
@@ -75,26 +70,18 @@ export function StatExplainer({ id, autoOpen, children }: { id: string; autoOpen
       {/* No role="dialog": an always-on HUD popover must not satisfy getByRole('dialog')
        * lookups meant for event modals (ui-qa-fixes finding #2); role="note" keeps the
        * accessible name without the dialog semantics. */}
-      {open && (
+      {open && document.getElementById('stat-explainer-dock') && createPortal(
         <span
           role="note"
           aria-label={`About ${def.title}`}
           data-testid={`stat-explainer-${id}`}
           style={{
-            position: 'absolute',
-            top: 'calc(100% + 6px)',
-            left: 0,
-            zIndex: 300,
-            width: 260,
+            position: 'relative',
+            margin: '4px 12px',
             background: '#fff',
             border: '1px solid #b8860b',
             borderRadius: 8,
             boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
-            // The popover is informational only and can hang over unrelated controls (the tab
-            // bar at narrow widths); pointer-events: none lets the click through to the control
-            // beneath, and the document mousedown listener then dismisses the popover. Without
-            // this the popover swallowed taps (smoke.spec.ts tutorial run hung on a covered tab).
-            pointerEvents: 'none',
             padding: '0.6rem 0.7rem',
             fontWeight: 'normal',
             fontSize: '0.78rem',
@@ -117,7 +104,8 @@ export function StatExplainer({ id, autoOpen, children }: { id: string; autoOpen
           <button onClick={dismiss} style={{ padding: '0.2rem 0.7rem', cursor: 'pointer' }}>
             Got it
           </button>
-        </span>
+        </span>,
+        document.getElementById('stat-explainer-dock')!,
       )}
     </span>
   );
