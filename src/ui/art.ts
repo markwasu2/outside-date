@@ -17,6 +17,7 @@ import hallRfsImg from '../assets/art/hall-rfs.png';
 import hallShellImg from '../assets/art/hall-shell.png';
 import hallSteelImg from '../assets/art/hall-steel.png';
 import tileLaydownImg from '../assets/art/tile-laydown.png';
+import tileRoadImg from '../assets/art/tile-road.png';
 import tilePondImg from '../assets/art/tile-pond.png';
 import tileSiteOfficeImg from '../assets/art/tile-site-office.png';
 import tileSubstationImg from '../assets/art/tile-substation.png';
@@ -33,7 +34,7 @@ export interface TileArt {
  * record (not `Record<string, TileArt>`) so `noUncheckedIndexedAccess` doesn't force `undefined`
  * checks at every one of this file's known-safe call sites in `MapGrid.tsx`. */
 export const TILE_ART: Record<'road' | 'siteOffice' | 'pond' | 'laydownYard' | 'substation', TileArt> = {
-  road: { bg: '#d8c3a0', icon: '\u{1F6E4}\uFE0F', label: 'Road' }, // 🛣️
+  road: { bg: '#d8c3a0', icon: '\u{1F6E4}\uFE0F', label: 'Road', img: tileRoadImg }, // 🛣️
   siteOffice: { bg: '#c89b6a', icon: '\u{1F3E2}', label: 'Site office', img: tileSiteOfficeImg }, // 🏢
   pond: { bg: '#8fb3a6', icon: '\u{1F30A}', label: 'Pond', img: tilePondImg }, // 🌊 (one deliberate cool note: water)
   laydownYard: { bg: '#d9b88c', icon: '\u{1F4E6}', label: 'Laydown yard', img: tileLaydownImg }, // 📦
