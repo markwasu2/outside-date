@@ -29,7 +29,7 @@
   { "id": "draw", "term": "draw", "definition": "A request to pull funds from a committed loan or equity source to pay that month's bills." },
   { "id": "capitalized-interest", "term": "capitalized interest", "definition": "Loan interest added to the loan balance during construction instead of paid in cash." },
   { "id": "covenant", "term": "covenant", "definition": "A rule in a loan agreement that you must keep meeting or risk default." },
-  { "id": "dscr", "term": "DSCR", "definition": "Debt service coverage ratio: income divided by debt payments owed. Higher means more cushion.", "codexId": "the-bond" },
+  { "id": "dscr", "term": "DSCR", "definition": "Debt service coverage ratio: income divided by debt payments owed. More headroom above the covenant trigger means more cushion before default.", "codexId": "crefc-rating-framework" },
   { "id": "conversion", "term": "conversion", "definition": "The test a construction loan must pass to convert to cheaper, permanent financing." },
   { "id": "step-up", "term": "step-up", "definition": "A higher interest rate charged after a loan fails its conversion test." },
   { "id": "takeout", "term": "takeout", "definition": "Refinancing the construction loan with permanent debt once the project is stable." },

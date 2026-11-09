@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
 import { loadContent } from '../../src/content/load';
-import { REMEDIES } from '../../src/ui/screens/LeaseScreen';
+import { getRemedies } from '../../src/ui/screens/LeaseScreen';
 import { MEZZ_HINTS, PLAYER_SHARE_HINTS, SENIOR_HINTS } from '../../src/ui/screens/CapitalScreen';
 import { MIN_CHARGE_HINTS, PLANT_B_OFFSET_HINTS } from '../../src/ui/screens/PowerScreen';
 import { COOLINGS, GCS, SITES, TIERS } from '../../src/ui/screens/SetupScreen';
 
 // UI-polish item 5: every SetupWizard option needs a hand-written tradeoff hint under 90 chars.
 const content = loadContent();
-const { capital, power } = content.tuning;
+const { capital, power, lease } = content.tuning;
 
 function expectAllUnder90(hints: string[]) {
   for (const hint of hints) {
@@ -26,7 +26,7 @@ describe('SetupWizard tradeoff hints (item 5)', () => {
   });
 
   it('Lease screen: late-remedy options each have a note under 90 chars', () => {
-    expectAllUnder90(REMEDIES.map((o) => o.note));
+    expectAllUnder90(getRemedies(lease.ldCapMonths).map((o) => o.note));
   });
 
   it('Capital screen: one hint per senior/mezz/equity-share option, under 90 chars', () => {

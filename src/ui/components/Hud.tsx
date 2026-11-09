@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import type { Content } from '../../content/schemas';
 import { formatDollars, formatMonth, formatMonths } from '../../engine/format';
-import { dscr, forwardNoi, runway } from '../../engine/selectors';
-import type { GoodwillGroup } from '../../engine/types';
+import { dscr, forwardNoi, hallGrossRent, runway } from '../../engine/selectors';
+import type { GameState, GoodwillGroup } from '../../engine/types';
 import { totalApCost } from '../../engine/step';
 import { exportSaveToFile, SAVE_VERSION } from '../save';
 import { useStore } from '../store';
@@ -31,12 +32,121 @@ export function formatDscrHeadroom(d: number, dscrTrigger: number, forwardNoiVal
   return (d - dscrTrigger).toFixed(2);
 }
 
+/** Fix 15 (playtest-fixes): the HUD's "DSCR headroom" number had only a one-line tooltip ("DSCR
+ * headroom over the covenant trigger") - no explanation of what the figure means, what counts as
+ * healthy, or what the player can actually do about a thin one. `dscr()` (engine/selectors.ts) is
+ * forward NOI over annual debt service at the permanent rate; headroom is that minus
+ * `covenant.dscrTrigger`, tested for real at `covenant.forcedTestMonth`. Display only - explains
+ * the existing number, doesn't change it. Exported so tests can cover all three branches without
+ * rendering the component. */
+export function dscrHeadroomTooltip(d: number, dscrTrigger: number, forwardNoiValue: number, forcedTestMonth: number): string {
+  const basis = `DSCR headroom is projected rent income over annual debt payments, minus the ${dscrTrigger.toFixed(2)}x covenant trigger lenders test for at month ${forcedTestMonth}.`;
+  const healthyRange = 'Healthy is comfortably above 0 - at or below 0 means this campus would fail that test today.';
+  const levers = 'Levers: deliver halls on schedule and keep rent terms confirmed to raise income; avoid drawing more debt than the project needs.';
+  const status = formatDscrHeadroom(d, dscrTrigger, forwardNoiValue);
+  if (status === 'n/a until first draw') {
+    return `${basis} Reads "n/a" until your first debt draw, since there's no payment to cover yet.\n\n${healthyRange}\n\n${levers}`;
+  }
+  if (status === 'n/a until first delivery') {
+    return `${basis} Reads "n/a" until your first hall delivers, since there's no rent income yet.\n\n${healthyRange}\n\n${levers}`;
+  }
+  return `${basis}\n\n${healthyRange}\n\n${levers}`;
+}
+
 /** Item 8: extra tooltip text when the real `runway()` figure differs from a naive cash/burn-only
  * estimate by more than 2 months - empty string when it doesn't, so the base tooltip is unchanged. */
 export function runwayBreakdownNote(months: number, naiveMonths: number): string {
   if (!Number.isFinite(months) || !Number.isFinite(naiveMonths)) return '';
   if (Math.abs(months - naiveMonths) <= 2) return '';
   return ` (naive cash/burn-only estimate would read ${formatMonths(naiveMonths)} - the difference is hall income/insurance costs netted into burn)`;
+}
+
+export interface RunwayDriver {
+  label: string;
+  /** Positive = adds to monthly net burn; negative = offsets it. These always sum to the same
+   * net that `runway()` (engine/selectors.ts) uses internally. */
+  amount: number;
+}
+
+/** Fix 11 (playtest-fixes): `runway()` nets several components into a single number with no
+ * breakdown shown anywhere - the player can't tell why a month got worse. This mirrors
+ * `monthlyOutflow`/`monthlyInflow` (engine/selectors.ts, both private to that module) purely for
+ * display, built from the same content-tuning fields and the one exported helper those functions
+ * also use (`hallGrossRent`). No engine change; keep in sync with selectors.ts if that formula
+ * changes. Exported so tests can cover it without rendering the component. */
+export function runwayDrivers(state: GameState, content: Content): RunwayDriver[] {
+  const drivers: RunwayDriver[] = [{ label: 'Base burn', amount: state.monthlyBurn }];
+
+  if (state.insurance.buildersRisk) {
+    drivers.push({ label: "Builder's risk insurance", amount: content.tuning.insurance.buildersRiskMonthly });
+  }
+  if (state.insurance.dsu) {
+    drivers.push({ label: 'DSU insurance', amount: content.tuning.insurance.dsuMonthly });
+  }
+
+  const level = state.power.minCharge;
+  if (level) {
+    const pue = content.tuning.cooling[state.setup.cooling].pue;
+    const committedGridMW = state.power.plants.reduce(
+      (sum, p) => (p.onlineMonth !== null || p.plannedOnlineMonth !== null ? sum + p.mwGrid : sum),
+      0,
+    );
+    const usedByDelivered = state.halls
+      .filter((h) => h.delivered && !h.terminated)
+      .reduce((sum, h) => sum + h.mwIT * pue, 0);
+    const unusedMW = Math.max(0, committedGridMW - usedByDelivered);
+    const amount = Math.round(content.tuning.power.minChargePerMwMonth[level] * unusedMW);
+    if (amount !== 0) drivers.push({ label: 'Utility minimum charge', amount });
+  }
+
+  if (state.lease && state.lease.lateRemedy === 'liquidatedDamages') {
+    let ldTotal = 0;
+    for (const h of state.halls) {
+      if (h.delivered || h.terminated) continue;
+      if (state.month <= h.deliveryMonth || state.month > h.outsideMonth) continue;
+      if (h.ldMonthsAccrued >= content.tuning.lease.ldCapMonths) continue;
+      if (state.insurance.dsu && h.insuredDelayMonths > 0) continue;
+      ldTotal += Math.round(content.tuning.lease.ldPerDayPer25MW * (h.mwIT / 25) * 30);
+    }
+    if (ldTotal !== 0) drivers.push({ label: 'Liquidated-damages accrual', amount: ldTotal });
+  }
+
+  const hallIncome = state.halls
+    .filter((h) => h.delivered && !h.terminated && h.deliveredMonth !== null)
+    .reduce((sum, h) => {
+      const gross = hallGrossRent(state, content, h);
+      return sum + (gross - content.tuning.lease.landlordCostShare * gross);
+    }, 0);
+  if (hallIncome !== 0) drivers.push({ label: 'Hall rent income', amount: -hallIncome });
+
+  return drivers;
+}
+
+/** Biggest-magnitude drivers first, zero-amount entries dropped, capped at `n`. */
+export function topRunwayDrivers(drivers: RunwayDriver[], n = 3): RunwayDriver[] {
+  return [...drivers]
+    .filter((d) => d.amount !== 0)
+    .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))
+    .slice(0, n);
+}
+
+export function formatRunwayDriver(d: RunwayDriver): string {
+  const sign = d.amount > 0 ? '+' : '';
+  return `${d.label} ${sign}${formatDollars(d.amount)}/mo`;
+}
+
+/** Net monthly burn (outflow - inflow), for month-over-month tracking; always equals the sum of
+ * `runwayDrivers`' amounts. */
+export function netMonthlyBurn(state: GameState, content: Content): number {
+  return runwayDrivers(state, content).reduce((sum, d) => sum + d.amount, 0);
+}
+
+export function formatMomChange(prevNet: number, currentNet: number): string {
+  const delta = currentNet - prevNet;
+  if (delta === 0) return 'Flat vs last month';
+  const sign = delta > 0 ? '+' : '';
+  const direction = delta > 0 ? 'worse' : 'better';
+  return `${sign}${formatDollars(delta)}/mo vs last month (${direction})`;
 }
 
 /** Emoji mood for a 0..100 goodwill value: sour below 35, content 35..70, happy above. */
@@ -75,7 +185,32 @@ export function Hud() {
   const naiveMonths = draft.monthlyBurn > 0 ? draft.cash / draft.monthlyBurn : Infinity;
   const breakdownNote = runwayBreakdownNote(months, naiveMonths);
   const d = dscr(draft, content);
-  const headroomText = formatDscrHeadroom(d, content.tuning.covenant.dscrTrigger, forwardNoi(draft, content));
+  const forwardNoiValue = forwardNoi(draft, content);
+  const headroomText = formatDscrHeadroom(d, content.tuning.covenant.dscrTrigger, forwardNoiValue);
+
+  // Fix 11 (playtest-fixes): top drivers use `draft` so they match the displayed runway figure
+  // above (including any currently-queued plan). Month-over-month tracking instead keys off the
+  // last *committed* month (`state`), recorded into real component state (not a ref) so the MoM
+  // line stays visible for every re-render within a month, not just the one right after it
+  // commits - display only, `runway()`'s own calculation is untouched.
+  const topDrivers = topRunwayDrivers(runwayDrivers(draft, content));
+  const currentCommittedNet = netMonthlyBurn(state, content);
+  const [netHistory, setNetHistory] = useState<Record<number, number>>({});
+  useEffect(() => {
+    setNetHistory({});
+  }, [state.seed]);
+  useEffect(() => {
+    setNetHistory((prev) => (prev[state.month] !== undefined ? prev : { ...prev, [state.month]: currentCommittedNet }));
+  }, [state.month, currentCommittedNet]);
+  const prevMonthNet = netHistory[state.month - 1];
+  const momText = prevMonthNet !== undefined ? formatMomChange(prevMonthNet, currentCommittedNet) : null;
+  const runwayTooltip = [
+    `Months of runway at current burn/rent, net of hall income, insurance premiums, utility minimum charges, and liquidated-damages accruals${breakdownNote}`,
+    topDrivers.length ? `Top drivers this month:\n${topDrivers.map(formatRunwayDriver).join('\n')}` : '',
+    momText ?? '',
+  ]
+    .filter(Boolean)
+    .join('\n\n');
 
   const activeHalls = draft.halls.filter((h) => !h.terminated && !h.delivered);
   const nextOutside = activeHalls.length
@@ -124,15 +259,16 @@ export function Hud() {
       <div>Cash: {formatDollars(draft.cash)}</div>
 
       {/* QA pass 2, finding 8: the tooltip used to omit the utility minimum charge and
-          liquidated-damages accrual terms even though runway()'s number includes both. */}
-      <div
-        title={`Months of runway at current burn/rent, net of hall income, insurance premiums, utility minimum charges, and liquidated-damages accruals${breakdownNote}`}
-        style={{ color: runwayColor(months) }}
-      >
+          liquidated-damages accrual terms even though runway()'s number includes both.
+          Fix 11 (playtest-fixes): extended with the top 3 drivers behind this month's number and
+          the month-over-month change, so a bad month shows WHY, not just the headline figure. */}
+      <div title={runwayTooltip} style={{ color: runwayColor(months) }}>
         Runway: {formatMonths(months)}
       </div>
 
-      <div title="DSCR headroom over the covenant trigger">DSCR headroom: {headroomText}</div>
+      <div title={dscrHeadroomTooltip(d, content.tuning.covenant.dscrTrigger, forwardNoiValue, content.tuning.covenant.forcedTestMonth)}>
+        DSCR headroom: {headroomText}
+      </div>
 
       {/* QA pass 2, finding 3: persistent indicator while a lender draw freeze is active -
           construction draws are paused until the player cures it from the Money tab. The engine
@@ -175,7 +311,9 @@ export function Hud() {
             ? 'Skip months with no actions queued until something needs your attention'
             : plan.length > 0
               ? 'Clear the planned actions this month before fast-forwarding'
-              : 'Not available right now'
+              : draft.phase === 'awaitingChoice'
+                ? 'Resolve the pending event before fast-forwarding'
+                : 'Not available right now'
         }
         disabled={!canFastForward || ffBusy}
         onClick={handleFastForward}

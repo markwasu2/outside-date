@@ -11,16 +11,22 @@ interface Props {
   onNext: () => void;
 }
 
-export const REMEDIES: { id: LateRemedy; label: string; note: string }[] = [
-  { id: 'liquidatedDamages', label: 'Liquidated damages', note: 'Pay a fixed daily penalty per late, undelivered hall, capped at a number of months.' },
-  { id: 'abatement', label: 'Abatement', note: 'Owe a month of future rent credit per late month instead of a cash penalty.' },
-];
+/** Fix 1 (playtest-fixes): the LD option used to say "capped at a number of months" with no
+ * actual number. Takes the scenario's real `ldCapMonths` so the cap is always correct instead of
+ * a hardcoded value drifting from tuning. */
+export function getRemedies(ldCapMonths: number): { id: LateRemedy; label: string; note: string }[] {
+  return [
+    { id: 'liquidatedDamages', label: 'Liquidated damages', note: `Pay a fixed daily penalty per late hall, capped at ${ldCapMonths} months.` },
+    { id: 'abatement', label: 'Abatement', note: 'Owe a month of future rent credit per late month instead of a cash penalty.' },
+  ];
+}
 
 /** P7.3. Rent and the escalator curve are both computed live from `tuning.lease` (the same
  * formula `init.ts`/`selectors.ts` use), not hardcoded, so they track tuning changes. */
 export function LeaseScreen({ negotiation, onChange, onBack, onNext }: Props) {
   const content = useStore((s) => s.content);
   const { lease } = content.tuning;
+  const remedies = getRemedies(lease.ldCapMonths);
   const rentFor = (month: number) => lease.baseRent + lease.rentPerMonthEarlier * (lease.referenceDeliveryMonth - month);
 
   const years = Array.from({ length: 15 }, (_, i) => i + 1);
@@ -53,7 +59,7 @@ export function LeaseScreen({ negotiation, onChange, onBack, onNext }: Props) {
 
       <strong>Late remedy</strong>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', margin: '0.25rem 0 1rem' }}>
-        {REMEDIES.map((r) => (
+        {remedies.map((r) => (
           <label key={r.id} style={{ display: 'flex', gap: '0.5rem', alignItems: 'baseline' }}>
             <input type="radio" checked={negotiation.lease.lateRemedy === r.id} onChange={() => onChange({ ...negotiation.lease, lateRemedy: r.id })} />
             <span>

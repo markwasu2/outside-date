@@ -391,6 +391,10 @@ export function TracksPanel() {
   // row on the Money tab. Surface a prominent finish button here and disable End month with a
   // hint until the takeout is queued.
   const takeoutOpen = state.phase === 'takeoutAvailable';
+  // Fix 12 (playtest-fixes): an event modal is pending until the player answers it; End month
+  // (and the Hud's Fast forward button, see Hud.tsx) are disabled during this window so a click
+  // can't race the modal and surface the engine's internal phase-guard error.
+  const awaitingChoice = state.phase === 'awaitingChoice';
   const takeoutQueued = plan.some((a) => a.actionId === 'priceTakeout');
 
   return (
@@ -499,9 +503,26 @@ export function TracksPanel() {
       <div style={{ borderTop: '1px solid #ccc', padding: '0.5rem' }}>
         <strong>Planned this month</strong>
         {plan.length === 0 && <div style={{ color: '#888' }}>Nothing queued.</div>}
+        {/* Fix 4 (playtest-fixes): queuing an action immediately updates the Hud's Cash/goodwill
+            preview (it reads `draft`, state+plan folded together) with no indication that
+            nothing is committed yet. Tag each queued row "Pending" and explain the preview once,
+            right where the queue list lives, rather than only in a one-off coach tip. */}
+        {plan.length > 0 && (
+          <div style={{ color: '#888', fontSize: '0.75rem', margin: '0.25rem 0' }}>
+            Pending - Cash/goodwill above already preview these effects, but nothing is committed until you end the month.
+          </div>
+        )}
         {plan.map((action, i) => (
-          <div key={i} style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>{describeAction(action, content)}</span>
+          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '0.5rem' }}>
+            <span>
+              {describeAction(action, content)}{' '}
+              <span
+                data-testid="queued-pending-tag"
+                style={{ fontSize: '0.7rem', color: '#b8860b', fontStyle: 'italic' }}
+              >
+                (pending)
+              </span>
+            </span>
             <button onClick={() => removeAction(i)}>remove</button>
           </div>
         ))}
@@ -524,11 +545,13 @@ export function TracksPanel() {
         )}
         <button
           onClick={endMonth}
-          disabled={takeoutOpen && !takeoutQueued}
+          disabled={(takeoutOpen && !takeoutQueued) || awaitingChoice}
           title={
-            takeoutOpen && !takeoutQueued
-              ? 'The takeout window is open - price the takeout (above, or the Money tab) to finish the campaign'
-              : undefined
+            awaitingChoice
+              ? 'Resolve the pending event before ending the month'
+              : takeoutOpen && !takeoutQueued
+                ? 'The takeout window is open - price the takeout (above, or the Money tab) to finish the campaign'
+                : undefined
           }
           style={{ marginTop: '0.5rem', width: '100%', padding: '0.5rem' }}
         >
