@@ -55,6 +55,8 @@ function applyRent(state: GameState, content: Content): GameState {
     }
     const gross = hallGrossRent(state, content, hall);
     cash += gross - content.tuning.lease.landlordCostShare * gross;
+    // Phase 6 (spatial spike): a far-pad hall's feeder bleeds line losses every month.
+    if ((hall.pad ?? 'near') === 'far') cash -= content.tuning.spatial.farLineLossPerMonth;
     return hall;
   });
   return { ...state, cash, halls };

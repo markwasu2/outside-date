@@ -80,6 +80,9 @@ export function ProgressSpine() {
   const meetingsDone = state.docket.intervenors.reduce((sum, i) => sum + i.meetingsDone, 0);
   const meetingsNeeded = state.docket.intervenors.reduce((sum, i) => sum + i.meetingsNeeded, 0);
 
+  // Phase 7 (scarcity pack): installation consumes the orders, so once the substation is
+  // underway the equipment legs read 'done' rather than reverting to 'todo'.
+  const installed = state.power.substationStatus !== 'none';
   const transformerOrder = state.power.orders.find((o) => o.kind === 'transformer');
   const switchgearOrder = state.power.orders.find((o) => o.kind === 'switchgear');
   const plantsOnline = state.power.plants.filter((p) => p.onlineMonth !== null && p.onlineMonth <= state.month).length;
@@ -150,13 +153,13 @@ export function ProgressSpine() {
         <Dot
           label="transformer"
           state={
-            state.skipTransformerOrder ? 'done' : transformerOrder ? (transformerOrder.arrived ? 'done' : 'pending') : 'todo'
+            state.skipTransformerOrder || installed ? 'done' : transformerOrder ? (transformerOrder.arrived ? 'done' : 'pending') : 'todo'
           }
           title={state.skipTransformerOrder ? 'Transformer not needed on this campus' : 'Transformer long-lead order'}
         />
         <Dot
           label="switchgear"
-          state={switchgearOrder ? (switchgearOrder.arrived ? 'done' : 'pending') : 'todo'}
+          state={installed ? 'done' : switchgearOrder ? (switchgearOrder.arrived ? 'done' : 'pending') : 'todo'}
           title="Switchgear long-lead order"
         />
         <Dot

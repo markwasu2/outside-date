@@ -119,9 +119,14 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
         )}
 
         {objectId === 'laydownYard' ? (
-          orders.length === 0 ? (
-            <div style={{ color: '#777' }}>No equipment on order yet. Order the transformer and switchgear from the substation.</div>
-          ) : (
+          <>
+            {/* Phase 7 (scarcity pack): the yard is a real constraint now - show the load. */}
+            <div style={{ color: '#555', marginBottom: 4 }} data-testid="yard-popover-capacity">
+              {orders.length} of {content.tuning.spatial.laydownCapacity} crate slots in use
+            </div>
+            {orders.length === 0 ? (
+              <div style={{ color: '#777' }}>No equipment on order yet. Order the transformer and switchgear from the substation.</div>
+            ) : (
             orders.map((o) => (
               <div key={`${o.kind}-${o.arrivalMonth}`} style={{ padding: '3px 0', borderBottom: '1px solid #eee' }}>
                 {'\u{1F4E6}'} {o.kind} -{' '}
@@ -129,8 +134,9 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
                   ? 'arrived, on site'
                   : `arrives ${formatMonth(o.arrivalMonth)} (${Math.max(0, o.arrivalMonth - state.month)}mo left)`}
               </div>
-            ))
-          )
+              ))
+            )}
+          </>
         ) : rows.length === 0 ? (
           <div style={{ color: '#777' }}>Nothing to do here right now.</div>
         ) : (

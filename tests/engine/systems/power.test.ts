@@ -74,11 +74,40 @@ describe('power: orders, study, substation', () => {
     expect(state.power.substationStatus).toBe('none');
 
     state = runMonths(state, 1); // this tick's pre-increment month matches the transformer's arrivalMonth
-    expect(state.power.orders.find((o) => o.kind === 'transformer')?.arrived).toBe(true);
+    // Phase 7 (scarcity pack): the flip to 'building' installs the arrived units - they leave
+    // the laydown yard (orders list) and free their slots.
+    expect(state.power.orders.length).toBe(0);
     expect(state.power.substationStatus).toBe('building');
     expect(state.power.substationDoneMonth).toBe(
       content.tuning.power.transformerLeadMonths + content.tuning.power.substationBuildMonths,
     );
+  });
+});
+
+describe('laydown yard capacity (Phase 7 scarcity pack)', () => {
+  it('rejects a new order once the yard holds laydownCapacity crates', () => {
+    let state = freshState();
+    state = applyAction(state, { actionId: 'commissionStudy' }, content);
+    state = applyAction(state, { actionId: 'orderTransformer' }, content);
+    state = applyAction(state, { actionId: 'orderSwitchgear' }, content);
+    // Third crate fits: second-sourcing the transformer is the pack's sanctioned use of the
+    // last slot.
+    state = applyAction(state, { actionId: 'secondSource', params: { kind: 'transformer' } }, content);
+    expect(state.power.orders.length).toBe(content.tuning.spatial.laydownCapacity);
+    expect(() => applyAction(state, { actionId: 'secondSource', params: { kind: 'switchgear' } }, content)).toThrow(
+      /Laydown yard is full/,
+    );
+  });
+
+  it('installation at substation start frees the slots, and ordering is over from then on', () => {
+    let state = freshState();
+    state = applyAction(state, { actionId: 'commissionStudy' }, content);
+    state = applyAction(state, { actionId: 'orderTransformer' }, content);
+    state = applyAction(state, { actionId: 'orderSwitchgear' }, content);
+    state = runMonths(state, content.tuning.power.transformerLeadMonths + 1);
+    expect(state.power.substationStatus).toBe('building');
+    expect(state.power.orders.length).toBe(0);
+    expect(() => applyAction(state, { actionId: 'orderTransformer' }, content)).toThrow(/already underway/);
   });
 });
 

@@ -56,9 +56,11 @@ export function nextStep(state: GameState, content: Content): NextStep {
   }
 
   // 3. The transformer has the longest lead time in the game; order it as soon as the study is
-  // underway. (Skipped entirely on small-grid scenarios like the tutorial.)
+  // underway. (Skipped entirely on small-grid scenarios like the tutorial. Phase 7: installation
+  // consumes the orders, so once the substation is underway these cards no longer apply.)
+  const orderingOpen = power.substationStatus === 'none';
   const transformerOrder = power.orders.find((o) => o.kind === 'transformer');
-  if (!state.skipTransformerOrder && !transformerOrder) {
+  if (orderingOpen && !state.skipTransformerOrder && !transformerOrder) {
     return {
       title: 'Order the transformer',
       why: `The lead time is ${resolved.tuning.power.transformerLeadMonths} months - longer than the path to your first pad. Every month you wait pushes energization a month.`,
@@ -69,7 +71,7 @@ export function nextStep(state: GameState, content: Content): NextStep {
 
   // 4. Switchgear is the second long-lead order.
   const switchgearOrder = power.orders.find((o) => o.kind === 'switchgear');
-  if (!switchgearOrder) {
+  if (orderingOpen && !switchgearOrder) {
     return {
       title: 'Order the switchgear',
       why: `Lead time runs ${resolved.tuning.power.switchgearLeadMin} to ${resolved.tuning.power.switchgearLeadMax} months and halls cannot energize without it.`,

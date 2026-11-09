@@ -103,9 +103,32 @@ function row(content: Content, state: GameState, id: string, label: string, para
 export function boardActionsForObject(objectId: string, state: GameState, content: Content): ActionRow[] {
   const hall = state.halls.find((h) => h.id === objectId);
   if (hall) {
-    const rows: ActionRow[] = [
-      row(content, state, 'advanceHall', `Advance construction: ${hall.id}`, { hallId: hall.id }),
-    ];
+    const rows: ActionRow[] = [];
+    // Phase 6 (spatial spike): an unbroken hall picks its pad at groundbreak. Near pads
+    // (limited) are free; the far pad trenches a feeder and bleeds line losses. Once a stage
+    // is underway the pad is fixed and the generic advance row takes over.
+    if (hall.stageIndex === -1 && !hall.stageActive) {
+      // Resolved per site: farmland's pond takes one of the two near pads (Phase 7).
+      const spatial = resolveContent(state, content).tuning.spatial;
+      const nearTaken = state.halls.filter((h) => h.stageIndex >= 0 && (h.pad ?? 'near') === 'near').length;
+      const nearLeft = Math.max(0, spatial.nearPads - nearTaken);
+      rows.push(
+        row(content, state, 'advanceHall', `Break ground on a near pad: ${hall.id} (${nearLeft} of ${spatial.nearPads} left, no feeder cost)`, {
+          hallId: hall.id,
+          pad: 'near',
+        }),
+        row(
+          content,
+          state,
+          'advanceHall',
+          // Phase 7 (scarcity pack): the far pad also adds pad-stage months - say so on the row.
+          `Break ground on the far pad: ${hall.id} (+${spatial.farPadExtraMonths}mo pad, ${formatDollars(spatial.farFeederCost)} feeder + ${formatDollars(spatial.farLineLossPerMonth)}/mo line losses)`,
+          { hallId: hall.id, pad: 'far' },
+        ),
+      );
+    } else {
+      rows.push(row(content, state, 'advanceHall', `Advance construction: ${hall.id}`, { hallId: hall.id }));
+    }
     // Liquid-cooling readiness only exists on liquid/hybrid tiers (air halls have no liquid loop).
     if (state.setup.hallTier === 'liquid' || state.setup.hallTier === 'hybrid') {
       rows.push(row(content, state, 'readyLiquid', `Ready liquid cooling: ${hall.id}`, { hallId: hall.id }));
@@ -123,6 +146,11 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
     const index = state.markets.equipmentIndex;
     const markets = resolveContent(state, content).tuning.markets;
     const power = resolveContent(state, content).tuning.power;
+    // Phase 7 (scarcity pack): installation consumes the orders and ordering closes, so the
+    // dialog collapses to the study row once the substation is underway.
+    if (state.power.substationStatus !== 'none') {
+      return [row(content, state, 'commissionStudy', findDef(content, 'commissionStudy').label)];
+    }
     const rows: ActionRow[] = [
       row(content, state, 'commissionStudy', findDef(content, 'commissionStudy').label),
       row(content, state, 'orderTransformer', findDef(content, 'orderTransformer').label),
