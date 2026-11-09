@@ -26,12 +26,12 @@ async function startCampaign(page: Page, siteId: string) {
 test('phase 7 farmland pad choice shot', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
 
-  // Farmland: the pond takes one near pad, so the choice row reads 1 of 1 and the far row
-  // owns up to the extra pad months.
+  // Farmland: both near pads are back (Phase 8 moved the pond's cost to a hall position);
+  // the far row owns up to the extra pad months.
   await startCampaign(page, 'farmland');
   await page.getByText('H1', { exact: true }).click();
   const popover = page.getByTestId('map-popover');
-  await expect(popover.getByTestId('popover-action').filter({ hasText: 'near pad' })).toContainText('1 of 1 left');
+  await expect(popover.getByTestId('popover-action').filter({ hasText: 'near pad' })).toContainText('2 of 2 left');
   await expect(popover.getByTestId('popover-action').filter({ hasText: 'far pad' })).toContainText('+2mo pad');
   await page.screenshot({ path: '/downloads/p7-farmland-pads.png' });
 });

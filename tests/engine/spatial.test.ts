@@ -168,7 +168,7 @@ describe('the pond takes a hall (Phase 8)', () => {
 
   it('the mitigation needs the wetlands permit, and cannot run twice', () => {
     let state = farmlandState();
-    state = { ...state, permits: { ...state.permits, wetlands: { ...state.permits['wetlands']!, status: 'filed' as const } } };
+    state = { ...state, permits: { ...state.permits, wetlands: { ...state.permits['wetlands']!, status: 'pending' as const } } };
     expect(() => applyAction(state, { actionId: 'mitigateWetlands' }, content)).toThrow(/wetlands permit/);
     state = { ...state, permits: { ...state.permits, wetlands: { ...state.permits['wetlands']!, status: 'granted' as const } } };
     state = applyAction(state, { actionId: 'mitigateWetlands' }, content);
