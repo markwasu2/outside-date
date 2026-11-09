@@ -202,7 +202,7 @@
     ],
     "levers": {
       "equityCall": {
-        "maxShareOfCommitted": 0.001,
+        "maxShareOfCommitted": 0.5,
         "maxCalls": 1,
         "cooldownMonths": 4,
         "premium": 0.25,
@@ -210,14 +210,14 @@
         "strainPerCall": 1
       },
       "bridgeLoan": {
-        "maxShareOfCost": 0.001,
+        "maxShareOfCost": 0.012,
         "maxLoans": 1,
         "cooldownMonths": 3,
         "rate": 0.14,
         "feeRate": 0.02
       },
       "mezzTopUp": {
-        "maxShareOfCost": 0.0007,
+        "maxShareOfCost": 0.01,
         "maxUses": 1,
         "cooldownMonths": 3,
         "ltcCap": 0.8,
@@ -234,11 +234,28 @@
       "recap": {
         "minMonth": 12,
         "minSpentShare": 0.3,
-        "raiseShareOfCost": 0.0007,
+        "raiseShareOfCost": 0.02,
         "feeRate": 0.015,
         "rateStep": 0.0075,
         "ltcCap": 0.78
       }
+    },
+    "strain": {
+      "perUse": {
+        "equityCall": 1,
+        "bridgeLoan": 0.75,
+        "mezzTopUp": 0.75,
+        "scopeDown": 1.5,
+        "recap": 1.5
+      },
+      "disputeOddsPerStrain": 0.15,
+      "settledShare": 0.5
+    },
+    "closingMonths": {
+      "equityCall": 2,
+      "bridgeLoan": 1,
+      "mezzTopUp": 2,
+      "recap": 3
     }
   },
   "lease": {

@@ -35,8 +35,9 @@ describe('equity call', () => {
     expect(after.equity.playerShare).toBeLessThan(s.equity.playerShare);
     expect(after.equity.calledTotal).toBe(s.equity.calledTotal + q.maxAmount);
     expect(after.capital.partnerStrain).toBeGreaterThan(s.capital.partnerStrain);
-    expect(after.cash).toBeLessThan(s.cash + q.maxAmount);
-    expect(after.cash).toBeGreaterThan(s.cash);
+    // Proceeds close later: only the fee comes out now, the money is queued as pending.
+    expect(after.cash).toBeLessThan(s.cash);
+    expect(after.capital.pending.at(-1)?.amount).toBe(q.maxAmount);
   });
 
   it('follows a cooldown and a max-call cap', () => {
@@ -63,7 +64,7 @@ describe('bridge loan', () => {
     expect(q.available).toBe(true);
     const after = bridgeLoan(s, { amount: q.maxAmount }, content);
     expect(after.debt.bridgeDrawn).toBeGreaterThanOrEqual(q.maxAmount); // the fee is added to the balance
-    expect(after.cash).toBeGreaterThan(s.cash);
+    expect(after.capital.pending.at(-1)?.amount).toBe(q.maxAmount);
     const next = step(after, [], content).state;
     expect(next.debt.bridgeAccruedPik).toBeGreaterThan(0);
 
@@ -78,6 +79,27 @@ describe('bridge loan', () => {
       ['mezz', 0],
       ['equity', 0],
     ]);
+  });
+});
+
+describe('closing lead time and partner strain', () => {
+  it('lever cash lands after the closing months, not at once', () => {
+    let s = fresh();
+    const q = leverQuote(s, content, 'bridgeLoan');
+    s = bridgeLoan(s, { amount: q.maxAmount }, content);
+    const before = s.cash;
+    const lead = content.tuning.capital.closingMonths.bridgeLoan;
+    let t = s;
+    for (let i = 0; i < lead + 1; i += 1) t = step(t, [], content).state;
+    expect(t.capital.pending).toHaveLength(0);
+    expect(t.cash).toBeGreaterThan(before - 100_000_000);
+  });
+
+  it('every lever use adds partner strain from tuning', () => {
+    const s = fresh();
+    const q = leverQuote(s, content, 'bridgeLoan');
+    const after = bridgeLoan(s, { amount: q.maxAmount }, content);
+    expect(after.capital.partnerStrain).toBe(content.tuning.capital.strain.perUse.bridgeLoan);
   });
 });
 

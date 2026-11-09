@@ -23,7 +23,7 @@ const MIN_SAFE_RUNWAY_MONTHS = 3;
  * smoke-test run, see Decisions log).
  */
 /** Reach for a capital lever once recurring outflow would drain cash in under this many months. */
-const LEVER_RUNWAY_MONTHS = 1;
+const LEVER_RUNWAY_MONTHS = 3.5;
 
 const DEFERRABLE_ACTIONS = new Set(['fundExtensions', 'importCrews']);
 
@@ -211,6 +211,9 @@ export function delaySwapCandidates(state: GameState, content: Content): Planned
  * lever-specific logic so every bot shares one definition of "in trouble".
  */
 export function needsCapital(state: GameState, content: Content): boolean {
+  // The tutorial teaches the core loop, not capital levers; its pinned numbers stay lever-free.
+  if (state.scenarioId.startsWith('tutorial')) return false;
+  if (state.capital.pending.length > 0) return false;
   if (state.flags.outOfBalance) return true;
   if (runway(state, content) < LEVER_RUNWAY_MONTHS) return true;
   const shortfall = Math.max(0, costToCompleteShortfall(state, content));

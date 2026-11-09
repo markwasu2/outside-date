@@ -56,6 +56,7 @@ export function emptyCapital(): CapitalState {
     },
     partnerStrain: 0,
     equityCured: 0,
+    pending: [],
     log: [],
   };
 }

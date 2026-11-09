@@ -101,6 +101,15 @@ export const TuningSchema = z.object({
     seniorOptions: z.array(z.object({ ltc: z.number(), rate: z.number() })),
     mezzOptions: z.array(z.object({ share: z.number(), rate: z.number() })),
     playerShareOptions: z.array(z.number()),
+    /** Months between taking a lever and the cash landing. Lead time is the cost of waiting. */
+    closingMonths: z.object({ equityCall: z.number().int(), bridgeLoan: z.number().int(), mezzTopUp: z.number().int(), recap: z.number().int() }),
+    /** Partner strain: every lever use adds strain, and strain feeds partner_dispute odds. */
+    strain: z.object({
+      perUse: z.object({ equityCall: z.number(), bridgeLoan: z.number(), mezzTopUp: z.number(), scopeDown: z.number(), recap: z.number() }),
+      disputeOddsPerStrain: z.number(),
+      /** Share of strain a dispute settles (the rest lingers). */
+      settledShare: z.number(),
+    }),
     levers: z.object({
       equityCall: z.object({
         maxShareOfCommitted: z.number(),

@@ -140,6 +140,8 @@ export interface CapitalState {
   partnerStrain: number;
   /** Total equity added by calls (not part of the closing table). */
   equityCured: Dollars;
+  /** Lever proceeds still closing: they land as cash in `arrivesMonth`. */
+  pending: { arrivesMonth: Month; amount: Dollars; lever: LeverId }[];
   log: LeverLogEntry[];
 }
 

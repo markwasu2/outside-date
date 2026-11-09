@@ -696,15 +696,14 @@
   {
     "id": "partner_dispute",
     "title": "Your equity partner pushes back",
-    "body": "Your partner does not like a call you made and wants either a bigger share or a pause while lawyers talk. Pick your cost.",
+    "body": "Your partner has funded calls and bridges for you and wants it back in share or schedule. The more you lean on them, the more often this comes up.",
     "bodyVariants": [
-      "Your equity partner reads the same numbers and likes them less. Lawyers are mentioned.",
-      "A disagreement over a call you made. The options are share or schedule.",
-      "Your partner wants a bigger slice or a pause. Pick the one that costs less."
+      "Your equity partner reads the numbers and the capital calls. Lawyers are mentioned.",
+      "Your partner wants a bigger slice or a long pause. Pick the one that costs less.",
+      "Every call you made was their money. They want something for it."
     ],
     "art": "partner_dispute",
-    "odds": 0.03,
-    "once": true,
+    "odds": 0.0,
     "requires": [
       "constructionActive"
     ],
@@ -712,25 +711,37 @@
     "choices": [
       {
         "id": "concede",
-        "label": "Concede a bigger share",
+        "label": "Concede a bigger share and pay their legal fees",
         "effects": [
           {
             "type": "playerShare",
             "args": [
-              -0.05
+              -0.08
+            ]
+          },
+          {
+            "type": "cash",
+            "args": [
+              -20000000
             ]
           }
         ]
       },
       {
         "id": "wait",
-        "label": "Wait it out",
+        "label": "Wait it out (a month of delay and a retainer)",
         "effects": [
           {
             "type": "hallPause",
             "args": [
               "all",
               1
+            ]
+          },
+          {
+            "type": "cash",
+            "args": [
+              -10000000
             ]
           }
         ]

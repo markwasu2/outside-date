@@ -88,7 +88,8 @@ export function undrawnFunding(state: GameState): number {
   const equity = Math.max(0, state.equity.committedTotal - state.equity.calledTotal);
   const mezz = Math.max(0, state.debt.mezzCommitment - state.debt.mezzDrawn);
   const senior = Math.max(0, state.debt.seniorCommitment - state.debt.seniorDrawn);
-  return equity + mezz + senior;
+  const closing = state.capital.pending.reduce((sum, p) => sum + p.amount, 0);
+  return equity + mezz + senior + closing;
 }
 
 export function costToCompleteShortfall(state: GameState, content: Content): number {
@@ -210,13 +211,21 @@ function proFormaDebt(state: GameState): number {
 // Shared state updates
 // ---------------------------------------------------------------------------
 
-function recordUse(state: GameState, entry: LeverLogEntry): GameState {
+function recordUse(state: GameState, entry: LeverLogEntry, content: Content): GameState {
   const use = state.capital.levers[entry.lever];
   return {
     ...state,
     capital: {
       ...state.capital,
+      partnerStrain: state.capital.partnerStrain + content.tuning.capital.strain.perUse[entry.lever],
       levers: { ...state.capital.levers, [entry.lever]: { count: use.count + 1, lastMonth: state.month } },
+      pending:
+        entry.lever === 'scopeDown'
+          ? state.capital.pending
+          : [
+              ...state.capital.pending,
+              { arrivesMonth: state.month + content.tuning.capital.closingMonths[entry.lever], amount: entry.amount, lever: entry.lever },
+            ],
       log: [...state.capital.log, entry],
     },
     log: [...state.log, { month: state.month, kind: 'action', text: entry.note }],
@@ -266,13 +275,13 @@ export function equityCall(state: GameState, params: Record<string, string | num
 
   let next: GameState = {
     ...state,
-    cash: state.cash + amount - fee,
+    cash: state.cash - fee,
     equity: {
       committedTotal: committed + amount,
       calledTotal: state.equity.calledTotal + amount,
       playerShare,
     },
-    capital: { ...state.capital, partnerStrain: state.capital.partnerStrain + c.strainPerCall, equityCured: state.capital.equityCured + amount },
+    capital: { ...state.capital, equityCured: state.capital.equityCured + amount },
   };
   next = recordUse(next, {
     month: state.month,
@@ -280,7 +289,7 @@ export function equityCall(state: GameState, params: Record<string, string | num
     amount,
     fee,
     note: `Equity call: partner funded ${formatDollars(amount)} (fee ${formatDollars(fee)}). Your share is now ${(playerShare * 100).toFixed(1)}%.`,
-  });
+  }, content);
   return rebalance(next, content);
 }
 
@@ -292,7 +301,6 @@ export function bridgeLoan(state: GameState, params: Record<string, string | num
   const fee = round(amount * c.feeRate);
   let next: GameState = {
     ...state,
-    cash: state.cash + amount,
     debt: { ...state.debt, bridgeDrawn: state.debt.bridgeDrawn + amount + fee, bridgeRate: c.rate },
   };
   next = recordUse(next, {
@@ -301,7 +309,7 @@ export function bridgeLoan(state: GameState, params: Record<string, string | num
     amount,
     fee,
     note: `Bridge loan: ${formatDollars(amount)} at ${(c.rate * 100).toFixed(0)}% in kind, fee ${formatDollars(fee)} added to the balance.`,
-  });
+  }, content);
   return rebalance(next, content);
 }
 
@@ -316,7 +324,6 @@ export function mezzTopUp(state: GameState, params: Record<string, string | numb
   const blended = (oldBalance * state.debt.mezzRate + (amount + fee) * newRate) / Math.max(1, oldBalance + amount + fee);
   let next: GameState = {
     ...state,
-    cash: state.cash + amount,
     debt: {
       ...state.debt,
       mezzCommitment: state.debt.mezzCommitment + amount + fee,
@@ -330,7 +337,7 @@ export function mezzTopUp(state: GameState, params: Record<string, string | numb
     amount,
     fee,
     note: `Mezz top-up: ${formatDollars(amount)} drawn, fee ${formatDollars(fee)} capitalized. Mezz rate is now ${(next.debt.mezzRate * 100).toFixed(1)}%.`,
-  });
+  }, content);
   return rebalance(next, content);
 }
 
@@ -358,7 +365,7 @@ export function scopeDown(state: GameState, params: Record<string, string | numb
     amount: salvage,
     fee,
     note: `Scope-down: ${hallId} terminated. Fee ${formatDollars(fee)}, salvage ${formatDollars(salvage)}, tenant goodwill ${c.tenantGoodwill}.`,
-  });
+  }, content);
   return rebalance(next, content);
 }
 
@@ -371,7 +378,6 @@ export function recap(state: GameState, _params: Record<string, string | number>
   const fee = round(newCommitment * c.feeRate);
   let next: GameState = {
     ...state,
-    cash: state.cash + raise,
     debt: {
       ...state.debt,
       seniorCommitment: newCommitment,
@@ -386,7 +392,7 @@ export function recap(state: GameState, _params: Record<string, string | number>
     amount: raise,
     fee,
     note: `Recap: senior loan raised ${formatDollars(raise)}, fee ${formatDollars(fee)}, rate up ${(c.rateStep * 10000).toFixed(0)} bps to ${(next.debt.seniorRate * 100).toFixed(2)}%.`,
-  });
+  }, content);
   return rebalance(next, content);
 }
 
@@ -394,7 +400,21 @@ export function recap(state: GameState, _params: Record<string, string | number>
 // Cost-to-complete lender test (world tick)
 // ---------------------------------------------------------------------------
 
-export function tick(state: GameState, content: Content): GameState {
+/** Lever proceeds land as cash once their closing lead time has run. */
+function landPending(state: GameState): GameState {
+  const due = state.capital.pending.filter((p) => p.arrivesMonth <= state.month);
+  if (due.length === 0) return state;
+  const total = due.reduce((sum, p) => sum + p.amount, 0);
+  return {
+    ...state,
+    cash: state.cash + total,
+    capital: { ...state.capital, pending: state.capital.pending.filter((p) => p.arrivesMonth > state.month) },
+    log: [...state.log, { month: state.month, kind: 'action', text: `Capital closed: ${formatDollars(total)} landed in cash.` }],
+  };
+}
+
+export function tick(input: GameState, content: Content): GameState {
+  const state = landPending(input);
   const { startMonth, toleranceShare } = content.tuning.forecast.costToComplete;
   if (state.month < startMonth) return state;
   if (!state.halls.some((h) => h.stageActive && !h.delivered && !h.terminated)) return state;

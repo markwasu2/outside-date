@@ -129,7 +129,7 @@ function scriptedDue(state: GameState, card: EventCard): boolean {
  * (see events.json notes); every card's odds are also scaled by the difficulty's
  * `eventOddsMultipliers` (e.g. hard's `supply_shock: 2`), set on GameState by init.ts.
  */
-function cardOdds(state: GameState, card: EventCard): number {
+function cardOdds(state: GameState, card: EventCard, content: Content): number {
   const base = card.odds ?? 0;
   let odds = base;
   if (card.id === 'labor_shortfall') {
@@ -137,6 +137,10 @@ function cardOdds(state: GameState, card: EventCard): number {
     if (typeof state.flags.hiringFairUntil === 'number' && state.month < state.flags.hiringFairUntil) {
       odds -= 0.05;
     }
+  }
+  if (card.id === 'partner_dispute') {
+    // Phase 3 (G): the counterweight to the capital levers. Every lever you pull strains the partner.
+    odds = base + state.capital.partnerStrain * content.tuning.capital.strain.disputeOddsPerStrain;
   }
   const multiplier = state.eventOddsMultipliers[card.id] ?? 1;
   return Math.min(1, Math.max(0, odds * multiplier));
@@ -158,7 +162,7 @@ function drawRandomCard(state: GameState, content: Content): { state: GameState;
   const shuffled = shuffle(state.rng, eligible);
   let rng = shuffled.state;
   for (const card of shuffled.value) {
-    const roll = chance(rng, cardOdds(state, card));
+    const roll = chance(rng, cardOdds(state, card, content));
     rng = roll.state;
     if (roll.value) return { state: { ...state, rng }, card };
   }
@@ -177,6 +181,11 @@ function markFired(state: GameState, card: EventCard): GameState {
 
 function applyCard(state: GameState, card: EventCard, content: Content): { state: GameState; pending: PendingEvent | null } {
   let next = markFired(state, card);
+  if (card.id === 'partner_dispute') {
+    // A dispute settles part of the strain; the rest lingers.
+    const keep = 1 - content.tuning.capital.strain.settledShare;
+    next = { ...next, capital: { ...next.capital, partnerStrain: next.capital.partnerStrain * keep } };
+  }
   // Flavor pick (see flavor.ts): one of [body, ...bodyVariants] per occurrence, hashed from the
   // current rng state without advancing it, so the stream feeding every numeric roll is untouched.
   const body = flavorPick(next.rng, `event-body:${card.id}`, [card.body, ...(card.bodyVariants ?? [])]);

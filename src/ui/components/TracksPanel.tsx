@@ -477,6 +477,11 @@ export function TracksPanel() {
               Your call: {formatDollars(state.forecast.cost)} plus {(state.forecast.contingency * 100).toFixed(0)}% contingency. Spent so far{' '}
               {formatDollars(state.totalCostToDate)}. Your equity share: {(state.equity.playerShare * 100).toFixed(1)}%.
             </div>
+            <div data-testid="capital-strain">
+              Partner strain {state.capital.partnerStrain.toFixed(1)}: more strain means more disputes.
+              {state.capital.pending.length > 0 &&
+                ` Closing: ${formatDollars(state.capital.pending.reduce((n, p) => n + p.amount, 0))} lands in the coming months.`}
+            </div>
             {state.capital.log.length === 0 ? (
               <div>No levers used yet. Every one costs you in the equity multiple.</div>
             ) : (
