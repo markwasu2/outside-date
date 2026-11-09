@@ -1,3 +1,4 @@
+/* global window, console */
 import { chromium } from 'playwright';
 const b = await chromium.launch();
 const p = await b.newPage();

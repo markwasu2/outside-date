@@ -1,3 +1,4 @@
+/* global window, console */
 // Phase 1 screenshot capture: drives the dev server through the six required board states at two
 // viewport widths and saves PNGs to /downloads/shots/. Run: node scripts/phase1-screenshots.mjs
 // (dev server must already be running on :5173).

@@ -36,8 +36,8 @@ describe('loadContent', () => {
     const content = loadContent();
     expect(content.actions.length).toBeGreaterThan(0);
     expect(content.events.length).toBe(30);
-    expect(content.glossary.length).toBe(48);
-    expect(content.codex.length).toBe(21);
+    expect(content.glossary.length).toBe(61);
+    expect(content.codex.length).toBe(32);
     expect(content.cast.cast.length).toBe(10);
     expect(content.cast.intervenors.length).toBe(4);
     expect(Object.keys(content.scenarios).sort()).toEqual(['millbrook-relay', 'tutorial-edge5', 'whale']);

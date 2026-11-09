@@ -1,9 +1,11 @@
 import type { DifficultyId, NegotiationChoices } from '../engine/init';
 import type { GameState } from '../engine/types';
+import type { FinancialSnapshot } from './financials';
 
-/** P10.1: bump this whenever `SaveFile`'s shape changes incompatibly. `loadSavedGame` treats any
- * mismatch as "no usable save" rather than attempting a migration - v1 has nothing to migrate from. */
-export const SAVE_VERSION = 1;
+/** P10.1: bump this whenever `SaveFile`'s shape changes incompatibly. v2 (Phase 2, D1) adds
+ * `financialSnapshots`; v1 saves migrate by starting an empty series (the drawer then records
+ * from the next committed month on). */
+export const SAVE_VERSION = 2;
 const SAVE_KEY = 'outside-date-save';
 
 export interface SaveFile {
@@ -12,6 +14,21 @@ export interface SaveFile {
   lastNegotiation: NegotiationChoices;
   lastDifficultyId: DifficultyId;
   dismissedCoachTips: string[];
+  financialSnapshots: FinancialSnapshot[];
+}
+
+/** Accepts a parsed save of any known version and returns a current-version SaveFile, or null
+ * when the version is unknown (treated as "no usable save", same as corrupt/missing). v1 ->
+ * v2: adds an empty financialSnapshots series; the full GameState is already in the save, so
+ * nothing else needs backfilling. Exported for tests. */
+export function migrateSave(parsed: unknown): SaveFile | null {
+  if (!parsed || typeof parsed !== 'object') return null;
+  const save = parsed as Partial<SaveFile> & { version?: number };
+  if (save.version === 2) return save as SaveFile;
+  if (save.version === 1) {
+    return { ...(save as Omit<SaveFile, 'version' | 'financialSnapshots'>), version: 2, financialSnapshots: [] };
+  }
+  return null;
 }
 
 /** Autosaves after every committed month (store.ts calls this from `endMonth`/`fastForward`/
@@ -27,14 +44,12 @@ export function saveGame(save: SaveFile): void {
 
 /** Returns null (never throws) for "no save", "corrupt save", and "save from an incompatible
  * version" alike - all three mean the same thing to the Title screen's Continue button: nothing to
- * continue from. */
+ * continue from. Older-but-known versions migrate via `migrateSave`. */
 export function loadSavedGame(): SaveFile | null {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as SaveFile;
-    if (parsed.version !== SAVE_VERSION) return null;
-    return parsed;
+    return migrateSave(JSON.parse(raw));
   } catch {
     return null;
   }
@@ -56,7 +71,10 @@ export function exportSaveToFile(save: SaveFile): void {
  * `loadSavedGame`) so the Title screen's import button can surface a real error message instead
  * of silently doing nothing. */
 export function parseImportedSave(text: string): SaveFile {
-  const parsed = JSON.parse(text) as SaveFile;
-  if (parsed.version !== SAVE_VERSION) throw new Error(`Unsupported save version: ${parsed.version}`);
-  return parsed;
+  const migrated = migrateSave(JSON.parse(text));
+  if (!migrated) {
+    const version = (JSON.parse(text) as { version?: number }).version;
+    throw new Error(`Unsupported save version: ${version}`);
+  }
+  return migrated;
 }

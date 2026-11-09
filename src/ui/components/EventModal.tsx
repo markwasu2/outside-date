@@ -4,8 +4,10 @@ import type { Effect, EventCard } from '../../content/schemas';
 import { formatDollars } from '../../engine/format';
 import type { GoodwillGroup } from '../../engine/types';
 import { playSound } from '../sound';
+import { EVENT_STAKEHOLDER } from '../stakeholders';
 import { useStore } from '../store';
 import { GOODWILL_LABELS } from './Hud';
+import { WhoHoldsChip } from './WhoHoldsChip';
 
 /** `docketVoteFail` is synthesized inline by regulation.ts's resolveVote and has no entry in
  * content/events.json, so its card text is hardcoded here (see PLAN.md Decisions log). */
@@ -122,6 +124,17 @@ export function EventModal() {
             Learn more in the codex
           </button>
         )}
+        {/* Phase 2 (D5): every event card says who holds the risk it represents, linking to
+            the Codex's Stakeholders view. */}
+        {(() => {
+          const mapping = EVENT_STAKEHOLDER[pending.cardId];
+          if (!mapping) return null;
+          return (
+            <div style={{ marginTop: '0.5rem' }}>
+              <WhoHoldsChip riskId={mapping.riskId} roleId={mapping.roleId} />
+            </div>
+          );
+        })()}
         <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
           {pending.choices.map((choice) => {
             const costText = describeChoiceEffects(choice.id, eventCard);

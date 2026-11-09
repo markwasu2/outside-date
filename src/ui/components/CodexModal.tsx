@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { useStore } from '../store';
+import { StakeholdersView } from './StakeholdersView';
 
 /** P9.3: codex overlay, mounted once at the App root (see App.tsx) so it is reachable from the
  * Title screen's Codex button and from any `<Term>`'s "more" link mid-game, regardless of which
@@ -28,7 +29,10 @@ export function CodexModal() {
 
   if (!codexOpen) return null;
 
-  const selected = selectedId ? content.codex.find((c) => c.id === selectedId) : undefined;
+  // Phase 2 (D4): 'stakeholders' is a reserved selected id rendering the Stakeholders view
+  // (StakeholdersView.tsx) instead of an entry detail; real entries never use that id.
+  const showStakeholders = selectedId === 'stakeholders';
+  const selected = !showStakeholders && selectedId ? content.codex.find((c) => c.id === selectedId) : undefined;
   const q = query.toLowerCase();
   const filtered = content.codex.filter((c) => c.title.toLowerCase().includes(q) || c.body.toLowerCase().includes(q));
 
@@ -64,7 +68,9 @@ export function CodexModal() {
           <button onClick={closeCodex}>Close</button>
         </div>
 
-        {selected ? (
+        {showStakeholders ? (
+          <StakeholdersView />
+        ) : selected ? (
           <div>
             <button onClick={() => openCodex(undefined)} style={{ marginTop: '1rem' }}>
               Back to list
@@ -102,8 +108,26 @@ export function CodexModal() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search the codex..."
-              style={{ width: '100%', padding: '0.5rem', marginTop: '1rem', marginBottom: '1rem', boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '0.5rem', marginTop: '1rem', marginBottom: '0.5rem', boxSizing: 'border-box' }}
             />
+            {/* Phase 2 (D4): the Stakeholders view sits next to the searchable entry list. */}
+            <button
+              data-testid="codex-stakeholders-button"
+              onClick={() => openCodex('stakeholders')}
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                padding: '0.5rem',
+                marginBottom: '1rem',
+                border: '1px solid #6a5acd',
+                borderRadius: 4,
+                background: '#f3f0ff',
+                cursor: 'pointer',
+              }}
+            >
+              Stakeholders: who holds which risk
+            </button>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {filtered.map((entry) => (
                 <li key={entry.id} style={{ marginBottom: '0.5rem' }}>
