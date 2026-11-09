@@ -135,7 +135,7 @@ const BESPOKE_CHOICE_STAKES: Record<string, (tier: string) => Record<string, str
   chip_generation: (tier) =>
     tier === 'air'
       ? {
-          retrofit: 'Costs $15.0M per undelivered hall',
+          retrofit: 'Costs $15.0M per undelivered hall, no added fitout delay',
           decline: 'Tenant goodwill -15, asset score -3',
         }
       : {

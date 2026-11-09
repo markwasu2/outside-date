@@ -925,3 +925,16 @@ and quote live MW only once online. Existing gear/cooling sprites remain.
 | visual | done: 1280x720 mixed working/online screenshot inspected |
 | full gates | done: 512 vitest, 55 e2e (54 + isolated long tutorial), lint, tsc, build |
 | balance grid | skipped: display-only buildout, engine untouched |
+
+# Cold playthrough 2, fix 7 - racks choice stakes verified
+
+Prior bespoke-stakes work already supplied retrofit costs and decline penalties;
+now air retrofit explicitly says no added fitout delay. A real pending-card e2e
+verifies the visible air price/zero delay and liquid price/one-month delay.
+
+| criterion | status |
+|---|---|
+| price and delay before commit | done: air and liquid actual modal assertions |
+| visual | done: desktop racks modal inspected, choices readable |
+| full gates | done: 512 vitest, 56 e2e (55 + isolated long tutorial), lint, tsc, build |
+| balance grid | skipped: copy/tests only |

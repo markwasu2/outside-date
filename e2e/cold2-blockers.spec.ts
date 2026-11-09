@@ -41,3 +41,23 @@ test('event body and buttons paint above every map label', async ({ page }) => {
   await page.screenshot({ path: 'docs/screenshots/cold2/modal-layer.png' });
   await button.click(); await expect(dialog).toHaveCount(0);
 });
+
+test('racks modal shows the real retrofit price and delay before either choice', async ({ page }) => {
+  await page.goto('/'); await page.getByTestId('quick-start').click();
+  await page.evaluate(async () => {
+    const { useStore } = await import('/src/ui/store.ts'); const s = useStore.getState();
+    const card = s.content.events.find((c) => c.id === 'chip_generation')!;
+    const next = { ...s.state, phase: 'awaitingChoice', pending: { cardId: card.id, choices: [{ id:'retrofit',label:'Retrofit' },{ id:'decline',label:'Decline' }] } };
+    useStore.setState({state:next,draft:next});
+  });
+  const dialog = page.getByRole('dialog').filter({ has: page.getByTestId('event-choice') });
+  await expect(dialog).toContainText('Costs $15.0M per undelivered hall, no added fitout delay');
+  await expect(dialog).toContainText('Tenant goodwill -15, asset score -3');
+  await page.screenshot({ path: 'docs/screenshots/cold2/rack-stakes.png' });
+  await page.evaluate(async () => {
+    const { useStore } = await import('/src/ui/store.ts'); const s = useStore.getState();
+    const next = {...s.state,setup:{...s.state.setup,hallTier:'liquid'}};
+    useStore.setState({state:next,draft:next});
+  });
+  await expect(dialog).toContainText('Costs $4.0M per undelivered hall, +1 fitout month on each');
+});
