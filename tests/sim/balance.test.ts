@@ -75,6 +75,10 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
   // Phase 7 (2026-11-09) measured: careful 71.5% / 1.62x (1000 seeds, whale normal). Two of
   // four whale halls take the far pad now (+2 pad months, feeder cost, line losses); the
   // delivery-month sort puts the near pads on the earliest halls. Easy 99.1%, hard 22.5%.
+  // Phase 11 (2026-11-09) measured: careful 74.5% / 1.38x, hard 32.1% / 1.03x (1000 seeds,
+  // whale). Levers trigger at 5 months runway (was 3.5), hard's starting cash matches easy's
+  // $215M (was $205M), and the equity call caps at 40% of committed (was 50%) - the max call
+  // was a $712M raise with a $14M fee that strained the partner into fatal -$20M disputes.
   it('careful: win rate 60-75%, median multiple 1.4-1.8x', () => {
     const report = runBot('careful');
     expect(report.winRate).toBeGreaterThanOrEqual(0.6);
@@ -119,11 +123,14 @@ describe('P5.3 balance regression guard (section 8 targets)', () => {
     expect(report.docketFailedFirstVoteRate).toBeLessThanOrEqual(0.3);
   });
 
-  it('competent/hard: win rate 28-45% (Phase 3 measured 50.3%, Phase 4 measured 44.8%, Phase 5 measured 44.7%, Phase 7 measured 32.1%)', () => {
+  it('competent/hard: win rate 28-45% (Phase 3 measured 50.3%, Phase 4 measured 44.8%, Phase 5 measured 44.7%, Phase 7 measured 32.1%, Phase 11 measured 38.6%)', () => {
     const report = runBot('competent', 'whale', 'hard');
     // Phase 7 (2026-11-09): 44.7% -> 32.1% at 100 seeds. The scarcity pack gives whale two
     // near pads for four halls, so two halls always take the far pad's +2 pad months, feeder
     // cost and line losses - on hard the schedule slack to absorb that is what was missing.
+    // Phase 11 (2026-11-09): 28.0% -> 38.6% at 1000 seeds (same three changes as the careful
+    // comment above; the equity-call cap and the earlier trigger help every archetype's
+    // late-campaign cash crises, careful most of all).
     expect(report.winRate).toBeGreaterThanOrEqual(0.28);
     expect(report.winRate).toBeLessThanOrEqual(0.45);
   });
