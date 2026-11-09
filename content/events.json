@@ -9,7 +9,7 @@
       "Lightning on the horizon, water on the pad. The crew chief calls it before lunch. Expect the lender to freeze construction draws until cured unless you carry delay-in-start-up cover."
     ],
     "art": "storm",
-    "odds": 0.04,
+    "odds": 0.05,
     "window": [
       24,
       59
@@ -950,7 +950,7 @@
     ],
     "art": "water_damage",
     "codexId": "builders-risk-claims",
-    "odds": 0.02,
+    "odds": 0.035,
     "requires": [
       "constructionActive"
     ],
@@ -975,7 +975,7 @@
     ],
     "art": "theft",
     "codexId": "site-theft-copper",
-    "odds": 0.015,
+    "odds": 0.025,
     "requires": [
       "constructionActive"
     ],

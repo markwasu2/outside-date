@@ -202,23 +202,23 @@
     ],
     "levers": {
       "equityCall": {
-        "maxShareOfCommitted": 0.06,
-        "maxCalls": 3,
+        "maxShareOfCommitted": 0.001,
+        "maxCalls": 1,
         "cooldownMonths": 4,
         "premium": 0.25,
         "feeRate": 0.02,
         "strainPerCall": 1
       },
       "bridgeLoan": {
-        "maxShareOfCost": 0.03,
-        "maxLoans": 2,
+        "maxShareOfCost": 0.001,
+        "maxLoans": 1,
         "cooldownMonths": 3,
         "rate": 0.14,
         "feeRate": 0.02
       },
       "mezzTopUp": {
-        "maxShareOfCost": 0.03,
-        "maxUses": 2,
+        "maxShareOfCost": 0.001,
+        "maxUses": 1,
         "cooldownMonths": 3,
         "ltcCap": 0.8,
         "dscrFloor": 1.3,
@@ -234,7 +234,7 @@
       "recap": {
         "minMonth": 12,
         "minSpentShare": 0.3,
-        "raiseShareOfCost": 0.04,
+        "raiseShareOfCost": 0.001,
         "feeRate": 0.015,
         "rateStep": 0.0075,
         "ltcCap": 0.78
@@ -295,7 +295,7 @@
     "marketBandHigh": 15000000
   },
   "events": {
-    "stormDamageShare": 0.28,
+    "stormDamageShare": 0.33,
     "fireDamageShare": 0.22,
     "waterDamageShare": [
       0.004,

@@ -77,6 +77,7 @@ export function playOneGame(
   scenarioId: string,
   difficulty: DifficultyId,
   seed: number,
+  onMonth?: (state: GameState) => void,
 ): { state: GameState; lastEventTitle: string | null } {
   const rng = new BotRng(seed);
   let state = createGame(content, scenarioId, bot.setup, bot.negotiation, seed, difficulty);
@@ -88,6 +89,7 @@ export function playOneGame(
     guard += 1;
     if (guard > maxIterations) throw new Error(`playOneGame: exceeded iteration guard (seed ${seed})`);
 
+    onMonth?.(state);
     const actions = bot.chooseActions(state, content, rng);
     const logLenBefore = state.log.length;
     const result = step(state, actions, content);
