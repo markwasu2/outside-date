@@ -65,6 +65,10 @@ export function tabUnlocks(state: GameState, content: Content): Record<TrackTab,
       unlocked: money,
       hint: money ? null : 'Unlocks after your first construction draw.',
     },
+    capital: {
+      unlocked: true,
+      hint: null,
+    },
     chips: {
       unlocked: chips,
       hint: chips ? null : 'Unlocks when a hall nears fitout.',

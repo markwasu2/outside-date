@@ -74,7 +74,7 @@ function playTransitionSounds(before: GameState, after: GameState, planContent: 
 }
 
 /** The six track tabs the TracksPanel renders (P6.5); the 'any' track (visitCast) gets its own always-visible section. */
-export type TrackTab = 'land' | 'regulation' | 'power' | 'money' | 'chips' | 'construction';
+export type TrackTab = 'land' | 'regulation' | 'power' | 'money' | 'capital' | 'chips' | 'construction';
 /** The floating panels (P6.2's "floating ledger drawer", Phase 2 D1's Financials drawer); TracksPanel's own tab switching is local UI state, not store state. */
 export type OpenPanel = 'ledger' | 'financials';
 /** 'start' is the Phase 7 title/setup/negotiation wizard (src/ui/screens/SetupWizard.tsx, which

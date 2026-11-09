@@ -1,5 +1,6 @@
 import type { Content } from '../../content/schemas';
 import { formatDollars, formatMonth, formatMonths } from '../../engine/format';
+import { allLeverQuotes } from '../../engine/systems/capital';
 import { resolveContent } from '../../engine/resolve';
 import { dscr, forwardNoi, ledger, runway } from '../../engine/selectors';
 import type { GameState } from '../../engine/types';
@@ -35,7 +36,7 @@ export interface BoardWarning {
 
 /** Which cash-saving levers actually exist right now. The runway warning lists these as fixes;
  * when none exist the copy must say so honestly (capital levers are a later-phase engine change). */
-function cashLevers(state: GameState): WarningFix[] {
+function cashLevers(state: GameState, content?: Content): WarningFix[] {
   const fixes: WarningFix[] = [];
   const standDownHall = state.halls.find((h) => !h.delivered && !h.terminated && h.stageActive && !h.pausedThisMonth);
   if (standDownHall) {
@@ -47,6 +48,9 @@ function cashLevers(state: GameState): WarningFix[] {
   }
   if (state.insurance.dsu || state.insurance.buildersRisk) {
     fixes.push({ label: "Drop DSU or builder's risk cover", tab: 'money' });
+  }
+  if (content && allLeverQuotes(state, content).some((q) => q.available)) {
+    fixes.push({ label: 'Raise capital: bridge loan, equity call, mezz (Capital tab)', tab: 'capital' });
   }
   const swapHall = state.halls.find((h) => !h.delivered && !h.terminated);
   if (swapHall && state.flags.rackScheduleConfirmed) {
@@ -85,10 +89,10 @@ export function warnings(state: GameState, content: Content): BoardWarning[] {
   const months = runway(state, content);
   if (months < 9) {
     const level: WarningLevel = months < 3 ? 'critical' : months < 6 ? 'warning' : 'notice';
-    const fixes = cashLevers(state);
+    const fixes = cashLevers(state, content);
     const leverNote =
       fixes.length === 0
-        ? ' No financing lever exists yet - the only way through is to finish revenue-earning work or cut AP-free costs.'
+        ? ' No capital lever is open right now (each has a cooldown and a cap) - finish revenue-earning work or cut costs.'
         : '';
     out.push({
       id: 'runway',
@@ -108,7 +112,7 @@ export function warnings(state: GameState, content: Content): BoardWarning[] {
       level: 'critical',
       title: 'Cash covers less than one month of net outflow',
       detail: `Cash ${formatDollars(state.cash)} vs net outflow ${formatDollars(net)}/mo. The game ends the month cash goes below zero.`,
-      fixes: cashLevers(state),
+      fixes: cashLevers(state, content),
     });
   }
 
@@ -125,7 +129,7 @@ export function warnings(state: GameState, content: Content): BoardWarning[] {
         level,
         title: `DSCR headroom ${headroom.toFixed(2)} - lenders test at ${formatMonth(resolved.tuning.covenant.forcedTestMonth)}`,
         detail:
-          'Projected rent income barely covers debt payments at the permanent rate. The levers are income-side: deliver halls on schedule and keep rent terms confirmed. No financing lever exists yet.',
+          'Projected rent income barely covers debt payments at the permanent rate. Deliver halls on schedule and keep rent terms confirmed. The Capital tab has levers that raise money at a price, if one is open.',
         fixes: undelivered ? [{ label: `Keep ${undelivered.id} moving to delivery`, objectId: undelivered.id }] : [],
       });
     }

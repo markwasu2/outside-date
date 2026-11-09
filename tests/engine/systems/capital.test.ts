@@ -104,7 +104,7 @@ describe('scope-down and recap', () => {
     const s = fresh();
     const q = leverQuote(s, content, 'scopeDown');
     expect(q.available).toBe(true);
-    const after = scopeDown(s, { hallId: q.halls[0] }, content);
+    const after = scopeDown(s, { hallId: q.halls[0]! }, content);
     expect(after.halls.filter((h) => !h.terminated).length).toBe(s.halls.filter((h) => !h.terminated).length - 1);
     expect(after.capital.log.at(-1)?.lever).toBe('scopeDown');
   });

@@ -5,6 +5,7 @@ import type { Setup } from '../../engine/types';
 import { DEFAULT_NEGOTIATION, DEFAULT_SETUP } from '../defaultGame';
 import { useStore } from '../store';
 import { CapitalScreen } from './CapitalScreen';
+import { ForecastScreen } from './ForecastScreen';
 import { InsuranceScreen } from './InsuranceScreen';
 import { LeaseScreen } from './LeaseScreen';
 import { PowerScreen } from './PowerScreen';
@@ -12,7 +13,7 @@ import { SetupScreen } from './SetupScreen';
 import { TitleScreen } from './TitleScreen';
 import { resolveWizardConfiguration } from './setupWizardConfig';
 
-type Step = 'title' | 'setup' | 'lease' | 'capital' | 'power' | 'insurance';
+type Step = 'title' | 'setup' | 'lease' | 'forecast' | 'capital' | 'power' | 'insurance';
 
 /** The canonical defaults now live in ../defaultGame.ts (single source shared with the
  * tutorial sim test, qa-fixes-2 finding 2); re-exported here so App.tsx and
@@ -30,7 +31,11 @@ export function SetupWizard() {
   const [scenarioId, setScenarioId] = useState(Object.keys(content.scenarios)[0] ?? 'whale');
   const [difficultyId, setDifficultyId] = useState<DifficultyId>('normal');
   const [setup, setSetup] = useState<Setup>(DEFAULT_SETUP);
-  const [negotiation, setNegotiation] = useState<NegotiationChoices>(DEFAULT_NEGOTIATION);
+  const [negotiation, setNegotiation] = useState<NegotiationChoices>({
+    ...DEFAULT_NEGOTIATION,
+    // Wizard default: call the estimate with the standard 10% cushion.
+    forecast: { costCallPct: 0, contingency: content.tuning.forecast.defaultContingency, monthOffset: 0 },
+  });
   const wizard = resolveWizardConfiguration(content, scenarioId, setup, negotiation, difficultyId);
 
   function start() {
@@ -79,6 +84,19 @@ export function SetupWizard() {
           negotiation={wizard.negotiation}
           onChange={(lease) => setNegotiation((n) => ({ ...n, lease }))}
           onBack={() => setStep('setup')}
+          onNext={() => setStep('forecast')}
+        />
+      );
+    case 'forecast':
+      return (
+        <ForecastScreen
+          content={wizard.content}
+          scenarioId={scenarioId}
+          difficultyId={difficultyId}
+          setup={setup}
+          negotiation={wizard.negotiation}
+          onChange={(forecast) => setNegotiation((n) => ({ ...n, forecast }))}
+          onBack={() => setStep('lease')}
           onNext={() => setStep('capital')}
         />
       );
@@ -91,7 +109,7 @@ export function SetupWizard() {
           setup={setup}
           negotiation={wizard.negotiation}
           onChange={(capital) => setNegotiation((n) => ({ ...n, capital }))}
-          onBack={() => setStep('lease')}
+          onBack={() => setStep('forecast')}
           onNext={() => setStep('power')}
         />
       );

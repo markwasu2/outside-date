@@ -1,5 +1,6 @@
 import type { Content } from '../content/schemas';
-import { penalizedRiskCount } from '../engine/systems/reportCard';
+import { formatDollars } from '../engine/format';
+import { costRatio, monthCallOffset, penalizedRiskCount } from '../engine/systems/reportCard';
 import type { GameState } from '../engine/types';
 
 /** P9.2: one-line "why this grade" reasons for each of the 4.13 report card's five axes,
@@ -7,16 +8,19 @@ import type { GameState } from '../engine/types';
 
 export function timeExplain(state: GameState): string {
   if (state.halls.length === 0) return 'No halls to deliver.';
-  const onTime = state.halls.filter((h) => h.deliveredMonth !== null && h.deliveredMonth <= h.deliveryMonth).length;
+  const offset = monthCallOffset(state);
+  const onTime = state.halls.filter((h) => h.deliveredMonth !== null && h.deliveredMonth <= h.deliveryMonth + offset).length;
   const total = state.halls.length;
-  if (onTime === total) return 'Every hall delivered on or before its deadline.';
-  return `${total - onTime} of ${total} hall${total > 1 ? 's' : ''} delivered late.`;
+  const call = offset === 0 ? 'the lease date' : `your call (${offset > 0 ? `${offset} months after` : `${-offset} months before`} the lease date)`;
+  if (onTime === total) return `Every hall delivered on or before ${call}.`;
+  return `${total - onTime} of ${total} hall${total > 1 ? 's' : ''} missed ${call}.`;
 }
 
 export function costExplain(state: GameState): string {
-  const ratio = state.budgetAtClose > 0 ? state.totalCostToDate / state.budgetAtClose : 0;
-  if (ratio <= 1.0) return 'Total cost came in at or under the budget set at close.';
-  return `Total cost ran ${((ratio - 1) * 100).toFixed(0)}% over the budget set at close.`;
+  const ratio = costRatio(state);
+  const call = formatDollars(state.forecast.cost);
+  if (ratio <= 1.0) return `Total cost came in at or under your call of ${call}.`;
+  return `Total cost ran ${((ratio - 1) * 100).toFixed(0)}% over your call of ${call}.`;
 }
 
 export function riskAllocationExplain(state: GameState, content: Content): string {
