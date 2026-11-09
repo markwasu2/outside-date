@@ -126,6 +126,41 @@ describe('construction: cost incurrence', () => {
   });
 });
 
+
+  it('a labor-shortfall month incurs half the monthly cost for its half progress', () => {
+    let state = freshState();
+    state = applyAction(state, { actionId: 'optionSite' }, content);
+    state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H1' } }, content);
+    state = { ...state, flags: { ...state.flags, laborShortUntilMonth: state.month + 2 } };
+    const hallBefore = state.halls.find((h) => h.id === 'H1')!;
+    const padStage = content.tuning.stages[0]!;
+    const fullMonthly = Math.round((hallBefore.costBudget * padStage.costShare) / padStage.minMonths);
+
+    state = runMonths(state, 1);
+    const hallAfter = state.halls.find((h) => h.id === 'H1')!;
+    expect(hallAfter.stageMonthsDone).toBe(0.5);
+    // Cost tracks progress: a half-progress month costs half, so a shortfall costs schedule,
+    // not double money (stage total still lands on costBudget * costShare).
+    expect(hallAfter.costSpent).toBe(Math.round(fullMonthly * 0.5));
+  });
+
+  it('a stage total cost still equals costBudget * costShare through a labor shortfall', () => {
+    let state = freshState();
+    state = applyAction(state, { actionId: 'optionSite' }, content);
+    state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H1' } }, content);
+    state = { ...state, flags: { ...state.flags, laborShortUntilMonth: state.month + 3 } };
+    const hallBefore = state.halls.find((h) => h.id === 'H1')!;
+    const padStage = content.tuning.stages[0]!;
+    // 3 shortfall months at 0.5 = 1.5 progress; pad needs padStage.minMonths total. Run enough
+    // months to finish regardless, then compare the banked cost for the completed stage.
+    const monthsToFinish = Math.ceil((padStage.minMonths - 1.5) / 1) + 3;
+    state = runMonths(state, monthsToFinish);
+    const hallAfter = state.halls.find((h) => h.id === 'H1')!;
+    expect(hallAfter.stageIndex).toBe(1); // pad complete, moved on
+    expect(hallAfter.costSpent).toBeGreaterThanOrEqual(Math.round(hallBefore.costBudget * padStage.costShare) - monthsToFinish); // rounding slack
+    expect(hallAfter.costSpent).toBeLessThanOrEqual(Math.round(hallBefore.costBudget * padStage.costShare) + monthsToFinish);
+  });
+
 describe('construction: stand-down', () => {
   it('pauses progress and cost for the month it is taken, then resumes automatically', () => {
     let state = freshState();

@@ -151,18 +151,30 @@ function progressHall(state: GameState, content: Content, hall: Hall): { state: 
       : stageDef.minMonths) + extraFitout;
   const monthlyCost = Math.round((hall.costBudget * stageDef.costShare) / minMonths);
 
-  const funded = tryFundAmount(state, monthlyCost);
+  // Derived (P3.7), not a literal flag: true while a `labor_shortfall` event card's effect
+  // (`labor(n)`) has set `laborShortUntilMonth` in the future.
+  const laborShort = typeof state.flags.laborShortUntilMonth === 'number' && state.month < state.flags.laborShortUntilMonth;
+  // Capped at the stage's remaining progress: a month that finishes the stage mid-stride is
+  // charged only for the progress actually needed, never for overshoot past `minMonths`.
+  const increment = Math.min(laborShort ? 0.5 : 1, minMonths - hall.stageMonthsDone);
+
+  // Cost tracks progress actually made, not calendar months: a half-progress month (labor
+  // shortfall) incurs half the monthly cost, so a stage's total still lands on
+  // `costBudget * costShare` and a shortfall costs schedule, not double money. The old code
+  // charged full monthlyCost for 0.5-progress months, draining ~1.5-2x a stage's budgeted
+  // share from cash whenever a shortfall hit mid-stage. Storm rework still costs a full
+  // month: the storm's `-1 stageMonthsDone` undoes already-spent progress, so re-doing it is
+  // charged again, matching 4.11's damage model.
+  const costThisMonth = Math.round(monthlyCost * increment);
+
+  const funded = tryFundAmount(state, costThisMonth);
   if (!funded.funded) {
     // Out of committed funds this month (4.8): the hall pauses, no progress, no cost.
     return { state, hall };
   }
 
-  // Derived (P3.7), not a literal flag: true while a `labor_shortfall` event card's effect
-  // (`labor(n)`) has set `laborShortUntilMonth` in the future.
-  const laborShort = typeof state.flags.laborShortUntilMonth === 'number' && state.month < state.flags.laborShortUntilMonth;
-  const increment = laborShort ? 0.5 : 1;
   const stageMonthsDone = hall.stageMonthsDone + increment;
-  const costSpent = hall.costSpent + monthlyCost;
+  const costSpent = hall.costSpent + costThisMonth;
 
   if (stageMonthsDone < minMonths) {
     return { state: funded.state, hall: { ...hall, stageMonthsDone, costSpent } };
