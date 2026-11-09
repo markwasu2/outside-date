@@ -6,6 +6,7 @@ import type { GoodwillGroup } from '../../engine/types';
 import { totalApCost } from '../../engine/step';
 import { exportSaveToFile, SAVE_VERSION } from '../save';
 import { useStore } from '../store';
+import { CastHover } from './CastHover';
 
 // UI-polish item 2: distinct labels so the four cast groups never read as interchangeable
 // numbers - the old render showed only each label's first letter ("T" for both Town and Tenant),
@@ -134,14 +135,17 @@ export function Hud() {
 
       <div style={{ display: 'flex', gap: '0.75rem' }}>
         {(Object.keys(GOODWILL_LABELS) as GoodwillGroup[]).map((g) => {
-          // Surface the cast behind each goodwill group (names + one-line personalities) in the
-          // existing tooltip; no new UI, just names where the group already renders.
+          // Surface the cast behind each goodwill group in a hover card (portrait + name, role
+          // and one-line personality per member). The card replaces the old `title` tooltip,
+          // which couldn't show portraits; the visible HUD content is unchanged.
           const members = content.cast.cast.filter((m) => m.goodwillGroup === g);
-          const who = members.map((m) => `${m.name} (${m.role})${m.blurb ? ` - ${m.blurb}` : ''}`).join('\n');
+          const summary = `${GOODWILL_LABELS[g]} goodwill: ${draft.goodwill[g]}`;
           return (
-            <span key={g} title={`${GOODWILL_LABELS[g]} goodwill: ${draft.goodwill[g]}${who ? `\n${who}` : ''}`}>
-              {goodwillFace(draft.goodwill[g])} {GOODWILL_LABELS[g]}: {draft.goodwill[g]}
-            </span>
+            <CastHover key={g} members={members} header={summary} placement="below">
+              <span aria-label={summary}>
+                {goodwillFace(draft.goodwill[g])} {GOODWILL_LABELS[g]}: {draft.goodwill[g]}
+              </span>
+            </CastHover>
           );
         })}
       </div>
