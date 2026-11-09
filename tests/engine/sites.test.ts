@@ -59,16 +59,16 @@ describe('siteTuningOverride', () => {
   it("expresses the site's study months and interim grid in the tuningOverrides shape", () => {
     const quarry = resolveSite(content, 'whale', 'quarry-ridge');
     const override = siteTuningOverride(quarry);
-    expect(override.power?.studyMonthsMin).toBe(6);
-    expect(override.power?.studyMonthsMax).toBe(12);
+    expect(override.power?.studyMonthsMin).toBe(9);
+    expect(override.power?.studyMonthsMax).toBe(15);
     expect(override.power?.interimGridMW).toBe(64);
   });
 
   it('resolveContent merges the site last, so ticks read site values', () => {
     const state = createGame(content, 'whale', whaleOn('quarry-ridge'), negotiation, 7);
     const resolved = resolveContent(state, content);
-    expect(resolved.tuning.power.studyMonthsMin).toBe(6);
-    expect(resolved.tuning.power.studyMonthsMax).toBe(12);
+    expect(resolved.tuning.power.studyMonthsMin).toBe(9);
+    expect(resolved.tuning.power.studyMonthsMax).toBe(15);
     const farmland = createGame(content, 'whale', whaleOn('farmland'), negotiation, 7);
     const farmlandResolved = resolveContent(farmland, content);
     expect(farmlandResolved.tuning.power.studyMonthsMax).toBe(24);
@@ -84,7 +84,7 @@ describe('createGame reads the site end-to-end', () => {
   it('prices land from the site, not the tuning union', () => {
     const quarry = createGame(content, 'whale', whaleOn('quarry-ridge'), negotiation, 7);
     const mega = createGame(content, 'whale', whaleOn('megasite'), negotiation, 7);
-    expect(mega.budgetAtClose - quarry.budgetAtClose).toBe(20_000_000);
+    expect(mega.budgetAtClose - quarry.budgetAtClose).toBe(14_000_000);
   });
 
   it('adds the site permits to permitsRequired (farmland adds wetlands; quarry adds none)', () => {
@@ -98,7 +98,7 @@ describe('createGame reads the site end-to-end', () => {
     const farm = createGame(content, 'whale', whaleOn('farmland'), negotiation, 7);
     expect(farm.goodwill.town).toBe(56);
     const quarry = createGame(content, 'whale', whaleOn('quarry-ridge'), negotiation, 7);
-    expect(quarry.goodwill.town).toBe(45);
+    expect(quarry.goodwill.town).toBe(42);
   });
 
   it('sets the interim grid from the site', () => {
@@ -112,14 +112,14 @@ describe('createGame reads the site end-to-end', () => {
 describe('the site incentive effect', () => {
   it('cashGrant pays cash at close and lands as a closing-table source line', () => {
     const mega = createGame(content, 'whale', whaleOn('megasite'), negotiation, 7);
-    expect(mega.cash).toBe(185_000_000 + 8_000_000);
-    expect(mega.flags.siteIncentiveCash).toBe(8_000_000);
+    expect(mega.cash).toBe(185_000_000 + 12_000_000);
+    expect(mega.flags.siteIncentiveCash).toBe(12_000_000);
     const table = buildCloseTable(mega, content, 185_000_000);
     const line = table.sources.find((l) => l.label.startsWith('Site incentive'));
-    expect(line?.amount).toBe(8_000_000);
+    expect(line?.amount).toBe(12_000_000);
     expect(table.sourcesTotal).toBe(table.usesTotal);
     const wc = table.uses.find((l) => l.label === 'Working capital');
-    expect(wc?.amount).toBe(185_000_000 + 8_000_000);
+    expect(wc?.amount).toBe(185_000_000 + 12_000_000);
   });
 
   it('permitFastTrack starts the named permit granted', () => {
@@ -153,7 +153,7 @@ describe('construction reads the site', () => {
     const optioned = applyAction(quarry, { actionId: 'optionSite' }, content);
     const equityDelta = optioned.equity.calledTotal - quarry.equity.calledTotal;
     const cashDelta = quarry.cash - optioned.cash;
-    expect(equityDelta + cashDelta).toBe(30_000_000);
+    expect(equityDelta + cashDelta).toBe(36_000_000);
   });
 });
 

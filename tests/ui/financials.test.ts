@@ -88,7 +88,7 @@ describe('financials: sources and uses at close (D1)', () => {
     expect(line('Liquid-ready fitout')).toBe(0); // air tier
     expect(line('Working capital')).toBe(state.equity.calledTotal + siteGrant(state));
     // Phase 4: the megasite's shovel-ready grant shows as its own source line.
-    expect(su.sources.find((l) => l.label.startsWith('Site incentive'))?.amount).toBe(8_000_000);
+    expect(su.sources.find((l) => l.label.startsWith('Site incentive'))?.amount).toBe(12_000_000);
   });
 
   it('excludes the transformer for skipTransformerOrder scenarios (tutorial), on resolved tuning', () => {
@@ -110,7 +110,7 @@ describe('financials: snapshot builder (D1)', () => {
     expect(snap.sourcesUses).not.toBeNull();
     expect(snap.dscr).toBeNull();
     expect(snap.forwardNoi).toBe(0);
-    expect(snap.cash).toBe(185_000_000 + 8_000_000); // working capital + the megasite's $8M grant
+    expect(snap.cash).toBe(185_000_000 + 12_000_000); // working capital + the megasite's $12M grant
     expect(snap.seniorDrawn).toBe(0);
     expect(snap.drivers.reduce((s, d) => s + d.amount, 0)).toBe(snap.netMonthlyBurn);
   });
