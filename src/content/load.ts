@@ -10,6 +10,7 @@ import castJson from '../../content/cast.json';
 import millbrookRelayJson from '../../content/scenarios/millbrook-relay.json';
 import whaleJson from '../../content/scenarios/whale.json';
 import tutorialEdge5Json from '../../content/scenarios/tutorial-edge5.json';
+import sitesJson from '../../content/sites.json';
 
 import {
   TuningSchema,
@@ -20,6 +21,7 @@ import {
   CodexFileSchema,
   CastFileSchema,
   ScenarioSchema,
+  SitesFileSchema,
   ContentSchema,
   type Content,
   type Tuning,
@@ -183,6 +185,33 @@ export function loadContent(): Content {
   );
   const scenarios = { [whale.id]: whale, [tutorialEdge5.id]: tutorialEdge5, [millbrookRelay.id]: millbrookRelay };
 
-  const bundle = { tuning, actions, events, risks, glossary, codex, cast, scenarios };
+  // Phase 4 (pillar A): three sites per scenario, ids unique, and each scenario must be able
+  // to resolve the legacy 'megasite'/'farmland' union members (by literal id or `replaces`) so
+  // v3 saves, UI defaults and older callers keep working.
+  const sites = parseOrThrow(SitesFileSchema, sitesJson, 'content/sites.json');
+  for (const scenarioId of Object.keys(scenarios)) {
+    const list = sites[scenarioId];
+    if (!list) throw new Error(`Invalid content in content/sites.json: no sites for scenario "${scenarioId}"`);
+    const ids = list.map((s) => s.id);
+    if (new Set(ids).size !== ids.length) {
+      throw new Error(`Invalid content in content/sites.json: duplicate site id in "${scenarioId}"`);
+    }
+    for (const legacyId of ['megasite', 'farmland'] as const) {
+      if (!list.some((s) => s.id === legacyId || s.replaces === legacyId)) {
+        throw new Error(
+          `Invalid content in content/sites.json: scenario "${scenarioId}" has no site resolving the legacy "${legacyId}" choice`,
+        );
+      }
+    }
+    for (const site of list) {
+      if (site.studyMonthsMin > site.studyMonthsMax) {
+        throw new Error(
+          `Invalid content in content/sites.json: site "${site.id}" has studyMonthsMin > studyMonthsMax`,
+        );
+      }
+    }
+  }
+
+  const bundle = { tuning, actions, events, risks, glossary, codex, cast, scenarios, sites };
   return parseOrThrow(ContentSchema, bundle, 'content bundle (aggregate)');
 }

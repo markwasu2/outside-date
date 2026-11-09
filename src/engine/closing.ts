@@ -1,4 +1,5 @@
 import type { Content } from '../content/schemas';
+import { resolveSite } from '../content/sites';
 import type { ClosingLine, ClosingTable, GameState } from './types';
 
 /**
@@ -20,7 +21,10 @@ function table(month: number, label: string, sources: ClosingLine[], uses: Closi
 /** The table at close: uses come from the cost basis, sources from the commitments the lenders sized. */
 export function buildCloseTable(state: GameState, content: Content, workingCapital: number): ClosingTable {
   const { tuning } = content;
-  const land = tuning.land[state.setup.site];
+  // Phase 4 (pillar A): the land line and the site incentive both come from the chosen site.
+  const site = resolveSite(content, state.scenarioId, state.setup.site, tuning);
+  const land = site.landCost;
+  const incentiveCash = typeof state.flags.siteIncentiveCash === 'number' ? state.flags.siteIncentiveCash : 0;
   const halls = state.halls.reduce((sum, h) => sum + h.costBudget, 0);
   const cooling = tuning.cooling[state.setup.cooling].capex;
   const powerEquip =
@@ -43,12 +47,13 @@ export function buildCloseTable(state: GameState, content: Content, workingCapit
     { label: 'Power equipment', amount: powerEquip },
     { label: 'Liquid-ready fitout', amount: liquid },
     { label: state.forecast.contingency > 0 ? 'Contingency and forecast cushion' : 'Forecast adjustment', amount: sized - basis },
-    { label: 'Working capital', amount: workingCapital },
+    { label: 'Working capital', amount: workingCapital + incentiveCash },
   ];
   const sources: ClosingLine[] = [
     { label: 'Senior loan commitment', amount: state.debt.seniorCommitment },
     { label: 'Mezzanine commitment', amount: state.debt.mezzCommitment },
     { label: 'Equity committed', amount: state.equity.committedTotal },
+    ...(incentiveCash > 0 ? [{ label: `Site incentive (${site.name})`, amount: incentiveCash }] : []),
   ];
   return table(0, 'At close', sources, uses);
 }

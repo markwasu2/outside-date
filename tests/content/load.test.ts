@@ -17,6 +17,7 @@ import risksJson from '../../content/risks.json';
 import glossaryJson from '../../content/glossary.json';
 import codexJson from '../../content/codex.json';
 import castJson from '../../content/cast.json';
+import sitesJson from '../../content/sites.json';
 
 const REAL_WORLD_NAMES = ['Meta', 'Entergy', 'Louisiana', 'Hyperion', 'NVIDIA', 'CoreWeave'];
 
@@ -42,6 +43,45 @@ describe('loadContent', () => {
     expect(content.cast.cast.length).toBe(10);
     expect(content.cast.intervenors.length).toBe(4);
     expect(Object.keys(content.scenarios).sort()).toEqual(['millbrook-relay', 'tutorial-edge5', 'whale']);
+  });
+
+  it('loads content/sites.json: three sites per scenario with every field from the design doc (Phase 4)', () => {
+    const content = loadContent();
+    for (const scenarioId of Object.keys(content.scenarios)) {
+      const sites = content.sites[scenarioId];
+      if (!sites) throw new Error(`no sites for ${scenarioId}`);
+      expect(sites, scenarioId).toHaveLength(3);
+      for (const site of sites) {
+        expect(site.landCost).toBeGreaterThan(0);
+        expect(site.extraPadMonths).toBeGreaterThanOrEqual(0);
+        expect(site.studyMonthsMin).toBeLessThanOrEqual(site.studyMonthsMax);
+        expect(site.interimGridMW).toBeGreaterThan(0);
+        expect(site.incentive.label.length).toBeGreaterThan(0);
+        if (site.incentive.kind === 'cashGrant') expect(site.incentive.amount).toBeGreaterThan(0);
+        expect(site.mapTheme.poles).toBeGreaterThanOrEqual(0);
+        expect(site.summary.length).toBeGreaterThan(0);
+        expect(site.name.length).toBeGreaterThan(0);
+      }
+      // Legacy two-value union members must resolve for v3 saves and UI defaults.
+      for (const legacyId of ['megasite', 'farmland'] as const) {
+        expect(
+          sites.some((s) => s.id === legacyId || s.replaces === legacyId),
+          `${scenarioId} must resolve legacy "${legacyId}"`,
+        ).toBe(true);
+      }
+      // Stardew test support: the three themes must not all be identical.
+      const themes = sites.map((s) => JSON.stringify(s.mapTheme));
+      expect(new Set(themes).size, scenarioId).toBe(3);
+    }
+  });
+
+  it('keeps real-world names and em dashes out of content/sites.json too', () => {
+    for (const str of allStrings(sitesJson)) {
+      for (const forbidden of REAL_WORLD_NAMES) {
+        expect(str.toLowerCase().includes(forbidden.toLowerCase()), `sites.json: "${str}"`).toBe(false);
+      }
+      expect(str.includes('\u2014'), `sites.json: "${str}"`).toBe(false);
+    }
   });
 
   it('fails with a readable message on a deliberately broken fixture', () => {

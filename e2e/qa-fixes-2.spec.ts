@@ -16,6 +16,13 @@ async function startTutorialOnLandTab(page: Page) {
 test('finding #1: the tutorial fundExtensions trap is disabled with a runway reason', async ({ page }) => {
   await startTutorialOnLandTab(page);
 
+  // Phase 4: the tutorial's edge5-campus site pays a $1M grant at close, and at $9M the
+  // extensions clear the runway check. Pin cash back to the pre-grant $8M (same pin as
+  // tests/ui/checkAction.test.ts) so this finding's trap is exercised, not the grant.
+  await page.evaluate(() => {
+    (window as unknown as { __debugSetCash: (cash: number) => void }).__debugSetCash(8_000_000);
+  });
+
   const fundRow = page.getByTestId('action-row-button').filter({ hasText: 'Fund road and school extensions' });
   await expect(fundRow).toBeDisabled();
   await expect(fundRow).toContainText('runway');

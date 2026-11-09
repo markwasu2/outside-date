@@ -1,4 +1,5 @@
 import type { Content } from '../../content/schemas';
+import { resolveSite } from '../../content/sites';
 import type { GameState, Hall, PermitId } from '../types';
 import { STAGES } from '../types';
 import { formatDollars } from '../format';
@@ -80,12 +81,17 @@ function permitGranted(state: GameState, id: PermitId): boolean {
   return state.permits[id].status === 'granted';
 }
 
-function stagePrereqsMet(state: GameState, hall: Hall, stageId: (typeof STAGES)[number]): boolean {
+function stagePrereqsMet(state: GameState, content: Content, hall: Hall, stageId: (typeof STAGES)[number]): boolean {
   switch (stageId) {
-    case 'pad':
+    case 'pad': {
       if (!isSiteOptioned(state)) return false;
-      if (state.setup.site === 'farmland' && state.permits.wetlands.status !== 'granted') return false;
+      // Phase 4 (pillar A): the site's own extra permits (e.g. wetlands on farmland) gate the pad.
+      const site = resolveSite(content, state.scenarioId, state.setup.site, content.tuning);
+      for (const permitId of site.permits) {
+        if (state.permits[permitId].status !== 'granted') return false;
+      }
       return true;
+    }
     case 'steel':
       return permitGranted(state, 'building');
     case 'shell':
@@ -146,9 +152,10 @@ function progressHall(state: GameState, content: Content, hall: Hall): { state: 
     stageId === 'fitout' && typeof state.flags[`extraFitoutMonths:${hall.id}`] === 'number'
       ? (state.flags[`extraFitoutMonths:${hall.id}`] as number)
       : 0;
+  // Phase 4 (pillar A): extra pad months come from the chosen site, not a hardcoded farmland rule.
   const minMonths =
-    (stageId === 'pad' && state.setup.site === 'farmland'
-      ? stageDef.minMonths + content.tuning.land.farmlandExtraPadMonths
+    (stageId === 'pad'
+      ? stageDef.minMonths + resolveSite(content, state.scenarioId, state.setup.site, content.tuning).extraPadMonths
       : stageDef.minMonths) + extraFitout;
   const monthlyCost = Math.round((hall.costBudget * stageDef.costShare) / minMonths);
 
@@ -253,7 +260,7 @@ export function optionSite(
   content: Content,
 ): GameState {
   if (isSiteOptioned(state)) throw new Error('The site is already optioned');
-  const cost = content.tuning.land[state.setup.site];
+  const cost = resolveSite(content, state.scenarioId, state.setup.site, content.tuning).landCost;
   const funded = tryFundAmount(state, cost);
   if (!funded.funded) throw new Error('Insufficient funding to option the site');
   // Engine-audit (2026-11-08, playtest finding #8): the fee is real and flows through the
@@ -282,7 +289,7 @@ export function optionSite(
 export function advanceHall(
   state: GameState,
   params: Record<string, string | number> | undefined,
-  _content: Content,
+  content: Content,
 ): GameState {
   const hallId = requireHallId(params);
   const hall = findHall(state, hallId);
@@ -293,7 +300,7 @@ export function advanceHall(
   const targetStageIndex = hall.stageIndex === -1 ? 0 : hall.stageIndex;
   const stageId = STAGES[targetStageIndex];
   if (!stageId) throw new Error(`Hall ${hallId} has no further stages`);
-  if (!stagePrereqsMet(state, hall, stageId)) {
+  if (!stagePrereqsMet(state, content, hall, stageId)) {
     throw new Error(`Hall ${hallId} cannot start stage "${stageId}": prerequisites not met`);
   }
   return replaceHall(state, hallId, { ...hall, stageIndex: targetStageIndex, stageActive: true, stageMonthsDone: 0 });

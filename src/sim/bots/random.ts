@@ -8,6 +8,7 @@ import {
   delaySwapCandidates,
   fillAp,
   fixInspectionCandidates,
+  pickRandomSite,
   readyLiquidCandidates,
   requiredPermitCandidates,
   unsettledIntervenorCandidates,
@@ -64,4 +65,4 @@ function chooseEvent(_state: GameState, pending: PendingEvent, rng: BotRng): str
   return rng.pick(pending.choices).id;
 }
 
-export const randomBot: Bot = { id: 'random', setup, negotiation, chooseActions, chooseEvent };
+export const randomBot: Bot = { id: 'random', setup, negotiation, pickSite: (content, scenarioId, rng) => pickRandomSite(content, scenarioId, rng), chooseActions, chooseEvent };

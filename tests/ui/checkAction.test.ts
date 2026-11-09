@@ -63,8 +63,9 @@ describe('checkAction: zero-AP action dedup (item 1)', () => {
 // cash and leaves under one month of runway.
 describe('checkAction: cash-runway guard (qa-fixes-2 finding #1)', () => {
   it('rejects the tutorial fundExtensions trap at exactly $8.0M cash', () => {
-    const tutorial = createGame(content, 'tutorial-edge5', setup, negotiation, 1);
-    expect(tutorial.cash).toBe(8_000_000);
+    // Phase 4: the campus site's $1.0M county grant lifts the tutorial to $9.0M at close, so
+    // the trap's exact cash level is pinned by hand - the guard math is what is under test.
+    const tutorial = { ...createGame(content, 'tutorial-edge5', setup, negotiation, 1), cash: 8_000_000 };
     const result = checkAction(tutorial, content, [], { actionId: 'fundExtensions' });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.reason).toContain('runway');

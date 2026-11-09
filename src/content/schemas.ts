@@ -431,7 +431,7 @@ export const DifficultyPresetSchema = z.object({
   flags: z.record(z.string(), z.union([z.boolean(), z.number()])).optional(),
   /** Added to the default goodwill of 50 for that group at game start. */
   goodwillOverrides: z.record(GoodwillGroupSchema, z.number()).optional(),
-  forcedSetup: z.object({ site: z.enum(['megasite', 'farmland']).optional() }).optional(),
+  forcedSetup: z.object({ site: z.string().optional() }).optional(),
   /** Multiplies a named event card's base `odds`. */
   eventOddsMultipliers: z.record(z.string(), z.number()).optional(),
 });
@@ -476,6 +476,56 @@ export const ScenarioSchema = z.object({
 export type Scenario = z.infer<typeof ScenarioSchema>;
 
 // ---------------------------------------------------------------------------
+// Sites (Phase 4, pillar A: Choose Your Ground)
+// ---------------------------------------------------------------------------
+
+export const PermitIdSchema = z.enum(['air', 'water', 'wetlands', 'building', 'docketAmendment']);
+
+/** The one kicker each site carries. `cashGrant` pays cash at close; `permitFastTrack` starts
+ * the named permit already granted. */
+export const SiteIncentiveSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('cashGrant'), amount: z.number().int().nonnegative(), label: z.string() }),
+  z.object({ kind: z.literal('permitFastTrack'), permitId: PermitIdSchema, label: z.string() }),
+]);
+export type SiteIncentive = z.infer<typeof SiteIncentiveSchema>;
+
+/** How the site repaints the board (Phase 4 Stardew test): terrain color, pond or no pond in
+ * the wetland slot, and the queue of transmission poles at the road. SVG/CSS only, no assets. */
+export const SiteMapThemeSchema = z.object({
+  ground: z.string(),
+  pond: z.boolean(),
+  poles: z.number().int().nonnegative(),
+});
+export type SiteMapTheme = z.infer<typeof SiteMapThemeSchema>;
+
+export const SiteDefSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  /** The tradeoff in plain words, shown on the wizard's site card. */
+  summary: z.string(),
+  landCost: z.number().int().nonnegative(),
+  extraPadMonths: z.number().int().nonnegative(),
+  /** Extra permits this site requires (added to the scenario's permitsRequired; they gate the pad stage). */
+  permits: z.array(PermitIdSchema),
+  studyMonthsMin: z.number().int().positive(),
+  studyMonthsMax: z.number().int().positive(),
+  interimGridMW: z.number(),
+  incentive: SiteIncentiveSchema,
+  /** Starting-goodwill deltas from the default of 50. */
+  goodwill: z.record(GoodwillGroupSchema, z.number()).default({}),
+  mapTheme: SiteMapThemeSchema,
+  /** Anything else the site needs to override; merged last, after scenario/difficulty overrides. */
+  tuningOverrides: TuningOverrideSchema.optional(),
+  /** The legacy two-value site union member this site replaces, for v3 save migration and for
+   * callers (older tests, UI defaults) that still pass 'megasite'/'farmland'. */
+  replaces: z.enum(['megasite', 'farmland']).optional(),
+});
+export type SiteDef = z.infer<typeof SiteDefSchema>;
+
+/** Three sites per scenario (Phase 4). */
+export const SitesFileSchema = z.record(z.string(), z.array(SiteDefSchema).length(3));
+
+// ---------------------------------------------------------------------------
 // Aggregate content bundle
 // ---------------------------------------------------------------------------
 
@@ -488,5 +538,6 @@ export const ContentSchema = z.object({
   codex: CodexFileSchema,
   cast: CastFileSchema,
   scenarios: z.record(z.string(), ScenarioSchema),
+  sites: z.record(z.string(), z.array(SiteDefSchema)),
 });
 export type Content = z.infer<typeof ContentSchema>;

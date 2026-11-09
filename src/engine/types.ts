@@ -190,7 +190,10 @@ export interface Insurance {
 }
 
 export interface Setup {
-  site: 'megasite' | 'farmland';
+  /** Phase 4 (pillar A): a site id from content/sites.json (three per scenario). The legacy
+   * 'megasite'/'farmland' union members still resolve via each site's `replaces` field
+   * (src/content/sites.ts `resolveSite`), so v3 saves and older callers keep working. */
+  site: string;
   hallTier: HallTier;
   cooling: CoolingChoice;
   gc: GcContract;

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 
 import { formatMonth } from '../../engine/format';
+import { resolveContent } from '../../engine/resolve';
 import { hallGrossRent } from '../../engine/selectors';
+import { resolveSite } from '../../content/sites';
 import { STAGES } from '../../engine/types';
 import type { PlannedAction } from '../../engine/types';
 import { STAGE_ART, TILE_ART, type TileArt } from '../art';
@@ -94,6 +96,10 @@ export function MapGrid() {
 
   // D4/D9: month-over-month deltas between the last two committed states.
   const deltas = monthDeltas(prevState, state, content);
+  // Phase 4 (pillar A, Stardew test): the chosen site repaints the board - terrain color, pond
+  // or no pond in the wetland slot, and the queue of transmission poles at the road.
+  const resolvedContent = resolveContent(state, content);
+  const siteTheme = resolveSite(resolvedContent, state.scenarioId, state.setup.site, resolvedContent.tuning).mapTheme;
   const stageMin = stageMinMonths(state, content);
   const hallIds = draft.halls.map((h) => h.id);
   const layout = hallAreaLayout(draft.halls.length);
@@ -141,6 +147,8 @@ export function MapGrid() {
   return (
     <div
       ref={containerRef}
+      data-testid="map-root"
+      data-ground={siteTheme.ground}
       style={{
         position: 'relative',
         display: 'grid',
@@ -152,11 +160,21 @@ export function MapGrid() {
         boxSizing: 'border-box',
         fontFamily: 'sans-serif',
         fontSize: '0.75rem',
+        background: siteTheme.ground,
       }}
     >
-      {/* Road: no popover (D1). */}
+      {/* Road: no popover (D1). Phase 4: the site's transmission poles queue at the road. */}
       <div style={{ gridColumn: '1 / 13', gridRow: '1 / 2', background: TILE_ART.road.bg, ...cellStyle }}>
-        {TILE_ART.road.icon} {TILE_ART.road.label}
+        <span>
+          {TILE_ART.road.icon} {TILE_ART.road.label}
+        </span>
+        {siteTheme.poles > 0 && (
+          <span data-testid="road-poles" title={`${siteTheme.poles} transmission poles at the road`} style={{ marginLeft: 6 }}>
+            {Array.from({ length: siteTheme.poles }, (_, i) => (
+              <span key={i}>{'\u{1F5FC}'}</span>
+            ))}
+          </span>
+        )}
       </div>
 
       {/* Site office (D1: air/building permits, docket, discovery, testimony, intervenors, cast). */}
@@ -180,24 +198,27 @@ export function MapGrid() {
         {objectHasQueuedAction('siteOffice', plan, hallIds) && <QueuedGhost />}
       </div>
 
-      {/* Pond (D1: water permit, plus wetlands on farmland). */}
+      {/* Wetland slot (D1: water permit, plus the site's extra permits). Phase 4: the site's
+          theme decides whether this is a pond or a dry low field - same slot, same popover. */}
       <div
         {...selectableCellProps(boardPopover === 'pond', () => openObject('pond', null))}
         ref={(el) => {
           if (el) cellRefs.current.set('pond', el);
         }}
+        data-testid="map-pond-slot"
+        data-pond={siteTheme.pond ? 'true' : 'false'}
         style={{
           gridColumn: '1 / 2',
           gridRow: '4 / 8',
-          background: TILE_ART.pond.bg,
+          background: siteTheme.pond ? TILE_ART.pond.bg : '#c9b458',
           border: boardPopover === 'pond' ? '2px solid #000' : '1px solid #999',
           cursor: 'pointer',
           position: 'relative',
           ...cellStyle,
         }}
-        title="Pond"
+        title={siteTheme.pond ? 'Pond' : 'Low field'}
       >
-        {TILE_ART.pond.icon} {TILE_ART.pond.label}
+        {siteTheme.pond ? `${TILE_ART.pond.icon} ${TILE_ART.pond.label}` : '\u{1F33E} Low field'}
         {objectHasQueuedAction('pond', plan, hallIds) && <QueuedGhost />}
       </div>
 

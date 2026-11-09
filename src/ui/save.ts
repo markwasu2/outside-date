@@ -1,12 +1,15 @@
 import { emptyCapital, type DifficultyId, type NegotiationChoices } from '../engine/init';
+import { migrateSiteId } from '../content/sites';
 import type { GameState } from '../engine/types';
 import type { FinancialSnapshot } from './financials';
 
 /** P10.1: bump this whenever `SaveFile`'s shape changes incompatibly. v2 (Phase 2, D1) adds
  * `financialSnapshots`; v1 saves migrate by starting an empty series (the drawer then records
  * from the next committed month on). v3 (Phase 3) adds the forecast call, capital levers, claims,
- * the amended closing table and bridge-loan fields to GameState; v2 saves are backfilled. */
-export const SAVE_VERSION = 3;
+ * the amended closing table and bridge-loan fields to GameState; v2 saves are backfilled.
+ * v4 (Phase 4, pillar A): `Setup.site` becomes a site id string from content/sites.json; v3
+ * saves' two-value union members map to each scenario's replacement site. */
+export const SAVE_VERSION = 4;
 const SAVE_KEY = 'outside-date-save';
 
 export interface SaveFile {
@@ -25,11 +28,12 @@ export interface SaveFile {
 export function migrateSave(parsed: unknown): SaveFile | null {
   if (!parsed || typeof parsed !== 'object') return null;
   const save = parsed as Partial<SaveFile> & { version?: number };
-  if (save.version === 3) return save as SaveFile;
-  if (save.version === 2) return upgradeV2(save as SaveFile);
+  if (save.version === 4) return save as SaveFile;
+  if (save.version === 3) return upgradeV3(save as SaveFile);
+  if (save.version === 2) return upgradeV3(upgradeV2(save as SaveFile));
   if (save.version === 1) {
     const v2 = { ...(save as Omit<SaveFile, 'version' | 'financialSnapshots'>), version: 2, financialSnapshots: [] };
-    return upgradeV2(v2 as SaveFile);
+    return upgradeV3(upgradeV2(v2 as SaveFile));
   }
   return null;
 }
@@ -52,6 +56,21 @@ function upgradeV2(save: SaveFile): SaveFile {
     takeout: s.takeout ? { ...s.takeout, repayments: s.takeout.repayments ?? [] } : null,
   };
   return { ...save, version: 3, state };
+}
+
+/** v3 -> v4: the two-value site union member becomes the scenario's replacement site id
+ * (content/sites.json `replaces`); a state already on a current id is left alone. The legacy
+ * `farmlandExtraPadMonths` flag is dead weight under the site's own extraPadMonths and drops. */
+function upgradeV3(save: SaveFile): SaveFile {
+  const s = save.state;
+  const { farmlandExtraPadMonths: _dropped, ...flags } = s.flags;
+  void _dropped;
+  const state: GameState = {
+    ...s,
+    flags,
+    setup: { ...s.setup, site: migrateSiteId(s.scenarioId, s.setup.site) },
+  };
+  return { ...save, version: 4, state };
 }
 
 /** Autosaves after every committed month (store.ts calls this from `endMonth`/`fastForward`/
