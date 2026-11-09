@@ -112,7 +112,7 @@ test('a full tutorial-scenario run on a non-default site completes to an outcome
   const dialog = page.getByRole('dialog');
   const ratingHeading = page.getByRole('heading', { name: 'Rating the campus' });
   const reportCardHeading = page.getByRole('heading', { name: 'Report card' });
-  const gameOverHeading = page.getByRole('heading', { name: /^(You win|You lose|Game over)/ });
+  const gameOverHeading = page.getByRole('heading', { name: /^(You win|You lose|You scraped by|Game over)/ });
 
   for (let i = 0; i < 500; i += 1) {
     if ((await reportCardHeading.count()) > 0 || (await gameOverHeading.count()) > 0) break;
