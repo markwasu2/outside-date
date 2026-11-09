@@ -90,6 +90,11 @@ export function StatExplainer({ id, autoOpen, children }: { id: string; autoOpen
             border: '1px solid #b8860b',
             borderRadius: 8,
             boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+            // The popover is informational only and can hang over unrelated controls (the tab
+            // bar at narrow widths); pointer-events: none lets the click through to the control
+            // beneath, and the document mousedown listener then dismisses the popover. Without
+            // this the popover swallowed taps (smoke.spec.ts tutorial run hung on a covered tab).
+            pointerEvents: 'none',
             padding: '0.6rem 0.7rem',
             fontWeight: 'normal',
             fontSize: '0.78rem',
