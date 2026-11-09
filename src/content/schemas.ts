@@ -55,6 +55,12 @@ export const SpatialTuningSchema = z.object({
   farFeederCost: z.number().int(),
   /** Monthly line losses for a delivered far-pad hall. */
   farLineLossPerMonth: z.number().int(),
+  /** Phase 7 (scarcity pack): extra pad-stage months for a far-pad hall (the schedule teeth -
+   * haul distance costs time, not just money). */
+  farPadExtraMonths: z.number().int(),
+  /** Phase 7 (scarcity pack): crates the laydown yard can hold at once (pending orders plus
+   * arrived units waiting for the substation). New orders need a free slot. */
+  laydownCapacity: z.number().int(),
 });
 export type SpatialTuning = z.infer<typeof SpatialTuningSchema>;
 

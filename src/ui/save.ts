@@ -9,8 +9,10 @@ import type { FinancialSnapshot } from './financials';
  * from the next committed month on). v3 (Phase 3) adds the forecast call, capital levers, claims,
  * the amended closing table and bridge-loan fields to GameState; v2 saves are backfilled.
  * v4 (Phase 4, pillar A): `Setup.site` becomes a site id string from content/sites.json; v3
- * saves' two-value union members map to each scenario's replacement site. */
-export const SAVE_VERSION = 5;
+ * saves' two-value union members map to each scenario's replacement site.
+ * v6 (Phase 7, scarcity pack): `Hall.pad` joins the state; v5 saves' halls default to 'near',
+ * the only pad kind that existed when they were written. */
+export const SAVE_VERSION = 6;
 const SAVE_KEY = 'outside-date-save';
 
 export interface SaveFile {
@@ -29,15 +31,26 @@ export interface SaveFile {
 export function migrateSave(parsed: unknown): SaveFile | null {
   if (!parsed || typeof parsed !== 'object') return null;
   const save = parsed as Partial<SaveFile> & { version?: number };
-  if (save.version === 5) return save as SaveFile;
-  if (save.version === 4) return upgradeV4(save as SaveFile);
-  if (save.version === 3) return upgradeV4(upgradeV3(save as SaveFile));
-  if (save.version === 2) return upgradeV4(upgradeV3(upgradeV2(save as SaveFile)));
+  if (save.version === 6) return save as SaveFile;
+  if (save.version === 5) return upgradeV5(save as SaveFile);
+  if (save.version === 4) return upgradeV5(upgradeV4(save as SaveFile));
+  if (save.version === 3) return upgradeV5(upgradeV4(upgradeV3(save as SaveFile)));
+  if (save.version === 2) return upgradeV5(upgradeV4(upgradeV3(upgradeV2(save as SaveFile))));
   if (save.version === 1) {
     const v2 = { ...(save as Omit<SaveFile, 'version' | 'financialSnapshots'>), version: 2, financialSnapshots: [] };
-    return upgradeV4(upgradeV3(upgradeV2(v2 as SaveFile)));
+    return upgradeV5(upgradeV4(upgradeV3(upgradeV2(v2 as SaveFile))));
   }
   return null;
+}
+
+/** v5 -> v6: halls saved before pad placement existed were all effectively near-pad builds,
+ * so backfill `pad: 'near'` and leave everything else untouched. */
+function upgradeV5(save: SaveFile): SaveFile {
+  const state: GameState = {
+    ...save.state,
+    halls: save.state.halls.map((h) => ({ ...h, pad: h.pad ?? 'near' })),
+  };
+  return { ...save, version: 6, state };
 }
 
 /** v2 -> v3: the forecast defaults to "called it exactly, no contingency" (cost = the budget

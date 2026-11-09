@@ -156,7 +156,10 @@ function progressHall(state: GameState, content: Content, hall: Hall): { state: 
   // Phase 4 (pillar A): extra pad months come from the chosen site, not a hardcoded farmland rule.
   const minMonths =
     (stageId === 'pad'
-      ? stageDef.minMonths + resolveSite(content, state.scenarioId, state.setup.site, content.tuning).extraPadMonths
+      ? stageDef.minMonths +
+        resolveSite(content, state.scenarioId, state.setup.site, content.tuning).extraPadMonths +
+        // Phase 7 (scarcity pack): a far pad's feeder haul takes schedule, not just money.
+        (hall.pad === 'far' ? content.tuning.spatial.farPadExtraMonths : 0)
       : stageDef.minMonths) + extraFitout;
   const monthlyCost = Math.round((hall.costBudget * stageDef.costShare) / minMonths);
 

@@ -207,7 +207,7 @@ function snap1Cash(snaps: { cash: number }[]): number {
   return snaps[1]?.cash ?? 0;
 }
 
-describe('save migration (v1 -> v2 -> v3 -> v4)', () => {
+describe('save migration (v1 -> v2 -> v3 -> v4 -> v5 -> v6)', () => {
   const base = {
     state: fresh('tutorial-edge5'),
     lastNegotiation: negotiation,
@@ -218,14 +218,23 @@ describe('save migration (v1 -> v2 -> v3 -> v4)', () => {
   it('migrates a v1 save by adding an empty snapshot series', () => {
     const migrated = migrateSave({ ...base, version: 1 });
     expect(migrated).not.toBeNull();
-    expect(migrated?.version).toBe(5);
+    expect(migrated?.version).toBe(6);
     expect(migrated?.financialSnapshots).toEqual([]);
     expect(migrated?.dismissedCoachTips).toEqual(['hud']);
   });
 
-  it('passes a v5 save through unchanged', () => {
-    const v5 = { ...base, version: 5, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
-    expect(migrateSave(v5)).toBe(v5);
+  it('passes a v6 save through unchanged', () => {
+    const v6 = { ...base, version: 6, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
+    expect(migrateSave(v6)).toBe(v6);
+  });
+
+  it('migrates a v5 save to v6, defaulting every hall to a near pad (Phase 7)', () => {
+    // A v5 save predates pad placement: strip the field to simulate it.
+    const v5State = { ...base.state, halls: base.state.halls.map((h) => ({ ...h, pad: undefined })) };
+    const v5 = { ...base, state: v5State, version: 5, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
+    const migrated = migrateSave(v5);
+    expect(migrated?.version).toBe(6);
+    expect(migrated?.state.halls.every((h) => h.pad === 'near')).toBe(true);
   });
 
   it('migrates a v4 save to v5, seeding the market indexes and tagging open orders (Phase 5)', () => {
@@ -238,7 +247,7 @@ describe('save migration (v1 -> v2 -> v3 -> v4)', () => {
     };
     const v4 = { ...base, state: v4State, version: 4, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
     const migrated = migrateSave(v4);
-    expect(migrated?.version).toBe(5);
+    expect(migrated?.version).toBe(6);
     expect(migrated?.state.markets).toEqual({ equipmentIndex: 1, laborIndex: 1, contractorIndex: 1 });
     expect(migrated?.state.power.orders[0]?.supplier).toBe('standard');
     // A legacy order's full price is reconstructed from the deposit and the tuner book balance.
@@ -251,7 +260,7 @@ describe('save migration (v1 -> v2 -> v3 -> v4)', () => {
     const legacyState = { ...base.state, setup: { ...base.state.setup, site: 'megasite' } };
     const v3 = { ...base, state: legacyState, version: 3, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
     const migrated = migrateSave(v3);
-    expect(migrated?.version).toBe(5);
+    expect(migrated?.version).toBe(6);
     expect(migrated?.state.setup.site).toBe('edge5-campus');
     // A save already on a current site id keeps it (the whale kept its legacy ids).
     const whaleState = { ...base.state, scenarioId: 'whale', setup: { ...base.state.setup, site: 'farmland' } };
@@ -266,7 +275,7 @@ describe('save migration (v1 -> v2 -> v3 -> v4)', () => {
     delete oldDebt.bridgeDrawn; delete oldDebt.bridgeAccruedPik; delete oldDebt.bridgeRate;
     const v2 = { ...base, state: { ...oldState, debt: oldDebt }, version: 2, financialSnapshots: [] };
     const migrated = migrateSave(v2);
-    expect(migrated?.version).toBe(5);
+    expect(migrated?.version).toBe(6);
     expect(migrated?.state.forecast).toEqual({
       cost: base.state.budgetAtClose,
       month: Math.min(...base.state.halls.map((h) => h.deliveryMonth)),

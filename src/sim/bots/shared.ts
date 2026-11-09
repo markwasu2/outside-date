@@ -184,10 +184,14 @@ export function fixInspectionCandidates(state: GameState): PlannedAction[] {
     .map((h) => ({ actionId: 'fixInspection', params: { hallId: h.id } }));
 }
 
-/** One `advanceHall` candidate per hall that isn't terminated/delivered and has no active stage. */
+/** One `advanceHall` candidate per hall that isn't terminated/delivered and has no active stage.
+ * Phase 7 (scarcity pack): sorted by delivery month ascending, so fillAp tries the
+ * earliest-delivering halls first and the scarce near pads land on the schedule-critical
+ * halls rather than whichever hall id iterates first. */
 export function advanceHallCandidates(state: GameState): PlannedAction[] {
   return state.halls
     .filter((h) => !h.terminated && !h.delivered && !h.stageActive)
+    .sort((a, b) => a.deliveryMonth - b.deliveryMonth)
     .map((h) => ({ actionId: 'advanceHall', params: { hallId: h.id } }));
 }
 
@@ -341,6 +345,13 @@ export function marketCandidates(state: GameState, content: Content, policy: Mar
   const out: PlannedAction[] = [];
   const index = state.markets.equipmentIndex;
   const kinds: Array<'transformer' | 'switchgear'> = state.skipTransformerOrder ? ['switchgear'] : ['transformer', 'switchgear'];
+  // Phase 7 (scarcity pack): spot-buys and second sources are extra crates; never propose
+  // them while the laydown yard is full. (Standard re-orders are probe-and-apply filtered
+  // by the handler's own capacity throw, but an extra order that can never land should not
+  // be proposed at all.) Once the substation is underway its crates are installed and
+  // ordering is over for the game - skip the whole order loop.
+  const yardFree = state.power.orders.length < content.tuning.spatial.laydownCapacity;
+  const orderingOpen = state.power.substationStatus === 'none';
 
   // The schedule anchor for "late": the earliest outside date among undelivered halls.
   const outsideMonths = state.halls
@@ -349,7 +360,7 @@ export function marketCandidates(state: GameState, content: Content, policy: Mar
     .filter((m): m is number => m !== null);
   const firstOutside = outsideMonths.length > 0 ? Math.min(...outsideMonths) : null;
 
-  for (const kind of kinds) {
+  for (const kind of orderingOpen ? kinds : []) {
     const orders = state.power.orders.filter((o) => o.kind === kind);
     const arrived = orders.some((o) => o.arrived);
     if (arrived) continue;
@@ -362,11 +373,16 @@ export function marketCandidates(state: GameState, content: Content, policy: Mar
       // (Re-ordering standard after a lost slot is the archetype's base rule's job: with no
       // pending order of the kind left, its usual order candidate fires again on its own.)
       const late = firstOutside !== null && state.month + standardLead > firstOutside - policy.spotWhenLateWithin;
-      if (late && policy.spotWhenLateWithin < Infinity) out.push({ actionId: 'spotBuy', params: { kind } });
+      if (late && policy.spotWhenLateWithin < Infinity && yardFree) out.push({ actionId: 'spotBuy', params: { kind } });
       continue;
     }
     // Second-source a pending standard slot when the market runs past the archetype's nerve.
-    if (index >= policy.secondSourceIndex && pending.some((o) => o.supplier === 'standard') && !pending.some((o) => o.supplier === 'alt')) {
+    if (
+      yardFree &&
+      index >= policy.secondSourceIndex &&
+      pending.some((o) => o.supplier === 'standard') &&
+      !pending.some((o) => o.supplier === 'alt')
+    ) {
       out.push({ actionId: 'secondSource', params: { kind } });
     }
   }

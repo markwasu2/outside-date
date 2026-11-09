@@ -88,13 +88,26 @@ function resolveSubstation(state: GameState, content: Content): GameState {
     const transformerReady = state.skipTransformerOrder || power.orders.some((o) => o.kind === 'transformer' && o.arrived);
     const switchgearReady = power.orders.some((o) => o.kind === 'switchgear' && o.arrived);
     if (power.studyStatus !== 'done' || !transformerReady || !switchgearReady) return state;
+    // Phase 7 (scarcity pack): arrived units are installed at the substation, which frees
+    // their laydown yard slots for the next long-lead orders.
+    const installed = power.orders.filter((o) => o.arrived).map((o) => o.kind);
+    const orders = power.orders.filter((o) => !o.arrived);
     return {
       ...state,
       power: {
         ...power,
+        orders,
         substationStatus: 'building',
         substationDoneMonth: state.month + content.tuning.power.substationBuildMonths,
       },
+      log: [
+        ...state.log,
+        {
+          month: state.month,
+          kind: 'milestone' as const,
+          text: `Substation build starts: ${installed.join(' and ')} installed, laydown yard slots freed.`,
+        },
+      ],
     };
   }
   if (power.substationStatus === 'building' && power.substationDoneMonth !== null && state.month >= power.substationDoneMonth) {
@@ -231,6 +244,27 @@ function requireOrderKind(params: Record<string, string | number> | undefined): 
   return kind;
 }
 
+/** Phase 7 (scarcity pack): substation installation consumes the arrived crates, so orders
+ * stop making sense once the substation is underway - every ordering path rejects from then
+ * on, for players and for bots probing candidates. */
+function assertSubstationOrdering(state: GameState): void {
+  if (state.power.substationStatus !== 'none') {
+    throw new Error('The substation is already underway: its equipment is installed and no further orders are needed');
+  }
+}
+
+/** Phase 7 (scarcity pack): the laydown yard holds `laydownCapacity` crates at once
+ * (pending orders plus arrived units waiting for the substation). Every new order needs a
+ * free slot; installation at substation-build start frees the slots it consumed. */
+function assertLaydownSlot(state: GameState, content: Content): void {
+  const capacity = content.tuning.spatial.laydownCapacity;
+  if (state.power.orders.length >= capacity) {
+    throw new Error(
+      `Laydown yard is full (${state.power.orders.length}/${capacity}): a crate has to arrive, be installed, or be cancelled first`,
+    );
+  }
+}
+
 export function orderLongLead(
   state: GameState,
   _params: Record<string, string | number> | undefined,
@@ -246,6 +280,8 @@ export function orderLongLead(
   }
   const kind = fixedKind;
   if (state.power.orders.some((o) => o.kind === kind)) throw new Error(`An order for "${kind}" is already placed`);
+  assertSubstationOrdering(state);
+  assertLaydownSlot(state, content);
 
   // Phase 5 (pillar K): price and lead read the equipment demand index. A hot market costs
   // more and takes longer; the quoted price is frozen at order time.
@@ -287,6 +323,8 @@ export function spotBuy(
   const kind = requireOrderKind(params);
   if (state.power.orders.some((o) => o.kind === kind)) throw new Error(`An order for "${kind}" is already placed`);
   if (kind === 'transformer' && state.skipTransformerOrder) throw new Error('This scenario does not need a transformer order');
+  assertSubstationOrdering(state);
+  assertLaydownSlot(state, content);
   const index = state.markets.equipmentIndex;
   const markets = content.tuning.markets;
   const book =
@@ -325,6 +363,8 @@ export function secondSource(
   if (state.power.orders.some((o) => o.kind === kind && o.supplier === 'alt')) {
     throw new Error(`The ${kind} is already second-sourced`);
   }
+  assertSubstationOrdering(state);
+  assertLaydownSlot(state, content);
   const index = state.markets.equipmentIndex;
   const markets = content.tuning.markets;
   let next = state;

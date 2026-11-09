@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
 import { step } from '../../src/engine/step';
+import { applyAction } from '../../src/engine/actions';
 import { advanceHall } from '../../src/engine/systems/construction';
 import { tick as leaseTick } from '../../src/engine/systems/lease';
 import type { GameState, Setup } from '../../src/engine/types';
@@ -85,5 +86,45 @@ describe('pad placement (Phase 6 spike)', () => {
     const state = freshState();
     const after = step(state, [{ actionId: 'advanceHall', params: { hallId: 'H1', pad: 'far' } }], content).state;
     expect(after.halls.find((h) => h.id === 'H1')?.pad).toBe('far');
+  });
+});
+
+describe('scarcity pack (Phase 7)', () => {
+  const padMonthsToFinish = (state: GameState): number => {
+    // Step with no actions until the pad stage completes; progress is 1 month per tick with
+    // the event deck off, so the tick count is the pad stage's effective minMonths.
+    let s = state;
+    const padIndex = 0;
+    for (let m = 0; m < 40; m++) {
+      if (s.halls[0]!.stageIndex > padIndex) return m;
+      s = step(s, [], content).state;
+    }
+    throw new Error('pad stage never finished');
+  };
+
+  it('a far pad adds farPadExtraMonths to the pad stage (the schedule teeth)', () => {
+    const near = padMonthsToFinish(breakGround(freshState(), 'H1', 'near'));
+    const far = padMonthsToFinish(breakGround(freshState(), 'H1', 'far'));
+    expect(far - near).toBe(content.tuning.spatial.farPadExtraMonths);
+    expect(content.tuning.spatial.farPadExtraMonths).toBeGreaterThanOrEqual(1);
+    expect(content.tuning.spatial.farPadExtraMonths).toBeLessThanOrEqual(2);
+  });
+
+  it("farmland's pond leaves a single near pad: the second groundbreak goes far", () => {
+    // The site carries the exclusion as a tuningOverride, so go through applyAction (which
+    // resolves site overrides) rather than calling the handler with raw content.
+    const siteSetup: Setup = { ...setup, site: 'farmland' };
+    let state = createGame(content, 'whale', siteSetup, negotiation, 7);
+    state = {
+      ...state,
+      flags: { ...state.flags, siteOptioned: true },
+      permits: Object.fromEntries(
+        Object.entries(state.permits).map(([id, p]) => [id, { ...p, status: 'granted' as const }]),
+      ) as typeof state.permits,
+    };
+    state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H1', pad: 'near' } }, content);
+    expect(state.halls.find((h) => h.id === 'H1')?.pad).toBe('near');
+    state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H2' } }, content);
+    expect(state.halls.find((h) => h.id === 'H2')?.pad).toBe('far');
   });
 });

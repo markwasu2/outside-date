@@ -108,7 +108,8 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
     // (limited) are free; the far pad trenches a feeder and bleeds line losses. Once a stage
     // is underway the pad is fixed and the generic advance row takes over.
     if (hall.stageIndex === -1 && !hall.stageActive) {
-      const spatial = content.tuning.spatial;
+      // Resolved per site: farmland's pond takes one of the two near pads (Phase 7).
+      const spatial = resolveContent(state, content).tuning.spatial;
       const nearTaken = state.halls.filter((h) => h.stageIndex >= 0 && (h.pad ?? 'near') === 'near').length;
       const nearLeft = Math.max(0, spatial.nearPads - nearTaken);
       rows.push(
@@ -120,7 +121,8 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
           content,
           state,
           'advanceHall',
-          `Break ground on the far pad: ${hall.id} (${formatDollars(spatial.farFeederCost)} feeder + ${formatDollars(spatial.farLineLossPerMonth)}/mo line losses)`,
+          // Phase 7 (scarcity pack): the far pad also adds pad-stage months - say so on the row.
+          `Break ground on the far pad: ${hall.id} (+${spatial.farPadExtraMonths}mo pad, ${formatDollars(spatial.farFeederCost)} feeder + ${formatDollars(spatial.farLineLossPerMonth)}/mo line losses)`,
           { hallId: hall.id, pad: 'far' },
         ),
       );

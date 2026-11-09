@@ -389,6 +389,8 @@
   "spatial": {
     "nearPads": 2,
     "farFeederCost": 250000,
-    "farLineLossPerMonth": 40000
+    "farLineLossPerMonth": 40000,
+    "farPadExtraMonths": 2,
+    "laydownCapacity": 3
   }
 }

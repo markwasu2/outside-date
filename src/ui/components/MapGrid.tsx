@@ -336,6 +336,11 @@ export function MapGrid() {
       >
         <div>
           {TILE_ART.laydownYard.icon} {TILE_ART.laydownYard.label}
+          {/* Phase 7 (scarcity pack): the yard holds a fixed number of crates; show the load. */}
+          <span style={{ color: '#6d4c41', fontSize: '0.65rem' }} data-testid="yard-capacity">
+            {' '}
+            {power.orders.length}/{resolveContent(draft, content).tuning.spatial.laydownCapacity}
+          </span>
         </div>
         {power.orders.length === 0 && <div style={{ color: '#6d4c41', fontSize: '0.65rem' }}>empty</div>}
         {power.orders.map((o) => {
