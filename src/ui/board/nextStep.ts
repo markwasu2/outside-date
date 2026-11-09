@@ -4,6 +4,7 @@ import { resolveContent } from '../../engine/resolve';
 import { leadWithIndex } from '../../engine/systems/markets';
 import type { GameState } from '../../engine/types';
 import { projectedFitoutMonth } from './warnings';
+import { hallBlocker } from './legibility';
 
 /**
  * Phase 1 (D7): the single most useful next move, as a pure function of the committed state and
@@ -170,7 +171,7 @@ export function nextStep(state: GameState, content: Content): NextStep {
 
   // 8. Construction: advance the earliest undelivered hall that is free to start a stage.
   const buildable = state.halls.find(
-    (h) => !h.delivered && !h.terminated && !h.stageActive && !h.pausedThisMonth && !state.flags[`inspectionFail:${h.id}`],
+    (h) => !h.delivered && !h.terminated && !h.stageActive && !h.pausedThisMonth && !state.flags[`inspectionFail:${h.id}`] && !hallBlocker(state, content, h),
   );
   if (buildable) {
     return {
@@ -182,6 +183,26 @@ export function nextStep(state: GameState, content: Content): NextStep {
       actionId: 'advanceHall',
       params: { hallId: buildable.id },
     };
+  }
+
+  // A finished fitout is not an idle crew: RFS cannot start until power is ready.
+  // Explain the actual automatic chain rather than inventing a Build action.
+  const blocked = state.halls.find((h) => !h.delivered && !h.terminated && hallBlocker(state, content, h));
+  if (blocked) {
+    const blocker = hallBlocker(state, content, blocked)!;
+    if (blocker === 'waiting on power hookup') {
+      const pending = power.orders.filter((o) => !o.arrived);
+      const chain = 'The substation builds itself once the study is complete and the gear is installed.';
+      const wait = power.substationStatus === 'building'
+        ? `Substation construction is underway until ${formatMonth(power.substationDoneMonth ?? state.month)}.`
+        : power.substationStatus === 'none' && pending.length
+          ? pending.map((o) => `${o.kind} ${state.month >= o.arrivalMonth ? 'is due now; check Money if its balance cannot be funded' : `arrives ${formatMonth(o.arrivalMonth)}`}`).join('; ') + '.'
+          : power.substationStatus === 'none'
+            ? `Study ${power.studyStatus === 'pending' ? `finishes ${formatMonth(power.studyDoneMonth ?? state.month)}` : 'complete'}; gear installs automatically on the next monthly tick when both orders have arrived.`
+            : 'Substation is complete; the next source of capacity is the power plants. Check their online dates in Power.';
+      return { title: `${blocked.id}: waiting on power hookup`, why: `${wait} ${chain} End the month to advance these clocks.`, objectId: 'substation' };
+    }
+    return { title: `${blocked.id}: ${blocker}`, why: 'This prerequisite blocks its next stage. Resolve it before advancing construction.', objectId: blocker.includes('permit') ? 'siteOffice' : blocked.id };
   }
 
   // 9. Everything is in flight: end the month and let the clocks run.

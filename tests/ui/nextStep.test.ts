@@ -106,3 +106,41 @@ describe('nextStep', () => {
     expect(known.has(step.objectId) || state.halls.some((h) => h.id === step.objectId)).toBe(true);
   });
 });
+
+function powerWaitingState() {
+  const state = freshState();
+  fileAllPermits(state);
+  for (const id of state.permitsRequired) state.permits[id]!.status = 'granted';
+  state.flags.siteOptioned = true;
+  state.power.studyStatus = 'done';
+  state.docket.status = 'approved';
+  state.power.orders = [
+    { kind: 'transformer', orderedMonth: 0, arrivalMonth: 40, deposit: 0, price: 0, arrived: false, supplier: 'standard' },
+    { kind: 'switchgear', orderedMonth: 0, arrivalMonth: 30, deposit: 0, price: 0, arrived: true, supplier: 'standard' },
+  ];
+  for (const h of state.halls) { h.stageIndex = 4; h.stageActive = false; h.energized = false; }
+  return state;
+}
+
+it('never tells a power-blocked RFS hall to advance construction', () => {
+  const step = nextStep(powerWaitingState(), content);
+  expect(step.title).toBe('H1: waiting on power hookup');
+  expect(step.why).toContain('transformer arrives');
+  expect(step.why).toContain('substation builds itself');
+  expect(step.actionId).toBeUndefined();
+});
+it('names automatic substation construction and completion date', () => {
+  const state = powerWaitingState();
+  state.power.substationStatus = 'building'; state.power.substationDoneMonth = 42;
+  const step = nextStep(state, content);
+  expect(step.why).toContain('Substation construction is underway until');
+  expect(step.why).not.toContain('Everything critical');
+});
+it('skips a blocked hall when another hall can really advance', () => {
+  const state = powerWaitingState(); state.halls[1]!.stageIndex = 2;
+  expect(nextStep(state, content).title).toBe('Advance construction on H2');
+});
+it('names the funding check when gear is due but its balance is unpaid', () => {
+  const state = powerWaitingState(); state.month = 40;
+  expect(nextStep(state, content).why).toContain('check Money');
+});
