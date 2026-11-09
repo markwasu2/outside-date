@@ -38,7 +38,11 @@ export function tryFundAmount(state: GameState, amount: number): { state: GameSt
   }
 
   let seniorDrawn = state.debt.seniorDrawn;
-  if (remaining > 0 && state.insurance.buildersRisk && !state.flags.drawFreeze) {
+  // Senior draws are gated on the draw freeze only, not on builder's risk insurance: going
+  // uninsured is a deliberate archetype choice (the greedy setup drops it to save the premium),
+  // and the storm/fire effects already charge full cash damage when uninsured. Gating draws on
+  // the policy made "no insurance" silently defund the whole construction loan instead.
+  if (remaining > 0 && !state.flags.drawFreeze) {
     const availSenior = Math.max(0, state.debt.seniorCommitment - seniorDrawn);
     const useSenior = Math.min(remaining, availSenior);
     seniorDrawn += useSenior;

@@ -1,76 +1,266 @@
 {
-  "campaign": { "maxMonths": 60, "apPerMonth": 3, "startingCash": 300000000, "monthlyBurn": 1000000 },
-  "campus": { "costPerMwIT": 15000000 },
-  "land": { "megasite": 50000000, "farmland": 12000000, "farmlandExtraPadMonths": 4 },
+  "campaign": {
+    "maxMonths": 60,
+    "apPerMonth": 3,
+    "startingCash": 185000000,
+    "monthlyBurn": 2000000,
+    "_comment": "SENSITIVITY: startingCash (working capital) vs monthlyBurn is a knife-edge - at 1000-run sims, 185M/2M lands competent at ~67% win; 175M drops it to ~37%; 150M to 0%. Change either value only with a full 1000-run balance sim (npm run sim) before and after."
+  },
+  "campus": {
+    "costPerMwIT": 15000000
+  },
+  "land": {
+    "megasite": 50000000,
+    "farmland": 12000000,
+    "farmlandExtraPadMonths": 4
+  },
   "stages": [
-    { "id": "pad", "costShare": 0.10, "minMonths": 3 },
-    { "id": "steel", "costShare": 0.25, "minMonths": 6 },
-    { "id": "shell", "costShare": 0.25, "minMonths": 6 },
-    { "id": "fitout", "costShare": 0.30, "minMonths": 7 },
-    { "id": "rfs", "costShare": 0.10, "minMonths": 2 }
+    {
+      "id": "pad",
+      "costShare": 0.1,
+      "minMonths": 3
+    },
+    {
+      "id": "steel",
+      "costShare": 0.25,
+      "minMonths": 6
+    },
+    {
+      "id": "shell",
+      "costShare": 0.25,
+      "minMonths": 6
+    },
+    {
+      "id": "fitout",
+      "costShare": 0.3,
+      "minMonths": 7
+    },
+    {
+      "id": "rfs",
+      "costShare": 0.1,
+      "minMonths": 2
+    }
   ],
   "tiers": {
-    "air": { "costMult": 0.85, "rentMult": 0.80 },
-    "liquid": { "costMult": 1.00, "rentMult": 1.00 },
-    "hybrid": { "costMult": 0.95, "rentMult": 1.00 }
+    "air": {
+      "costMult": 0.85,
+      "rentMult": 0.8
+    },
+    "liquid": {
+      "costMult": 1.0,
+      "rentMult": 1.0
+    },
+    "hybrid": {
+      "costMult": 0.95,
+      "rentMult": 1.0
+    }
   },
-  "chips": { "liquidReadyCost": 6000000, "hybridLiquidReadyCost": 9000000 },
+  "chips": {
+    "liquidReadyCost": 6000000,
+    "hybridLiquidReadyCost": 9000000
+  },
   "cooling": {
-    "evaporative": { "pue": 1.20, "capex": 0, "droughtTown": -10, "droughtCommission": -5 },
-    "dry": { "pue": 1.35, "capex": 0, "droughtTown": 0, "droughtCommission": 0 },
-    "hybrid": { "pue": 1.25, "capex": 20000000, "droughtTown": -2, "droughtCommission": 0 }
+    "evaporative": {
+      "pue": 1.2,
+      "capex": 0,
+      "droughtTown": -10,
+      "droughtCommission": -5
+    },
+    "dry": {
+      "pue": 1.35,
+      "capex": 0,
+      "droughtTown": 0,
+      "droughtCommission": 0
+    },
+    "hybrid": {
+      "pue": 1.25,
+      "capex": 20000000,
+      "droughtTown": -2,
+      "droughtCommission": 0
+    }
   },
-  "gc": { "gmpPremium": 1.05, "overrunShare": 0.03 },
+  "gc": {
+    "gmpPremium": 1.05,
+    "overrunShare": 0.03
+  },
   "permits": {
-    "air": { "months": 9, "baseOdds": 0.85 },
-    "water": { "months": 6, "baseOdds": 0.88 },
-    "wetlands": { "months": 8, "baseOdds": 0.82 },
-    "building": { "months": 3, "baseOdds": 0.95 }
+    "air": {
+      "months": 9,
+      "baseOdds": 0.85
+    },
+    "water": {
+      "months": 6,
+      "baseOdds": 0.88
+    },
+    "wetlands": {
+      "months": 8,
+      "baseOdds": 0.82
+    },
+    "building": {
+      "months": 3,
+      "baseOdds": 0.95
+    }
   },
   "docket": {
-    "monthsToVote": 12, "intervenorCount": 3, "meetingsToSettle": 2,
-    "discoveryOdds": 0.30, "discoverySlipMonths": 2,
-    "testimonyBonus": 0.08, "testimonyCap": 0.24, "settleBonus": 0.05,
-    "voteBase": 0.45, "minOdds": 0.10, "maxOdds": 0.92,
-    "appealMonths": 6, "appealBonus": 0.10,
-    "redesignMonths": 4, "redesignCost": 15000000, "redesignBonus": 0.05
+    "monthsToVote": 12,
+    "intervenorCount": 3,
+    "meetingsToSettle": 2,
+    "discoveryOdds": 0.3,
+    "discoverySlipMonths": 2,
+    "testimonyBonus": 0.08,
+    "testimonyCap": 0.24,
+    "settleBonus": 0.05,
+    "voteBase": 0.45,
+    "minOdds": 0.1,
+    "maxOdds": 0.92,
+    "appealMonths": 6,
+    "appealBonus": 0.1,
+    "redesignMonths": 4,
+    "redesignCost": 15000000,
+    "redesignBonus": 0.05
   },
   "power": {
-    "studyCost": 2000000, "studyMonthsMin": 12, "studyMonthsMax": 24,
-    "transformerLeadMonths": 24, "transformerDeposit": 8000000, "transformerBalance": 22000000,
-    "switchgearLeadMin": 11, "switchgearLeadMax": 20, "switchgearDeposit": 3000000, "switchgearBalance": 9000000,
-    "cancelFeeShare": 0.20,
-    "substationBuildMonths": 3, "substationCapacityMW": 320, "interimGridMW": 32,
+    "studyCost": 2000000,
+    "studyMonthsMin": 12,
+    "studyMonthsMax": 24,
+    "transformerLeadMonths": 24,
+    "transformerDeposit": 8000000,
+    "transformerBalance": 22000000,
+    "switchgearLeadMin": 11,
+    "switchgearLeadMax": 20,
+    "switchgearDeposit": 3000000,
+    "switchgearBalance": 9000000,
+    "cancelFeeShare": 0.2,
+    "substationBuildMonths": 3,
+    "substationCapacityMW": 320,
+    "interimGridMW": 32,
     "plantBuildMonths": 24,
-    "plants": [ { "id": "A", "mwGrid": 62 }, { "id": "B", "mwGrid": 62 } ],
-    "plantBOffsetOptions": [0, 6, 12],
-    "slipOdds": { "low": 0.35, "medium": 0.15, "high": 0.05 },
-    "slipMonths": { "low": 6, "medium": 4, "high": 3 },
-    "minChargePerMwMonth": { "low": 6000, "medium": 10000, "high": 15000 }
+    "plants": [
+      {
+        "id": "A",
+        "mwGrid": 62
+      },
+      {
+        "id": "B",
+        "mwGrid": 100
+      }
+    ],
+    "plantBOffsetOptions": [
+      0,
+      6,
+      12
+    ],
+    "slipOdds": {
+      "low": 0.35,
+      "medium": 0.15,
+      "high": 0.05
+    },
+    "slipMonths": {
+      "low": 6,
+      "medium": 4,
+      "high": 3
+    },
+    "minChargePerMwMonth": {
+      "low": 6000,
+      "medium": 10000,
+      "high": 15000
+    }
   },
   "capital": {
-    "seniorOptions": [ { "ltc": 0.55, "rate": 0.0725 }, { "ltc": 0.625, "rate": 0.0775 }, { "ltc": 0.70, "rate": 0.085 } ],
-    "mezzOptions": [ { "share": 0.0, "rate": 0.12 }, { "share": 0.15, "rate": 0.12 }, { "share": 0.20, "rate": 0.13 } ],
-    "playerShareOptions": [0.2, 0.3, 0.5]
+    "seniorOptions": [
+      {
+        "ltc": 0.55,
+        "rate": 0.0725
+      },
+      {
+        "ltc": 0.625,
+        "rate": 0.0775
+      },
+      {
+        "ltc": 0.7,
+        "rate": 0.085
+      }
+    ],
+    "mezzOptions": [
+      {
+        "share": 0.0,
+        "rate": 0.12
+      },
+      {
+        "share": 0.15,
+        "rate": 0.12
+      },
+      {
+        "share": 0.2,
+        "rate": 0.13
+      }
+    ],
+    "playerShareOptions": [
+      0.2,
+      0.3,
+      0.5
+    ]
   },
   "lease": {
-    "baseRent": 135, "referenceDeliveryMonth": 38, "rentPerMonthEarlier": 1.25,
-    "firstDeliveryOptions": [34, 38, 42], "hallStaggerMonths": 4,
-    "outsideDateMonths": 12, "termYears": 15, "escalator": 0.03,
+    "baseRent": 160,
+    "referenceDeliveryMonth": 38,
+    "rentPerMonthEarlier": 1.25,
+    "firstDeliveryOptions": [
+      34,
+      38,
+      42
+    ],
+    "hallStaggerMonths": 4,
+    "outsideDateMonths": 12,
+    "termYears": 15,
+    "escalator": 0.03,
     "landlordCostShare": 0.07,
-    "ldPerDayPer25MW": 50000, "ldCapMonths": 12,
-    "extensionGoodwill": 70, "extensionMonths": 3,
-    "swapMonths": 2, "swapBaseOdds": 0.5, "swapRentCut": 0.02
+    "ldPerDayPer25MW": 75000,
+    "ldCapMonths": 12,
+    "extensionGoodwill": 70,
+    "extensionMonths": 3,
+    "swapMonths": 2,
+    "swapBaseOdds": 0.5,
+    "swapRentCut": 0.02
   },
-  "insurance": { "buildersRiskMonthly": 600000, "dsuMonthly": 1000000, "deductible": 2000000 },
-  "covenant": { "dscrTrigger": 1.25, "permRate": 0.07, "stepUp": 0.02, "forcedTestMonth": 54 },
+  "insurance": {
+    "buildersRiskMonthly": 600000,
+    "dsuMonthly": 1000000,
+    "deductible": 2000000
+  },
+  "covenant": {
+    "dscrTrigger": 1.25,
+    "permRate": 0.07,
+    "stepUp": 0.02,
+    "forcedTestMonth": 54
+  },
   "takeout": {
-    "seasoningMonths": 3, "baseCapRate": 0.07, "capRateSwing": 0.01, "outlookCutBps": 0.005,
-    "darkValueShare": 0.30, "greatMultiple": 2.0,
-    "tierPoints": { "air": 5, "liquid": 10, "hybrid": 12 },
-    "coolingPoints": { "evaporative": 1, "dry": 2, "hybrid": 3 },
-    "marketBandLow": 10000000, "marketBandHigh": 15000000
+    "seasoningMonths": 3,
+    "baseCapRate": 0.0675,
+    "capRateSwing": 0.01,
+    "outlookCutBps": 0.005,
+    "darkValueShare": 0.3,
+    "greatMultiple": 2.0,
+    "tierPoints": {
+      "air": 5,
+      "liquid": 10,
+      "hybrid": 12
+    },
+    "coolingPoints": {
+      "evaporative": 1,
+      "dry": 2,
+      "hybrid": 3
+    },
+    "marketBandLow": 10000000,
+    "marketBandHigh": 15000000
   },
-  "events": { "stormDamage": 12000000, "fireDamage": 10000000, "rateMoveBps": 0.0025 },
-  "crews": { "importCost": 4000000, "importMonths": 6 }
+  "events": {
+    "stormDamage": 36000000,
+    "fireDamage": 26000000,
+    "rateMoveBps": 0.0025
+  },
+  "crews": {
+    "importCost": 4000000,
+    "importMonths": 6
+  }
 }

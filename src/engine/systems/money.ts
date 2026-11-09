@@ -15,13 +15,12 @@ import { totalDebt } from '../selectors';
 function capitalizeSenior(state: GameState): GameState {
   const debt = state.debt;
   const accrued = ((debt.seniorDrawn + debt.seniorCapitalizedInterest) * debt.seniorRate) / 12;
-  const headroom = Math.max(0, debt.seniorCommitment - debt.seniorDrawn - debt.seniorCapitalizedInterest);
-  const capitalized = Math.min(accrued, headroom);
-  const excess = accrued - capitalized;
+  // Interest reserve: pre-conversion interest capitalizes in full rather than cash-paying the
+  // excess over commitment headroom (a real construction loan sizes an interest reserve for
+  // exactly this; the cash-paid excess was an untracked drain that fought the working capital).
   return {
     ...state,
-    cash: state.cash - excess,
-    debt: { ...debt, seniorCapitalizedInterest: debt.seniorCapitalizedInterest + capitalized },
+    debt: { ...debt, seniorCapitalizedInterest: debt.seniorCapitalizedInterest + accrued },
   };
 }
 

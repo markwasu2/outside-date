@@ -185,6 +185,7 @@ export interface TakeoutResult {
 
 export interface GameState {
   scenarioId: string;
+  difficultyId: 'easy' | 'normal' | 'hard';
   seed: number;
   rng: { s: number }; // serializable RNG state
   month: Month;

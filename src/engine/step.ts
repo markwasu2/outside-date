@@ -5,6 +5,7 @@ import { applyAction } from './actions';
 import { applyEffect } from './effects';
 import { ledger, dscr, runway } from './selectors';
 import { drawEvent, resolveChoice } from './systems/events';
+import { resolveContent } from './resolve';
 import { tick as powerTick } from './systems/power';
 import { tick as regulationTick } from './systems/regulation';
 import { tick as constructionTick } from './systems/construction';
@@ -93,6 +94,7 @@ export function step(
     throw new ActionError(`step() called while phase is "${state.phase}", expected "playing"`);
   }
 
+  content = resolveContent(state, content);
   const apCost = validateActions(state, actions, content);
   let next: GameState = { ...state, apUsedThisMonth: state.apUsedThisMonth + apCost };
 
@@ -118,6 +120,7 @@ export function resolveEvent(
   if (state.phase !== 'awaitingChoice' || !state.pending) {
     throw new ActionError('resolveEvent() called with no pending event');
   }
+  content = resolveContent(state, content);
   const resolved = resolveChoice(state, choiceId, content);
   const next: GameState = { ...resolved, phase: 'playing', pending: null };
   return runWorldTick(next, content);

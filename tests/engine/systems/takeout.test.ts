@@ -46,27 +46,30 @@ function stateAtCleanTakeout(): GameState {
 describe('takeout: sanity math (PLAN.md 4.13/5 worked example)', () => {
   it('budget/senior/mezz/equity match the documented defaults within rounding', () => {
     const state = freshState();
-    expect(state.budgetAtClose).toBeCloseTo(1_570_000_000, -5);
-    expect(state.debt.seniorCommitment).toBeCloseTo(981_250_000, -4);
-    expect(state.debt.mezzCommitment).toBeCloseTo(235_500_000, -4);
-    expect(state.equity.committedTotal).toBeCloseTo(353_250_000, -4);
+    // Updated for the balance-fix capital stack: budget now includes power equipment ($42M)
+    // and liquid-ready fitout ($24M), and equity commits its construction share plus the $185M
+    // working capital. See PLAN.md Decisions log (2026-11-08, balance-fixes entries).
+    expect(state.budgetAtClose).toBeCloseTo(1_636_000_000, -5);
+    expect(state.debt.seniorCommitment).toBeCloseTo(1_022_500_000, -4);
+    expect(state.debt.mezzCommitment).toBeCloseTo(245_400_000, -4);
+    expect(state.equity.committedTotal).toBeCloseTo(553_100_000, -4);
   });
 
-  it('reproduces ~2.1x equity multiple at a 7% cap rate (within 5%)', () => {
+  it('reproduces ~2.2x equity multiple at the 6.75% base cap rate (within 5%)', () => {
     const state = stateAtCleanTakeout();
     const after = priceTakeout(state, content);
-    expect(after.takeout?.forwardNoi).toBeCloseTo(150_660_000, -4);
-    expect(after.takeout?.capRate).toBeCloseTo(0.07, 5);
-    expect(after.takeout?.equityMultiple).toBeGreaterThan(2.1 * 0.95);
-    expect(after.takeout?.equityMultiple).toBeLessThan(2.1 * 1.05);
+    expect(after.takeout?.forwardNoi).toBeCloseTo(178_560_000, -4); // rent 160/kW after the balance pass
+    expect(after.takeout?.capRate).toBeCloseTo(0.0675, 5);
+    expect(after.takeout?.equityMultiple).toBeGreaterThan(2.2 * 0.95);
+    expect(after.takeout?.equityMultiple).toBeLessThan(2.2 * 1.05);
   });
 
-  it('reproduces ~1.3x equity multiple at an 8% cap rate (within 5%)', () => {
+  it('reproduces ~1.6x equity multiple at a +1% cap-rate swing (within 5%)', () => {
     const state = { ...stateAtCleanTakeout(), market: { ...stateAtCleanTakeout().market, capRateModifier: 0.01 } };
     const after = priceTakeout(state, content);
-    expect(after.takeout?.capRate).toBeCloseTo(0.08, 5);
-    expect(after.takeout?.equityMultiple).toBeGreaterThan(1.3 * 0.95);
-    expect(after.takeout?.equityMultiple).toBeLessThan(1.3 * 1.05);
+    expect(after.takeout?.capRate).toBeCloseTo(0.0775, 5);
+    expect(after.takeout?.equityMultiple).toBeGreaterThan(1.6 * 0.95);
+    expect(after.takeout?.equityMultiple).toBeLessThan(1.6 * 1.05);
   });
 });
 
@@ -110,7 +113,7 @@ describe('takeout: win/lose outcomes', () => {
   });
 
   it('ends as win/scraped when 0 < equityMultiple < 1.0', () => {
-    const state = { ...stateAtCleanTakeout(), debt: { ...stateAtCleanTakeout().debt, seniorDrawn: 2_000_000_000 } };
+    const state = { ...stateAtCleanTakeout(), debt: { ...stateAtCleanTakeout().debt, seniorDrawn: 2_200_000_000 } };
     const after = priceTakeout(state, content);
     expect(after.takeout!.equityMultiple).toBeGreaterThan(0);
     expect(after.takeout!.equityMultiple).toBeLessThan(1.0);

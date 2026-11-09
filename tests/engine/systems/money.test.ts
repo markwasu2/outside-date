@@ -60,7 +60,7 @@ describe('money: funding waterfall order (equity -> mezz -> senior -> cash)', ()
     expect(beyondMezz.state.cash).toBe(state.cash);
   });
 
-  it("without builder's risk, senior draws are blocked and the shortfall comes from cash instead", () => {
+  it("without builder's risk, senior still draws (going uninsured is a valid archetype choice; storm/fire charge cash instead)", () => {
     const state = freshState();
     const noRisk = { ...state, insurance: { ...state.insurance, buildersRisk: false } };
     const equityHeadroom = noRisk.equity.committedTotal - noRisk.equity.calledTotal;
@@ -68,13 +68,25 @@ describe('money: funding waterfall order (equity -> mezz -> senior -> cash)', ()
 
     const result = tryFundAmount(noRisk, equityHeadroom + mezzHeadroom + 5_000_000);
     expect(result.funded).toBe(true);
+    expect(result.state.debt.seniorDrawn).toBe(5_000_000);
+    expect(result.state.cash).toBe(noRisk.cash);
+  });
+
+  it('a draw freeze blocks senior draws and the shortfall comes from cash instead', () => {
+    const state = freshState();
+    const frozen = { ...state, flags: { ...state.flags, drawFreeze: true } };
+    const equityHeadroom = frozen.equity.committedTotal - frozen.equity.calledTotal;
+    const mezzHeadroom = frozen.debt.mezzCommitment - frozen.debt.mezzDrawn;
+
+    const result = tryFundAmount(frozen, equityHeadroom + mezzHeadroom + 5_000_000);
+    expect(result.funded).toBe(true);
     expect(result.state.debt.seniorDrawn).toBe(0);
-    expect(result.state.cash).toBe(noRisk.cash - 5_000_000);
+    expect(result.state.cash).toBe(frozen.cash - 5_000_000);
   });
 
   it('returns funded: false (unchanged state) rather than overdrawing cash once every commitment is exhausted', () => {
     const state = freshState();
-    const noRiskNoCash = { ...state, insurance: { ...state.insurance, buildersRisk: false }, cash: 0 };
+    const noRiskNoCash = { ...state, flags: { ...state.flags, drawFreeze: true }, cash: 0 };
     const equityHeadroom = noRiskNoCash.equity.committedTotal - noRiskNoCash.equity.calledTotal;
     const mezzHeadroom = noRiskNoCash.debt.mezzCommitment - noRiskNoCash.debt.mezzDrawn;
 
@@ -99,7 +111,7 @@ describe('money: senior capitalized interest and mezz PIK accrual, pre-conversio
     expect(state.debt.seniorCapitalizedInterest).toBeCloseTo(month1 + month2, 2);
   });
 
-  it('senior capitalized interest is capped at the commitment headroom, with the excess paid from cash', () => {
+  it('senior capitalized interest accrues in full past the commitment headroom (interest reserve; no cash-paid excess)', () => {
     let state = freshState();
     state = withDebt(state, { seniorDrawn: 100_000_000, seniorCapitalizedInterest: 0, seniorCommitment: 100_000_500 });
     const rate = state.debt.seniorRate;
@@ -108,10 +120,9 @@ describe('money: senior capitalized interest and mezz PIK accrual, pre-conversio
 
     state = runMonths(state, 1);
 
-    expect(state.debt.seniorCapitalizedInterest).toBe(500);
-    const excess = accrued - 500;
-    // insurance.tick's builder's risk premium (P3.6, on by default) also runs every month.
-    expect(cashBefore - state.cash).toBeCloseTo(excess + state.monthlyBurn + content.tuning.insurance.buildersRiskMonthly, 2);
+    expect(state.debt.seniorCapitalizedInterest).toBeCloseTo(accrued, 2);
+    // No interest hits cash; only burn and the builder's risk premium (P3.6) do.
+    expect(cashBefore - state.cash).toBeCloseTo(state.monthlyBurn + content.tuning.insurance.buildersRiskMonthly, 2);
   });
 
   it('mezz PIK compounds monthly with no cash cost and no commitment cap', () => {

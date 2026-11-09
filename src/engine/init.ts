@@ -94,7 +94,16 @@ export function createGame(
     });
   }
 
-  const budgetAtClose = landCost + halls.reduce((sum, h) => sum + h.costBudget, 0) + coolingCapex;
+  // Budget at close includes the power equipment and liquid-ready fitout that tryFundAmount
+  // pays for anyway; excluding them left ~$66M of spend outside the capital stack, so
+  // construction silently fell through to cash (the cash cliff behind P5.3's defaults).
+  const powerEquip =
+    (scenario.skipTransformerOrder ? 0 : tuning.power.transformerDeposit + tuning.power.transformerBalance) +
+    tuning.power.switchgearDeposit + tuning.power.switchgearBalance;
+  const perHallLiquid =
+    effectiveSetup.hallTier === 'liquid' ? tuning.chips.liquidReadyCost : effectiveSetup.hallTier === 'hybrid' ? tuning.chips.hybridLiquidReadyCost : 0;
+  const budgetAtClose =
+    landCost + halls.reduce((sum, h) => sum + h.costBudget, 0) + coolingCapex + powerEquip + perHallLiquid * halls.length;
 
   // --- Capital stack ----------------------------------------------------
   const seniorOption =
@@ -107,7 +116,12 @@ export function createGame(
   const seniorLtc = scenario.capital?.seniorLtc ?? seniorOption.ltc;
   const seniorCommitment = Math.round(seniorLtc * budgetAtClose);
   const mezzCommitment = Math.round(mezzOption.share * budgetAtClose);
-  const equityCommittedTotal = budgetAtClose - seniorCommitment - mezzCommitment;
+  // Equity funds its construction share PLUS working capital (the starting cash). Initializing
+  // calledTotal to startingCash while committedTotal excluded it parked the whole working-capital
+  // amount in the bank: it counted as "already contributed" without being available to spend,
+  // starving construction by exactly that much.
+  const workingCapital = scenario.capital?.playerEquityCash ?? tuning.campaign.startingCash;
+  const equityCommittedTotal = budgetAtClose - seniorCommitment - mezzCommitment + workingCapital;
 
   let playerShare: number;
   if (scenario.capital?.playerEquityCash !== undefined) {
@@ -171,6 +185,7 @@ export function createGame(
 
   return {
     scenarioId,
+    difficultyId,
     seed,
     rng: createRng(seed),
     month: 0,
@@ -180,7 +195,7 @@ export function createGame(
     phase: 'playing',
     pending: null,
     setup: effectiveSetup,
-    cash: tuning.campaign.startingCash,
+    cash: workingCapital,
     monthlyBurn: tuning.campaign.monthlyBurn,
     goodwill,
     permits: emptyPermits(),
@@ -232,7 +247,7 @@ export function createGame(
     },
     equity: {
       committedTotal: equityCommittedTotal,
-      calledTotal: tuning.campaign.startingCash,
+      calledTotal: workingCapital,
       playerShare,
     },
     insurance: {

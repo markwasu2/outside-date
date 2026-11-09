@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { loadContent } from '../../src/content/load';
+import { loadContent, mergeTuning } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
 import type { Setup } from '../../src/engine/types';
 
@@ -19,22 +19,30 @@ describe('createGame: tutorial-edge5 sanity math', () => {
   // Independently recompute the expected numbers from tuning.json + the scenario's own
   // overrides, mirroring the formulas in PLAN.md section 4.1, rather than re-deriving them
   // from init.ts itself — this is the "sanity math" cross-check P2.3 asks for.
-  const tuning = content.tuning;
   const scenario = content.scenarios['tutorial-edge5'];
   if (!scenario) throw new Error('tutorial-edge5 scenario missing from content');
+  // Resolve the scenario's tuning overrides exactly as createGame() does.
+  const tuning = mergeTuning(content.tuning, scenario.tuningOverrides);
 
   const tierMult = tuning.tiers.air.costMult; // 0.85
   const gcMult = 1; // costPlus
   const landCost = tuning.land.farmland; // 12,000,000
   const coolingCapex = tuning.cooling.evaporative.capex; // 0
   const hallCost = Math.round(scenario.hallMwIT * tuning.campus.costPerMwIT * tierMult * gcMult);
-  const expectedBudget = landCost + hallCost * scenario.halls + coolingCapex;
+  // Budget at close also funds the power equipment and per-hall liquid-ready fitout that
+  // tryFundAmount pays for anyway (see init.ts); air tier has no liquid-ready cost.
+  const powerEquip =
+    (scenario.skipTransformerOrder ? 0 : tuning.power.transformerDeposit + tuning.power.transformerBalance) +
+    tuning.power.switchgearDeposit + tuning.power.switchgearBalance;
+  const expectedBudget = landCost + hallCost * scenario.halls + coolingCapex + powerEquip;
 
   const seniorLtc = scenario.capital?.seniorLtc ?? tuning.capital.seniorOptions[0]?.ltc ?? 0;
   const expectedSenior = Math.round(seniorLtc * expectedBudget);
   const mezzShare = tuning.capital.mezzOptions[0]?.share ?? 0;
   const expectedMezz = Math.round(mezzShare * expectedBudget);
-  const expectedEquity = expectedBudget - expectedSenior - expectedMezz;
+  // Equity commits its construction share PLUS working capital (the starting cash).
+  const workingCapital = scenario.capital?.playerEquityCash ?? tuning.campaign.startingCash;
+  const expectedEquity = expectedBudget - expectedSenior - expectedMezz + workingCapital;
   const playerCash = scenario.capital?.playerEquityCash ?? 0;
   const expectedPlayerShare = expectedEquity > 0 ? playerCash / expectedEquity : 0;
 

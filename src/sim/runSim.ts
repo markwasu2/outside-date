@@ -130,8 +130,14 @@ export function runOneGame(bot: Bot, content: Content, scenarioId: string, diffi
   };
 }
 
+// `nodeProcess()` indirection: this module is bundled into the browser build via store.ts, and
+// the project has no @types/node, so a bare `process` reference breaks both tsc and the browser.
+function nodeProcess(): { argv: string[] } | undefined {
+  return (globalThis as { process?: { argv: string[] } }).process;
+}
+
 function main(): void {
-  const args = parseArgs(process.argv.slice(2));
+  const args = parseArgs((nodeProcess()?.argv ?? []).slice(2));
   const bot = BOTS[args.bot];
   if (!bot) throw new Error(`Unknown bot "${args.bot}". Known bots: ${Object.keys(BOTS).join(', ')}`);
 
@@ -158,6 +164,6 @@ function main(): void {
 // `typeof process !== 'undefined'` short-circuits before touching `process.argv`, which doesn't
 // exist in a browser and would otherwise throw a `ReferenceError` on every page load (crashing
 // the whole app, since `main()` itself is never meant to run outside the Node CLI anyway).
-if (typeof process !== 'undefined' && import.meta.url === `file://${process.argv[1]}`) {
+if (nodeProcess() && import.meta.url === `file://${nodeProcess()!.argv[1]}`) {
   main();
 }
