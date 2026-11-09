@@ -53,6 +53,58 @@ export function describeEffect(effect: Effect): string {
     const sign = delta > 0 ? '+' : '';
     return `${label} goodwill ${sign}${delta}`;
   }
+  // UX 6: branches for the no-choice event cards, so their notice cards can state the stakes
+  // instead of falling back to "Has consequences". Same effect args the handlers read.
+  if (effect.type === 'labor') {
+    const n = effect.args[0];
+    return typeof n === 'number' ? `Fitout crews run at half speed for ${n} months` : 'Has consequences';
+  }
+  if (effect.type === 'seniorRate') {
+    const v = effect.args[0];
+    if (typeof v !== 'number') return 'Has consequences';
+    const bps = Math.round(v * 10000);
+    return `Senior debt rate ${bps > 0 ? '+' : ''}${bps} bps`;
+  }
+  if (effect.type === 'capRate') {
+    const v = effect.args[0];
+    if (typeof v !== 'number') return 'Has consequences';
+    const bps = Math.round(v * 10000);
+    return `Exit cap rate ${bps > 0 ? '+' : ''}${bps} bps`;
+  }
+  if (effect.type === 'orderSlip') {
+    const months = effect.args[1];
+    const target = effect.args[0] === 'randomPending' ? 'A pending order' : `The ${String(effect.args[0])}`;
+    return typeof months === 'number' ? `${target} slips ${months} months` : 'Has consequences';
+  }
+  if (effect.type === 'studySlip') {
+    const months = effect.args[0];
+    if (typeof months !== 'number') return 'Has consequences';
+    return months > 0 ? `Interconnection study slips ${months} months` : `Interconnection study moves up ${-months} months`;
+  }
+  if (effect.type === 'hallCostPct') {
+    const pct = effect.args[1];
+    return typeof pct === 'number' ? `A hall's budget grows ${Math.round(pct * 100)}%` : 'Has consequences';
+  }
+  if (effect.type === 'hallPause') {
+    return 'A hall stops work until the problem is fixed';
+  }
+  if (effect.type === 'hallProgress') {
+    const n = effect.args[1];
+    if (typeof n !== 'number') return 'Has consequences';
+    return n > 0 ? `A hall gains ${n} month of progress` : `A hall loses ${-n} month of progress`;
+  }
+  if (effect.type === 'stormDamage') {
+    return 'Damage to a hall under construction';
+  }
+  if (effect.type === 'fireDamage') {
+    return 'Fire damage to a hall in fitout';
+  }
+  if (effect.type === 'smallLoss') {
+    return 'A loss hits an active hall';
+  }
+  if (effect.type === 'drawFreeze') {
+    return 'Lender draws freeze until the problem is cured';
+  }
   return 'Has consequences';
 }
 
