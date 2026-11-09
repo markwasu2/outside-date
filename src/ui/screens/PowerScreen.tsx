@@ -22,8 +22,8 @@ const MIN_CHARGES: { id: MinChargeLevel; label: string }[] = [
 /** UI-polish item 5: hand-written hints from `tuning.power`'s `minChargePerMwMonth`/`slipOdds`
  * and `plantBOffsetOptions` - each under 90 characters. */
 export const MIN_CHARGE_HINTS: Record<MinChargeLevel, string> = {
-  low: 'Cheapest minimum bill, but ties the highest slip odds, with the longest slips.',
-  medium: 'Same slip odds as Low, but each slip runs a month shorter.',
+  low: 'Cheapest minimum bill, but highest slip odds and longest slips.',
+  medium: 'Lower slip odds than Low, and each slip runs a month shorter.',
   high: 'Priciest minimum bill, but buys the lowest odds of a plant slip.',
 };
 export const PLANT_B_OFFSET_HINTS: Record<number, string> = {

@@ -62,3 +62,14 @@ test('wizard: the insurance screen shows what DSU off costs', async ({ page }) =
   await expect(page.getByTestId('dsu-stakes-on')).toBeVisible();
   await expect(page.getByTestId('dsu-stakes-off')).toHaveCount(0);
 });
+
+test('power hints agree with the slip odds shown on setup buttons', async ({ page }) => {
+  await startWhaleToForecast(page);
+  await page.getByRole('button', { name: 'Next: Capital stack' }).click();
+  await page.getByRole('button', { name: 'Next: Power' }).click();
+  await expect(page.getByRole('button', { name: /Low .*55%/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Medium .*45%/ })).toBeVisible();
+  await expect(page.getByText('Lower slip odds than Low, and each slip runs a month shorter.')).toBeVisible();
+  await expect(page.getByText(/Same slip odds as Low/)).toHaveCount(0);
+  await page.screenshot({ path: 'docs/screenshots/cold2/power-hints.png' });
+});
