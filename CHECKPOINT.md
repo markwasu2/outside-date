@@ -339,3 +339,38 @@ Note: the phase-8/10 checkpoints carried a stale greedy-normal 47.1; re-measured
   cost-to-complete coverage instead of recurring-burn runway.
 - No UI-surface change: the only player-facing number is the capital dialog's max-raise
   figure, computed from tuning (covered by existing capital tests), so no new screenshots.
+
+# Phase 12: millbrook dip recovery - the lever trigger learns context (2026-11-09)
+
+Branch phase12-lever-trigger-projection (off main d8cc764). Phase 11's earlier lever trigger
+(3.5 -> 5 months of runway) fixed careful/hard but cost millbrook ~4 win points (careful
+85.5 -> 81.4, competent 72.0 -> 67.5).
+
+## Diagnosis
+
+On millbrook the runway trigger was the ONLY condition firing (0 shortfall-condition months
+in 200 seeds), and when it fired, the median hall ETA was Infinity: no hall had even broken
+ground. Millbrook's pre-construction fixed-cost dips read as "5 months of runway left", the
+bot levered up against a non-threat, and the fees + partner strain cost ~4 win points in runs
+that were fine. Whale hard's useful fires all happen with construction active.
+
+## The change (one gate, bot policy only)
+
+needsCapital's runway condition now only fires when at least one hall is under construction
+or delivered - the phases where a low recurring-burn runway actually threatens survival.
+Pre-groundbreak dips rely on the cost-to-complete shortfall condition and outOfBalance,
+which cover genuine funding gaps. No engine, content or UI change.
+
+Rejected alternatives (measured at 300 seeds): an ETA-window exemption (don't lever when a
+delivery lands inside the closing window) - whale normal careful 80.0, over the 75 ceiling,
+and millbrook didn't recover (its fires are pre-groundbreak, not near-delivery); trigger back
+to 3.5 - millbrook recovered but whale normal careful 79.7, also over.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| millbrook recovers | done (1000 seeds): careful 81.4 -> 85.5 (matches the pre-phase-11 baseline exactly), competent 67.5 -> 69.6 (baseline 72.0; residual -2.4, its fires happen with construction active where the gate keeps the trigger) |
+| whale grids unchanged from phase 11 | done: the 1000-seed whale grid is identical to phase 11's after-grid (careful 74.5/32.1, competent 70.3/38.6, greedy 34.9/40.2) - whale's useful fires all have construction active |
+| full suite green | done: 472 vitest, 41 playwright, eslint, tsc, vite build |
+| no save bump, no UI change | engine/content untouched; one bot-policy gate |

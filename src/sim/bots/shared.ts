@@ -293,7 +293,17 @@ export function needsCapital(state: GameState, content: Content): boolean {
   if (state.scenarioId.startsWith('tutorial')) return false;
   if (state.capital.pending.length > 0) return false;
   if (state.flags.outOfBalance) return true;
-  if (runway(state, content) < LEVER_RUNWAY_MONTHS) return true;
+  if (runway(state, content) < LEVER_RUNWAY_MONTHS) {
+    // Phase 12: a low recurring-burn runway only threatens survival when real obligations
+    // are running - halls under construction or delivered. Before groundbreak the burn is
+    // small fixed costs and the dip self-heals (the cost-to-complete shortfall condition
+    // below covers a genuine funding gap); levering up there just pays fees and partner
+    // strain. On millbrook 11-20% of runs hit runway < 5 with no hall started (ETA median
+    // Infinity), and the unneeded lever cost ~4 win points.
+    const constructionActive = state.halls.some((h) => h.stageActive && !h.delivered && !h.terminated);
+    const anyDelivered = state.halls.some((h) => h.delivered && !h.terminated);
+    if (constructionActive || anyDelivered) return true;
+  }
   const shortfall = Math.max(0, costToCompleteShortfall(state, content));
   if (shortfall === 0) return false;
   return state.cash < shortfall + 3 * state.monthlyBurn;
