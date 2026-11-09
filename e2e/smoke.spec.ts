@@ -66,7 +66,7 @@ async function queueEveryLegalAction(page: Page) {
  * heading appears. */
 async function finishEndedFlow(page: Page) {
   const reportCardHeading = page.getByRole('heading', { name: 'Report card' });
-  const gameOverHeading = page.getByRole('heading', { name: /^(You win|You lose|Game over)/ });
+  const gameOverHeading = page.getByRole('heading', { name: /^(You win|You lose|You scraped by|Game over)/ });
   for (let i = 0; i < 5; i += 1) {
     if ((await reportCardHeading.count()) > 0 || (await gameOverHeading.count()) > 0) return;
     await page.getByRole('button', { name: /^(Skip|Continue)$/ }).click();
@@ -84,7 +84,7 @@ test('tutorial completes via real clicks and shows an outcome screen', async ({ 
   const dialog = page.getByRole('dialog');
   const ratingHeading = page.getByRole('heading', { name: 'Rating the campus' });
   const reportCardHeading = page.getByRole('heading', { name: 'Report card' });
-  const gameOverHeading = page.getByRole('heading', { name: /^(You win|You lose|Game over)/ });
+  const gameOverHeading = page.getByRole('heading', { name: /^(You win|You lose|You scraped by|Game over)/ });
 
   // Bug fix (found diagnosing test 1's remaining timeout): event-dialog iterations don't advance
   // the month, and the tutorial scenario runs up to 20 months with frequent scripted events, so a

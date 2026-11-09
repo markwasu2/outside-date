@@ -55,7 +55,7 @@ test('fix 14: fast-forwarding a whale campaign through Y3 never freezes silently
   const ffButton = page.getByTestId('fast-forward-button');
   const stopReason = page.getByText(/Fast-forward stopped/);
   const monthLabel = page.locator('strong').first();
-  const gameOverHeading = page.getByRole('heading', { name: /^(You win|You lose|Game over)/ });
+  const gameOverHeading = page.getByRole('heading', { name: /^(You win|You lose|You scraped by|Game over)/ });
   const reportCardHeading = page.getByRole('heading', { name: 'Report card' });
 
   function yearOf(text: string | null): number {

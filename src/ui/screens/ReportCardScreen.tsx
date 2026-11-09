@@ -71,6 +71,16 @@ const WIN_TIER_TEXT: Record<string, string> = {
   scraped: 'you scraped by',
 };
 
+/** UX queue item 7: the ending headline must be consistent with the score. great/good keep
+ * "You win"; a scraped takeout (equity multiple under 1.0 - investors lost money, whatever the
+ * grades say) headlines "You scraped by" instead of claiming a win. */
+export function outcomeHeadline(outcome: GameState['outcome']): string {
+  if (outcome?.kind === 'win') {
+    return outcome.tier === 'scraped' ? 'You scraped by' : `You win: ${WIN_TIER_TEXT[outcome.tier] ?? outcome.tier}`;
+  }
+  return `You lose: ${outcome?.kind === 'lose' ? LOSE_REASON_TEXT[outcome.reason] ?? outcome.reason : 'unknown'}`;
+}
+
 /** P8.2, moved here from App.tsx's old placeholder `EndedSummary`: shown instead of the plain
  * "Play again" once the tutorial scenario itself ends, per PLAN.md's "same rules, bigger
  * numbers" accept criterion. Quick-starts Whale the same way the Title screen's Tutorial button
@@ -222,14 +232,16 @@ export function ReportCardScreen() {
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 640, margin: '0 auto' }}>
-      <h1 style={{ textAlign: 'center' }}>
-        {outcome?.kind === 'win'
-          ? `You win: ${WIN_TIER_TEXT[outcome.tier] ?? outcome.tier}`
-          : `You lose: ${outcome?.kind === 'lose' ? LOSE_REASON_TEXT[outcome.reason] ?? outcome.reason : 'unknown'}`}
-      </h1>
+      <h1 style={{ textAlign: 'center' }}>{outcomeHeadline(outcome)}</h1>
       <p style={{ textAlign: 'center' }}>
         Campus value {formatDollars(takeout.campusValue)}, equity multiple {takeout.equityMultiple.toFixed(2)}x, your equity{' '}
         {formatDollars(takeout.playerEquityValue)}.
+        {outcome?.kind === 'win' && outcome.tier === 'scraped' && (
+          <>
+            {' '}
+            The takeout closed, but at {takeout.equityMultiple.toFixed(2)}x investors got back less than they put in.
+          </>
+        )}
       </p>
 
       <h2>Report card</h2>

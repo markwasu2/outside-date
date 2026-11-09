@@ -1,3 +1,22 @@
+# UX 7: ending headline consistent with the score (queue item 7)
+
+Branch `ux7-ending-framing` off main 63aa203. A 0.74x takeout headlined "You win: you scraped
+by" beside an F-strewn report card. Fix: great/good keep "You win"; a scraped takeout
+(equity multiple under 1.0) headlines "You scraped by" and adds "The takeout closed, but at
+X.XXx investors got back less than they put in." outcome.kind unchanged - no balance impact.
+
+## Done criteria
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | scraped ending drops the win claim and states the money result | PASS | outcomeHeadline() + conditional honesty line in ReportCardScreen |
+| 2 | great/good/lose headlines unchanged | PASS | tests/ui/reportCardScreen.test.ts outcomeHeadline cases (3 new) |
+| 3 | e2e heading patterns updated | PASS | playtest-fixes, smoke, phase4-sites heading regexes include "You scraped by" |
+| 4 | no engine/state-shape/balance change (outcome.kind untouched) | PASS | UI copy only; takeout.ts untouched |
+| 5 | gates green; scraped ending screenshot inspected | PASS | vitest 485, playwright 42, tsc/eslint/build clean; docs/screenshots/ux7/scraped-ending-1440.png (real greedy-bot run, 0.26x) |
+
+Grid: not run - no engine, bot or balance change.
+
 # UX 5: next-step banner and late-order warning tell one story (queue item 5)
 
 Branch `ux5-banner-consistency` off main 0f50197. The banner said "Order the transformer" and

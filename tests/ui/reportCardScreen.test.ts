@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
 import type { LogEntry, Setup } from '../../src/engine/types';
-import { finalStats, fiveMostConsequentialDecisions, proximateCauseOfDeath } from '../../src/ui/screens/ReportCardScreen';
+import { finalStats, fiveMostConsequentialDecisions, outcomeHeadline, proximateCauseOfDeath } from '../../src/ui/screens/ReportCardScreen';
 
 const content = loadContent();
 const negotiation: NegotiationChoices = {
@@ -87,5 +87,23 @@ describe('ReportCardScreen: proximateCauseOfDeath (fix 16)', () => {
   it('picks the LAST warning, not the first, when several occurred', () => {
     const log: LogEntry[] = [entry(3, 'warning', 'An early warning.'), entry(9, 'warning', 'The final warning.')];
     expect(proximateCauseOfDeath(log, 'fallback')).toBe('The final warning.');
+  });
+});
+
+// UX queue item 7: ending headline must match the score - a 0.74x "scraped" takeout used to
+// headline "You win" beside an F-strewn report card.
+describe('outcomeHeadline (UX queue item 7)', () => {
+  it('great and good keep the win headline', () => {
+    expect(outcomeHeadline({ kind: 'win', tier: 'great' })).toBe('You win: a great outcome');
+    expect(outcomeHeadline({ kind: 'win', tier: 'good' })).toBe('You win: a good outcome');
+  });
+
+  it('scraped drops the win claim', () => {
+    expect(outcomeHeadline({ kind: 'win', tier: 'scraped' })).toBe('You scraped by');
+    expect(outcomeHeadline({ kind: 'win', tier: 'scraped' })).not.toContain('win');
+  });
+
+  it('losses keep their reason', () => {
+    expect(outcomeHeadline({ kind: 'lose', reason: 'equityWiped' })).toContain('You lose');
   });
 });
