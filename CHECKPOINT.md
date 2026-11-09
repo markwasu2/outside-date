@@ -1,3 +1,22 @@
+# UX 3: quick start / recommended setup (cold-playthrough queue, item 3)
+
+Branch `ux3-quick-start` off main b15f510. Six setup screens with no recommended path. Fix: a
+"Quick start" button on the title screen that starts the campaign immediately with the
+wizard's own defaults (the recommended setup), skipping all six screens. "New game" keeps the
+full custom path.
+
+## Done criteria
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | quick-start option instead of six screens | PASS | TitleScreen "Quick start" -> SetupWizard start() with DEFAULT_SETUP/DEFAULT_NEGOTIATION (+ forecast default), scenario/difficulty picks still apply |
+| 2 | full custom path unchanged | PASS | "New game" still enters the wizard; e2e setup-wizard specs green |
+| 3 | e2e coverage | PASS | e2e/quick-start.spec.ts: lands on the board, no wizard buttons, whale goal strip shows 4 halls |
+| 4 | no engine/state-shape change | PASS | UI-only diff |
+| 5 | typecheck/lint/vitest/playwright/build green; screenshots inspected | PASS | vitest 480, playwright 42, tsc/eslint/build clean; docs/screenshots/ux3/ at 800+1440 |
+
+Grid: not run - no engine, bot or balance change.
+
 # UX 2: plain-language definitions at first use (cold-playthrough queue, item 2)
 
 Branch `ux2-jargon-definitions` off main ebc87a3. The cold player never tapped a glossary

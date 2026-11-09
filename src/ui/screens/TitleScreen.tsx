@@ -11,6 +11,7 @@ interface Props {
   onScenarioChange: (id: string) => void;
   onDifficultyChange: (id: DifficultyId) => void;
   onNewGame: () => void;
+  onQuickStart: () => void;
   onTutorial: () => void;
 }
 
@@ -46,7 +47,7 @@ export function describeDifficulty(preset: NonNullable<Scenario['difficulties']>
  * choices wouldn't change anything anyway, and skipping it keeps the "finish in about 10
  * minutes" accept criterion realistic. Codex (P9.3) opens the same overlay `<Term>`'s "more"
  * links and `EventModal`'s codex link open mid-game, just with no entry pre-selected. */
-export function TitleScreen({ scenarioId, difficultyId, onScenarioChange, onDifficultyChange, onNewGame, onTutorial }: Props) {
+export function TitleScreen({ scenarioId, difficultyId, onScenarioChange, onDifficultyChange, onNewGame, onQuickStart, onTutorial }: Props) {
   const content = useStore((s) => s.content);
   const openCodex = useStore((s) => s.openCodex);
   const loadGame = useStore((s) => s.loadGame);
@@ -105,6 +106,17 @@ export function TitleScreen({ scenarioId, difficultyId, onScenarioChange, onDiff
         {describeDifficulty(content.scenarios[scenarioId]?.difficulties?.[difficultyId])}
       </p>
 
+      {/* UX queue item 3 (cold playthrough): six setup screens with no quick way in. Quick
+          start skips them with the recommended setup (the wizard's own defaults); New game
+          keeps the full custom path. */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+        <button data-testid="quick-start" onClick={onQuickStart} style={{ padding: '0.5rem 1.5rem', fontWeight: 'bold' }}>
+          Quick start
+        </button>
+        <span style={{ fontSize: '0.75rem', color: '#777' }}>
+          Skip setup: recommended site, contract, capital stack and forecast.
+        </span>
+      </div>
       <div style={{ display: 'flex', gap: '0.5rem' }}>
         <button onClick={onNewGame} style={{ padding: '0.5rem 1.5rem' }}>
           New game
