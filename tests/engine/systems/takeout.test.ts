@@ -49,27 +49,31 @@ describe('takeout: sanity math (PLAN.md 4.13/5 worked example)', () => {
     // Updated for the balance-fix capital stack: budget now includes power equipment ($42M)
     // and liquid-ready fitout ($24M), and equity commits its construction share plus the $185M
     // working capital. See PLAN.md Decisions log (2026-11-08, balance-fixes entries).
-    expect(state.budgetAtClose).toBeCloseTo(1_636_000_000, -5);
-    expect(state.debt.seniorCommitment).toBeCloseTo(1_022_500_000, -4);
-    expect(state.debt.mezzCommitment).toBeCloseTo(245_400_000, -4);
-    expect(state.equity.committedTotal).toBeCloseTo(553_100_000, -4);
+    // Updated again for the bot-inspection retune: hybrid cooling capex $20M -> $24M adds $4M
+    // to the budget (Decisions log, 2026-11-08 bot-inspection-retune entry).
+    expect(state.budgetAtClose).toBeCloseTo(1_640_000_000, -5);
+    expect(state.debt.seniorCommitment).toBeCloseTo(1_025_000_000, -4);
+    expect(state.debt.mezzCommitment).toBeCloseTo(246_000_000, -4);
+    expect(state.equity.committedTotal).toBeCloseTo(554_000_000, -4);
   });
 
-  it('reproduces ~2.2x equity multiple at the 6.75% base cap rate (within 5%)', () => {
+  it('reproduces ~1.9x equity multiple at the 7.25% base cap rate (within 5%)', () => {
     const state = stateAtCleanTakeout();
     const after = priceTakeout(state, content);
     expect(after.takeout?.forwardNoi).toBeCloseTo(178_560_000, -4); // rent 160/kW after the balance pass
-    expect(after.takeout?.capRate).toBeCloseTo(0.0675, 5);
-    expect(after.takeout?.equityMultiple).toBeGreaterThan(2.2 * 0.95);
-    expect(after.takeout?.equityMultiple).toBeLessThan(2.2 * 1.05);
+    // Base cap rate 6.75% -> 7.25% (Decisions log, 2026-11-08 bot-inspection-retune): compresses
+    // takeout multiples to re-center the section-8 bands after the sim bots learned fixInspection.
+    expect(after.takeout?.capRate).toBeCloseTo(0.0725, 5);
+    expect(after.takeout?.equityMultiple).toBeGreaterThan(1.88 * 0.95);
+    expect(after.takeout?.equityMultiple).toBeLessThan(1.88 * 1.05);
   });
 
-  it('reproduces ~1.6x equity multiple at a +1% cap-rate swing (within 5%)', () => {
+  it('reproduces ~1.34x equity multiple at a +1% cap-rate swing (within 5%)', () => {
     const state = { ...stateAtCleanTakeout(), market: { ...stateAtCleanTakeout().market, capRateModifier: 0.01 } };
     const after = priceTakeout(state, content);
-    expect(after.takeout?.capRate).toBeCloseTo(0.0775, 5);
-    expect(after.takeout?.equityMultiple).toBeGreaterThan(1.6 * 0.95);
-    expect(after.takeout?.equityMultiple).toBeLessThan(1.6 * 1.05);
+    expect(after.takeout?.capRate).toBeCloseTo(0.0825, 5);
+    expect(after.takeout?.equityMultiple).toBeGreaterThan(1.34 * 0.95);
+    expect(after.takeout?.equityMultiple).toBeLessThan(1.34 * 1.05);
   });
 });
 

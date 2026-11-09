@@ -6,6 +6,7 @@ import {
   type Bot,
   delaySwapCandidates,
   fillAp,
+  fixInspectionCandidates,
   importCrewsActiveCandidate,
   readyLiquidCandidates,
   requiredPermitCandidates,
@@ -36,6 +37,7 @@ function chooseActions(state: GameState, content: Content): PlannedAction[] {
   const candidates: PlannedAction[] = [];
   candidates.push({ actionId: 'confirmRackSchedule' });
   if (state.flags.drawFreeze) candidates.push({ actionId: 'cureDraw' });
+  candidates.push(...fixInspectionCandidates(state));
   if (!state.flags.fundExtensionsDone && state.month <= 12) candidates.push({ actionId: 'fundExtensions' });
   if (!state.flags.siteOptioned && !state.flags.siteOptionedAtStart) candidates.push({ actionId: 'optionSite' });
   if (state.power.studyStatus === 'none') candidates.push({ actionId: 'commissionStudy' });

@@ -44,7 +44,7 @@
   "tiers": {
     "air": {
       "costMult": 0.85,
-      "rentMult": 0.8
+      "rentMult": 0.75
     },
     "liquid": {
       "costMult": 1.0,
@@ -74,14 +74,14 @@
     },
     "hybrid": {
       "pue": 1.25,
-      "capex": 20000000,
+      "capex": 24000000,
       "droughtTown": -2,
       "droughtCommission": 0
     }
   },
   "gc": {
     "gmpPremium": 1.05,
-    "overrunShare": 0.03
+    "overrunShare": 0.05
   },
   "permits": {
     "air": {
@@ -151,19 +151,19 @@
       12
     ],
     "slipOdds": {
-      "low": 0.35,
-      "medium": 0.15,
+      "low": 0.45,
+      "medium": 0.45,
       "high": 0.05
     },
     "slipMonths": {
       "low": 6,
-      "medium": 4,
+      "medium": 5,
       "high": 3
     },
     "minChargePerMwMonth": {
       "low": 6000,
       "medium": 10000,
-      "high": 15000
+      "high": 16000
     }
   },
   "capital": {
@@ -236,7 +236,7 @@
   },
   "takeout": {
     "seasoningMonths": 3,
-    "baseCapRate": 0.0675,
+    "baseCapRate": 0.0725,
     "capRateSwing": 0.01,
     "outlookCutBps": 0.005,
     "darkValueShare": 0.3,
@@ -255,8 +255,8 @@
     "marketBandHigh": 15000000
   },
   "events": {
-    "stormDamage": 36000000,
-    "fireDamage": 26000000,
+    "stormDamage": 44000000,
+    "fireDamage": 32000000,
     "rateMoveBps": 0.0025
   },
   "crews": {
