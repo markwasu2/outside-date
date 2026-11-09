@@ -19,13 +19,16 @@ The smallest change that makes placement a real decision: **pad placement at gro
 
 Tests: tests/engine/spatial.test.ts (capacity, explicit-near rejection on full pads, explicit
 far, line losses in the rent tick, end-to-end through step()). 463 vitest, lint, tsc, build
-green. Playwright: all hall/popover-path specs verified green individually (living-board,
-smoke, qa-fixes-2, read-the-deal, phase5-markets, phase5-shots, phase6-spike-shots,
-millbrook-relay, phase3-money). OPEN ITEM: playtest-fixes "fix 14" (a 300-second real-click
-fast-forward soak test) exceeds this sandbox's 120s command cap on the spike branch while
-passing in ~3s on main; engine fastForward and step verified byte-identical between branches
-by direct tsx runs, so the suspect is UI-side - resolve on a longer runner before treating
-the branch as fully green.
+green. Playwright: full 37-spec suite green, including playtest-fixes "fix 14" (the 300-second
+real-click fast-forward soak), verified 4/4 repeat runs at ~1.5s matching main.
+
+Fix-14 postmortem (resolved): the first spike cut of the pad chip was an absolutely positioned
+div with zIndex 2 and default pointer events, so it sat above modal dialogs in hit-testing and
+swallowed the event-choice click - the soak deadlocked with an event modal up (deterministic
+4/4 stall on the branch vs 4/4 pass on main; engine fastForward/step were byte-identical, and
+the wizard seeds campaigns with Math.random(), so a stall pattern that clean could only be
+UI-side). Fix: pointerEvents: 'none' on the chip - it is a passive indicator, and the hall
+cell underneath owns the click. Same class of bug as the Term/explainer pointer-events rule.
 
 ## What it proves
 

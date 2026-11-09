@@ -280,6 +280,9 @@ export function MapGrid() {
                   right: 3,
                   fontSize: '0.6rem',
                   zIndex: 2,
+                  // Passive indicator: never intercept a click (the hall cell underneath owns
+                  // selection, and a stray hit-target here deadlocked the fix-14 soak test).
+                  pointerEvents: 'none',
                   padding: '0 3px',
                   borderRadius: 3,
                   background:
