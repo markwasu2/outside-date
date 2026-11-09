@@ -910,3 +910,18 @@ the scenario-resolved duration. Study status no longer implies a finished site.
 | visual | done: 1280x720 working-state screenshot inspected; all labels legible |
 | full gates | done: 512 vitest, 54 e2e (53 + isolated long tutorial), lint, tsc, build |
 | balance grid | skipped: display-only art and progress, engine untouched |
+
+# Art pass 2e - power plant buildouts
+
+Plant A/B now have physical cards: empty planning space while waiting for the
+docket, crane/exposed structure while building, finished turbine halls online.
+Labels say waiting/building/delayed/online, use actual post-slip online dates,
+and quote live MW only once online. Existing gear/cooling sprites remain.
+
+| criterion | status |
+|---|---|
+| correct states | done: e2e waiting, building and online plus MW |
+| dates | reads onlineMonth before plannedOnlineMonth so slips do not show stale dates |
+| visual | done: 1280x720 mixed working/online screenshot inspected |
+| full gates | done: 512 vitest, 55 e2e (54 + isolated long tutorial), lint, tsc, build |
+| balance grid | skipped: display-only buildout, engine untouched |

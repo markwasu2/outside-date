@@ -100,3 +100,7 @@ import substationBuildingImg from '../assets/art/substation-building.png';
 
 /** Physical substation state, not the study status: empty surveyed plot, active build, complete. */
 export const SUBSTATION_ART = { none: substationPlannedImg, building: substationBuildingImg, done: tileSubstationImg };
+
+import plantBuildingImg from '../assets/art/plant-building.png';
+import plantOnlineImg from '../assets/art/plant-online.png';
+export const PLANT_ART = { building: plantBuildingImg, online: plantOnlineImg };
