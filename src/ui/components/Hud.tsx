@@ -361,8 +361,12 @@ export function Hud() {
       >
         Markets: E {draft.markets.equipmentIndex.toFixed(2)}x · L {draft.markets.laborIndex.toFixed(2)}x · C {draft.markets.contractorIndex.toFixed(2)}x
         {draft.markets.equipmentIndex >= 1.05 && (
-          <span data-testid="hud-markets-rising" style={{ marginLeft: 6, color: '#b26a00' }}>
-            Lead times are rising
+          <span
+            data-testid="hud-markets-rising"
+            title="Equipment demand is hot (E 1.05x or more): NEW long-lead orders cost more and take longer. Orders already placed keep their quoted price and arrival date, so order early when you can."
+            style={{ marginLeft: 6, color: '#b26a00' }}
+          >
+            Lead times are rising (new orders cost more, arrive later)
           </span>
         )}
       </div>
