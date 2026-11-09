@@ -1,6 +1,7 @@
 import type { ActionDef, Content } from '../content/schemas';
-import type { GameState, GoodwillGroup, PlannedAction } from './types';
+import type { GameState, GoodwillGroup, LogEntry, PlannedAction } from './types';
 import { KNOWN_ACTION_HANDLERS } from '../content/load';
+import { flavorPick } from './flavor';
 import { resolveContent } from './resolve';
 import {
   optionSite,
@@ -37,16 +38,28 @@ function clampGoodwill(value: number): number {
 
 const GOODWILL_GROUPS: GoodwillGroup[] = ['town', 'commission', 'utility', 'tenant'];
 
+/** Mood for picking a cast line, keyed off the same goodwill thresholds Hud.tsx's faces use. */
+function castMood(goodwill: number): 'greeting' | 'happy' | 'worried' | 'angry' {
+  if (goodwill > 70) return 'happy';
+  if (goodwill < 35) return 'angry';
+  if (goodwill < 50) return 'worried';
+  return 'greeting';
+}
+
 /**
  * 1 AP, free: +4 goodwill to one group, once per group every 3 months. A generic cross-group
  * action with no natural system-file home (not regulation-specific, not lease-specific, etc.),
  * so it's implemented directly here rather than delegated to a `systems/*.ts` module (P3.7
  * Decisions log).
+ *
+ * 2026-11-09 cast-flavor pass: the visit now logs who you saw and what they said (member and
+ * line both picked via flavor.ts, so no rng draws are consumed). This is the only action that
+ * logs its own entry; applyAction's generic acknowledgment below skips it to avoid a double log.
  */
 function visitCast(
   state: GameState,
   params: Record<string, string | number> | undefined,
-  _content: Content,
+  content: Content,
 ): GameState {
   const group = params?.['group'];
   if (typeof group !== 'string' || !(GOODWILL_GROUPS as string[]).includes(group)) {
@@ -58,10 +71,26 @@ function visitCast(
     throw new Error(`Cast visits to "${group}" are on cooldown for ${3 - (state.month - last)} more month(s)`);
   }
   const groupKey = group as GoodwillGroup;
+  const goodwill = clampGoodwill(state.goodwill[groupKey] + 4);
+
+  const members = content.cast.cast.filter((m) => m.goodwillGroup === groupKey);
+  let entry: LogEntry = { month: state.month, kind: 'action', text: `Visited the ${group} group.` };
+  if (members.length > 0) {
+    const member = flavorPick(state.rng, `visit:${group}:${state.month}`, members);
+    const moodLines = member.lines[castMood(goodwill)] ?? [];
+    entry = {
+      month: state.month,
+      kind: 'action',
+      text: `Visited ${member.name} (${member.role}).`,
+      detail: moodLines.length > 0 ? `"${flavorPick(state.rng, `visit-line:${member.id}:${state.month}`, moodLines)}"` : undefined,
+    };
+  }
+
   return {
     ...state,
-    goodwill: { ...state.goodwill, [groupKey]: clampGoodwill(state.goodwill[groupKey] + 4) },
+    goodwill: { ...state.goodwill, [groupKey]: goodwill },
     flags: { ...state.flags, [flagKey]: state.month },
+    log: [...state.log, entry],
   };
 }
 
@@ -95,6 +124,20 @@ export const actionHandlers: Record<(typeof KNOWN_ACTION_HANDLERS)[number], Acti
   visitCast,
 };
 
+/** One-line log text for an applied action, with the same param suffixes the plan list shows. */
+function describeAppliedAction(def: ActionDef, action: PlannedAction, content: Content): string {
+  const permitId = action.params?.['permitId'];
+  if (typeof permitId === 'string') return `${def.label}: ${permitId}`;
+  const hallId = action.params?.['hallId'];
+  if (typeof hallId === 'string') return `${def.label}: ${hallId}`;
+  const intervenorId = action.params?.['intervenorId'];
+  if (typeof intervenorId === 'string') {
+    const name = content.cast.intervenors.find((i) => i.id === intervenorId)?.name ?? intervenorId;
+    return `${def.label}: ${name}`;
+  }
+  return def.label;
+}
+
 /** Looks up an action's content definition and applies its handler. */
 export function applyAction(state: GameState, action: PlannedAction, content: Content): GameState {
   content = resolveContent(state, content);
@@ -104,5 +147,14 @@ export function applyAction(state: GameState, action: PlannedAction, content: Co
   if (!handler) {
     throw new Error(`Action "${def.id}" references unknown handler "${def.handler}"`);
   }
-  return handler(state, action.params, content, def);
+  const next = handler(state, action.params, content, def);
+  // 2026-11-09 first-year pulse pass: every action acknowledges itself in the log (the cheapest
+  // existing feedback path; most setup actions previously left no trace). visitCast logs its own
+  // flavored entry in its handler, so it is skipped here.
+  if (def.id === 'visitCast') return next;
+  // Insert at the pre-handler log position so the acknowledgment precedes any milestone/warning
+  // entries the handler itself logged (e.g. advanceHall's "H1 delivered.").
+  const log = [...next.log];
+  log.splice(state.log.length, 0, { month: next.month, kind: 'action', text: describeAppliedAction(def, action, content) });
+  return { ...next, log };
 }

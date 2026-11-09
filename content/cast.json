@@ -4,6 +4,7 @@
       "id": "governor",
       "name": "Governor Eleanor Voss",
       "role": "Governor of Arcadia",
+      "blurb": "Campaigned on jobs and reads every ribbon-cutting as a receipt. Warm when the project hires, cold when it slips.",
       "goodwillGroup": "town",
       "portrait": "governor",
       "lines": {
@@ -33,6 +34,7 @@
       "id": "utility_ceo",
       "name": "Priya Natarajan",
       "role": "CEO, Arcadia Public Power",
+      "blurb": "Runs Arcadia Public Power like a ledger with a flag on it. Wants your load firm, your ask honest, and your checks on time.",
       "goodwillGroup": "utility",
       "portrait": "utility_ceo",
       "lines": {
@@ -62,6 +64,7 @@
       "id": "commissioner_friendly",
       "name": "Commissioner Hank Odell",
       "role": "Arcadia Utility Commission",
+      "blurb": "Twenty years on the bench and still reads every filing. Votes for a clean record, not a charming one.",
       "goodwillGroup": "commission",
       "portrait": "commissioner_friendly",
       "lines": {
@@ -91,6 +94,7 @@
       "id": "commissioner_skeptical",
       "name": "Commissioner Dana Kwambai",
       "role": "Arcadia Utility Commission",
+      "blurb": "Former prosecutor. Counts testimony in verifiable facts and keeps a running total.",
       "goodwillGroup": "commission",
       "portrait": "commissioner_skeptical",
       "lines": {
@@ -120,6 +124,7 @@
       "id": "ratepayer_lawyer",
       "name": "Lucia Byrne",
       "role": "Counsel, Millbrook Ratepayers Alliance",
+      "blurb": "Represents the Millbrook Ratepayers Alliance. Settles fast when the risk allocation is fair, and never before.",
       "goodwillGroup": "commission",
       "portrait": "ratepayer_lawyer",
       "lines": {
@@ -149,6 +154,7 @@
       "id": "lenders_engineer",
       "name": "Marcus Teale",
       "role": "Independent engineer, senior lender",
+      "blurb": "The senior lender's eyes on site. Certifies a draw only when progress matches paper.",
       "goodwillGroup": "utility",
       "portrait": "lenders_engineer",
       "lines": {
@@ -178,6 +184,7 @@
       "id": "gc_foreman",
       "name": "Foreman Ruth Calder",
       "role": "General contractor's site foreman",
+      "blurb": "Runs the crew. Judges you by decisions per week and whether the pad is ready when she is.",
       "goodwillGroup": "town",
       "portrait": "gc_foreman",
       "lines": {
@@ -207,6 +214,7 @@
       "id": "union_manager",
       "name": "Business Manager Ovidio Reyes",
       "role": "Richfield County trades council",
+      "blurb": "Business manager for the county trades. Steady work buys steady crews; stop-and-go buys speeches.",
       "goodwillGroup": "town",
       "portrait": "union_manager",
       "lines": {
@@ -236,6 +244,7 @@
       "id": "local_reporter",
       "name": "Sam Okafor",
       "role": "Reporter, the Millbrook Clarion",
+      "blurb": "Covers the campus for the Millbrook Clarion. Prints what the town already suspects, with your quotes attached.",
       "goodwillGroup": "town",
       "portrait": "local_reporter",
       "lines": {
@@ -258,6 +267,36 @@
           "That subpoena story wrote itself. Not a good look.",
           "I can't spin what the record shows.",
           "Readers remember stories like this."
+        ]
+      }
+    },
+    {
+      "id": "tenant_rep",
+      "name": "Jordan Ashe",
+      "role": "VP of site delivery, the Whale",
+      "blurb": "Owns the Whale's delivery date. Friendly right up to the outside date, then strictly contractual.",
+      "goodwillGroup": "tenant",
+      "portrait": "tenant_rep",
+      "lines": {
+        "greeting": [
+          "Walk me through the schedule.",
+          "How is my campus coming?",
+          "The date is the date. Everything else is details."
+        ],
+        "happy": [
+          "This is why we picked you.",
+          "Good month. Keep the date.",
+          "My team reads your reports first, and it shows."
+        ],
+        "worried": [
+          "Slippage makes my board nervous.",
+          "I need a recovery plan, not a status update.",
+          "The outside date is not a suggestion."
+        ],
+        "angry": [
+          "We signed a date, not a hope.",
+          "Damages are not a budget line I enjoy invoking.",
+          "This is not the partner we underwrote."
         ]
       }
     }

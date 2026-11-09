@@ -38,7 +38,7 @@ describe('loadContent', () => {
     expect(content.events.length).toBe(30);
     expect(content.glossary.length).toBe(48);
     expect(content.codex.length).toBe(21);
-    expect(content.cast.cast.length).toBe(9);
+    expect(content.cast.cast.length).toBe(10);
     expect(content.cast.intervenors.length).toBe(4);
     expect(Object.keys(content.scenarios).sort()).toEqual(['tutorial-edge5', 'whale']);
   });

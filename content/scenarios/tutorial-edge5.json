@@ -7,7 +7,8 @@
   "castIds": [
     "utility_ceo",
     "lenders_engineer",
-    "gc_foreman"
+    "gc_foreman",
+    "tenant_rep"
   ],
   "scriptedEvents": [
     {

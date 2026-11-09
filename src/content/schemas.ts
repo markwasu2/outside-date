@@ -236,6 +236,10 @@ export const EventCardSchema = z.object({
   id: z.string(),
   title: z.string(),
   body: z.string(),
+  /** Alternate tellings of `body` (same mechanics, different words). The engine picks one of
+   * [body, ...bodyVariants] per occurrence via a seeded, non-advancing flavor pick
+   * (src/engine/flavor.ts), so text varies without touching any sim number. */
+  bodyVariants: z.array(z.string()).optional(),
   codexId: z.string().optional(),
   art: z.string(),
   /** Monthly draw probability while eligible. Omitted for scripted-only cards. */
@@ -324,6 +328,9 @@ export const CastMemberSchema = z.object({
   id: z.string(),
   name: z.string(),
   role: z.string(),
+  /** One or two lines of personality, surfaced wherever the member's name renders (HUD tooltips,
+   * visit feedback). Text only; no mechanics read it. */
+  blurb: z.string().optional(),
   goodwillGroup: GoodwillGroupSchema,
   portrait: z.string(),
   lines: z.record(z.enum(['greeting', 'happy', 'worried', 'angry']), z.array(z.string())),
