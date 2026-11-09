@@ -45,4 +45,7 @@ test('finding #2: a scripted event choice shows a cost preview before it is comm
 
   const hostChoice = page.getByTestId('event-choice').filter({ hasText: 'Host the visit' });
   await expect(hostChoice).toContainText('Costs 1 AP next month');
+  // UX 9: the bespoke stakes name the rebate, not a generic fallback.
+  await expect(hostChoice).toContainText('$20.0M equipment rebate');
+  await expect(page.getByTestId('event-choice').filter({ hasText: 'Decline' })).toContainText('No visit, no rebate');
 });

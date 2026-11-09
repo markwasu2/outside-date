@@ -112,8 +112,46 @@ export function describeEffect(effect: Effect): string {
  * effects don't both read "Has consequences, Has consequences". Empty string (renders nothing) for
  * a choice with no effects, or when the choice can't be matched back to its content definition
  * (the synthetic `docketVoteFail` card's choices have no `content.events` entry at all). */
-export function describeChoiceEffects(choiceId: string, eventCard: EventCard | null | undefined): string {
+/** UX 9: cards whose real stakes live in bespoke handlers or flags, not closed-set effects, so
+ * the generic preview read "Has consequences" or nothing at all. Text mirrors each card's
+ * events.json note and its engine handler (resolveChoice / cardOdds): governor_visit's
+ * rebateUnlocked gates the scripted $20M equipment_rebate; union_pla's plaSigned drops
+ * labor_shortfall's draw odds from 0.22 to 0.05 a month (cardOdds); tenant_slide_offer's accept
+ * reuses delaySwap's tuning (swapMonths 2, swapRentCut 2%); chip_generation is tier-dependent
+ * (resolveChipGenerationChoice). */
+const BESPOKE_CHOICE_STAKES: Record<string, (tier: string) => Record<string, string>> = {
+  governor_visit: () => ({
+    host: 'Costs 1 AP next month, unlocks the $20.0M equipment rebate',
+    decline: 'No visit, no rebate',
+  }),
+  union_pla: () => ({
+    sign: 'Hall budgets +2%, labor-shortfall odds drop from 0.22 to 0.05 a month',
+    decline: 'Labor-shortfall odds stay at 0.22 a month',
+  }),
+  tenant_slide_offer: () => ({
+    accept: 'The next undelivered hall slips 2 months (delivery and outside date), its rent -2%',
+    decline: 'Dates and rent unchanged',
+  }),
+  chip_generation: (tier) =>
+    tier === 'air'
+      ? {
+          retrofit: 'Costs $15.0M per undelivered hall',
+          decline: 'Tenant goodwill -15, asset score -3',
+        }
+      : {
+          retrofit: 'Costs $4.0M per undelivered hall, +1 fitout month on each',
+          decline: 'Tenant goodwill -15',
+        },
+};
+
+export function describeChoiceEffects(
+  choiceId: string,
+  eventCard: EventCard | null | undefined,
+  hallTier?: string,
+): string {
   if (!eventCard) return '';
+  const bespoke = BESPOKE_CHOICE_STAKES[eventCard.id]?.(hallTier ?? 'liquid')[choiceId];
+  if (bespoke) return bespoke;
   const def = eventCard.choices?.find((c) => c.id === choiceId);
   if (!def || def.effects.length === 0) return '';
   const parts = def.effects.map(describeEffect);
@@ -203,7 +241,7 @@ export function EventModal() {
         })()}
         <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
           {pending.choices.map((choice) => {
-            const costText = describeChoiceEffects(choice.id, eventCard);
+            const costText = describeChoiceEffects(choice.id, eventCard, draft.setup.hallTier);
             return (
               <button
                 key={choice.id}

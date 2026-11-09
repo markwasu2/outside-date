@@ -728,3 +728,30 @@ the screen's headings per the no-em-dash rule.
 | balance grid | skipped: UI-only, no engine/content-tuning/bot change |
 | full suite green | done: 503 vitest, 44 playwright, eslint, tsc, vite build |
 | screenshots inspected | done: docs/screenshots/ux12/ (off + on, desktop 1440) |
+
+# UX 9 - bespoke choice stakes (Governor, labor agreement, racks, tenant slide)
+
+## The change (UI only)
+
+Queue item: four event cards showed "Has consequences" or nothing under their
+choices because their real stakes live in bespoke handlers or flags, not
+closed-set effects. describeChoiceEffects gains a bespoke stakes map keyed by
+card id (mirroring each card's events.json note and its engine handler), with
+an optional hallTier param for chip_generation's tier-dependent numbers:
+governor_visit (1 AP + unlocks the $20.0M rebate / no visit, no rebate),
+union_pla (budgets +2%, labor-shortfall odds 0.22 to 0.05 / odds stay 0.22),
+tenant_slide_offer (+2 months delivery and outside, rent -2% / unchanged),
+chip_generation (liquid $4.0M + 1 fitout month per undelivered hall; air
+$15.0M; decline tenant -15, air also asset -3). EventModal passes the run's
+hallTier. One pre-existing test updated (governor decline was pinned to the
+old empty string).
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| the four cards show real stakes | done: unit tests pin each card's text; screenshot of the Governor modal inspected |
+| tier-dependent racks stakes | done: liquid vs air asserted |
+| e2e | done: finding #2 spec extended (rebate + decline text), 44 passed |
+| balance grid | skipped: UI-only, no engine/content-tuning/bot change |
+| full suite green | done: 507 vitest (5 new + 1 updated), 44 playwright, eslint, tsc, vite build |
