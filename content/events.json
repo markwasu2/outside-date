@@ -78,7 +78,7 @@
     "codexId": "expansion-docket",
     "scripted": true,
     "scriptedMonth": 24,
-    "requires": ["docketApproved"],
+    "requires": ["docketApproved", "notFlag:fixedScope"],
     "effects": [],
     "choices": [
       { "id": "yes", "label": "Say yes", "effects": [{ "type": "addAskHalls", "args": [] }] },

@@ -40,7 +40,7 @@ describe('loadContent', () => {
     expect(content.codex.length).toBe(21);
     expect(content.cast.cast.length).toBe(10);
     expect(content.cast.intervenors.length).toBe(4);
-    expect(Object.keys(content.scenarios).sort()).toEqual(['tutorial-edge5', 'whale']);
+    expect(Object.keys(content.scenarios).sort()).toEqual(['millbrook-relay', 'tutorial-edge5', 'whale']);
   });
 
   it('fails with a readable message on a deliberately broken fixture', () => {
