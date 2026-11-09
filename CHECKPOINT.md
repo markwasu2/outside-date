@@ -769,3 +769,19 @@ Low has the highest odds, Medium has lower odds and slips one month shorter.
 | full gates | done: 507 vitest, 45 playwright, tsc, eslint, build |
 | visual check | done: docs/screenshots/cold2/power-hints.png at 1280 desktop |
 | balance grid | skipped: UI copy only |
+
+# Cold playthrough 2, fix 2 - labelled water route
+
+Regulation already lists water permits, but the board route was hidden in an
+unlabelled dry field. Site office now offers File water permit alongside air
+and building permits, using the same action and legality checks. The dry-field
+tile also says Water permit, and its tooltip names the route. No existing route
+was removed. The office's queued ghost includes water filings.
+
+| criterion | status |
+|---|---|
+| discoverable water action | done: site office action and labelled low field |
+| existing routes retained | done: Regulation and pond unchanged |
+| full gates | done: 507 vitest, 46 playwright, tsc, eslint, build |
+| visual check | done: docs/screenshots/cold2/water-route.png at 1280 desktop |
+| balance grid | skipped: UI routing only |
