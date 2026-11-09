@@ -8,6 +8,7 @@ import { resolveSite } from '../../content/sites';
 import { STAGES } from '../../engine/types';
 import type { PlannedAction } from '../../engine/types';
 import { STAGE_ART, TILE_ART, type TileArt } from '../art';
+import { LEGEND_ENTRIES, hallCaption, pondStateWords, substationStateWords } from '../board/legibility';
 import { useStore } from '../store';
 import { usePrefersReducedMotion } from '../board/boardStyles';
 import { monthDeltas } from '../board/deltas';
@@ -37,6 +38,52 @@ function ArtLayer({ img, dimmed }: { img?: string; dimmed?: boolean }) {
         filter: dimmed ? 'grayscale(0.5)' : undefined,
       }}
     />
+  );
+}
+
+/** UX legibility: a small collapsible legend explaining the board's chips, icons and stage
+ *  art. Collapsed by default so it never covers the board unprompted. */
+function BoardLegend() {
+  const [open, setOpen] = useState(false);
+  // Mounted at map-root level (not inside the road cell, whose overflow:hidden would clip the
+  // panel). The button floats over the road row's right end; the panel drops below it.
+  return (
+    <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 30 }}>
+      <button
+        data-testid="board-legend-toggle"
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((v) => !v);
+        }}
+        style={{ fontSize: '0.65rem', padding: '0 6px', cursor: 'pointer' }}
+      >
+        {open ? 'Hide legend' : 'Legend'}
+      </button>
+      {open && (
+        <div
+          data-testid="board-legend-panel"
+          style={{
+            position: 'absolute',
+            top: '110%',
+            right: 0,
+            background: 'rgba(255,253,248,0.97)',
+            border: '1px solid #999',
+            borderRadius: 6,
+            padding: '0.5rem 0.6rem',
+            width: 340,
+            textAlign: 'left',
+            fontSize: '0.7rem',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          }}
+        >
+          {LEGEND_ENTRIES.map((e) => (
+            <div key={e.symbol} style={{ marginBottom: 3 }}>
+              <strong>{e.symbol}:</strong> {e.meaning}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -198,6 +245,7 @@ export function MapGrid() {
         background: siteTheme.ground,
       }}
     >
+      <BoardLegend />
       {/* Road: no popover (D1). Phase 4: the site's transmission poles queue at the road. */}
       <div style={{ gridColumn: '1 / 13', gridRow: '1 / 2', background: TILE_ART.road.bg, ...cellStyle }}>
         <span>
@@ -260,6 +308,7 @@ export function MapGrid() {
         <span style={siteTheme.pond ? ART_CHIP : { position: 'relative' }}>
           {siteTheme.pond ? `${TILE_ART.pond.icon} ${TILE_ART.pond.label}` : '\u{1F33E} Low field'}
         </span>
+        {siteTheme.pond && <span style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{pondStateWords(draft)}</span>}
         {objectHasQueuedAction('pond', plan, hallIds) && <QueuedGhost />}
       </div>
 
@@ -309,6 +358,25 @@ export function MapGrid() {
             >
               <div style={{ position: 'absolute', top: 1, left: 3, fontSize: '0.7rem', zIndex: 2 }}>
                 <strong>{hall.id}</strong>
+              </div>
+              {/* UX legibility: the stage in words plus what the hall is waiting on. */}
+              <div
+                data-testid={`caption-${hall.id}`}
+                style={{
+                  position: 'absolute',
+                  top: 14,
+                  left: 3,
+                  fontSize: '0.6rem',
+                  zIndex: 2,
+                  pointerEvents: 'none',
+                  padding: '0 3px',
+                  borderRadius: 3,
+                  background: 'rgba(255,253,248,0.85)',
+                  color: '#3a3026',
+                  maxWidth: '90%',
+                }}
+              >
+                {hallCaption(draft, content, hall)}
               </div>
               {/* Phase 6 (spatial spike): the pad chip. Unbroken halls are unplaced; broken
                   ground fixes near (adjacent to the substation, free) or far (feeder + line
@@ -470,18 +538,17 @@ export function MapGrid() {
         <div style={ART_CHIP}>
           {TILE_ART.substation.icon} {TILE_ART.substation.label}
         </div>
+        <div style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{substationStateWords(draft)}</div>
         {power.studyStatus === 'pending' && (
           <div style={ART_CHIP}>
             {'\u{1F4CB}'} study{studyMonthsLeft !== null ? `: ${Math.max(0, studyMonthsLeft)}mo left` : ''}
           </div>
         )}
-        {power.studyStatus === 'done' && <div style={ART_CHIP}>{'\u{1F4CB}'} study done</div>}
         {power.substationStatus === 'building' && (
           <div style={ART_CHIP}>
-            {'\u{1F3D7}\uFE0F'} building{power.substationDoneMonth !== null ? ` (${formatMonth(power.substationDoneMonth)})` : ''}
+            {'\u{1F3D7}\uFE0F'} done {power.substationDoneMonth !== null ? formatMonth(power.substationDoneMonth) : 'soon'}
           </div>
         )}
-        {substationEnergized && <div style={ART_CHIP}>{'\u26A1'} energized</div>}
         {objectHasQueuedAction('substation', plan, hallIds) && <QueuedGhost />}
       </div>
 
