@@ -57,10 +57,10 @@ against init.ts via tests instead of touching the engine.
 | 6 | npm run typecheck clean | PASS | npx tsc --noEmit clean |
 | 7 | npm run lint clean | PASS | npx eslint clean; includes the baseline repair below |
 | 8 | npx vitest run: all pass, count >= 361 + new | PASS | 393 passed, 42 files, 0 skips (361 baseline + 32 new in 3 files) |
-| 9 | npx playwright test: all pass, count >= 20 + new | PASS | 25 passed (20 baseline + 5 new read-the-deal specs), run per-spec on a 2-CPU box |
+| 9 | npx playwright test: all pass, count >= 20 + new | PASS | 25 passed (20 baseline + 5 new read-the-deal specs), run per-spec on a 2-CPU box; smoke.spec.ts 2/2 green after the pointer-events fix |
 | 10 | npm run build succeeds | PASS | npm run build OK, 493 kB bundle |
 | 11 | Protected-file check prints nothing | PASS | git diff main...HEAD --stat on src/engine src/sim content/tuning.json content/actions.json tests/engine tests/sim tests/fixtures + all pre-existing e2e specs prints nothing |
-| 12 | Visual check done (screenshots opened, one line each) | PENDING | scripts/phase2-screenshots.mjs -> docs/screenshots/phase2/ (5 states x 800px + 1440px) |
+| 12 | Visual check done (screenshots opened, one line each) | PASS | 10 PNGs opened, notes in Visual check log |
 | 13 | Every named company has a source URL + date | PASS | content/codex.json: 32/32 entries carry https sourceUrl + verifiedOn (scripted check); new stakeholder sources: BDC Giants 400 (GCs, 2025-10-07), Zurich via Commercial Risk (insurer, 2026-06-16), Nikkei Asia (Hitachi Energy >30mo, 2026-03-25), PEI (JPMorgan $7.12B Abilene, 2025-05-29); reused Phase 1 verified URLs for developer/tenant/partner/utility/ratepayers/town/commission |
 | 14 | No TODO/FIXME/stub/placeholder left in touched files | PASS | grep over all new + touched files: clean |
 | 15 | npx vitest run tests/sim/balance.test.ts passes unchanged | PASS | file untouched (protected diff empty); passes inside the 393-test full run |
@@ -96,7 +96,17 @@ against init.ts via tests instead of touching the engine.
 - DSCR trend + forward NOI are UI-side projections from committed snapshots (fixed lease math);
   an engine-owned projection would pick up mid-stream lease amendments, delay swaps and rent
   relief automatically instead of the UI mirror having to re-derive them.
+- The sources & uses closing table is rebuilt from current setup choices; when an event amends
+  the deal mid-run (the_ask adds 2 halls), the UI mirror's uses grow while recorded commitments
+  don't, so sources != uses on such states (observed: $2.77B vs $3.54B on a bot state that took
+  the ask). The engine should emit an amended closing table when it applies deal-changing
+  effects.
 
 ## Visual check log
 
-PENDING - screenshots land in docs/screenshots/phase2/ and each PNG gets a one-line note here.
+All 10 PNGs (5 states x 800px + 1440px viewports) opened and inspected:
+- p2-01-financials-drawer-whale: real Whale campaign at Y2 M3; closing table balances ($1.55B = $1.55B, senior/mezz/equity vs land/halls/cooling/power/fitout/working capital), draw-schedule bars (equity $235M of $492.6M drawn), interest reserve $0 folded in with $1.06B headroom, DSCR trend honestly reads "no readings yet" (n/a until first draw), waterfall below the fold (drawer scrolls). Clean at both widths. (An earlier capture from a bot-injected state showed sources $2.77B vs uses $3.54B - the ask-event drift noted under NEEDS ENGINE - so the final shot is from a campaign played by real clicks.)
+- p2-02-first-time-explainer: fresh Whale month 0, the Cash explainer card auto-opened (what/why/do + Got it), lock icons on Regulation/Power/Money/Chips. Readable at both widths; slight overlap of the next-step card, popover is pointer-events:none so nothing is blocked.
+- p2-03-locked-tabs-tutorial: tutorial month 0, Power tab active showing its unlock hint ("click the substation on the map") over dimmed-but-functional rows (study enabled, transformer disabled with its reason). Coach tip overlaps "Planned this month" - pre-existing behavior, unchanged.
+- p2-04-stakeholders-codex: Stakeholders view from the title Codex; role cards show cast (Ruth Calder, Priya Natarajan, Jordan Ashe, Marcus Teale), one-line responsibility, "Holds by default" risk lists, and the sourced real-world link with verified date.
+- p2-05-event-who-holds-chip: the tutorial's month-3 governor_visit card (first card the run reaches) carries the "Who holds this: The town and county" chip between the body and the choices; choices keep their cost previews ("Costs 1 AP next month").

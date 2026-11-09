@@ -1,6 +1,8 @@
 import { formatDollars, formatMonth } from '../../engine/format';
 import { forwardNoi } from '../../engine/selectors';
 import {
+  buildFinancialSnapshot,
+  buildSourcesAndUses,
   cashWaterfall,
   drawScheduleRows,
   dscrTrend,
@@ -146,7 +148,17 @@ export function FinancialsDrawer() {
     );
   }
 
-  const atClose = snapshots.find((s) => s.month === 0);
+  // Sources & uses come from the month-0 snapshot; states that predate the recorder (old saves,
+  // debug-injected runs) fall back to rebuilding the closing table from the current state's
+  // setup choices, which still carry every at-close fact the table needs.
+  const atClose = (() => {
+    const recorded = snapshots.find((s) => s.month === 0);
+    if (recorded) return recorded;
+    const fallback = buildFinancialSnapshot(state, content);
+    // buildFinancialSnapshot only attaches sources/uses at month 0 (when snapshots are normally
+    // recorded); the closing table is computable from setup choices at any month.
+    return { ...fallback, sourcesUses: fallback.sourcesUses ?? buildSourcesAndUses(state, content) };
+  })();
   const last = snapshots[snapshots.length - 1];
   const draws = drawScheduleRows(snapshots);
   const trend = dscrTrend(snapshots);

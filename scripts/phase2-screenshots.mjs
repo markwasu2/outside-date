@@ -59,12 +59,43 @@ mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch();
 const page = await browser.newPage();
 
-// 1. Financials drawer on a Whale run with real history: bot to first delivery, then open the
-// drawer (sources=uses at close, draw schedule, DSCR trend, interest reserve, waterfall).
+// 1. Financials drawer on a REAL Whale campaign, played ~14 months by clicks (bot-injected
+// states drift the closing table: events like the_ask amend the deal, which a UI-only mirror
+// can't reconcile - see CHECKPOINT NEEDS ENGINE). Sources=uses at close, draws underway,
+// waterfall + DSCR series populated.
 await page.goto(BASE);
-await page.waitForFunction(() => typeof window.__debugBotToFirstDelivery === 'function');
-await page.evaluate(() => window.__debugBotToFirstDelivery('competent', 'whale', 'normal', 2));
+await page.locator('select').first().selectOption('whale');
+await page.getByRole('button', { name: 'New game' }).click();
+await page.getByRole('button', { name: 'Next: Lease' }).click();
+await page.getByRole('button', { name: 'Next: Capital stack' }).click();
+await page.getByRole('button', { name: 'Next: Power' }).click();
+await page.getByRole('button', { name: 'Next: Insurance' }).click();
+await page.getByRole('button', { name: 'Start campaign' }).click();
+for (let m = 0; m < 14; m += 1) {
+  await dismissExplainers(page);
+  await dismissEventIfUp(page);
+  // Queue every enabled action on every tab (skipping stand-down, same discipline as smoke).
+  for (const tabName of ['Land', 'Regulation', 'Power', 'Money', 'Chips', 'Construction']) {
+    await page.getByRole('button', { name: tabName, exact: true }).click();
+    for (let g = 0; g < 6; g += 1) {
+      const buttons = page.getByTestId('action-row-button').and(page.locator(':enabled'));
+      const count = await buttons.count();
+      let clicked = false;
+      for (let i = 0; i < count; i += 1) {
+        const name = await buttons.nth(i).innerText();
+        if (name.startsWith('Stand down')) continue;
+        await buttons.nth(i).click();
+        clicked = true;
+        break;
+      }
+      if (!clicked) break;
+    }
+  }
+  await dismissExplainers(page);
+  await page.getByRole('button', { name: 'End month' }).click();
+}
 await dismissExplainers(page);
+await dismissEventIfUp(page);
 await page.getByTestId('open-financials').click();
 await page.getByTestId('financials-drawer').waitFor();
 await shot(page, 'p2-01-financials-drawer-whale');
