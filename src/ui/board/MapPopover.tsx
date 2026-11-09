@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { formatMonth } from '../../engine/format';
 import { checkAction, useStore } from '../store';
@@ -44,6 +44,12 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
     markBoardObjectSeen(objectId);
   }, [objectId, markBoardObjectSeen]);
 
+  const popoverRef = useRef<HTMLDivElement>(null);
+
+  // Close on Esc or an outside mousedown. No backdrop element: a full-screen overlay would
+  // swallow the first click aimed at anything else (including the TracksPanel's buttons), so
+  // outside-click detection lives here instead. The same click still reaches its target - e.g.
+  // clicking another map object closes this popover and opens that one in one gesture.
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
@@ -51,8 +57,17 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
         onClose();
       }
     }
+    function onMouseDown(e: MouseEvent) {
+      if (popoverRef.current && e.target instanceof Node && !popoverRef.current.contains(e.target)) {
+        onClose();
+      }
+    }
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    document.addEventListener('mousedown', onMouseDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('mousedown', onMouseDown);
+    };
   }, [onClose]);
 
   const hall = state.halls.find((h) => h.id === objectId);
@@ -63,13 +78,8 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
 
   return (
     <>
-      {/* outside-click backdrop: covers the screen under the popover */}
       <div
-        data-testid="popover-backdrop"
-        onClick={onClose}
-        style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'transparent' }}
-      />
-      <div
+        ref={popoverRef}
         role="dialog"
         aria-label={`${title} actions`}
         data-testid="map-popover"

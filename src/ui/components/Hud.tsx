@@ -240,11 +240,19 @@ export function Hud() {
       setDisplayCash(draft.cash);
       return;
     }
+    // Update in ~8 coarse steps rather than every animation frame: the HUD sits at the app root,
+    // so each setDisplayCash re-renders the whole board - per-frame updates made end-to-end play
+    // noticeably slower without looking any smoother.
     let raf = 0;
     const start = performance.now();
+    let lastStep = -1;
     const tick = (t: number) => {
       const p = Math.min(1, (t - start) / 600);
-      setDisplayCash(Math.round(from + (draft.cash - from) * p));
+      const step = Math.floor(p * 8);
+      if (step !== lastStep) {
+        lastStep = step;
+        setDisplayCash(Math.round(from + (draft.cash - from) * p));
+      }
       if (p < 1) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);

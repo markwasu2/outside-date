@@ -126,9 +126,12 @@ export function MapGrid() {
     setPopoverPos({ left, top });
   }, [boardPopover]);
 
+  // Popover opens (never toggles) on cell click: closing is handled by Esc, outside mousedown,
+  // queueing an action, or the popover's own close button (D1). Toggling here would race the
+  // outside-mousedown close for clicks on the anchor cell itself.
   const openObject = (objectId: string, hallId: string | null) => {
     selectHall(hallId);
-    setBoardPopover(boardPopover === objectId ? null : objectId);
+    setBoardPopover(objectId);
   };
 
   const power = draft.power;
