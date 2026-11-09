@@ -153,8 +153,9 @@ export function applyAction(state: GameState, action: PlannedAction, content: Co
   const next = handler(state, action.params, content, def);
   // 2026-11-09 first-year pulse pass: every action acknowledges itself in the log (the cheapest
   // existing feedback path; most setup actions previously left no trace). visitCast logs its own
-  // flavored entry in its handler, so it is skipped here.
-  if (def.id === 'visitCast') return next;
+  // flavored entry in its handler, and optionSite logs its own cost/funding-source line
+  // (2026-11-08 engine-audit), so both are skipped here.
+  if (def.id === 'visitCast' || def.id === 'optionSite') return next;
   // Insert at the pre-handler log position so the acknowledgment precedes any milestone/warning
   // entries the handler itself logged (e.g. advanceHall's "H1 delivered.").
   const log = [...next.log];

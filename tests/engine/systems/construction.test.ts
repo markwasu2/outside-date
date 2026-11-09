@@ -220,6 +220,17 @@ describe('construction: optionSite / fundExtensions / readyLiquid', () => {
     expect(() => applyAction(state, { actionId: 'optionSite' }, content)).toThrow(/already optioned/);
   });
 
+  it('optionSite logs the funded amount and its source (engine-audit: the fee never touched Cash visibly)', () => {
+    let state = freshState();
+    state = applyAction(state, { actionId: 'optionSite' }, content);
+    const entries = state.log.filter((e) => e.text.startsWith('Option the site'));
+    // Exactly one line (applyAction skips its generic acknowledgment for this action), naming
+    // the megasite land cost and the waterfall source that paid it (equity on a fresh stack).
+    expect(entries).toHaveLength(1);
+    expect(entries[0]!.text).toContain('$50.0M');
+    expect(entries[0]!.text).toContain('equity');
+  });
+
   it('fundExtensions spends fixed cash and raises town goodwill', () => {
     let state = freshState();
     const cashBefore = state.cash;
