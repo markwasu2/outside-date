@@ -50,3 +50,19 @@ test('substation illustration follows physical build state, not just a completed
   await expect(sub).toHaveAttribute('data-build-state','done');
   await expect(sub.getByRole('progressbar')).toHaveCount(0);
 });
+
+test('power plants show waiting, working and online buildouts with real dates and MW', async ({ page }) => {
+  await page.goto('/'); await page.getByTestId('quick-start').click();
+  await expect(page.getByTestId('plant-buildout-A')).toHaveAttribute('data-build-state','waiting');
+  await page.evaluate(async () => {
+    const { useStore } = await import('/src/ui/store.ts'); const s = useStore.getState();
+    const next = structuredClone(s.state);
+    next.power.plants[0].plannedOnlineMonth = next.month + 3;
+    next.power.plants[1].plannedOnlineMonth = next.month; next.power.plants[1].onlineMonth = next.month;
+    useStore.setState({state:next,draft:next});
+  });
+  await expect(page.getByTestId('plant-buildout-A')).toHaveAttribute('data-build-state','building');
+  await expect(page.getByTestId('plant-buildout-B')).toHaveAttribute('data-build-state','online');
+  await expect(page.getByTestId('plant-buildout-B')).toContainText('MW');
+  await page.screenshot({ path: 'docs/screenshots/cold2/art-plants.png' });
+});

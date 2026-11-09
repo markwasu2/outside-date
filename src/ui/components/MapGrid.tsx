@@ -7,7 +7,7 @@ import { pondMitigated } from '../../engine/systems/construction';
 import { resolveSite } from '../../content/sites';
 import { STAGES } from '../../engine/types';
 import type { PlannedAction } from '../../engine/types';
-import { STAGE_ART, TILE_ART, SUBSTATION_ART, type TileArt } from '../art';
+import { STAGE_ART, TILE_ART, SUBSTATION_ART, PLANT_ART, type TileArt } from '../art';
 import { LEGEND_ENTRIES, hallCaption, pondStateWords, substationStateWords } from '../board/legibility';
 import { COOLING_ART, DELIVERY_TRUCK, EQUIP_ART } from '../art';
 import { useStore } from '../store';
@@ -610,34 +610,28 @@ export function MapGrid() {
             />
           )}
         </div>
+        <div style={{ display: 'flex', gap: 3, flex: 1, minHeight: 0, width: '100%', marginTop: 3 }}>
         {power.plants.map((p) => {
           const online = p.onlineMonth !== null && p.onlineMonth <= draft.month;
           const planned = p.plannedOnlineMonth !== null;
+          const status = online ? 'online' : planned ? 'building' : 'waiting';
+          const targetMonth = p.onlineMonth ?? p.plannedOnlineMonth;
           const flash = deltas.plantsOnline.includes(p.id) && !reducedMotion;
           return (
-            <div
-              key={p.id}
+            <div key={p.id} data-testid={`plant-buildout-${p.id}`} data-build-state={status}
               className={flash ? 'board-arrival-flash' : undefined}
-              title={
-                online
-                  ? `Plant ${p.id}: online (${p.mwGrid} MW)`
-                  : planned
-                    ? `Plant ${p.id}: planned online ${formatMonth(p.plannedOnlineMonth ?? 0)}`
-                    : `Plant ${p.id}: not started`
-              }
-              style={{
-                marginTop: 3,
-                padding: '1px 4px',
-                borderRadius: 3,
-                fontSize: '0.65rem',
-                background: online ? '#fff59d' : planned ? '#ffe0b2' : '#d7ccc8',
-                border: '1px solid #8d6e63',
-              }}
-            >
-              {online ? '\u{1F50B}' : '\u{1F527}'} {p.id} {online ? `online (${p.mwGrid} MW)` : planned ? `planned ${formatMonth(p.plannedOnlineMonth ?? 0)}` : 'not started'}
+              title={online ? `Plant ${p.id}: online (${p.mwGrid} MW)` : planned ? `Plant ${p.id}: ${p.slipped ? 'delayed' : 'building'}, online ${formatMonth(targetMonth ?? 0)}` : `Plant ${p.id}: waiting for approved docket`}
+              style={{ flex: 1, minWidth: 0, position: 'relative', borderRadius: 3, overflow: 'hidden', background: online ? '#e4efd9' : '#ede3d0', border: '1px solid #8d6e63', display: 'flex', flexDirection: 'column' }}>
+              {planned ? <img src={online ? PLANT_ART.online : PLANT_ART.building} alt="" aria-hidden="true" draggable={false} style={{ width: '100%', flex: 1, minHeight: 0, objectFit: 'cover', pointerEvents: 'none' }} />
+                : <div style={{ flex: 1, display: 'grid', placeItems: 'center', border: '1px dashed #ae9a77', color: '#776a53', fontSize: 20 }}>{'\u{1F4CB}'}</div>}
+              <div style={{ fontSize: '0.6rem', padding: 2, textAlign: 'center', background: online ? '#d6e9c9' : '#fff8e9' }}>
+                <strong>{p.id} {online ? 'online' : planned ? p.slipped ? 'delayed' : 'building' : 'waiting'}</strong><br />
+                {online ? `${p.mwGrid} MW` : planned ? formatMonth(targetMonth ?? 0) : 'needs docket'}
+              </div>
             </div>
           );
         })}
+        </div>
       </div>
 
       {/* D3: animated power line from an energized substation into the campus. */}
