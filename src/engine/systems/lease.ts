@@ -2,6 +2,7 @@ import type { Content } from '../../content/schemas';
 import type { GameState, Hall, RiskHolder, RiskRow } from '../types';
 import { chance } from '../rng';
 import { hallGrossRent } from '../selectors';
+import { formatDollars } from '../format';
 
 /**
  * Lease system (PLAN.md 4.9 lease screen, 4.10 lease operations): rent, LD/abatement
@@ -78,6 +79,7 @@ function applyLateRemedy(state: GameState, content: Content): GameState {
 
   let cash = state.cash;
   let risks = state.risks;
+  let log = state.log;
   const halls = state.halls.map((hall) => {
     if (!lateHalls.includes(hall)) return hall;
 
@@ -85,6 +87,15 @@ function applyLateRemedy(state: GameState, content: Content): GameState {
     if (dsuCovers) {
       cash += state.monthlyBurn / lateHalls.length;
       risks = setRiskHolder(risks, 'stormDelay', 'insurer');
+      log = [
+        ...log,
+        {
+          month: state.month,
+          kind: 'milestone' as const,
+          text: `DSU insurance covers this month's delay on ${hall.id}: burn reimbursed, no liquidated damages, no rent abatement.`,
+          detail: `Remaining DSU cover: ${hall.insuredDelayMonths - 1} month(s).`,
+        },
+      ];
     }
 
     if (lease.lateRemedy === 'liquidatedDamages') {
@@ -93,6 +104,15 @@ function applyLateRemedy(state: GameState, content: Content): GameState {
       if (!dsuCovers) {
         cash -= ld;
         risks = materializeRisk(risks, 'deliveryDelay', ld);
+        log = [
+          ...log,
+          {
+            month: state.month,
+            kind: 'warning' as const,
+            text: `${hall.id} missed its delivery date: liquidated damages cost ${formatDollars(ld)} this month.`,
+            detail: `Outside date: month ${hall.outsideMonth}. Fix by delivering, or ask the tenant to extend.`,
+          },
+        ];
       }
       return {
         ...hall,
@@ -102,13 +122,24 @@ function applyLateRemedy(state: GameState, content: Content): GameState {
       };
     }
 
+    if (!dsuCovers) {
+      log = [
+        ...log,
+        {
+          month: state.month,
+          kind: 'warning' as const,
+          text: `${hall.id} is past its delivery date: the tenant will abate ${hall.abatementMonthsOwed + 1} month(s) of rent after delivery.`,
+          detail: `Outside date: month ${hall.outsideMonth}.`,
+        },
+      ];
+    }
     return {
       ...hall,
       abatementMonthsOwed: dsuCovers ? hall.abatementMonthsOwed : hall.abatementMonthsOwed + 1,
       insuredDelayMonths: dsuCovers ? hall.insuredDelayMonths - 1 : hall.insuredDelayMonths,
     };
   });
-  return { ...state, cash, risks, halls };
+  return { ...state, cash, risks, halls, log };
 }
 
 /** Outside date (4.10): a one-time extension if tenant goodwill is high enough, else termination. */

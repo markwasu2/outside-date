@@ -624,3 +624,31 @@ addition. Desktop only.
 | balance grid | skipped: UI-only, no engine/content-tuning/bot change |
 | full suite green | done: 499 vitest (hallVisual flag test updated), 42 playwright, eslint, tsc, vite build |
 | screenshots inspected | done: docs/screenshots/gfx2/ (board + delivery truck, desktop 1440) |
+
+# UX 10 - explained warnings
+
+## The change
+
+User ask: the "Lead times are rising" warning is unexplained, and early-month
+penalties hit silently. Two fixes. (1) HUD: the markets strip now reads
+"Lead times are rising (new orders cost more, arrive later)" with a tooltip
+explaining the E index threshold and that orders already placed keep their
+quoted price and arrival date. (2) Engine log: applyLateRemedy in lease.ts
+previously deducted liquidated-damages cash and accrued tenant rent-abatement
+months with no log line - the player saw cash drop with no reason. It now logs
+a warning card per month per late hall (LD cost with outside date and fix
+hint, or abatement accrual), and a milestone entry when DSU insurance covers
+the month. Warning-kind entries surface as UX 6 notice cards; bots never read
+state.log (grep clean), no numeric/rng/bot behavior changed.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| markets warning explains itself | done: inline suffix + tooltip, screenshot docs/screenshots/ux10/hud-markets-rising-desktop-1440.png |
+| LD charge surfaces with reason and fix | done: warning card "H1 missed its delivery date: liquidated damages cost $2.3M this month" + outside date + fix hint (screenshot) |
+| abatement accrual surfaces | done: warning card naming hall, months owed and outside date |
+| DSU coverage no longer silent | done: milestone log entry (burn reimbursed, remaining cover) |
+| balance grid | skipped: log-only engine change - no numeric, rng, content-tuning or bot behavior touched; 499 vitest (incl. perfect-play + state-equality fixtures) confirm state math unchanged |
+| full suite green | done: 499 vitest, 42 playwright, eslint, tsc, vite build |
+| screenshots inspected | done: docs/screenshots/ux10/ (LD card + HUD strip, desktop 1440) |
