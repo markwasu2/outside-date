@@ -15,6 +15,40 @@ import { hallVisual, stageMinMonths } from '../board/hallVisual';
 import { HallSprite } from '../board/HallSprite';
 import { MapPopover, POPOVER_MAX_HEIGHT, POPOVER_WIDTH } from '../board/MapPopover';
 
+/** GFX 1: the generated isometric tile art sits under the tile's content as a
+ *  full-bleed image; textual labels ride on a light chip so they stay readable. */
+function ArtLayer({ img, dimmed }: { img?: string; dimmed?: boolean }) {
+  if (!img) return null;
+  return (
+    <img
+      src={img}
+      alt=""
+      aria-hidden="true"
+      draggable={false}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        borderRadius: 4,
+        pointerEvents: 'none',
+        opacity: dimmed ? 0.4 : 1,
+        filter: dimmed ? 'grayscale(0.5)' : undefined,
+      }}
+    />
+  );
+}
+
+const ART_CHIP: CSSProperties = {
+  position: 'relative',
+  background: 'rgba(255,253,248,0.85)',
+  borderRadius: 3,
+  padding: '0 3px',
+  display: 'inline-block',
+  color: '#3a3026',
+};
+
 function hallLook(stageIndex: number, delivered: boolean): TileArt {
   if (delivered) return STAGE_ART.delivered as TileArt;
   if (stageIndex < 0) return STAGE_ART.notStarted as TileArt;
@@ -195,7 +229,10 @@ export function MapGrid() {
         }}
         title="Site office"
       >
-        {TILE_ART.siteOffice.icon} {TILE_ART.siteOffice.label}
+        <ArtLayer img={TILE_ART.siteOffice.img} />
+        <span style={ART_CHIP}>
+          {TILE_ART.siteOffice.icon} {TILE_ART.siteOffice.label}
+        </span>
         {objectHasQueuedAction('siteOffice', plan, hallIds) && <QueuedGhost />}
       </div>
 
@@ -219,7 +256,10 @@ export function MapGrid() {
         }}
         title={siteTheme.pond ? 'Pond' : 'Low field'}
       >
-        {siteTheme.pond ? `${TILE_ART.pond.icon} ${TILE_ART.pond.label}` : '\u{1F33E} Low field'}
+        {siteTheme.pond && <ArtLayer img={TILE_ART.pond.img} />}
+        <span style={siteTheme.pond ? ART_CHIP : { position: 'relative' }}>
+          {siteTheme.pond ? `${TILE_ART.pond.icon} ${TILE_ART.pond.label}` : '\u{1F33E} Low field'}
+        </span>
         {objectHasQueuedAction('pond', plan, hallIds) && <QueuedGhost />}
       </div>
 
@@ -347,7 +387,8 @@ export function MapGrid() {
         }}
         title="Laydown yard"
       >
-        <div>
+        <ArtLayer img={TILE_ART.laydownYard.img} />
+        <div style={ART_CHIP}>
           {TILE_ART.laydownYard.icon} {TILE_ART.laydownYard.label}
           {/* Phase 7 (scarcity pack): the yard holds a fixed number of crates; show the load. */}
           <span style={{ color: '#6d4c41', fontSize: '0.65rem' }} data-testid="yard-capacity">
@@ -355,7 +396,9 @@ export function MapGrid() {
             {power.orders.length}/{resolveContent(draft, content).tuning.spatial.laydownCapacity}
           </span>
         </div>
-        {power.orders.length === 0 && <div style={{ color: '#6d4c41', fontSize: '0.65rem' }}>empty</div>}
+        {power.orders.length === 0 && (
+          <div style={{ ...ART_CHIP, color: '#6d4c41', fontSize: '0.65rem' }}>empty</div>
+        )}
         {power.orders.map((o) => {
           const flash = (deltas.arrivedOrders.includes(o.kind) || deltas.newOrders.includes(o.kind)) && !reducedMotion;
           // Phase 5 (pillar K): a booked slot is a crate you can lose - past its arrival month
@@ -375,6 +418,7 @@ export function MapGrid() {
                     : `${o.kind} (${o.supplier === 'alt' ? 'second supplier' : o.supplier === 'spot' ? 'spot' : 'standard'}): arrives ${formatMonth(o.arrivalMonth)}`
               }
               style={{
+                position: 'relative',
                 marginTop: 3,
                 padding: '1px 4px',
                 borderRadius: 3,
@@ -419,21 +463,25 @@ export function MapGrid() {
         }}
         title="Substation"
       >
-        <div>
+        <ArtLayer
+          img={TILE_ART.substation.img}
+          dimmed={power.studyStatus === 'none' && power.substationStatus === 'none'}
+        />
+        <div style={ART_CHIP}>
           {TILE_ART.substation.icon} {TILE_ART.substation.label}
         </div>
         {power.studyStatus === 'pending' && (
-          <div>
+          <div style={ART_CHIP}>
             {'\u{1F4CB}'} study{studyMonthsLeft !== null ? `: ${Math.max(0, studyMonthsLeft)}mo left` : ''}
           </div>
         )}
-        {power.studyStatus === 'done' && <div>{'\u{1F4CB}'} study done</div>}
+        {power.studyStatus === 'done' && <div style={ART_CHIP}>{'\u{1F4CB}'} study done</div>}
         {power.substationStatus === 'building' && (
-          <div>
+          <div style={ART_CHIP}>
             {'\u{1F3D7}\uFE0F'} building{power.substationDoneMonth !== null ? ` (${formatMonth(power.substationDoneMonth)})` : ''}
           </div>
         )}
-        {substationEnergized && <div>{'\u26A1'} energized</div>}
+        {substationEnergized && <div style={ART_CHIP}>{'\u26A1'} energized</div>}
         {objectHasQueuedAction('substation', plan, hallIds) && <QueuedGhost />}
       </div>
 
