@@ -164,6 +164,9 @@ export interface LogEntry {
   text: string;
   /** Optional second line (event body variant, cast visit line). Display only. */
   detail?: string;
+  /** Cast member id when the entry is about one (a cast visit); lets the UI render that
+   * member's portrait next to the entry. Display only; no mechanic reads it. */
+  castId?: string;
 }
 
 export type Phase = 'setup' | 'playing' | 'awaitingChoice' | 'takeoutAvailable' | 'ended';

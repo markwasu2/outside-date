@@ -5,6 +5,8 @@ import type { ActionDef, Content } from '../../content/schemas';
 import type { GameState, GoodwillGroup, PlannedAction } from '../../engine/types';
 import { checkAction, useStore } from '../store';
 import type { TrackTab } from '../store';
+import { CastPortrait, INTERVENOR_REP } from '../portraits';
+import { CastHover } from './CastHover';
 
 const TABS: { id: TrackTab; label: string }[] = [
   { id: 'land', label: 'Land' },
@@ -22,6 +24,10 @@ interface Row {
   ap: number;
   cashLabel: string;
   action: PlannedAction;
+  /** Portrait id + display name when the row's counterparty is a named cast member
+   * (2026-11-09 cast-portraits pass: the ratepayers-alliance meet row shows its counsel). */
+  portrait?: string;
+  portraitName?: string;
 }
 
 /** Resolves a 'dynamic' cash cost to a concrete number where it's actually deterministic given
@@ -118,6 +124,10 @@ function buildRows(tab: TrackTab, state: GameState, content: Content, selectedHa
     for (const intervenor of state.docket.intervenors) {
       // Render the intervenor's display name from content, not the raw id ("riverkeepers").
       const name = content.cast.intervenors.find((i) => i.id === intervenor.id)?.name ?? intervenor.id;
+      // When the intervenor has a named cast representative (the Ratepayers Alliance's
+      // counsel), show their portrait on the row; purely visual.
+      const repPortrait = INTERVENOR_REP[intervenor.id];
+      const rep = repPortrait ? content.cast.cast.find((m) => m.portrait === repPortrait) : undefined;
       rows.push({
         key: `meetIntervenor:${intervenor.id}`,
         label: `Meet ${name}`,
@@ -125,6 +135,7 @@ function buildRows(tab: TrackTab, state: GameState, content: Content, selectedHa
         ap: meetIntervenor.ap,
         cashLabel: cashLabel(meetIntervenor, state, content),
         action: { actionId: 'meetIntervenor', params: { intervenorId: intervenor.id } },
+        ...(rep && repPortrait ? { portrait: repPortrait, portraitName: rep.name } : {}),
       });
     }
     return rows;
@@ -350,7 +361,10 @@ export function TracksPanel() {
         ))}
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '0.5rem' }}>
+      {/* minHeight: 0 lets this flex child actually shrink and scroll; without it a long row
+       * list (e.g. regulation with all three intervenors) overflows and paints rows 8+ under
+       * the "Planned this month" section instead of scrolling. */}
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.5rem' }}>
         {rows.map((row) => {
           const check = checkAction(state, content, plan, row.action);
           return (
@@ -362,10 +376,15 @@ export function TracksPanel() {
                 data-testid="action-row-button"
                 style={{ width: '100%', textAlign: 'left', padding: '0.4rem', cursor: check.ok ? 'pointer' : 'not-allowed' }}
               >
-                <div>
-                  <strong>{row.label}</strong> ({row.ap} AP, {row.cashLabel})
+                <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                  {row.portrait && <CastPortrait portrait={row.portrait} name={row.portraitName} size={22} />}
+                  <div>
+                    <div>
+                      <strong>{row.label}</strong> ({row.ap} AP, {row.cashLabel})
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#555' }}>{check.ok ? row.help : check.reason}</div>
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#555' }}>{check.ok ? row.help : check.reason}</div>
               </button>
             </div>
           );
@@ -376,23 +395,23 @@ export function TracksPanel() {
           {GOODWILL_GROUPS.map((group) => {
             const action: PlannedAction = { actionId: 'visitCast', params: { group } };
             const check = checkAction(state, content, plan, action);
-            // Who you'd be visiting: the group's cast members and their one-line personalities,
-            // in the button's existing tooltip.
+            // Who you'd be visiting: the group's cast members with portraits, names and
+            // one-line personalities in a hover card (replacing the old `title` tooltip, which
+            // couldn't show portraits). The button's visible text is unchanged.
             const members = content.cast.cast.filter((m) => m.goodwillGroup === group);
-            const who = members.map((m) => `${m.name} (${m.role})${m.blurb ? ` - ${m.blurb}` : ''}`).join('\n');
-            const visitTitle = check.ok ? `${visitCastDef.help}${who ? `\n${who}` : ''}` : check.reason;
             return (
-              <div key={group} style={{ marginBottom: '0.25rem', opacity: check.ok ? 1 : 0.5 }}>
-                <button
-                  disabled={!check.ok}
-                  onClick={() => queueAction(action)}
-                  title={visitTitle}
-                  data-testid="action-row-button"
-                  style={{ width: '100%', textAlign: 'left', padding: '0.3rem', cursor: check.ok ? 'pointer' : 'not-allowed' }}
-                >
-                  Visit {group} ({visitCastDef.ap} AP)
-                </button>
-              </div>
+              <CastHover key={group} members={members} header={visitCastDef.help} placement="left" display="block">
+                <div style={{ marginBottom: '0.25rem', opacity: check.ok ? 1 : 0.5 }}>
+                  <button
+                    disabled={!check.ok}
+                    onClick={() => queueAction(action)}
+                    data-testid="action-row-button"
+                    style={{ width: '100%', textAlign: 'left', padding: '0.3rem', cursor: check.ok ? 'pointer' : 'not-allowed' }}
+                  >
+                    Visit {group} ({visitCastDef.ap} AP)
+                  </button>
+                </div>
+              </CastHover>
             );
           })}
         </div>

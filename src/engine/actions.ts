@@ -83,6 +83,9 @@ function visitCast(
       kind: 'action',
       text: `Visited ${member.name} (${member.role}).`,
       detail: moodLines.length > 0 ? `"${flavorPick(state.rng, `visit-line:${member.id}:${state.month}`, moodLines)}"` : undefined,
+      // Display-only portrait hook for the log UI (2026-11-09 cast-portraits pass); the member
+      // was already picked above via flavor.ts, so this consumes no rng and changes no math.
+      castId: member.id,
     };
   }
 
