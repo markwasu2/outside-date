@@ -1,4 +1,22 @@
-# Phase 4: Choose Your Ground (pillar A, site selection)
+# UX 1: persistent goal sentence (cold-playthrough queue, item 1)
+
+Branch `ux1-goal-sentence` off main 7d7879e. A cold player reached step 28 unable to say how
+to win. Fix: one muted line under the HUD, always visible, derived from live state so it stays
+true as halls deliver. Pure helper exported for tests; no engine or balance surface touched.
+
+## Done criteria
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | one-sentence goal always visible on the main screen | PASS | src/ui/board/GoalStrip.tsx mounted in App.tsx between Hud and ProgressSpine |
+| 2 | sentence is dynamic: halls remaining + first outside month; post-delivery reads close-the-takeout | PASS | goalSentence() branches; tests/ui/goalStrip.test.ts (5 tests) |
+| 3 | muted, one line, adds no visual load | PASS | docs/screenshots/ux1/board-top-1440.png, goal-strip-800.png / -1440.png visually inspected |
+| 4 | no engine/state-shape change (no save bump, no migration, no balance impact) | PASS | UI-only diff: App.tsx + GoalStrip.tsx + test |
+| 5 | typecheck/lint/vitest/playwright green | PASS | see below |
+
+Grid: not run - no engine, bot, content or balance change; win rates cannot move. (Gate per the
+standing directive applies to state-shape/balance changes; this PR touches neither.)
+
 
 Branch `phase4-choose-your-ground`. Status: ALL 15 CRITERIA PASS. vitest 443 green,
 typecheck/lint clean, playwright 34 green, build green, screenshots taken and visually
