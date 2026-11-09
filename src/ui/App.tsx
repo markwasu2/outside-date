@@ -6,6 +6,7 @@ import { WarningBanner } from './board/WarningBanner';
 import { CoachTip } from './components/CoachTip';
 import { CodexModal } from './components/CodexModal';
 import { EventModal } from './components/EventModal';
+import { FinancialsDrawer } from './components/FinancialsDrawer';
 import { Hud } from './components/Hud';
 import { LedgerDrawer } from './components/LedgerDrawer';
 import { LogStrip } from './components/LogStrip';
@@ -97,6 +98,7 @@ export function App() {
           </div>
           <LogStrip />
           <LedgerDrawer />
+          <FinancialsDrawer />
           <EventModal />
           <CoachTip />
         </div>

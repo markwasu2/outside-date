@@ -6,9 +6,11 @@ import { dscr, forwardNoi, hallGrossRent, runway } from '../../engine/selectors'
 import type { GameState, GoodwillGroup } from '../../engine/types';
 import { totalApCost } from '../../engine/step';
 import { exportSaveToFile, SAVE_VERSION } from '../save';
+import { STAT_EXPLAINERS } from '../explainers';
 import { usePrefersReducedMotion } from '../board/boardStyles';
 import { useStore } from '../store';
 import { CastHover } from './CastHover';
+import { StatExplainer } from './StatExplainer';
 
 // UI-polish item 2: distinct labels so the four cast groups never read as interchangeable
 // numbers - the old render showed only each label's first letter ("T" for both Town and Tenant),
@@ -182,6 +184,8 @@ export function Hud() {
   const lastNegotiation = useStore((s) => s.lastNegotiation);
   const lastDifficultyId = useStore((s) => s.lastDifficultyId);
   const dismissedCoachTips = useStore((s) => s.dismissedCoachTips);
+  const financialSnapshots = useStore((s) => s.financialSnapshots);
+  const seenExplainers = useStore((s) => s.seenExplainers);
   const muted = useStore((s) => s.muted);
   const toggleMuted = useStore((s) => s.toggleMuted);
   const fastForward = useStore((s) => s.fastForward);
@@ -261,6 +265,11 @@ export function Hud() {
 
   const canFastForward = plan.length === 0 && draft.phase === 'playing';
 
+  // Phase 2 (D2): the first eligible unseen explainer auto-opens; the rest wait their turn
+  // (one at a time, same discipline as coachTips).
+  const firstEligibleExplainer =
+    STAT_EXPLAINERS.find((e) => !seenExplainers.includes(e.id) && e.trigger(draft, content))?.id ?? null;
+
   const handleFastForward = () => {
     if (!canFastForward || ffBusy) return;
     setFfBusy(true);
@@ -289,21 +298,26 @@ export function Hud() {
         <strong>{formatMonth(draft.month)}</strong>
       </div>
 
-      <div title="Action points used this month">
-        AP:{' '}
-        {Array.from({ length: apTotal }, (_, i) => (
-          <span key={i} style={{ marginRight: 2 }}>
-            {i < apUsed ? '\u25CF' : '\u25CB'}
-          </span>
-        ))}
-      </div>
+      <StatExplainer id="ap" autoOpen={firstEligibleExplainer === 'ap'}>
+        <div title="Action points used this month">
+          AP:{' '}
+          {Array.from({ length: apTotal }, (_, i) => (
+            <span key={i} style={{ marginRight: 2 }}>
+              {i < apUsed ? '\u25CF' : '\u25CB'}
+            </span>
+          ))}
+        </div>
+      </StatExplainer>
 
-      <div data-testid="hud-cash">Cash: {formatDollars(displayCash)}</div>
+      <StatExplainer id="cash" autoOpen={firstEligibleExplainer === 'cash'}>
+        <div data-testid="hud-cash">Cash: {formatDollars(displayCash)}</div>
+      </StatExplainer>
 
       {/* QA pass 2, finding 8: the tooltip used to omit the utility minimum charge and
           liquidated-damages accrual terms even though runway()'s number includes both.
           Fix 11 (playtest-fixes): extended with the top 3 drivers behind this month's number and
           the month-over-month change, so a bad month shows WHY, not just the headline figure. */}
+      <StatExplainer id="runway" autoOpen={firstEligibleExplainer === 'runway'}>
       <div title={runwayTooltip} style={{ color: runwayColor(months) }}>
         Runway: {formatMonths(months)}
         {/* Phase 1 (D8): runway as a bar at the same thresholds as the warnings banner. */}
@@ -322,10 +336,13 @@ export function Hud() {
           />
         </span>
       </div>
+      </StatExplainer>
 
+      <StatExplainer id="dscrHeadroom" autoOpen={firstEligibleExplainer === 'dscrHeadroom'}>
       <div title={dscrHeadroomTooltip(d, content.tuning.covenant.dscrTrigger, forwardNoiValue, content.tuning.covenant.forcedTestMonth)}>
         DSCR headroom: {headroomText}
       </div>
+      </StatExplainer>
 
       {/* QA pass 2, finding 3: persistent indicator while a lender draw freeze is active -
           construction draws are paused until the player cures it from the Money tab. The engine
@@ -340,9 +357,11 @@ export function Hud() {
         </div>
       )}
 
+      <StatExplainer id="nextOutsideDate" autoOpen={firstEligibleExplainer === 'nextOutsideDate'}>
       <div title="Soonest active hall's outside date">
         Next outside date: {nextOutside !== null ? formatMonth(nextOutside) : 'none'}
       </div>
+      </StatExplainer>
 
       <div style={{ display: 'flex', gap: '0.75rem' }}>
         {(Object.keys(GOODWILL_LABELS) as GoodwillGroup[]).map((g) => {
@@ -353,9 +372,11 @@ export function Hud() {
           const summary = `${GOODWILL_LABELS[g]} goodwill: ${draft.goodwill[g]}`;
           return (
             <CastHover key={g} members={members} header={summary} placement="below">
-              <span aria-label={summary}>
-                {goodwillFace(draft.goodwill[g])} {GOODWILL_LABELS[g]}: {draft.goodwill[g]}
-              </span>
+              <StatExplainer id="goodwill" autoOpen={firstEligibleExplainer === 'goodwill' && g === 'town'}>
+                <span aria-label={summary}>
+                  {goodwillFace(draft.goodwill[g])} {GOODWILL_LABELS[g]}: {draft.goodwill[g]}
+                </span>
+              </StatExplainer>
             </CastHover>
           );
         })}
@@ -389,7 +410,7 @@ export function Hud() {
       <button
         title="Download the current save as a JSON file"
         onClick={() =>
-          exportSaveToFile({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips })
+          exportSaveToFile({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots })
         }
       >
         Export save

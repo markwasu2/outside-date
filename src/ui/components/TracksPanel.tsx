@@ -5,6 +5,7 @@ import type { GameState, GoodwillGroup, PlannedAction } from '../../engine/types
 import { cashLabel, findDef } from '../board/actions';
 import { checkAction, useStore } from '../store';
 import type { TrackTab } from '../store';
+import { tabUnlocks } from '../tabUnlock';
 import { CastPortrait, INTERVENOR_REP } from '../portraits';
 import { CastHover } from './CastHover';
 
@@ -331,14 +332,18 @@ export function TracksPanel() {
   // from this component; adopt it once and clear it.
   const requestedTab = useStore((s) => s.requestedTab);
   const requestTab = useStore((s) => s.requestTab);
-  useEffect(() => {
-    if (requestedTab) {
-      setTab(requestedTab);
-      requestTab(null);
-    }
-  }, [requestedTab, requestTab]);
   const state = useStore((s) => s.state);
   const content = useStore((s) => s.content);
+  // Phase 2 (D3): tabs unlock as their systems come online (derived from the committed state).
+  const unlocks = tabUnlocks(state, content);
+  useEffect(() => {
+    // A warning fix button can ask for a tab; ignore the request when that tab is still locked
+    // (the fix action lives behind a system that has not come online yet).
+    if (requestedTab) {
+      if (unlocks[requestedTab].unlocked) setTab(requestedTab);
+      requestTab(null);
+    }
+  }, [requestedTab, requestTab, unlocks]);
   const plan = useStore((s) => s.plan);
   const selectedHallId = useStore((s) => s.selectedHallId);
   const selectHall = useStore((s) => s.selectHall);
@@ -385,29 +390,45 @@ export function TracksPanel() {
         </div>
       )}
       <div style={{ display: 'flex', borderBottom: '1px solid #ccc' }}>
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
-            style={{
-              flex: 1,
-              padding: '0.4rem',
-              background: tab === t.id ? '#eee' : 'transparent',
-              border: 'none',
-              borderBottom: tab === t.id ? '2px solid #333' : '2px solid transparent',
-              cursor: 'pointer',
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
+        {TABS.map((t) => {
+          const locked = !unlocks[t.id].unlocked;
+          return (
+            <button
+              key={t.id}
+              data-testid={`track-tab-${t.id}`}
+              data-locked={locked}
+              onClick={() => setTab(t.id)}
+              title={locked ? (unlocks[t.id].hint ?? 'Locked') : undefined}
+              style={{
+                flex: 1,
+                padding: '0.4rem',
+                background: tab === t.id ? '#eee' : 'transparent',
+                border: 'none',
+                borderBottom: tab === t.id ? '2px solid #333' : '2px solid transparent',
+                cursor: 'pointer',
+                opacity: locked ? 0.45 : 1,
+              }}
+            >
+              {t.label}
+              {locked ? ' \u{1F512}' : ''}
+            </button>
+          );
+        })}
       </div>
 
       {/* minHeight: 0 lets this flex child actually shrink and scroll; without it a long row
        * list (e.g. regulation with all three intervenors) overflows and paints rows 8+ under
        * the "Planned this month" section instead of scrolling. */}
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.5rem' }}>
-        {rows.map((row) => {
+        {!unlocks[tab].unlocked && (
+          <div
+            data-testid="locked-tab-hint"
+            style={{ padding: '0.5rem', marginBottom: '0.5rem', background: '#f5f5f0', border: '1px dashed #bbb', borderRadius: 4, fontSize: '0.78rem', color: '#555' }}
+          >
+            {unlocks[tab].hint}
+          </div>
+        )}
+        {unlocks[tab].unlocked && rows.map((row) => {
           const check = checkAction(state, content, plan, row.action);
           return (
             <div key={row.key} style={{ marginBottom: '0.5rem', opacity: check.ok ? 1 : 0.5 }}>
