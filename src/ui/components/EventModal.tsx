@@ -96,6 +96,7 @@ export function EventModal() {
   // pending.body carries this occurrence's flavor pick (base body or a bodyVariant), chosen by
   // events.ts's applyCard when the card fired; the content-file body is the fallback.
   const body = isSynthetic ? DOCKET_VOTE_FAIL_CARD.body : pending.body ?? eventCard?.body ?? '';
+  const claim = [...draft.claims].reverse().find((c) => c.cardId === pending.cardId && c.month === draft.month) ?? null;
   const codexId = isSynthetic ? undefined : eventCard?.codexId;
 
   return (
@@ -116,6 +117,19 @@ export function EventModal() {
       <div style={{ background: '#fff', borderRadius: 8, padding: '1.5rem', maxWidth: 420 }}>
         <h2 style={{ marginTop: 0 }}>{title}</h2>
         <p>{body}</p>
+        {claim && (
+          <div data-testid="claim-breakdown" style={{ margin: '0.5rem 0', padding: '0.5rem', background: '#f5f5f0', border: '1px solid #ddd', borderRadius: 4, fontSize: '0.8rem' }}>
+            <div>Loss: {formatDollars(claim.gross)}</div>
+            {claim.insured ? (
+              <>
+                <div>Policy paid: {formatDollars(claim.paid)}</div>
+                <div>Deductible you paid: {formatDollars(claim.deductible)}</div>
+              </>
+            ) : (
+              <div>No builder&apos;s risk in force: you paid all of it, {formatDollars(claim.outOfPocket)}.</div>
+            )}
+          </div>
+        )}
         {codexId && (
           <button
             onClick={() => openCodex(codexId)}

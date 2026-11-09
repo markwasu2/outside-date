@@ -3,6 +3,7 @@ import type { NegotiationChoices } from '../../engine/init';
 import type { GameState, PendingEvent, PlannedAction, Setup } from '../../engine/types';
 import {
   advanceHallCandidates,
+  capitalCandidates,
   type Bot,
   delaySwapCandidates,
   fillAp,
@@ -23,6 +24,7 @@ const negotiation: NegotiationChoices = {
   capital: { seniorIndex: 0, mezzIndex: 1, playerShareIndex: 1 },
   power: { minCharge: 'medium', plantBOffset: 0 },
   insurance: { dsu: true },
+  forecast: { costCallPct: 0, contingency: 0.05, monthOffset: 0 },
 };
 
 /**
@@ -36,6 +38,7 @@ const negotiation: NegotiationChoices = {
 function chooseActions(state: GameState, content: Content): PlannedAction[] {
   const candidates: PlannedAction[] = [];
   candidates.push({ actionId: 'confirmRackSchedule' });
+  candidates.push(...capitalCandidates(state, content, ['mezzTopUp', 'bridgeLoan', 'equityCall', 'recap']));
   if (state.flags.drawFreeze) candidates.push({ actionId: 'cureDraw' });
   candidates.push(...fixInspectionCandidates(state));
   if (!state.flags.fundExtensionsDone && state.month <= 12) candidates.push({ actionId: 'fundExtensions' });

@@ -15,6 +15,7 @@ const negotiation: NegotiationChoices = {
   capital: { seniorIndex: 2, mezzIndex: 2, playerShareIndex: 2 },
   power: { minCharge: 'low', plantBOffset: 0 },
   insurance: { dsu: false },
+  forecast: { costCallPct: 0, contingency: 0, monthOffset: 0 },
 };
 
 /**

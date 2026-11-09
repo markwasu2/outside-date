@@ -21,6 +21,7 @@ import {
 } from './systems/regulation';
 import { commissionStudy, orderLongLead, cancelOrder } from './systems/power';
 import { cureDraw } from './systems/money';
+import { equityCall, bridgeLoan, mezzTopUp, scopeDown, recap } from './systems/capital';
 import { confirmRackSchedule, delaySwap } from './systems/lease';
 import { setInsurance } from './systems/insurance';
 import { priceTakeoutAction } from './systems/takeout';
@@ -125,6 +126,11 @@ export const actionHandlers: Record<(typeof KNOWN_ACTION_HANDLERS)[number], Acti
   standDown,
   fixInspection,
   visitCast,
+  equityCall,
+  bridgeLoan,
+  mezzTopUp,
+  scopeDown,
+  recap,
 };
 
 /** One-line log text for an applied action, with the same param suffixes the plan list shows. */

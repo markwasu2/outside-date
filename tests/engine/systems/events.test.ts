@@ -422,18 +422,19 @@ describe('events: per-card effects', () => {
     expect(next.power.studyDoneMonth).toBe(state.month + 14);
   });
 
-  it('partner_dispute: concede trims player equity share, wait pauses every hall, once only', () => {
+  it('partner_dispute: concede costs share and cash, wait pauses every hall, repeatable (strain-driven)', () => {
     let state = freshState();
     state = setHallStage(state, 'H1', 'pad');
     const { state: pendingState, pending } = drawEvent(state, withCards([forced('partner_dispute')]));
     expect(pending?.choices.map((c) => c.id).sort()).toEqual(['concede', 'wait']);
 
     const conceded = resolveChoice(pendingState, 'concede', baseContent);
-    expect(conceded.equity.playerShare).toBeCloseTo(state.equity.playerShare - 0.05);
+    expect(conceded.equity.playerShare).toBeCloseTo(state.equity.playerShare - 0.08);
+    expect(conceded.cash).toBe(state.cash - 20_000_000);
 
     const waited = resolveChoice(pendingState, 'wait', baseContent);
     expect(waited.halls.every((h) => h.pausedThisMonth)).toBe(true);
-    expect(pendingState.firedOnce).toContain('partner_dispute');
+    expect(pendingState.firedOnce).not.toContain('partner_dispute');
   });
 
   it('neighbor_wells: hurts town goodwill only under evaporative cooling with a delivered hall', () => {

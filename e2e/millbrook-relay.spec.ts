@@ -10,6 +10,7 @@ test('Millbrook Relay is selectable and starts a single-hall campaign', async ({
   await page.getByRole('button', { name: /^Next:/ }).click();
   await page.getByRole('button', { name: /^Next:/ }).click();
   await page.getByRole('button', { name: /^Next:/ }).click();
+  await page.getByRole('button', { name: /^Next:/ }).click();
   await page.getByRole('button', { name: 'Start campaign', exact: true }).click();
   await expect(page.getByRole('button', { name: 'End month', exact: true })).toBeVisible();
   await expect(page.getByText('H1', { exact: false }).first()).toBeVisible();
@@ -31,6 +32,6 @@ test('Millbrook Relay careful seed 1 finishes with a priced report card', async 
   }
   await expect(report).toBeVisible();
   await expect(page.getByText(/Campus value .* equity multiple/)).toBeVisible();
-  await expect(page.getByText(/1\.61x/)).toBeVisible();
+  await expect(page.getByText(/1\.64x/)).toBeVisible(); // Phase 3 measured: 1.61x -> 1.64x (forecast sizing, lever bots)
   await page.screenshot({ path: '/tmp/millbrook-relay-report.png', fullPage: true });
 });

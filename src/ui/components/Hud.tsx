@@ -313,6 +313,15 @@ export function Hud() {
         <div data-testid="hud-cash">Cash: {formatDollars(displayCash)}</div>
       </StatExplainer>
 
+      {/* Phase 3 (B): your cost call against what has actually been spent, plus the delivery call. */}
+      <div
+        data-testid="hud-forecast"
+        title="Your cost call from the Forecast step against total spend so far. The report card grades the finished campus against the call."
+        style={{ color: draft.totalCostToDate > draft.forecast.cost ? '#c62828' : undefined }}
+      >
+        Call: {formatDollars(draft.forecast.cost)} / Spent: {formatDollars(draft.totalCostToDate)} / Due {formatMonth(draft.forecast.month)}
+      </div>
+
       {/* QA pass 2, finding 8: the tooltip used to omit the utility minimum charge and
           liquidated-damages accrual terms even though runway()'s number includes both.
           Fix 11 (playtest-fixes): extended with the top 3 drivers behind this month's number and

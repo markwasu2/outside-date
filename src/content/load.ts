@@ -74,6 +74,11 @@ export const KNOWN_ACTION_HANDLERS = [
   'standDown',
   'fixInspection',
   'visitCast',
+  'equityCall',
+  'bridgeLoan',
+  'mezzTopUp',
+  'scopeDown',
+  'recap',
 ] as const;
 
 function atomKind(atom: string): string {

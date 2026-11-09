@@ -10,6 +10,7 @@ import { tick as powerTick } from './systems/power';
 import { tick as regulationTick } from './systems/regulation';
 import { tick as constructionTick } from './systems/construction';
 import { tick as moneyTick } from './systems/money';
+import { tick as capitalTick } from './systems/capital';
 import { tick as insuranceTick } from './systems/insurance';
 import { tick as leaseTick } from './systems/lease';
 import { tick as conversionTick } from './systems/conversion';
@@ -154,6 +155,8 @@ function runWorldTick(state: GameState, content: Content): { state: GameState; l
   next = constructionTick(next, content);
   if (next.phase !== 'playing') return { state: next, log: [] };
   next = moneyTick(next, content);
+  if (next.phase !== 'playing') return { state: next, log: [] };
+  next = capitalTick(next, content);
   if (next.phase !== 'playing') return { state: next, log: [] };
   next = insuranceTick(next, content);
   if (next.phase !== 'playing') return { state: next, log: [] };

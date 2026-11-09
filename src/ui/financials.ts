@@ -1,4 +1,5 @@
 import type { Content } from '../content/schemas';
+import { latestClosing } from '../engine/closing';
 import { resolveContent } from '../engine/resolve';
 import { dscr, forwardNoi } from '../engine/selectors';
 import type { GameState } from '../engine/types';
@@ -59,7 +60,24 @@ export interface FinancialSnapshot {
 /** Sources and uses at close, computed from the current (month-0) state. Mirrors init.ts,
  * including its scenario/difficulty tuning resolution (resolveContent applies the same
  * overrides init.ts merged before its own math). */
+const CLOSING_TERMS: Record<string, string> = {
+  'Data halls': 'build-to-suit',
+  'Power equipment': 'transformer',
+  'Liquid-ready fitout': 'liquid-cooling',
+  'Working capital': 'cash-waterfall',
+  'Senior loan commitment': 'senior-loan',
+  'Mezzanine commitment': 'mezzanine',
+  'Equity committed': 'equity',
+};
+
 export function buildSourcesAndUses(state: GameState, content: Content): SourcesAndUses {
+  // Phase 3 (NEEDS ENGINE 2): the engine owns the closing table and amends it when a deal-changing
+  // event (the ask) rescales commitments, so the drawer shows the amended, balanced table.
+  const closing = latestClosing(state);
+  if (closing) {
+    const line = (l: { label: string; amount: number }): SourcesUsesLine => ({ label: l.label, termId: CLOSING_TERMS[l.label] ?? null, amount: l.amount });
+    return { sources: closing.sources.map(line), uses: closing.uses.map(line), sourcesTotal: closing.sourcesTotal, usesTotal: closing.usesTotal };
+  }
   const { tuning } = resolveContent(state, content);
   const land = tuning.land[state.setup.site];
   const halls = state.halls.reduce((sum, h) => sum + h.costBudget, 0);

@@ -1,6 +1,6 @@
 import type { Content } from '../../content/schemas';
 import { dscr, forwardNoi, requiredGridMW, totalDebt } from '../selectors';
-import type { GameState, TakeoutResult } from '../types';
+import type { GameState, RepaymentLine, TakeoutResult } from '../types';
 import { buildReportCard } from './reportCard';
 
 function clamp(value: number, min: number, max: number): number {
@@ -54,6 +54,28 @@ function assetScore(state: GameState, content: Content): number {
   return clamp(raw, 0, 15);
 }
 
+/**
+ * Repayment priority at takeout (Phase 3, G): senior first, then the sponsor bridge (ahead of
+ * equity and ahead of mezz, since it is secured by the sponsor's own paper), then mezz, then
+ * equity gets whatever is left. When campus value falls short, each tier is paid in order until
+ * the money runs out, so a bridge loan really does sit between the senior lender and your equity.
+ */
+export function repaymentWaterfall(state: GameState, campusValue: number): RepaymentLine[] {
+  const tiers: { id: RepaymentLine['id']; label: string; owed: number }[] = [
+    { id: 'senior', label: 'Senior loan and capitalized interest', owed: state.debt.seniorDrawn + state.debt.seniorCapitalizedInterest },
+    { id: 'bridge', label: 'Sponsor bridge loan', owed: state.debt.bridgeDrawn + state.debt.bridgeAccruedPik },
+    { id: 'mezz', label: 'Mezzanine and paid-in-kind interest', owed: state.debt.mezzDrawn + state.debt.mezzAccruedPik },
+  ];
+  let remaining = Math.max(0, campusValue);
+  const lines: RepaymentLine[] = tiers.map((t) => {
+    const paid = Math.min(t.owed, remaining);
+    remaining -= paid;
+    return { ...t, paid };
+  });
+  lines.push({ id: 'equity', label: 'Equity (what is left)', owed: state.equity.calledTotal, paid: remaining });
+  return lines;
+}
+
 /** 4.13: prices the takeout, scores the campus, and sets the terminal win/lose outcome. */
 export function priceTakeout(state: GameState, content: Content): GameState {
   const power = powerScore(state, content);
@@ -73,6 +95,7 @@ export function priceTakeout(state: GameState, content: Content): GameState {
 
   const debt = totalDebt(state);
   const equityValue = campusValue - debt;
+  const repayments = repaymentWaterfall(state, campusValue);
   const equityContributed = state.equity.calledTotal;
   const equityMultiple = equityContributed > 0 ? equityValue / equityContributed : 0;
   const playerEquityValue = equityValue * state.equity.playerShare;
@@ -91,6 +114,7 @@ export function priceTakeout(state: GameState, content: Content): GameState {
     playerEquityValue,
     valuePerMwIT,
     reportCard: buildReportCard(state, content, valuePerMwIT),
+    repayments,
   };
 
   return finishTakeout(state, takeout, equityValue, equityMultiple, greatMultiple);

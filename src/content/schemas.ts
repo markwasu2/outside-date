@@ -101,6 +101,56 @@ export const TuningSchema = z.object({
     seniorOptions: z.array(z.object({ ltc: z.number(), rate: z.number() })),
     mezzOptions: z.array(z.object({ share: z.number(), rate: z.number() })),
     playerShareOptions: z.array(z.number()),
+    /** Months between taking a lever and the cash landing. Lead time is the cost of waiting. */
+    closingMonths: z.object({ equityCall: z.number().int(), bridgeLoan: z.number().int(), mezzTopUp: z.number().int(), recap: z.number().int() }),
+    /** Partner strain: every lever use adds strain, and strain feeds partner_dispute odds. */
+    strain: z.object({
+      perUse: z.object({ equityCall: z.number(), bridgeLoan: z.number(), mezzTopUp: z.number(), scopeDown: z.number(), recap: z.number() }),
+      disputeOddsPerStrain: z.number(),
+      /** Share of strain a dispute settles (the rest lingers). */
+      settledShare: z.number(),
+    }),
+    levers: z.object({
+      equityCall: z.object({
+        maxShareOfCommitted: z.number(),
+        maxCalls: z.number().int(),
+        cooldownMonths: z.number().int(),
+        /** Partner prices new equity at this premium, so your share dilutes by more than the cash raised. */
+        premium: z.number(),
+        feeRate: z.number(),
+        strainPerCall: z.number(),
+      }),
+      bridgeLoan: z.object({
+        maxShareOfCost: z.number(),
+        maxLoans: z.number().int(),
+        cooldownMonths: z.number().int(),
+        rate: z.number(),
+        feeRate: z.number(),
+      }),
+      mezzTopUp: z.object({
+        maxShareOfCost: z.number(),
+        maxUses: z.number().int(),
+        cooldownMonths: z.number().int(),
+        ltcCap: z.number(),
+        dscrFloor: z.number(),
+        ratePremium: z.number(),
+        feeRate: z.number(),
+      }),
+      scopeDown: z.object({
+        feeShare: z.number(),
+        salvageShare: z.number(),
+        tenantGoodwill: z.number(),
+        cooldownMonths: z.number().int(),
+      }),
+      recap: z.object({
+        minMonth: z.number().int(),
+        minSpentShare: z.number(),
+        raiseShareOfCost: z.number(),
+        feeRate: z.number(),
+        rateStep: z.number(),
+        ltcCap: z.number(),
+      }),
+    }),
   }),
   lease: z.object({
     baseRent: z.number(),
@@ -123,7 +173,23 @@ export const TuningSchema = z.object({
   insurance: z.object({
     buildersRiskMonthly: z.number().int(),
     dsuMonthly: z.number().int(),
+    /** Flat per-claim deductible; small losses (water, theft) are sized to sit inside it. */
     deductible: z.number().int(),
+  }),
+  forecast: z.object({
+    contingencyOptions: z.array(z.number()),
+    costCallOptions: z.array(z.number()),
+    monthOffsetOptions: z.array(z.number().int()),
+    defaultContingency: z.number(),
+    /** Upfront lender fee on the senior commitment, capitalized into the loan at close. */
+    commitmentFeeRate: z.number(),
+    /** Tenant goodwill lost per month you call delivery later than the lease month. */
+    lateCallGoodwillPerMonth: z.number(),
+    costToComplete: z.object({
+      startMonth: z.number().int(),
+      /** Shortfall tolerated before the lender calls the loan out of balance, as a share of the cost call. */
+      toleranceShare: z.number(),
+    }),
   }),
   covenant: z.object({
     dscrTrigger: z.number(),
@@ -144,8 +210,12 @@ export const TuningSchema = z.object({
     marketBandHigh: z.number().int(),
   }),
   events: z.object({
-    stormDamage: z.number().int(),
-    fireDamage: z.number().int(),
+    /** Major losses scale with the hit hall's cost (share of that hall's costBudget). */
+    stormDamageShare: z.number(),
+    fireDamageShare: z.number(),
+    /** Small, frequent losses: size drawn uniformly in [min, max] of the hall's costBudget. */
+    waterDamageShare: z.tuple([z.number(), z.number()]),
+    theftShare: z.tuple([z.number(), z.number()]),
     rateMoveBps: z.number(),
   }),
   crews: z.object({
@@ -212,6 +282,7 @@ export const EffectTypeSchema = z.enum([
   'materializeRisk',
   'stormDamage',
   'fireDamage',
+  'smallLoss',
   'owedAp',
   'budgetPct',
   'addAskHalls',

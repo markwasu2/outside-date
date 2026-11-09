@@ -36,8 +36,18 @@ function payCashInterest(state: GameState, content: Content): GameState {
   const rate = state.debt.converted
     ? content.tuning.covenant.permRate
     : state.debt.seniorRate + content.tuning.covenant.stepUp;
-  const interest = (totalDebt(state) * rate) / 12;
+  // The bridge is paid in kind, never in cash, so it is not part of the cash-interest base.
+  const cashBase = totalDebt(state) - state.debt.bridgeDrawn - state.debt.bridgeAccruedPik;
+  const interest = (cashBase * rate) / 12;
   return { ...state, cash: state.cash - interest };
+}
+
+/** Sponsor bridge accrues in kind at its own rate for as long as it is outstanding (Phase 3, G). */
+function accrueBridgePik(state: GameState): GameState {
+  const debt = state.debt;
+  if (debt.bridgeDrawn + debt.bridgeAccruedPik <= 0) return state;
+  const accrued = ((debt.bridgeDrawn + debt.bridgeAccruedPik) * debt.bridgeRate) / 12;
+  return { ...state, debt: { ...debt, bridgeAccruedPik: debt.bridgeAccruedPik + accrued } };
 }
 
 function applyInterest(state: GameState, content: Content): GameState {
@@ -46,8 +56,19 @@ function applyInterest(state: GameState, content: Content): GameState {
   return accrueMezzPik(capitalizeSenior(state));
 }
 
+/** The lender's upfront commitment fee capitalizes into the senior loan the month it is first drawn (Phase 3, B). */
+function chargeCommitmentFee(state: GameState): GameState {
+  const due = state.flags.commitmentFeeDue;
+  if (typeof due !== 'number' || due <= 0 || state.debt.seniorDrawn <= 0) return state;
+  return {
+    ...state,
+    debt: { ...state.debt, seniorCapitalizedInterest: state.debt.seniorCapitalizedInterest + due },
+    flags: { ...state.flags, commitmentFeeDue: 0 },
+  };
+}
+
 export function tick(state: GameState, content: Content): GameState {
-  const next = applyInterest(state, content);
+  const next = accrueBridgePik(applyInterest(chargeCommitmentFee(state), content));
   return { ...next, cash: next.cash - next.monthlyBurn };
 }
 
@@ -56,6 +77,9 @@ export function cureDraw(
   _params: Record<string, string | number> | undefined,
   _content: Content,
 ): GameState {
+  if (state.flags.outOfBalance) {
+    throw new Error('The lender will not release draws until the loan is back in balance. Raise money or scope down in the Capital tab.');
+  }
   if (!state.flags.drawFreeze) throw new Error('There is no active draw freeze to cure');
   return { ...state, flags: { ...state.flags, drawFreeze: false } };
 }

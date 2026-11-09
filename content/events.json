@@ -9,12 +9,26 @@
       "Lightning on the horizon, water on the pad. The crew chief calls it before lunch. Expect the lender to freeze construction draws until cured unless you carry delay-in-start-up cover."
     ],
     "art": "storm",
-    "odds": 0.28,
-    "window": [24, 59],
-    "seasonMonths": [5, 9],
-    "requires": ["anyHallStageIn:pad|steel|shell"],
-    "effects": [{ "type": "stormDamage", "args": [] }],
-    "note": "Per rules 4.11: pick one hall in pad/steel/shell (seeded). stageMonthsDone = max(0, stageMonthsDone - 1). Damage = tuning.events.stormDamage, builder's risk covers all but the deductible; without it, cash pays it all. insuredDelayMonths +1 only if builder's risk was in force. Also sets a draw freeze until cured (the cureDraw action lifts it) unless DSU is active. Card text fixed in the qa-fixes-2 pass: this note used to say '1-month' and the card never mentioned the lender, while the code has always frozen draws until cured."
+    "odds": 0.05,
+    "window": [
+      24,
+      59
+    ],
+    "seasonMonths": [
+      5,
+      9
+    ],
+    "requires": [
+      "anyHallStageIn:pad|steel|shell"
+    ],
+    "effects": [
+      {
+        "type": "stormDamage",
+        "args": []
+      }
+    ],
+    "note": "Phase 3: rare and large. Odds 0.04/mo in season while a hall is in pad/steel/shell. Damage = tuning.events.stormDamageShare of the hit hall's costBudget; with builder's risk you keep the flat per-claim deductible and the policy pays the rest, without it cash pays all. insuredDelayMonths +1 only if builder's risk was in force. Sets a draw freeze unless DSU is active. The claim lands on state.claims for the event card.",
+    "codexId": "storm-construction-risk"
   },
   {
     "id": "supply_shock",
@@ -28,8 +42,18 @@
     "art": "supply_shock",
     "odds": 0.1,
     "once": true,
-    "requires": ["orderPending:any"],
-    "effects": [{ "type": "orderSlip", "args": ["randomPending", 8] }],
+    "requires": [
+      "orderPending:any"
+    ],
+    "effects": [
+      {
+        "type": "orderSlip",
+        "args": [
+          "randomPending",
+          8
+        ]
+      }
+    ],
     "note": "\"randomPending\" selects uniformly among currently pending transformer/switchgear orders."
   },
   {
@@ -43,8 +67,18 @@
     ],
     "art": "labor_shortfall",
     "odds": 0.22,
-    "requires": ["anyHallStage:fitout", "notFlag:importCrewsActive"],
-    "effects": [{ "type": "labor", "args": [3] }],
+    "requires": [
+      "anyHallStage:fitout",
+      "notFlag:importCrewsActive"
+    ],
+    "effects": [
+      {
+        "type": "labor",
+        "args": [
+          3
+        ]
+      }
+    ],
     "note": "\"importCrewsActive\" is derived: true while month < flags.importCrewsUntil (set by the importCrews action or the union_pla card). labor_shortfall's own odds drop to 0.05 while flags.plaSigned is true (see union_pla)."
   },
   {
@@ -58,12 +92,26 @@
     ],
     "art": "outlook_cut",
     "odds": 0.03,
-    "window": [24, 59],
+    "window": [
+      24,
+      59
+    ],
     "once": true,
     "requires": [],
     "effects": [
-      { "type": "capRate", "args": [0.005] },
-      { "type": "setFlag", "args": ["outlookCut", true] }
+      {
+        "type": "capRate",
+        "args": [
+          0.005
+        ]
+      },
+      {
+        "type": "setFlag",
+        "args": [
+          "outlookCut",
+          true
+        ]
+      }
     ]
   },
   {
@@ -79,11 +127,32 @@
     "codexId": "expansion-docket",
     "scripted": true,
     "scriptedMonth": 24,
-    "requires": ["docketApproved", "notFlag:fixedScope"],
+    "requires": [
+      "docketApproved",
+      "notFlag:fixedScope"
+    ],
     "effects": [],
     "choices": [
-      { "id": "yes", "label": "Say yes", "effects": [{ "type": "addAskHalls", "args": [] }] },
-      { "id": "no", "label": "Say no", "effects": [{ "type": "declineAsk", "args": [] }] }
+      {
+        "id": "yes",
+        "label": "Say yes",
+        "effects": [
+          {
+            "type": "addAskHalls",
+            "args": []
+          }
+        ]
+      },
+      {
+        "id": "no",
+        "label": "Say no",
+        "effects": [
+          {
+            "type": "declineAsk",
+            "args": []
+          }
+        ]
+      }
     ],
     "note": "Fires at month 24 if the docket is already approved; otherwise fires the month the docket is approved. Yes: addAskHalls adds 2 halls of 25 MW IT, delivery = last hall's delivery + 9 and +12 months, opens a docket amendment vote in 9 months, and scales senior/equity commitments pro rata. No: declineAsk sets tenant goodwill -20. Failing the amendment vote later cancels the ask halls without a lose."
   },
@@ -101,7 +170,12 @@
     "scripted": true,
     "scriptedMonth": 30,
     "requires": [],
-    "effects": [{ "type": "chipGeneration", "args": [] }],
+    "effects": [
+      {
+        "type": "chipGeneration",
+        "args": []
+      }
+    ],
     "note": "Tier-dependent, resolved inside the chipGeneration effect handler using setup.hallTier: hybrid = no penalty. liquid = choice of retrofit (each undelivered hall +$4,000,000 and +1 month fitout) or decline (tenant -15). air = tenant -15 and asset score -3 unless retrofit at +$15,000,000 per undelivered hall. The handler sets phase=awaitingChoice with tier-appropriate choices; content intentionally leaves choices empty here since they depend on setup, not a fixed list."
   },
   {
@@ -115,11 +189,26 @@
     ],
     "art": "drought",
     "odds": 0.08,
-    "seasonMonths": [5, 7],
+    "seasonMonths": [
+      5,
+      7
+    ],
     "requires": [],
     "effects": [
-      { "type": "goodwill", "args": ["town", "fromTuning:cooling.droughtTown"] },
-      { "type": "goodwill", "args": ["commission", "fromTuning:cooling.droughtCommission"] }
+      {
+        "type": "goodwill",
+        "args": [
+          "town",
+          "fromTuning:cooling.droughtTown"
+        ]
+      },
+      {
+        "type": "goodwill",
+        "args": [
+          "commission",
+          "fromTuning:cooling.droughtCommission"
+        ]
+      }
     ],
     "note": "Deltas come from tuning.cooling.<setup.cooling>.droughtTown/droughtCommission. Evaporative stings the most, dry cooling is immune."
   },
@@ -133,27 +222,63 @@
       "Staff is asking for documents you would rather summarize. That is not how discovery works."
     ],
     "art": "subpoena",
-    "odds": 0.10,
+    "odds": 0.1,
     "once": true,
-    "requires": ["docketOpen"],
+    "requires": [
+      "docketOpen"
+    ],
     "effects": [],
     "choices": [
       {
         "id": "comply",
         "label": "Comply",
         "effects": [
-          { "type": "cash", "args": [-1000000] },
-          { "type": "goodwill", "args": ["commission", 5] },
-          { "type": "owedAp", "args": [1] }
+          {
+            "type": "cash",
+            "args": [
+              -1000000
+            ]
+          },
+          {
+            "type": "goodwill",
+            "args": [
+              "commission",
+              5
+            ]
+          },
+          {
+            "type": "owedAp",
+            "args": [
+              1
+            ]
+          }
         ]
       },
       {
         "id": "fight",
         "label": "Fight it",
         "effects": [
-          { "type": "voteSlip", "args": [3] },
-          { "type": "goodwill", "args": ["town", -5] },
-          { "type": "goodwill", "args": ["town", -10, "p:0.5"] }
+          {
+            "type": "voteSlip",
+            "args": [
+              3
+            ]
+          },
+          {
+            "type": "goodwill",
+            "args": [
+              "town",
+              -5
+            ]
+          },
+          {
+            "type": "goodwill",
+            "args": [
+              "town",
+              -10,
+              "p:0.5"
+            ]
+          }
         ]
       }
     ],
@@ -172,8 +297,18 @@
     "codexId": "tax-check",
     "scripted": true,
     "scriptedTrigger": "afterFirstDelivery",
-    "requires": ["anyHallDelivered"],
-    "effects": [{ "type": "goodwill", "args": ["town", 15] }]
+    "requires": [
+      "anyHallDelivered"
+    ],
+    "effects": [
+      {
+        "type": "goodwill",
+        "args": [
+          "town",
+          15
+        ]
+      }
+    ]
   },
   {
     "id": "draw_freeze",
@@ -186,8 +321,17 @@
     ],
     "art": "draw_freeze",
     "odds": 0.05,
-    "requires": ["constructionActive"],
-    "effects": [{ "type": "drawFreeze", "args": ["untilCured"] }],
+    "requires": [
+      "constructionActive"
+    ],
+    "effects": [
+      {
+        "type": "drawFreeze",
+        "args": [
+          "untilCured"
+        ]
+      }
+    ],
     "note": "Cured by the cureDraw action (1 AP)."
   },
   {
@@ -200,10 +344,18 @@
       "One electrical fault, one small fire, one harder week in fitout."
     ],
     "art": "fitout_fire",
-    "odds": 0.05,
-    "requires": ["anyHallStage:fitout"],
-    "effects": [{ "type": "fireDamage", "args": [] }],
-    "note": "Per closed-set handler: hallProgress(randomInStage:fitout, -2), damage = tuning.events.fireDamage paid per builder's risk (full cash cost without it), and that hall's insuredDelayMonths += 2 if builder's risk was in force."
+    "odds": 0.004,
+    "requires": [
+      "anyHallStage:fitout"
+    ],
+    "effects": [
+      {
+        "type": "fireDamage",
+        "args": []
+      }
+    ],
+    "note": "Phase 3: rare and large. Odds 0.004/mo during fitout. Damage = tuning.events.fireDamageShare of the hit hall's costBudget, settled like a storm. -2 months of progress, insuredDelayMonths +2 when insured, no draw freeze.",
+    "codexId": "construction-fire-case"
   },
   {
     "id": "overrun",
@@ -216,8 +368,19 @@
     ],
     "art": "overrun",
     "odds": 0.06,
-    "requires": ["anyHallStageIn:steel|fitout", "notGc:gmp"],
-    "effects": [{ "type": "hallCostPct", "args": ["randomInStages:steel|fitout", 0.03] }]
+    "requires": [
+      "anyHallStageIn:steel|fitout",
+      "notGc:gmp"
+    ],
+    "effects": [
+      {
+        "type": "hallCostPct",
+        "args": [
+          "randomInStages:steel|fitout",
+          0.03
+        ]
+      }
+    ]
   },
   {
     "id": "inspection_fail",
@@ -230,8 +393,18 @@
     ],
     "art": "inspection_fail",
     "odds": 0.06,
-    "requires": ["anyHallStageIn:shell|fitout"],
-    "effects": [{ "type": "hallPause", "args": ["randomInStages:shell|fitout", "untilFixed"] }],
+    "requires": [
+      "anyHallStageIn:shell|fitout"
+    ],
+    "effects": [
+      {
+        "type": "hallPause",
+        "args": [
+          "randomInStages:shell|fitout",
+          "untilFixed"
+        ]
+      }
+    ],
     "note": "Cleared by the fixInspection action."
   },
   {
@@ -247,8 +420,18 @@
     "odds": 0.04,
     "requires": [],
     "effects": [
-      { "type": "seniorRate", "args": [0.0025] },
-      { "type": "capRate", "args": [0.0015] }
+      {
+        "type": "seniorRate",
+        "args": [
+          0.0025
+        ]
+      },
+      {
+        "type": "capRate",
+        "args": [
+          0.0015
+        ]
+      }
     ]
   },
   {
@@ -264,8 +447,18 @@
     "odds": 0.04,
     "requires": [],
     "effects": [
-      { "type": "seniorRate", "args": [-0.0025] },
-      { "type": "capRate", "args": [-0.0015] }
+      {
+        "type": "seniorRate",
+        "args": [
+          -0.0025
+        ]
+      },
+      {
+        "type": "capRate",
+        "args": [
+          -0.0015
+        ]
+      }
     ]
   },
   {
@@ -282,8 +475,38 @@
     "requires": [],
     "effects": [],
     "choices": [
-      { "id": "attend", "label": "Attend", "effects": [{ "type": "owedAp", "args": [1] }, { "type": "goodwill", "args": ["town", 8] }] },
-      { "id": "skip", "label": "Skip it", "effects": [{ "type": "goodwill", "args": ["town", -5] }] }
+      {
+        "id": "attend",
+        "label": "Attend",
+        "effects": [
+          {
+            "type": "owedAp",
+            "args": [
+              1
+            ]
+          },
+          {
+            "type": "goodwill",
+            "args": [
+              "town",
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "id": "skip",
+        "label": "Skip it",
+        "effects": [
+          {
+            "type": "goodwill",
+            "args": [
+              "town",
+              -5
+            ]
+          }
+        ]
+      }
     ]
   },
   {
@@ -312,12 +535,25 @@
     ],
     "art": "tenant_slide_offer",
     "odds": 0.04,
-    "window": [24, 59],
-    "requires": ["noHallDelivered"],
+    "window": [
+      24,
+      59
+    ],
+    "requires": [
+      "noHallDelivered"
+    ],
     "effects": [],
     "choices": [
-      { "id": "accept", "label": "Accept", "effects": [] },
-      { "id": "decline", "label": "Decline", "effects": [] }
+      {
+        "id": "accept",
+        "label": "Accept",
+        "effects": []
+      },
+      {
+        "id": "decline",
+        "label": "Decline",
+        "effects": []
+      }
     ],
     "note": "Accept: the next undelivered hall's delivery and outside months +2, rent on that hall -2%. Decline: no change. Implemented directly in the choice handler (same mechanics as the delaySwap action), since hall-date shifts have no generic closed-set effect."
   },
@@ -336,8 +572,30 @@
     "requires": [],
     "effects": [],
     "choices": [
-      { "id": "host", "label": "Host the visit", "effects": [{ "type": "owedAp", "args": [1] }, { "type": "setFlag", "args": ["rebateUnlocked", true] }] },
-      { "id": "decline", "label": "Decline, politely", "effects": [] }
+      {
+        "id": "host",
+        "label": "Host the visit",
+        "effects": [
+          {
+            "type": "owedAp",
+            "args": [
+              1
+            ]
+          },
+          {
+            "type": "setFlag",
+            "args": [
+              "rebateUnlocked",
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "id": "decline",
+        "label": "Decline, politely",
+        "effects": []
+      }
     ]
   },
   {
@@ -351,13 +609,38 @@
     ],
     "art": "union_pla",
     "odds": 0.05,
-    "window": [12, 40],
+    "window": [
+      12,
+      40
+    ],
     "once": true,
     "requires": [],
     "effects": [],
     "choices": [
-      { "id": "sign", "label": "Sign the agreement", "effects": [{ "type": "budgetPct", "args": [0.02] }, { "type": "setFlag", "args": ["plaSigned", true] }] },
-      { "id": "decline", "label": "Decline", "effects": [] }
+      {
+        "id": "sign",
+        "label": "Sign the agreement",
+        "effects": [
+          {
+            "type": "budgetPct",
+            "args": [
+              0.02
+            ]
+          },
+          {
+            "type": "setFlag",
+            "args": [
+              "plaSigned",
+              true
+            ]
+          }
+        ]
+      },
+      {
+        "id": "decline",
+        "label": "Decline",
+        "effects": []
+      }
     ],
     "note": "Signing also drops labor_shortfall's draw odds to 0.05 for the rest of the run via flags.plaSigned (see labor_shortfall)."
   },
@@ -374,8 +657,18 @@
     "codexId": "transformer-lead-times",
     "odds": 0.02,
     "once": true,
-    "requires": ["orderPending:transformer"],
-    "effects": [{ "type": "orderSlip", "args": ["transformer", 9] }]
+    "requires": [
+      "orderPending:transformer"
+    ],
+    "effects": [
+      {
+        "type": "orderSlip",
+        "args": [
+          "transformer",
+          9
+        ]
+      }
+    ]
   },
   {
     "id": "restudy",
@@ -388,26 +681,71 @@
     ],
     "art": "restudy",
     "odds": 0.04,
-    "requires": ["studyPending"],
-    "effects": [{ "type": "studySlip", "args": [4] }]
+    "requires": [
+      "studyPending"
+    ],
+    "effects": [
+      {
+        "type": "studySlip",
+        "args": [
+          4
+        ]
+      }
+    ]
   },
   {
     "id": "partner_dispute",
     "title": "Your equity partner pushes back",
-    "body": "Your partner does not like a call you made and wants either a bigger share or a pause while lawyers talk. Pick your cost.",
+    "body": "Your partner has funded calls and bridges for you and wants it back in share or schedule. The more you lean on them, the more often this comes up.",
     "bodyVariants": [
-      "Your equity partner reads the same numbers and likes them less. Lawyers are mentioned.",
-      "A disagreement over a call you made. The options are share or schedule.",
-      "Your partner wants a bigger slice or a pause. Pick the one that costs less."
+      "Your equity partner reads the numbers and the capital calls. Lawyers are mentioned.",
+      "Your partner wants a bigger slice or a long pause. Pick the one that costs less.",
+      "Every call you made was their money. They want something for it."
     ],
     "art": "partner_dispute",
-    "odds": 0.03,
-    "once": true,
-    "requires": ["constructionActive"],
+    "odds": 0.0,
+    "requires": [
+      "constructionActive"
+    ],
     "effects": [],
     "choices": [
-      { "id": "concede", "label": "Concede a bigger share", "effects": [{ "type": "playerShare", "args": [-0.05] }] },
-      { "id": "wait", "label": "Wait it out", "effects": [{ "type": "hallPause", "args": ["all", 1] }] }
+      {
+        "id": "concede",
+        "label": "Concede a bigger share and pay their legal fees",
+        "effects": [
+          {
+            "type": "playerShare",
+            "args": [
+              -0.08
+            ]
+          },
+          {
+            "type": "cash",
+            "args": [
+              -20000000
+            ]
+          }
+        ]
+      },
+      {
+        "id": "wait",
+        "label": "Wait it out (a month of delay and a retainer)",
+        "effects": [
+          {
+            "type": "hallPause",
+            "args": [
+              "all",
+              1
+            ]
+          },
+          {
+            "type": "cash",
+            "args": [
+              -10000000
+            ]
+          }
+        ]
+      }
     ]
   },
   {
@@ -422,8 +760,19 @@
     "art": "neighbor_wells",
     "codexId": "water-registration",
     "odds": 0.06,
-    "requires": ["cooling:evaporative", "anyHallDelivered"],
-    "effects": [{ "type": "goodwill", "args": ["town", -6] }],
+    "requires": [
+      "cooling:evaporative",
+      "anyHallDelivered"
+    ],
+    "effects": [
+      {
+        "type": "goodwill",
+        "args": [
+          "town",
+          -6
+        ]
+      }
+    ],
     "note": "Mitigation: visitCast(town)."
   },
   {
@@ -437,9 +786,22 @@
     ],
     "art": "heat_wave_commissioning",
     "odds": 0.05,
-    "seasonMonths": [6, 8],
-    "requires": ["anyHallStage:rfs"],
-    "effects": [{ "type": "hallProgress", "args": ["randomInStage:rfs", -1] }]
+    "seasonMonths": [
+      6,
+      8
+    ],
+    "requires": [
+      "anyHallStage:rfs"
+    ],
+    "effects": [
+      {
+        "type": "hallProgress",
+        "args": [
+          "randomInStage:rfs",
+          -1
+        ]
+      }
+    ]
   },
   {
     "id": "equipment_rebate",
@@ -454,8 +816,17 @@
     "codexId": "equipment-rebate-law",
     "scripted": true,
     "scriptedTrigger": "afterFirstFitoutComplete",
-    "requires": ["flag:rebateUnlocked"],
-    "effects": [{ "type": "cash", "args": [20000000] }]
+    "requires": [
+      "flag:rebateUnlocked"
+    ],
+    "effects": [
+      {
+        "type": "cash",
+        "args": [
+          20000000
+        ]
+      }
+    ]
   },
   {
     "id": "good_weather",
@@ -468,8 +839,18 @@
     ],
     "art": "good_weather",
     "odds": 0.05,
-    "requires": ["constructionActive"],
-    "effects": [{ "type": "hallProgress", "args": ["randomActive", 1] }]
+    "requires": [
+      "constructionActive"
+    ],
+    "effects": [
+      {
+        "type": "hallProgress",
+        "args": [
+          "randomActive",
+          1
+        ]
+      }
+    ]
   },
   {
     "id": "hiring_fair",
@@ -489,12 +870,33 @@
         "id": "host",
         "label": "Sponsor a booth",
         "effects": [
-          { "type": "cash", "args": [-1000000] },
-          { "type": "goodwill", "args": ["town", 6] },
-          { "type": "setFlag", "args": ["hiringFairUntil", "monthPlus:6"] }
+          {
+            "type": "cash",
+            "args": [
+              -1000000
+            ]
+          },
+          {
+            "type": "goodwill",
+            "args": [
+              "town",
+              6
+            ]
+          },
+          {
+            "type": "setFlag",
+            "args": [
+              "hiringFairUntil",
+              "monthPlus:6"
+            ]
+          }
         ]
       },
-      { "id": "skip", "label": "Skip it", "effects": [] }
+      {
+        "id": "skip",
+        "label": "Skip it",
+        "effects": []
+      }
     ],
     "note": "While flags.hiringFairUntil is in the future, labor_shortfall's draw odds are reduced by 0.05."
   },
@@ -510,8 +912,18 @@
     "art": "commissioner_turnover",
     "odds": 0.03,
     "once": true,
-    "requires": ["docketOpen"],
-    "effects": [{ "type": "goodwill", "args": ["commission", "halfwayTo50"] }]
+    "requires": [
+      "docketOpen"
+    ],
+    "effects": [
+      {
+        "type": "goodwill",
+        "args": [
+          "commission",
+          "halfwayTo50"
+        ]
+      }
+    ]
   },
   {
     "id": "interconnect_queue_jump",
@@ -525,7 +937,67 @@
     "art": "interconnect_queue_jump",
     "odds": 0.03,
     "once": true,
-    "requires": ["studyPending", "goodwillAtLeast:utility:65"],
-    "effects": [{ "type": "studySlip", "args": [-3] }]
+    "requires": [
+      "studyPending",
+      "goodwillAtLeast:utility:65"
+    ],
+    "effects": [
+      {
+        "type": "studySlip",
+        "args": [
+          -3
+        ]
+      }
+    ]
+  },
+  {
+    "id": "water_damage",
+    "title": "Water in the building",
+    "body": "A fitting lets go over a weekend and a floor takes on water. Crews dry it out and re-do the work. It is small, it is annoying, and it is the most common claim on any job site.",
+    "bodyVariants": [
+      "A pipe separates on a Saturday night. By Monday there is an inch of water on the slab and a line of wet drywall.",
+      "Rain finds a gap in the envelope before the roof is tight. The crew spends a week pulling wet insulation.",
+      "A pressure test goes wrong and a joint fails. No one is hurt. The floor below is a pond."
+    ],
+    "art": "water_damage",
+    "codexId": "builders-risk-claims",
+    "odds": 0.035,
+    "requires": [
+      "constructionActive"
+    ],
+    "effects": [
+      {
+        "type": "smallLoss",
+        "args": [
+          "water"
+        ]
+      }
+    ],
+    "note": "Phase 3 small class: odds 0.02/mo while any hall is under construction. Loss is tuning.events.waterDamageShare of a random active hall's costBudget, always inside the deductible, so the policy pays nothing and it costs the same insured or not. Also -0.5 month of progress on that hall."
+  },
+  {
+    "id": "theft",
+    "title": "Copper walks off the site",
+    "body": "Someone cut the fence overnight and drove off with cable and tools. The sheriff takes a report. Your crew re-orders and moves on.",
+    "bodyVariants": [
+      "A trailer of copper wire leaves the yard after midnight. The gate camera caught a plate and not much else.",
+      "Thieves strip a spool of cable from the laydown yard. It is not much money, and it is the second time this year.",
+      "A deputy calls at dawn: the lock was cut and the tool crib is empty."
+    ],
+    "art": "theft",
+    "codexId": "site-theft-copper",
+    "odds": 0.025,
+    "requires": [
+      "constructionActive"
+    ],
+    "effects": [
+      {
+        "type": "smallLoss",
+        "args": [
+          "theft"
+        ]
+      }
+    ],
+    "note": "Phase 3 small class: odds 0.015/mo while any hall is under construction. Loss is tuning.events.theftShare of a random active hall's costBudget, inside the deductible. No schedule hit."
   }
 ]

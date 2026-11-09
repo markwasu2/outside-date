@@ -8,12 +8,16 @@ import type { TrackTab } from '../store';
 import { tabUnlocks } from '../tabUnlock';
 import { CastPortrait, INTERVENOR_REP } from '../portraits';
 import { CastHover } from './CastHover';
+import { projectNoiAndDscr } from '../../engine/projections';
+import { allLeverQuotes } from '../../engine/systems/capital';
+import { formatDollars } from '../../engine/format';
 
 const TABS: { id: TrackTab; label: string }[] = [
   { id: 'land', label: 'Land' },
   { id: 'regulation', label: 'Regulation' },
   { id: 'power', label: 'Power' },
   { id: 'money', label: 'Money' },
+  { id: 'capital', label: 'Capital' },
   { id: 'chips', label: 'Chips' },
   { id: 'construction', label: 'Construction' },
 ];
@@ -168,6 +172,40 @@ export function buildRows(tab: TrackTab, state: GameState, content: Content, sel
         ap: cancelOrder.ap,
         cashLabel: cashLabel(cancelOrder, state, content),
         action: { actionId: 'cancelOrder', params: { kind: order.kind } },
+      });
+    }
+    return rows;
+  }
+
+  if (tab === 'capital') {
+    // Phase 3 (G): one row per lever (scope-down gets one row per hall it can hit). The quote
+    // carries the plain-English price; an unavailable lever shows why.
+    const rows: Row[] = [];
+    for (const q of allLeverQuotes(state, content)) {
+      const def = findDef(content, q.id);
+      const priced = q.maxAmount > 0 ? ` Up to ${formatDollars(q.maxAmount)}.` : '';
+      const help = `${q.cost}${priced}`;
+      if (q.id === 'scopeDown') {
+        const halls = q.halls.length > 0 ? q.halls : [''];
+        for (const hallId of halls) {
+          rows.push({
+            key: `scopeDown-${hallId}`,
+            label: hallId ? `${def.label} (${hallId})` : def.label,
+            help,
+            ap: def.ap,
+            cashLabel: 'fee, less salvage',
+            action: { actionId: 'scopeDown', params: { hallId } },
+          });
+        }
+        continue;
+      }
+      rows.push({
+        key: q.id,
+        label: q.label,
+        help,
+        ap: def.ap,
+        cashLabel: q.maxAmount > 0 ? `raises ${formatDollars(q.maxAmount)}` : 'raises cash',
+        action: q.id === 'recap' ? { actionId: 'recap' } : { actionId: q.id, params: { amount: q.maxAmount } },
       });
     }
     return rows;
@@ -434,6 +472,38 @@ export function TracksPanel() {
          * isn't online yet (with the unlock path spelled out), it doesn't wall off the panel -
          * several existing flows (tutorial permit filing, event setup) drive these tabs before
          * their unlock condition is met. */}
+        {tab === 'capital' && (
+          <div data-testid="capital-summary" style={{ marginBottom: '0.5rem', fontSize: '0.78rem', color: '#444' }}>
+            <div>
+              Your call: {formatDollars(state.forecast.cost)} plus {(state.forecast.contingency * 100).toFixed(0)}% contingency. Spent so far{' '}
+              {formatDollars(state.totalCostToDate)}. Your equity share: {(state.equity.playerShare * 100).toFixed(1)}%.
+            </div>
+            <div data-testid="capital-projection">
+              Projected coverage at full delivery:{' '}
+              {(() => {
+                const end = projectNoiAndDscr(state, content, 60).at(-1);
+                return end && Number.isFinite(end.dscr) ? `${end.dscr.toFixed(2)}x` : 'n/a';
+              })()}
+              , on today&apos;s dates, rents and debt.
+            </div>
+            <div data-testid="capital-strain">
+              Partner strain {state.capital.partnerStrain.toFixed(1)}: more strain means more disputes.
+              {state.capital.pending.length > 0 &&
+                ` Closing: ${formatDollars(state.capital.pending.reduce((n, p) => n + p.amount, 0))} lands in the coming months.`}
+            </div>
+            {state.capital.log.length === 0 ? (
+              <div>No levers used yet. Every one costs you in the equity multiple.</div>
+            ) : (
+              <ul data-testid="capital-log" style={{ margin: '0.25rem 0 0 1rem', padding: 0 }}>
+                {state.capital.log.map((e, i) => (
+                  <li key={i}>
+                    Month {e.month}: {e.note}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
         {rows.map((row) => {
           const check = checkAction(state, content, plan, row.action);
           return (

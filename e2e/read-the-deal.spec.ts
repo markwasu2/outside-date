@@ -51,6 +51,7 @@ async function startWhale(page: Page) {
   await page.locator('select').first().selectOption('whale');
   await page.getByRole('button', { name: 'New game' }).click();
   await page.getByRole('button', { name: 'Next: Lease' }).click();
+  await page.getByRole('button', { name: 'Next: Forecast' }).click();
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();
   await page.getByRole('button', { name: 'Next: Power' }).click();
   await page.getByRole('button', { name: 'Next: Insurance' }).click();

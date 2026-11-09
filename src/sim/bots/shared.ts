@@ -2,7 +2,8 @@ import type { Content } from '../../content/schemas';
 import { applyAction } from '../../engine/actions';
 import type { NegotiationChoices } from '../../engine/init';
 import { runway } from '../../engine/selectors';
-import type { GameState, PendingEvent, PlannedAction, Setup } from '../../engine/types';
+import { costToCompleteShortfall, leverQuote } from '../../engine/systems/capital';
+import type { GameState, LeverId, PendingEvent, PlannedAction, Setup } from '../../engine/types';
 import { STAGES } from '../../engine/types';
 import type { BotRng } from '../rng';
 
@@ -21,6 +22,9 @@ const MIN_SAFE_RUNWAY_MONTHS = 3;
  * `cash < cost` guard (v1 of this gate blocked `orderTransformer` in every single month of a
  * smoke-test run, see Decisions log).
  */
+/** Reach for a capital lever once recurring outflow would drain cash in under this many months. */
+const LEVER_RUNWAY_MONTHS = 3.5;
+
 const DEFERRABLE_ACTIONS = new Set(['fundExtensions', 'importCrews']);
 
 /**
@@ -195,4 +199,67 @@ export function delaySwapCandidates(state: GameState, content: Content): Planned
       return projectedFinishMonth(state, content, h) - h.deliveryMonth >= 2;
     })
     .map((h) => ({ actionId: 'delaySwap', params: { hallId: h.id } }));
+}
+
+// ---------------------------------------------------------------------------
+// Phase 3: capital levers and insurance policy
+// ---------------------------------------------------------------------------
+
+/**
+ * True when the bot should reach for a capital lever: the loan is out of balance, or cash would
+ * not cover the cost-to-complete shortfall plus a few months of recurring outflow. Free of any
+ * lever-specific logic so every bot shares one definition of "in trouble".
+ */
+export function needsCapital(state: GameState, content: Content): boolean {
+  // The tutorial teaches the core loop, not capital levers; its pinned numbers stay lever-free.
+  if (state.scenarioId.startsWith('tutorial')) return false;
+  if (state.capital.pending.length > 0) return false;
+  if (state.flags.outOfBalance) return true;
+  if (runway(state, content) < LEVER_RUNWAY_MONTHS) return true;
+  const shortfall = Math.max(0, costToCompleteShortfall(state, content));
+  if (shortfall === 0) return false;
+  return state.cash < shortfall + 3 * state.monthlyBurn;
+}
+
+/** One lever candidate per eligible lever in the bot's preference order (raises max available). */
+export function capitalCandidates(state: GameState, content: Content, order: LeverId[]): PlannedAction[] {
+  if (!needsCapital(state, content)) return [];
+  const out: PlannedAction[] = [];
+  for (const id of order) {
+    const quote = leverQuote(state, content, id);
+    if (!quote.available) continue;
+    if (id === 'scopeDown') {
+      // Drop the least-started live hall.
+      const hall = state.halls
+        .filter((h) => quote.halls.includes(h.id))
+        .sort((a, b) => a.costSpent - b.costSpent)[0];
+      if (hall) out.push({ actionId: 'scopeDown', params: { hallId: hall.id } });
+    } else if (id === 'recap') {
+      out.push({ actionId: 'recap' });
+    } else {
+      out.push({ actionId: id, params: { amount: quote.maxAmount } });
+    }
+  }
+  return out;
+}
+
+/**
+ * Tail-risk insurance (Phase 3, J): holds builder's risk only while one big loss would hurt more
+ * than a cushion of cash - the policy is for the rare large loss, not the small frequent ones
+ * (those sit inside the deductible). Drops cover when cash alone could absorb a major loss on the
+ * largest live hall, and buys it back when it could not.
+ */
+export function tailRiskInsuranceCandidates(state: GameState, content: Content, cushionMultiple: number): PlannedAction[] {
+  const live = state.halls.filter((h) => !h.terminated && !h.delivered && h.stageActive);
+  const exposure =
+    Math.max(0, ...live.map((h) => h.costBudget)) * content.tuning.events.stormDamageShare;
+  if (exposure === 0) return [];
+  const covered = state.cash >= exposure * cushionMultiple;
+  if (state.insurance.buildersRisk && covered) {
+    return [{ actionId: 'buyInsurance', params: { kind: 'buildersRisk', on: 0 } }];
+  }
+  if (!state.insurance.buildersRisk && !covered) {
+    return [{ actionId: 'buyInsurance', params: { kind: 'buildersRisk', on: 1 } }];
+  }
+  return [];
 }

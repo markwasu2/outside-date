@@ -25,7 +25,9 @@
     "label": "File a permit",
     "help": "Starts that permit's decision clock.",
     "handler": "filePermit",
-    "params": ["permitId"]
+    "params": [
+      "permitId"
+    ]
   },
   {
     "id": "fileDocket",
@@ -35,7 +37,9 @@
     "label": "File the power docket",
     "help": "Opens the power docket for a vote. Needs the interconnection study pending or done.",
     "handler": "fileDocket",
-    "requires": ["studyPending"]
+    "requires": [
+      "studyPending"
+    ]
   },
   {
     "id": "prepTestimony",
@@ -45,7 +49,9 @@
     "label": "Prepare testimony",
     "help": "Raises the vote odds, up to a cap. Two months in a row costs commission -1.",
     "handler": "prepTestimony",
-    "requires": ["docketOpen"]
+    "requires": [
+      "docketOpen"
+    ]
   },
   {
     "id": "answerDiscovery",
@@ -55,7 +61,9 @@
     "label": "Answer discovery",
     "help": "Clears an outstanding discovery request before it slips the vote.",
     "handler": "answerDiscovery",
-    "requires": ["docketOpen"]
+    "requires": [
+      "docketOpen"
+    ]
   },
   {
     "id": "meetIntervenor",
@@ -65,8 +73,12 @@
     "label": "Meet an intervenor",
     "help": "Progress toward settling with one intervenor.",
     "handler": "meetIntervenor",
-    "params": ["intervenorId"],
-    "requires": ["docketOpen"]
+    "params": [
+      "intervenorId"
+    ],
+    "requires": [
+      "docketOpen"
+    ]
   },
   {
     "id": "commissionStudy",
@@ -85,7 +97,9 @@
     "label": "Order the transformer",
     "help": "Long lead time. Order it early.",
     "handler": "orderLongLead",
-    "params": ["transformer"]
+    "params": [
+      "transformer"
+    ]
   },
   {
     "id": "orderSwitchgear",
@@ -95,7 +109,9 @@
     "label": "Order the switchgear",
     "help": "Long lead time. Order it early.",
     "handler": "orderLongLead",
-    "params": ["switchgear"]
+    "params": [
+      "switchgear"
+    ]
   },
   {
     "id": "cancelOrder",
@@ -105,8 +121,12 @@
     "label": "Cancel an order",
     "help": "Refunds the deposit minus a cancellation fee.",
     "handler": "cancelOrder",
-    "params": ["kind"],
-    "requires": ["orderPending"]
+    "params": [
+      "kind"
+    ],
+    "requires": [
+      "orderPending"
+    ]
   },
   {
     "id": "buyInsurance",
@@ -116,7 +136,10 @@
     "label": "Adjust insurance",
     "help": "Turns builder's risk or delay-in-start-up cover on or off.",
     "handler": "setInsurance",
-    "params": ["kind", "on"]
+    "params": [
+      "kind",
+      "on"
+    ]
   },
   {
     "id": "cureDraw",
@@ -126,7 +149,9 @@
     "label": "Cure a draw freeze",
     "help": "Ends an active draw freeze so construction draws resume.",
     "handler": "cureDraw",
-    "requires": ["flag:drawFrozen"]
+    "requires": [
+      "flag:drawFrozen"
+    ]
   },
   {
     "id": "priceTakeout",
@@ -154,7 +179,9 @@
     "label": "Ready liquid cooling",
     "help": "Gets a hall ready for liquid-cooled racks (cost depends on tier).",
     "handler": "readyLiquid",
-    "params": ["hallId"]
+    "params": [
+      "hallId"
+    ]
   },
   {
     "id": "delaySwap",
@@ -164,8 +191,12 @@
     "label": "Ask for a delay swap",
     "help": "Asks the tenant to slide one hall's delivery and outside dates.",
     "handler": "delaySwap",
-    "params": ["hallId"],
-    "requires": ["flag:rackScheduleConfirmed"]
+    "params": [
+      "hallId"
+    ],
+    "requires": [
+      "flag:rackScheduleConfirmed"
+    ]
   },
   {
     "id": "advanceHall",
@@ -175,7 +206,9 @@
     "label": "Advance construction",
     "help": "Starts the next construction stage on a hall. Cost flows through draws.",
     "handler": "advanceHall",
-    "params": ["hallId"]
+    "params": [
+      "hallId"
+    ]
   },
   {
     "id": "importCrews",
@@ -194,7 +227,9 @@
     "label": "Stand down a hall",
     "help": "Pauses one hall this month to save cash. Resumes free next month.",
     "handler": "standDown",
-    "params": ["hallId"]
+    "params": [
+      "hallId"
+    ]
   },
   {
     "id": "fixInspection",
@@ -204,7 +239,9 @@
     "label": "Fix an inspection",
     "help": "Clears a failed inspection so the hall can resume.",
     "handler": "fixInspection",
-    "params": ["hallId"]
+    "params": [
+      "hallId"
+    ]
   },
   {
     "id": "visitCast",
@@ -214,6 +251,65 @@
     "label": "Visit a cast member",
     "help": "+4 goodwill to one group. Once per group every 3 months.",
     "handler": "visitCast",
-    "params": ["group"]
+    "params": [
+      "group"
+    ]
+  },
+  {
+    "id": "equityCall",
+    "track": "money",
+    "ap": 1,
+    "cash": 0,
+    "label": "Call equity from your partner",
+    "help": "Your partner funds a shortfall. Your share dilutes, a fee comes off the top, and the new money counts against your equity multiple.",
+    "handler": "equityCall",
+    "params": [
+      "amount"
+    ]
+  },
+  {
+    "id": "bridgeLoan",
+    "track": "money",
+    "ap": 1,
+    "cash": 0,
+    "label": "Take a sponsor bridge loan",
+    "help": "Short, about 14% paid in kind. Repaid ahead of equity at takeout.",
+    "handler": "bridgeLoan",
+    "params": [
+      "amount"
+    ]
+  },
+  {
+    "id": "mezzTopUp",
+    "track": "money",
+    "ap": 1,
+    "cash": 0,
+    "label": "Top up the mezz",
+    "help": "More mezz with a fee, only while loan to cost and coverage allow.",
+    "handler": "mezzTopUp",
+    "params": [
+      "amount"
+    ]
+  },
+  {
+    "id": "scopeDown",
+    "track": "money",
+    "ap": 1,
+    "cash": 0,
+    "label": "Scope down: cancel a hall",
+    "help": "Terminate a hall. You pay a fee, lose what you spent and get some salvage back.",
+    "handler": "scopeDown",
+    "params": [
+      "hallId"
+    ]
+  },
+  {
+    "id": "recap",
+    "track": "money",
+    "ap": 2,
+    "cash": 0,
+    "label": "Recap mid-construction",
+    "help": "Raise the senior loan for a fee and a higher rate. Once per game.",
+    "handler": "recap"
   }
 ]

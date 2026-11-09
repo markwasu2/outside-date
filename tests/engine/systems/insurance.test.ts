@@ -107,7 +107,7 @@ describe('insurance: applyStormDamage (4.11)', () => {
 
     const after = applyStormDamage(state, content, hall.id);
 
-    expect(cashBefore - after.cash).toBe(content.tuning.events.stormDamage);
+    expect(cashBefore - after.cash).toBe(Math.round(hall.costBudget * content.tuning.events.stormDamageShare));
     const afterHall = after.halls.find((h) => h.id === hall.id);
     expect(afterHall?.insuredDelayMonths).toBe(hall.insuredDelayMonths);
     expect(after.flags.drawFreeze).toBe(true);

@@ -42,15 +42,27 @@ function riskAllocationGrade(state: GameState, content: Content): TakeoutResult[
   return score >= 90 ? 'A' : score >= 75 ? 'B' : score >= 60 ? 'C' : score >= 40 ? 'D' : 'F';
 }
 
+/** Months your delivery call sits from the lease month (negative = you called it early). */
+export function monthCallOffset(state: GameState): number {
+  return state.lease ? state.forecast.month - state.lease.firstDeliveryMonth : 0;
+}
+
+/** Phase 3 (B): graded against YOUR call. Calling a later month than the lease buys slack here and costs tenant goodwill at close. */
 function timeGrade(state: GameState): TakeoutResult['reportCard']['time'] {
   if (state.halls.length === 0) return 'A';
-  const onTime = state.halls.filter((h) => h.deliveredMonth !== null && h.deliveredMonth <= h.deliveryMonth).length;
+  const offset = monthCallOffset(state);
+  const onTime = state.halls.filter((h) => h.deliveredMonth !== null && h.deliveredMonth <= h.deliveryMonth + offset).length;
   const pct = onTime / state.halls.length;
   return pct >= 1 ? 'A' : pct >= 0.75 ? 'B' : pct >= 0.5 ? 'C' : pct >= 0.25 ? 'D' : 'F';
 }
 
+/** Actual spend over your own cost call (the forecast), not the engine's private estimate. */
+export function costRatio(state: GameState): number {
+  return state.forecast.cost > 0 ? state.totalCostToDate / state.forecast.cost : 0;
+}
+
 function costGrade(state: GameState): TakeoutResult['reportCard']['cost'] {
-  const ratio = state.budgetAtClose > 0 ? state.totalCostToDate / state.budgetAtClose : 0;
+  const ratio = costRatio(state);
   return ratio <= 1.0 ? 'A' : ratio <= 1.03 ? 'B' : ratio <= 1.07 ? 'C' : ratio <= 1.12 ? 'D' : 'F';
 }
 

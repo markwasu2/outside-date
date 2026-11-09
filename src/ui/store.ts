@@ -13,6 +13,7 @@ import { BOTS, playOneGame } from '../sim/runSim';
 import { SAVE_VERSION, saveGame, type SaveFile } from './save';
 import { appendSnapshot, buildFinancialSnapshot, type FinancialSnapshot } from './financials';
 import { playSound } from './sound';
+import { applyFireDamage, applySmallLoss, applyStormDamage } from '../engine/systems/insurance';
 import { newCrossings, warnings } from './board/warnings';
 
 /** P10.3: months-of-runway threshold below which `playWarningIfNeeded` beeps on a fresh crossing
@@ -74,7 +75,7 @@ function playTransitionSounds(before: GameState, after: GameState, planContent: 
 }
 
 /** The six track tabs the TracksPanel renders (P6.5); the 'any' track (visitCast) gets its own always-visible section. */
-export type TrackTab = 'land' | 'regulation' | 'power' | 'money' | 'chips' | 'construction';
+export type TrackTab = 'land' | 'regulation' | 'power' | 'money' | 'capital' | 'chips' | 'construction';
 /** The floating panels (P6.2's "floating ledger drawer", Phase 2 D1's Financials drawer); TracksPanel's own tab switching is local UI state, not store state. */
 export type OpenPanel = 'ledger' | 'financials';
 /** 'start' is the Phase 7 title/setup/negotiation wizard (src/ui/screens/SetupWizard.tsx, which
@@ -625,6 +626,21 @@ if (import.meta.env.DEV && typeof window !== 'undefined') {
     const s = useStore.getState();
     if (!s.state) return;
     const next = { ...s.state, cash: amount };
+    useStore.setState({ state: next, draft: next });
+  };
+
+  // Phase 3 visual coverage: a real small loss or storm takes a long run to draw, so this dev-only
+  // hook applies the engine's own loss handlers to the live hall and opens the matching card.
+  (window as unknown as { __debugLoss?: (kind: 'theft' | 'water' | 'storm' | 'fire') => void }).__debugLoss = (kind) => {
+    const s = useStore.getState();
+    if (!s.state) return;
+    const content = s.content;
+    const hallId = s.state.halls[0]!.id;
+    const base = kind === 'storm' ? applyStormDamage(s.state, content, hallId)
+      : kind === 'fire' ? applyFireDamage(s.state, content, hallId)
+      : applySmallLoss(s.state, content, hallId, kind, 0.5);
+    const cardId = kind === 'storm' ? 'storm' : kind === 'fire' ? 'fitout_fire' : kind === 'water' ? 'water_damage' : 'theft';
+    const next = { ...base, phase: 'awaitingChoice' as const, pending: { cardId, choices: [{ id: 'ok', label: 'Carry on' }] } };
     useStore.setState({ state: next, draft: next });
   };
 }

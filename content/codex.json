@@ -255,5 +255,37 @@
     "realAnchor": "Louisiana Public Service Commission fast-track vote on Entergy's $2.1B plan, April 2026",
     "sourceUrl": "https://www.kplctv.com/2026/04/15/louisiana-psc-aproves-fast-track-entergy-21b-proposal-tied-meta-data-center/",
     "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "builders-risk-claims",
+    "title": "What builders risk claims really look like",
+    "body": "Most builders risk claims are small and frequent, not catastrophic. One industry breakdown puts water damage at about 4 in 10 claims (average near $400,000), theft and vandalism at about 3 in 10 (near $30,000) and fire at about 1 in 10 (near $850,000). A specialty broker reports water as 63% of all builders risk claims over the past several years, usually when a project is 60 to 70% complete and plumbing is pressurized. The small ones land inside the deductible, so you pay them yourself. Insurance is for the rare big one.",
+    "realAnchor": "IRMI, builders risk claim frequency and size; Bridge Specialty Group, builders risk symposium",
+    "sourceUrl": "https://www.irmi.com/articles/expert-commentary/exponentially-improve-your-financials-with-a-risk-management-maturity-journey",
+    "verifiedOn": "2026-11-09"
+  },
+  {
+    "id": "site-theft-copper",
+    "title": "Copper theft at a data center site",
+    "body": "In July 2026 deputies in Loudoun County, Virginia arrested three men after a midnight burglary at a data center construction site in Sterling, where over $100,000 of copper wire was taken. Copper and electrical gear are easy to resell, which makes data center sites a repeat target. One claim like this is small next to a deductible, but they come back.",
+    "realAnchor": "Loudoun County, Virginia copper wire theft, July 31, 2026",
+    "sourceUrl": "https://www.fox5dc.com/news/3-arrested-after-midnight-burglary-data-center-construction-site-loudoun-county",
+    "verifiedOn": "2026-11-09"
+  },
+  {
+    "id": "construction-fire-case",
+    "title": "A fire at a data center under construction",
+    "body": "On July 19, 2026 a fire broke out at a social media company's data center construction site in Beaver Dam, Wisconsin, and damaged part of the roof. Fire is the rare, expensive loss: about 1 in 10 builders risk claims, but the largest by dollars. A policy with a flat deductible pays the rest. Without one, the whole hall is on your cash.",
+    "realAnchor": "Meta AI data center construction site fire, Beaver Dam, Wisconsin, July 19, 2026",
+    "sourceUrl": "https://www.datacenterdynamics.com/en/news/fire-at-meta-data-center-construction-site-in-beaver-dam-wisconsin/",
+    "verifiedOn": "2026-11-09"
+  },
+  {
+    "id": "storm-construction-risk",
+    "title": "Severe weather on data center sites",
+    "body": "Zurich reports that 64% of US data center capacity under construction is outside the traditional hubs, in places with more severe weather such as West Texas, Tennessee, Wisconsin and Ohio, and that severe weather has passed fire as the leading construction threat. A storm that hits a site early can wreck a hall's frame and freeze lender draws until the claim is sorted. It is rare, and it is large.",
+    "realAnchor": "Zurich data center construction risk report as covered by Network World, July 2026",
+    "sourceUrl": "https://www.networkworld.com/article/4196358/weather-grows-as-one-of-data-center-growths-greatest-risks.html",
+    "verifiedOn": "2026-11-09"
   }
 ]

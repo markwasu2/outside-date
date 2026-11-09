@@ -36,16 +36,27 @@ describe('warnings', () => {
     expect(w?.level).toBe('critical');
   });
 
-  it('when no cash lever exists, the runway warning says so honestly', () => {
+  it('the runway warning deep-links its financing fix to the Capital tab', () => {
     const state = freshState();
-    // No active stage to stand down, no open orders, no insurance, no rack schedule confirmed.
     state.insurance.dsu = false;
     state.insurance.buildersRisk = false;
     state.flags.rackScheduleConfirmed = false;
     state.cash = 1;
     const w = byId(state, 'runway');
-    expect(w?.fixes ?? []).toHaveLength(0);
-    expect(w?.detail).toContain('No financing lever exists yet');
+    expect(w?.fixes.some((f) => f.tab === 'capital')).toBe(true);
+    expect(w?.detail).not.toContain('No financing lever exists yet');
+  });
+
+  it('when every capital lever is closed, the runway warning says so honestly', () => {
+    const state = freshState();
+    state.insurance.dsu = false;
+    state.insurance.buildersRisk = false;
+    state.flags.rackScheduleConfirmed = false;
+    state.cash = 1;
+    state.phase = 'awaitingChoice';
+    const w = byId(state, 'runway');
+    expect((w?.fixes ?? []).filter((f) => f.tab === 'capital')).toHaveLength(0);
+    expect(w?.detail).toContain('No capital lever is open right now');
   });
 
   it('an active draw freeze is always critical', () => {

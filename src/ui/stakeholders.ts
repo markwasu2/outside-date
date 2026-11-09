@@ -165,6 +165,8 @@ export function currentHolder(state: GameState, riskId: string): RiskHolder | nu
  */
 export const EVENT_STAKEHOLDER: Record<string, { riskId?: string; roleId?: StakeholderRoleId }> = {
   storm: { riskId: 'stormDelay' },
+  water_damage: { roleId: 'insurer' },
+  theft: { roleId: 'insurer' },
   supply_shock: { roleId: 'equipment' },
   labor_shortfall: { riskId: 'laborShortage' },
   outlook_cut: { riskId: 'rateMove' },

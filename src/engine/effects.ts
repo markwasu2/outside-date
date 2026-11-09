@@ -1,9 +1,10 @@
 import type { Content, Effect, EffectTypeSchema } from '../content/schemas';
 import type { z } from 'zod';
-import { pick, chance } from './rng';
-import { applyStormDamage, applyFireDamage } from './systems/insurance';
+import { pick, chance, next as nextRoll } from './rng';
+import { applyStormDamage, applyFireDamage, applySmallLoss } from './systems/insurance';
 import type { GameState, GoodwillGroup, Hall, StageId } from './types';
 import { STAGES } from './types';
+import { amendClosing, latestClosing } from './closing';
 
 type EffectType = z.infer<typeof EffectTypeSchema>;
 type EffectArg = Effect['args'][number];
@@ -294,6 +295,14 @@ export const effectHandlers: Record<EffectType, EffectHandler> = {
     return applyFireDamage(next, content, hall.id);
   },
 
+  smallLoss: (state, args, content) => {
+    const kind = args[0] === 'theft' ? 'theft' : 'water';
+    const { state: picked, hall } = pickHallBySelector(state, 'randomActive');
+    if (!hall) return picked;
+    const roll = nextRoll(picked.rng);
+    return applySmallLoss({ ...picked, rng: roll.state }, content, hall.id, kind, roll.value);
+  },
+
   owedAp: (state, args) => {
     const n = requireNumber(args[0]);
     const current = typeof state.flags.apOwedNextMonth === 'number' ? state.flags.apOwedNextMonth : 0;
@@ -321,20 +330,34 @@ export const effectHandlers: Record<EffectType, EffectHandler> = {
     ];
     const addedBudget = newHalls.reduce((sum, h) => sum + h.costBudget, 0);
     const budgetAtClose = state.budgetAtClose;
-    const seniorShare = budgetAtClose > 0 ? state.debt.seniorCommitment / budgetAtClose : 0;
-    const mezzShare = budgetAtClose > 0 ? state.debt.mezzCommitment / budgetAtClose : 0;
-    const equityShare = budgetAtClose > 0 ? state.equity.committedTotal / budgetAtClose : 0;
+    // Phase 3 (NEEDS ENGINE 2): the amended closing table is built from the previous table and
+    // each source scales on its share of the non-working-capital uses, so sources and uses stay
+    // balanced. The new halls carry the same forecast cushion the original build was sized on.
+    const sizedRatio = budgetAtClose > 0 ? (state.forecast.cost * (1 + state.forecast.contingency)) / budgetAtClose : 1;
+    const sizedAdded = Math.round(addedBudget * sizedRatio);
+    const prev = latestClosing(state);
+    const amended = prev
+      ? amendClosing(prev, state.month, 'The ask: two more halls', [
+          { label: 'Expansion halls', amount: addedBudget },
+          { label: 'Expansion cushion', amount: sizedAdded - addedBudget },
+        ])
+      : null;
+    const seniorAdd = amended?.senior ?? 0;
+    const mezzAdd = amended?.mezz ?? 0;
+    const equityAdd = amended?.equity ?? 0;
 
     return {
       ...state,
       halls: [...state.halls, ...newHalls],
       budgetAtClose: budgetAtClose + addedBudget,
+      forecast: { ...state.forecast, cost: state.forecast.cost + Math.round(addedBudget * (budgetAtClose > 0 ? state.forecast.cost / budgetAtClose : 1)) },
       debt: {
         ...state.debt,
-        seniorCommitment: Math.round(state.debt.seniorCommitment + addedBudget * seniorShare),
-        mezzCommitment: Math.round(state.debt.mezzCommitment + addedBudget * mezzShare),
+        seniorCommitment: state.debt.seniorCommitment + seniorAdd,
+        mezzCommitment: state.debt.mezzCommitment + mezzAdd,
       },
-      equity: { ...state.equity, committedTotal: Math.round(state.equity.committedTotal + addedBudget * equityShare) },
+      equity: { ...state.equity, committedTotal: state.equity.committedTotal + equityAdd },
+      closing: amended ? [...state.closing, amended.table] : state.closing,
       permits: {
         ...state.permits,
         docketAmendment: { id: 'docketAmendment', status: 'pending', decisionMonth: state.month + 9 },
