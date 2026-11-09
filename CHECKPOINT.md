@@ -755,3 +755,17 @@ old empty string).
 | e2e | done: finding #2 spec extended (rebate + decline text), 44 passed |
 | balance grid | skipped: UI-only, no engine/content-tuning/bot change |
 | full suite green | done: 507 vitest (5 new + 1 updated), 44 playwright, eslint, tsc, vite build |
+
+# Cold playthrough 2, fix 1 - power hints
+
+Medium's 45% base plant-slip odds are correct (power.ts reads tuning), but its
+prose still claimed equality with Low's 55%. Corrected both stale hints:
+Low has the highest odds, Medium has lower odds and slips one month shorter.
+
+| criterion | status |
+|---|---|
+| text matches engine odds | done: Low 55%, Medium 45%, High 5%; engine/tuning untouched |
+| regression test | done: desktop e2e asserts both numbers and corrected prose |
+| full gates | done: 507 vitest, 45 playwright, tsc, eslint, build |
+| visual check | done: docs/screenshots/cold2/power-hints.png at 1280 desktop |
+| balance grid | skipped: UI copy only |
