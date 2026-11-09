@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import type { DifficultyId, NegotiationChoices } from '../../engine/init';
 import type { Setup } from '../../engine/types';
+import { DEFAULT_NEGOTIATION, DEFAULT_SETUP } from '../defaultGame';
 import { useStore } from '../store';
 import { CapitalScreen } from './CapitalScreen';
 import { InsuranceScreen } from './InsuranceScreen';
@@ -12,17 +13,10 @@ import { TitleScreen } from './TitleScreen';
 
 type Step = 'title' | 'setup' | 'lease' | 'capital' | 'power' | 'insurance';
 
-/** Same shape as the Phase 6 placeholder defaults (store.ts), now just the wizard's own
- * starting point rather than the whole game's fixed setup. Exported for App.tsx's P8.2
- * end-of-tutorial "start the Whale campaign" button, which quick-starts the same way the
- * Tutorial button does rather than routing back through the 5-screen wizard. */
-export const DEFAULT_SETUP: Setup = { site: 'megasite', hallTier: 'air', cooling: 'evaporative', gc: 'costPlus' };
-export const DEFAULT_NEGOTIATION: NegotiationChoices = {
-  lease: { firstDeliveryMonth: 38, lateRemedy: 'liquidatedDamages' },
-  capital: { seniorIndex: 1, mezzIndex: 1, playerShareIndex: 1 },
-  power: { minCharge: 'medium', plantBOffset: 0 },
-  insurance: { dsu: false },
-};
+/** The canonical defaults now live in ../defaultGame.ts (single source shared with the
+ * tutorial sim test, qa-fixes-2 finding 2); re-exported here so App.tsx and
+ * ReportCardScreen.tsx's existing imports keep working. */
+export { DEFAULT_NEGOTIATION, DEFAULT_SETUP };
 
 /** Phase 7: title + the 5 negotiation screens, all choices threaded through local state (the
  * one-off wizard flow has no other consumer, same reasoning as TracksPanel's local tab state)

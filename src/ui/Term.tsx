@@ -17,6 +17,8 @@ export function Term({ id, children }: { id: string; children: ReactNode }) {
       <span title={entry?.definition ?? id} style={{ textDecoration: 'underline dotted', cursor: 'help' }}>
         {children}
       </span>
+      {/* QA pass 2, finding 9: the link used to render glued to the term ("Projected DSCRmore"
+          on the capital screen) - keep a real space before it. */}
       {entry?.codexId && (
         <button
           onClick={() => openCodex(entry.codexId)}
@@ -31,7 +33,7 @@ export function Term({ id, children }: { id: string; children: ReactNode }) {
             textDecoration: 'underline',
           }}
         >
-          more
+          {' more'}
         </button>
       )}
     </span>

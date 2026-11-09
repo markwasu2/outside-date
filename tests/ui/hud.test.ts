@@ -17,15 +17,21 @@ describe('Hud: goodwill labels (item 2)', () => {
 
 describe('Hud: DSCR headroom display (item 7)', () => {
   it('shows "n/a until first draw" when dscr() is Infinity (no debt drawn)', () => {
-    expect(formatDscrHeadroom(Infinity, 1.25)).toBe('n/a until first draw');
+    expect(formatDscrHeadroom(Infinity, 1.25, 0)).toBe('n/a until first draw');
   });
 
   it('shows "n/a until first draw" for NaN too, not a raw NaN string', () => {
-    expect(formatDscrHeadroom(NaN, 1.25)).toBe('n/a until first draw');
+    expect(formatDscrHeadroom(NaN, 1.25, 0)).toBe('n/a until first draw');
   });
 
-  it('shows a fixed-2 headroom number once debt is drawn (dscr() finite)', () => {
-    expect(formatDscrHeadroom(1.5, 1.25)).toBe('0.25');
+  // qa-fixes-2 finding #7: after the first draw but before any delivery, forward NOI is zero
+  // and dscr() reads 0 - the HUD used to show a constant "-1.25" for those months.
+  it('shows "n/a until first delivery" once debt is drawn but forward NOI is still zero', () => {
+    expect(formatDscrHeadroom(0, 1.25, 0)).toBe('n/a until first delivery');
+  });
+
+  it('shows a fixed-2 headroom number once rent is flowing (dscr() finite, NOI positive)', () => {
+    expect(formatDscrHeadroom(1.5, 1.25, 1000000)).toBe('0.25');
   });
 });
 

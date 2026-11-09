@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import type { ActionDef, Content } from '../content/schemas';
 import { loadContent } from '../content/load';
 import { applyAction } from '../engine/actions';
+import { formatDollars } from '../engine/format';
 import { createGame, type DifficultyId, type NegotiationChoices } from '../engine/init';
 import { runway } from '../engine/selectors';
 import { fastForward as engineFastForward, resolveEvent, step, totalApCost } from '../engine/step';
@@ -116,8 +117,22 @@ export function checkAction(
   if (isDuplicateZeroApAction(def, plan, action)) {
     return { ok: false, reason: 'Already queued this month' };
   }
+  const folded = foldPlan(state, planContent, plan);
   try {
-    applyAction(foldPlan(state, planContent, plan), action, planContent);
+    const after = applyAction(folded, action, planContent);
+    // QA pass 2, finding 1 (tutorial cash trap): a handler's own `cash < cost` check still
+    // passes when the cost exactly empties the bank - e.g. the tutorial's $8.0M "Fund road and
+    // school extensions" at exactly $8.0M cash, queueing an instant month-1 default. Refuse any
+    // queue that cuts cash AND leaves under one month of runway; the reason renders in place of
+    // the row's help text, the same pattern every other disabled row uses. UI-only: engine
+    // handlers and the sim bots (which carry their own runway gate in src/sim/bots/shared.ts)
+    // are deliberately untouched.
+    if (after.cash < folded.cash && runway(after, planContent) < 1) {
+      return {
+        ok: false,
+        reason: `Would leave ${formatDollars(after.cash)} cash, under a month of runway - an instant loss at end of month`,
+      };
+    }
     return { ok: true };
   } catch (e) {
     return { ok: false, reason: e instanceof Error ? e.message : String(e) };

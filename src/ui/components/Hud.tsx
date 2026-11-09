@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { formatDollars, formatMonth, formatMonths } from '../../engine/format';
-import { dscr, runway } from '../../engine/selectors';
+import { dscr, forwardNoi, runway } from '../../engine/selectors';
 import type { GoodwillGroup } from '../../engine/types';
 import { totalApCost } from '../../engine/step';
 import { exportSaveToFile, SAVE_VERSION } from '../save';
@@ -21,10 +21,13 @@ export const GOODWILL_LABELS: Record<GoodwillGroup, string> = {
 
 /** Item 7: `dscr()` (engine/selectors.ts) returns Infinity whenever no debt has been drawn yet
  * (debtService <= 0) - this used to render as a raw "∞" headroom figure, confusing before the
- * player has drawn anything. Exported as a pure function so tests/ui can cover both branches
- * without rendering the component. */
-export function formatDscrHeadroom(d: number, dscrTrigger: number): string {
+ * player has drawn anything. QA pass 2, finding 7: once the first draw lands, dscr() is 0 until
+ * the first delivery (forward NOI is still zero), so the HUD showed a constant -1.25 for months -
+ * now "n/a until first delivery" while forward NOI is zero. Exported as a pure function so
+ * tests/ui can cover all three branches without rendering the component. */
+export function formatDscrHeadroom(d: number, dscrTrigger: number, forwardNoiValue: number): string {
   if (!Number.isFinite(d)) return 'n/a until first draw';
+  if (forwardNoiValue <= 0) return 'n/a until first delivery';
   return (d - dscrTrigger).toFixed(2);
 }
 
@@ -72,7 +75,7 @@ export function Hud() {
   const naiveMonths = draft.monthlyBurn > 0 ? draft.cash / draft.monthlyBurn : Infinity;
   const breakdownNote = runwayBreakdownNote(months, naiveMonths);
   const d = dscr(draft, content);
-  const headroomText = formatDscrHeadroom(d, content.tuning.covenant.dscrTrigger);
+  const headroomText = formatDscrHeadroom(d, content.tuning.covenant.dscrTrigger, forwardNoi(draft, content));
 
   const activeHalls = draft.halls.filter((h) => !h.terminated && !h.delivered);
   const nextOutside = activeHalls.length
@@ -120,14 +123,29 @@ export function Hud() {
 
       <div>Cash: {formatDollars(draft.cash)}</div>
 
+      {/* QA pass 2, finding 8: the tooltip used to omit the utility minimum charge and
+          liquidated-damages accrual terms even though runway()'s number includes both. */}
       <div
-        title={`Months of runway at current burn/rent, net of hall income and insurance${breakdownNote}`}
+        title={`Months of runway at current burn/rent, net of hall income, insurance premiums, utility minimum charges, and liquidated-damages accruals${breakdownNote}`}
         style={{ color: runwayColor(months) }}
       >
         Runway: {formatMonths(months)}
       </div>
 
       <div title="DSCR headroom over the covenant trigger">DSCR headroom: {headroomText}</div>
+
+      {/* QA pass 2, finding 3: persistent indicator while a lender draw freeze is active -
+          construction draws are paused until the player cures it from the Money tab. The engine
+          also logs a line when the freeze starts (effects.ts / insurance.ts). */}
+      {!!draft.flags.drawFreeze && (
+        <div
+          data-testid="draw-freeze-indicator"
+          title="The lender has frozen construction draws. Queue 'Cure a draw freeze' on the Money tab to lift it."
+          style={{ color: '#c62828', fontWeight: 'bold' }}
+        >
+          {'\u26A0'} Draw freeze: lender holding draws
+        </div>
+      )}
 
       <div title="Soonest active hall's outside date">
         Next outside date: {nextOutside !== null ? formatMonth(nextOutside) : 'none'}
