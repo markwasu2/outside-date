@@ -38,6 +38,22 @@ export function noticeStakes(entry: LogEntry, content: Content): string | undefi
 }
 
 const MAX_VISIBLE = 3;
+
+/** A repeating monthly penalty (e.g. liquidated damages) logs an identical entry each month;
+ * stacking identical cards reads as a bug. Keep only the latest occurrence of each title+body,
+ * order preserved. */
+export function dedupeNotices(notices: Notice[]): Notice[] {
+  const seen = new Set<string>();
+  return [...notices]
+    .reverse()
+    .filter((n) => {
+      const id = `${n.title}\n${n.body ?? ''}`;
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    })
+    .reverse();
+}
 /** Cards fade on their own: a card must never sit over a gameplay control forever (qa-fixes-2
  * deadlocked when a card covered End month). The dismiss button remains for impatient players. */
 const NOTICE_TTL_MS = 9000;
@@ -86,7 +102,7 @@ export function EventNotices() {
         expiresAt: Date.now() + NOTICE_TTL_MS,
       }));
     if (cards.length > 0) {
-      setNotices((prev) => [...prev, ...cards].slice(-MAX_VISIBLE));
+      setNotices((prev) => dedupeNotices([...prev, ...cards]).slice(-MAX_VISIBLE));
     }
   }, [log, pendingTitle, content]);
 

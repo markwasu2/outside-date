@@ -652,3 +652,24 @@ state.log (grep clean), no numeric/rng/bot behavior changed.
 | balance grid | skipped: log-only engine change - no numeric, rng, content-tuning or bot behavior touched; 499 vitest (incl. perfect-play + state-equality fixtures) confirm state math unchanged |
 | full suite green | done: 499 vitest, 42 playwright, eslint, tsc, vite build |
 | screenshots inspected | done: docs/screenshots/ux10/ (LD card + HUD strip, desktop 1440) |
+
+# UX 10b - dedupe identical notice cards
+
+## The change (UI only)
+
+Bug found in the UX 10 screenshot: a repeating monthly penalty (liquidated
+damages) logs an identical entry each late month, and the notice stack showed
+two identical H1 LD cards. Root cause is not double-logging (one entry per
+month, correct) - identical text from consecutive months is indistinguishable
+in the stack. Fix: exported dedupeNotices() keeps only the latest occurrence
+of each title+body in the visible stack, order preserved, then caps at
+MAX_VISIBLE. Pinned by two unit tests.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| no identical duplicate cards | done: re-run of scripts/ux10.mjs shows 3 distinct cards (Clarion, one LD card, Copper), screenshot inspected |
+| repeats still surface once | done: latest LD card still present |
+| balance grid | skipped: UI-only, no engine/content-tuning/bot change |
+| full suite green | done: 501 vitest (2 new dedupe tests), 42 playwright, eslint, tsc, vite build |
