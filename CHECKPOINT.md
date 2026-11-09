@@ -245,3 +245,28 @@ speed (6-10 -> 4-8 moved nothing).
 - /downloads/p9-riverbend-card.png: setup site cards - riverbend reads "Land $7.0M · +3 pad
   months · study 6-10 mo" with "Easement already recorded: the wetlands permit comes cured at
   close"; no "needs wetlands" chase item.
+
+# Phase 10: the pond threatens the first hall (2026-11-09)
+
+Branch phase10-pond-hall (off main a97acbb). The early-hall variant main floated and the user
+invited ("keep going"): the pond now blocks the EARLIEST-delivery hall (H1) instead of the
+latest, so the mitigation route is urgent from month 1. Merged because the grids held.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| pond blocks the earliest-delivery hall | done: init marks halls[0] on pondTakesHall sites |
+| whale + millbrook grids stay in band | done: whale careful 71.5 / competent 68.8 (both pick quarry-ridge; headline grid unchanged); millbrook untouched |
+| farmland stays winnable with the route | done: careful 21.5%, competent 27.0% (was 23.0 / 29.5 blocking H4); greedy 34.9 (was 47.1); first delivery 43-44 (was 42). Multiples stay ~1.0x either way - farmland was already the break-even gamble |
+| full suite green | done: 472 vitest, 41 playwright, eslint, tsc, vite build |
+
+## Test adjustments
+
+- spatial phase-7 farmland pads test uses H2/H3/H4 (H1 is the pond hall now); the blocked-hall
+  assertion flips to earliest deliveryMonth.
+- sites.test prereq test uses H2 (H1 throws the pond error before prereqs are checked).
+- living-board rent-ticker e2e seed 2 -> 3: seed 2 plays farmland and now loses before any
+  delivery (the pond on H1 is exactly the nastiness intended); seed 3 delivers at month 30.
+- phase7 farmland pad-choice shot clicks H2 (H1's popover is the mitigation route).
+- phase8 pond shot regenerated with the H1 chip and route row (p8-pond-blocked.png).

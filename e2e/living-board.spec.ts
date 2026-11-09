@@ -93,7 +93,9 @@ test('Whale: a delivered hall shows its rent ticker on the board', async ({ page
       window as unknown as {
         __debugBotToFirstDelivery: (botId: string, scenarioId: string, difficulty: string, seed: number) => void;
       }
-    ).__debugBotToFirstDelivery('competent', 'whale', 'normal', 2);
+    // Phase 10: seed 2 plays farmland and now loses before any delivery (the pond blocks H1
+    // there); seed 3 delivers at month 30.
+    ).__debugBotToFirstDelivery('competent', 'whale', 'normal', 3);
   });
 
   // D4: the delivered hall carries a live rent ticker.

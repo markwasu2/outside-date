@@ -27,9 +27,9 @@ test('phase 8 pond shot', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await startCampaign(page, 'farmland');
 
-  // The pond took H4's position: the chip says so, and the popover offers the route through.
-  await expect(page.getByTestId('pad-H4')).toContainText('pond');
-  await page.getByText('H4', { exact: true }).click();
+  // The pond took H1's position: the chip says so, and the popover offers the route through.
+  await expect(page.getByTestId('pad-H1')).toContainText('pond');
+  await page.getByText('H1', { exact: true }).click();
   const popover = page.getByTestId('map-popover');
   const route = popover.getByTestId('popover-action').filter({ hasText: 'Mitigate the wetlands pond' });
   await expect(route).toBeVisible();
