@@ -882,3 +882,16 @@ remain. These are previews, not a claim that construction is already complete.
 | full gates | done: 512 vitest, 52 playwright (51 plus isolated long tutorial test), lint, tsc, build |
 | caveat | monolithic e2e hit execution time limit at long tutorial; isolated test passed in 12.5s |
 | balance grid | skipped: decorative setup UI only |
+
+# Cold playthrough 2, fix 6 - modal layering
+
+Event modal has an explicit layer above board labels and popovers. Board art
+and its labels are isolated into their own stacking context. Codex stays above
+the event modal so its Learn more route continues to work.
+
+| criterion | status |
+|---|---|
+| no pad-label bleed | done: desktop modal screenshot inspected |
+| button actually on top | done: elementFromPoint test and real pointer click resolving the event |
+| full gates | done: 512 vitest, 53 e2e (52 + isolated long tutorial), lint, tsc, build |
+| balance grid | skipped: CSS stacking only |

@@ -20,3 +20,24 @@ test('RFS nudge names the power blocker and automatic substation chain', async (
   await expect(page.getByText(/The substation builds itself once/)).toBeVisible();
   await page.screenshot({ path: 'docs/screenshots/cold2/real-blocker.png' });
 });
+
+test('event body and buttons paint above every map label', async ({ page }) => {
+  await page.goto('/'); await page.getByTestId('quick-start').click();
+  await page.evaluate(async () => {
+    const { useStore } = await import('/src/ui/store.ts');
+    const s = useStore.getState();
+    const card = s.content.events.find((c) => c.id === 'governor_visit')!;
+    const next = { ...s.state, phase: 'awaitingChoice', pending: { cardId: card.id, choices: card.choices } };
+    useStore.setState({ state: next, draft: next });
+  });
+  const dialog = page.getByRole('dialog').filter({ has: page.getByTestId('event-choice') });
+  const button = dialog.getByTestId('event-choice').first();
+  await expect(button).toBeVisible();
+  const onTop = await button.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
+  });
+  expect(onTop).toBe(true);
+  await page.screenshot({ path: 'docs/screenshots/cold2/modal-layer.png' });
+  await button.click(); await expect(dialog).toHaveCount(0);
+});

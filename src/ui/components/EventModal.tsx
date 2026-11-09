@@ -196,6 +196,7 @@ export function EventModal() {
       aria-label={title}
       style={{
         position: 'fixed',
+        zIndex: 900,
         inset: 0,
         background: 'rgba(0,0,0,0.5)',
         display: 'flex',
