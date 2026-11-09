@@ -17,6 +17,7 @@ import hallRfsImg from '../assets/art/hall-rfs.png';
 import hallShellImg from '../assets/art/hall-shell.png';
 import hallSteelImg from '../assets/art/hall-steel.png';
 import tileLaydownImg from '../assets/art/tile-laydown.png';
+import tileDryFieldImg from '../assets/art/tile-dry-field.png';
 import tileRoadImg from '../assets/art/tile-road.png';
 import tilePondImg from '../assets/art/tile-pond.png';
 import tileSiteOfficeImg from '../assets/art/tile-site-office.png';
@@ -33,9 +34,10 @@ export interface TileArt {
 /** Fixed, non-hall map tiles (road/site office/pond/laydown yard/substation). A literal-keyed
  * record (not `Record<string, TileArt>`) so `noUncheckedIndexedAccess` doesn't force `undefined`
  * checks at every one of this file's known-safe call sites in `MapGrid.tsx`. */
-export const TILE_ART: Record<'road' | 'siteOffice' | 'pond' | 'laydownYard' | 'substation', TileArt> = {
+export const TILE_ART: Record<'road' | 'siteOffice' | 'dryField' | 'pond' | 'laydownYard' | 'substation', TileArt> = {
   road: { bg: '#d8c3a0', icon: '\u{1F6E4}\uFE0F', label: 'Road', img: tileRoadImg }, // 🛣️
   siteOffice: { bg: '#c89b6a', icon: '\u{1F3E2}', label: 'Site office', img: tileSiteOfficeImg }, // 🏢
+  dryField: { bg: '#d6c38d', icon: '\u{1F33E}', label: 'Low field', img: tileDryFieldImg },
   pond: { bg: '#8fb3a6', icon: '\u{1F30A}', label: 'Pond', img: tilePondImg }, // 🌊 (one deliberate cool note: water)
   laydownYard: { bg: '#d9b88c', icon: '\u{1F4E6}', label: 'Laydown yard', img: tileLaydownImg }, // 📦
   substation: { bg: '#e0875a', icon: '\u26A1', label: 'Substation', img: tileSubstationImg }, // ⚡
