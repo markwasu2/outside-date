@@ -561,4 +561,13 @@ if (import.meta.env.DEV && typeof window !== 'undefined') {
       screen: 'game',
     });
   };
+
+  // Phase 1 (D8) visual coverage: a critical-runway warning takes months of real play to reach
+  // honestly; this dev-only hook drops cash so the warning system fires on the next render.
+  (window as unknown as { __debugSetCash?: (amount: number) => void }).__debugSetCash = (amount) => {
+    const s = useStore.getState();
+    if (!s.state) return;
+    const next = { ...s.state, cash: amount };
+    useStore.setState({ state: next, draft: next });
+  };
 }
