@@ -4,7 +4,7 @@
     "title": "Storm off the gulf",
     "body": "A late-season storm tracks over Richfield County and sits on your site for a day. Crews pull back until the water clears.",
     "art": "storm",
-    "odds": 0.25,
+    "odds": 0.28,
     "window": [24, 59],
     "seasonMonths": [5, 9],
     "requires": ["anyHallStageIn:pad|steel|shell"],
@@ -26,7 +26,7 @@
     "title": "Not enough hands",
     "body": "Fitout crews are scarce across the region this quarter. Your general contractor is stretched thin and it shows in the schedule.",
     "art": "labor_shortfall",
-    "odds": 0.15,
+    "odds": 0.22,
     "requires": ["anyHallStage:fitout", "notFlag:importCrewsActive"],
     "effects": [{ "type": "labor", "args": [3] }],
     "note": "\"importCrewsActive\" is derived: true while month < flags.importCrewsUntil (set by the importCrews action or the union_pla card). labor_shortfall's own odds drop to 0.05 while flags.plaSigned is true (see union_pla)."
@@ -144,7 +144,7 @@
     "title": "Fire in fitout",
     "body": "An electrical fault sparks a small fire in a hall under fitout. No one is hurt. The hall is a different story.",
     "art": "fitout_fire",
-    "odds": 0.03,
+    "odds": 0.05,
     "requires": ["anyHallStage:fitout"],
     "effects": [{ "type": "fireDamage", "args": [] }],
     "note": "Per closed-set handler: hallProgress(randomInStage:fitout, -2), damage = tuning.events.fireDamage paid per builder's risk (full cash cost without it), and that hall's insuredDelayMonths += 2 if builder's risk was in force."

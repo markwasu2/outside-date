@@ -108,6 +108,21 @@ export function unsettledIntervenorCandidates(state: GameState): PlannedAction[]
     .map((i) => ({ actionId: 'meetIntervenor', params: { intervenorId: i.id } }));
 }
 
+/**
+ * One `fixInspection` candidate per hall with an outstanding `inspection_fail` stall
+ * (`inspectionFail:<hallId>` flag, set by the `inspection_fail` event card's `hallPause`).
+ * A stalled hall makes no progress but burn, premiums and LD accruals keep running, and the
+ * card's `until fixed` pause never lifts on its own - so clearing it sits on the only path to
+ * delivering the hall, the same class as re-filing a denied permit: it stays out of
+ * `DEFERRABLE_ACTIONS` and relies on the handler's own `cash < cost` guard. Idempotent: once
+ * fixed, the flag is false and the candidate stops appearing.
+ */
+export function fixInspectionCandidates(state: GameState): PlannedAction[] {
+  return state.halls
+    .filter((h) => !h.terminated && !h.delivered && state.flags[`inspectionFail:${h.id}`])
+    .map((h) => ({ actionId: 'fixInspection', params: { hallId: h.id } }));
+}
+
 /** One `advanceHall` candidate per hall that isn't terminated/delivered and has no active stage. */
 export function advanceHallCandidates(state: GameState): PlannedAction[] {
   return state.halls
