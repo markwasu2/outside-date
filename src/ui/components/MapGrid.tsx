@@ -248,12 +248,13 @@ export function MapGrid() {
     >
       <BoardLegend />
       {/* Road: no popover (D1). Phase 4: the site's transmission poles queue at the road. */}
-      <div style={{ gridColumn: '1 / 13', gridRow: '1 / 2', background: TILE_ART.road.bg, ...cellStyle }}>
-        <span>
+      <div data-testid="map-road" style={{ gridColumn: '1 / 13', gridRow: '1 / 2', position: 'relative', background: TILE_ART.road.bg, ...cellStyle }}>
+        <ArtLayer img={TILE_ART.road.img} />
+        <span style={ART_CHIP}>
           {TILE_ART.road.icon} {TILE_ART.road.label}
         </span>
         {siteTheme.poles > 0 && (
-          <span data-testid="road-poles" title={`${siteTheme.poles} transmission poles at the road`} style={{ marginLeft: 6 }}>
+          <span data-testid="road-poles" title={`${siteTheme.poles} transmission poles at the road`} style={{ ...ART_CHIP, marginLeft: 6 }}>
             {Array.from({ length: siteTheme.poles }, (_, i) => (
               <span key={i}>{'\u{1F5FC}'}</span>
             ))}

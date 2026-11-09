@@ -842,3 +842,16 @@ No Build action was added, and no simulation behavior changed.
 | full gates | done: 512 vitest, 49 playwright, tsc, full eslint, build |
 | visual check | docs/screenshots/cold2/real-blocker.png, 1280x720 |
 | balance grid | skipped: read-only UI advice, engine/tuning/bots unchanged |
+
+# Art pass 2a - illustrated access road
+
+Replaced the flat road strip with a warm illustrated access road, utility poles,
+materials and delivery truck. Label and site-specific pole clues stay readable
+on light chips above the art. The image is decorative and cannot capture input.
+
+| criterion | status |
+|---|---|
+| visual | done: 1280x720 board inspected, road label and nearby controls clear |
+| full gates | done: 512 vitest, 50 playwright, full lint, tsc, build |
+| balance grid | skipped: decorative art only |
+| caveat | full e2e needed a clean rerun after two time-limit interruptions; final 50/50 passed |
