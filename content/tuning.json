@@ -392,5 +392,9 @@
     "farLineLossPerMonth": 40000,
     "farPadExtraMonths": 2,
     "laydownCapacity": 3
+  },
+  "wetlands": {
+    "mitigationCost": 6000000,
+    "mitigationMonths": 4
   }
 }

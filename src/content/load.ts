@@ -84,6 +84,7 @@ export const KNOWN_ACTION_HANDLERS = [
   'mezzTopUp',
   'scopeDown',
   'recap',
+  'mitigateWetlands',
 ] as const;
 
 function atomKind(atom: string): string {

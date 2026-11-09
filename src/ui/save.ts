@@ -11,8 +11,10 @@ import type { FinancialSnapshot } from './financials';
  * v4 (Phase 4, pillar A): `Setup.site` becomes a site id string from content/sites.json; v3
  * saves' two-value union members map to each scenario's replacement site.
  * v6 (Phase 7, scarcity pack): `Hall.pad` joins the state; v5 saves' halls default to 'near',
- * the only pad kind that existed when they were written. */
-export const SAVE_VERSION = 6;
+ * the only pad kind that existed when they were written.
+ * v7 (Phase 8, the pond takes a hall): `Hall.pondBlocked` joins; v6 saves' halls were all
+ * buildable, so they default to not blocked. */
+export const SAVE_VERSION = 7;
 const SAVE_KEY = 'outside-date-save';
 
 export interface SaveFile {
@@ -31,16 +33,26 @@ export interface SaveFile {
 export function migrateSave(parsed: unknown): SaveFile | null {
   if (!parsed || typeof parsed !== 'object') return null;
   const save = parsed as Partial<SaveFile> & { version?: number };
-  if (save.version === 6) return save as SaveFile;
-  if (save.version === 5) return upgradeV5(save as SaveFile);
-  if (save.version === 4) return upgradeV5(upgradeV4(save as SaveFile));
-  if (save.version === 3) return upgradeV5(upgradeV4(upgradeV3(save as SaveFile)));
-  if (save.version === 2) return upgradeV5(upgradeV4(upgradeV3(upgradeV2(save as SaveFile))));
+  if (save.version === 7) return save as SaveFile;
+  if (save.version === 6) return upgradeV6(save as SaveFile);
+  if (save.version === 5) return upgradeV6(upgradeV5(save as SaveFile));
+  if (save.version === 4) return upgradeV6(upgradeV5(upgradeV4(save as SaveFile)));
+  if (save.version === 3) return upgradeV6(upgradeV5(upgradeV4(upgradeV3(save as SaveFile))));
+  if (save.version === 2) return upgradeV6(upgradeV5(upgradeV4(upgradeV3(upgradeV2(save as SaveFile)))));
   if (save.version === 1) {
     const v2 = { ...(save as Omit<SaveFile, 'version' | 'financialSnapshots'>), version: 2, financialSnapshots: [] };
-    return upgradeV5(upgradeV4(upgradeV3(upgradeV2(v2 as SaveFile))));
+    return upgradeV6(upgradeV5(upgradeV4(upgradeV3(upgradeV2(v2 as SaveFile)))));
   }
   return null;
+}
+
+/** v6 -> v7: hall positions saved before the pond rule were all buildable. */
+function upgradeV6(save: SaveFile): SaveFile {
+  const state: GameState = {
+    ...save.state,
+    halls: save.state.halls.map((h) => ({ ...h, pondBlocked: h.pondBlocked ?? false })),
+  };
+  return { ...save, version: 7, state };
 }
 
 /** v5 -> v6: halls saved before pad placement existed were all effectively near-pad builds,

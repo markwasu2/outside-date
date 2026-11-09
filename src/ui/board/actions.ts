@@ -104,6 +104,24 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
   const hall = state.halls.find((h) => h.id === objectId);
   if (hall) {
     const rows: ActionRow[] = [];
+    // Phase 8: a hall position under the pond offers the mitigation route, not pads. The row
+    // surfaces the handler's own reason when it is not yet possible (no wetlands permit).
+    if (hall.pondBlocked) {
+      const doneMonth = state.flags.pondMitigationDoneMonth;
+      if (typeof doneMonth !== 'number') {
+        const wetlands = resolveContent(state, content).tuning.wetlands;
+        rows.push(
+          row(
+            content,
+            state,
+            'mitigateWetlands',
+            `Mitigate the wetlands pond (${formatDollars(wetlands.mitigationCost)}, ${wetlands.mitigationMonths}mo, then ${hall.id} can break ground)`,
+            {},
+          ),
+        );
+        return rows;
+      }
+    }
     // Phase 6 (spatial spike): an unbroken hall picks its pad at groundbreak. Near pads
     // (limited) are free; the far pad trenches a feeder and bleeds line losses. Once a stage
     // is underway the pad is fixed and the generic advance row takes over.

@@ -189,10 +189,22 @@ export function fixInspectionCandidates(state: GameState): PlannedAction[] {
  * earliest-delivering halls first and the scarce near pads land on the schedule-critical
  * halls rather than whichever hall id iterates first. */
 export function advanceHallCandidates(state: GameState): PlannedAction[] {
+  const mitigated = typeof state.flags.pondMitigationDoneMonth === 'number' && state.month >= state.flags.pondMitigationDoneMonth;
   return state.halls
-    .filter((h) => !h.terminated && !h.delivered && !h.stageActive)
+    // Phase 8: a pond-blocked hall can never start until the mitigation lands - proposing it
+    // every month would just burn the probe.
+    .filter((h) => !h.terminated && !h.delivered && !h.stageActive && (!h.pondBlocked || mitigated))
     .sort((a, b) => a.deliveryMonth - b.deliveryMonth)
     .map((h) => ({ actionId: 'advanceHall', params: { hallId: h.id } }));
+}
+
+/** Phase 8: fund the wetlands mitigation as soon as the permit allows it - every month the
+ * pond hall waits is a month off the slack the route exists to protect. */
+export function mitigateWetlandsCandidate(state: GameState): PlannedAction[] {
+  if (!state.halls.some((h) => h.pondBlocked)) return [];
+  if (typeof state.flags.pondMitigationDoneMonth === 'number') return [];
+  if (state.permits['wetlands']?.status !== 'granted') return [];
+  return [{ actionId: 'mitigateWetlands' }];
 }
 
 /** One `readyLiquid` candidate per hall that needs it and has reached fitout. */

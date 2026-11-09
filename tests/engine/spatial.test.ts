@@ -110,9 +110,9 @@ describe('scarcity pack (Phase 7)', () => {
     expect(content.tuning.spatial.farPadExtraMonths).toBeLessThanOrEqual(2);
   });
 
-  it("farmland's pond leaves a single near pad: the second groundbreak goes far", () => {
-    // The site carries the exclusion as a tuningOverride, so go through applyAction (which
-    // resolves site overrides) rather than calling the handler with raw content.
+  it('farmland keeps both near pads: the pond takes a hall position instead (Phase 8)', () => {
+    // Phase 7's near-pad exclusion was superseded by the pondTakesHall rule - the pads are
+    // back to two, and the pond's cost moved to a whole hall position (tested below).
     const siteSetup: Setup = { ...setup, site: 'farmland' };
     let state = createGame(content, 'whale', siteSetup, negotiation, 7);
     state = {
@@ -123,8 +123,57 @@ describe('scarcity pack (Phase 7)', () => {
       ) as typeof state.permits,
     };
     state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H1', pad: 'near' } }, content);
-    expect(state.halls.find((h) => h.id === 'H1')?.pad).toBe('near');
-    state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H2' } }, content);
-    expect(state.halls.find((h) => h.id === 'H2')?.pad).toBe('far');
+    state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H2', pad: 'near' } }, content);
+    expect(state.halls.find((h) => h.id === 'H2')?.pad).toBe('near');
+    state = applyAction(state, { actionId: 'advanceHall', params: { hallId: 'H3' } }, content);
+    expect(state.halls.find((h) => h.id === 'H3')?.pad).toBe('far');
+  });
+});
+
+describe('the pond takes a hall (Phase 8)', () => {
+  function farmlandState(): GameState {
+    const siteSetup: Setup = { ...setup, site: 'farmland' };
+    const state = createGame(content, 'whale', siteSetup, negotiation, 7);
+    return {
+      ...state,
+      flags: { ...state.flags, siteOptioned: true },
+      permits: Object.fromEntries(
+        Object.entries(state.permits).map(([id, p]) => [id, { ...p, status: 'granted' as const }]),
+      ) as typeof state.permits,
+    };
+  }
+
+  it('farmland starts with exactly one pond-blocked hall: the latest-delivery one', () => {
+    const state = farmlandState();
+    const blocked = state.halls.filter((h) => h.pondBlocked);
+    expect(blocked.length).toBe(1);
+    expect(blocked[0]!.deliveryMonth).toBe(Math.max(...state.halls.map((h) => h.deliveryMonth)));
+    // Non-pond sites are untouched.
+    expect(freshState().halls.every((h) => !h.pondBlocked)).toBe(true);
+  });
+
+  it('the blocked hall cannot break ground until the mitigation finishes', () => {
+    let state = farmlandState();
+    const blockedId = state.halls.find((h) => h.pondBlocked)!.id;
+    expect(() => applyAction(state, { actionId: 'advanceHall', params: { hallId: blockedId } }, content)).toThrow(/sits on the pond/);
+    // The route: mitigate, wait out the months, then groundbreak works.
+    state = applyAction(state, { actionId: 'mitigateWetlands' }, content);
+    expect(state.flags.pondMitigationDoneMonth).toBe(state.month + content.tuning.wetlands.mitigationMonths);
+    state = step(state, [], content).state; // still mid-mitigation
+    expect(() => applyAction(state, { actionId: 'advanceHall', params: { hallId: blockedId } }, content)).toThrow(/sits on the pond/);
+    for (let i = 0; i < content.tuning.wetlands.mitigationMonths; i++) state = step(state, [], content).state;
+    const after = applyAction(state, { actionId: 'advanceHall', params: { hallId: blockedId } }, content);
+    expect(after.halls.find((h) => h.id === blockedId)?.stageActive).toBe(true);
+  });
+
+  it('the mitigation needs the wetlands permit, and cannot run twice', () => {
+    let state = farmlandState();
+    state = { ...state, permits: { ...state.permits, wetlands: { ...state.permits['wetlands']!, status: 'filed' as const } } };
+    expect(() => applyAction(state, { actionId: 'mitigateWetlands' }, content)).toThrow(/wetlands permit/);
+    state = { ...state, permits: { ...state.permits, wetlands: { ...state.permits['wetlands']!, status: 'granted' as const } } };
+    state = applyAction(state, { actionId: 'mitigateWetlands' }, content);
+    expect(() => applyAction(state, { actionId: 'mitigateWetlands' }, content)).toThrow(/already underway or done/);
+    // And on a site with no pond there is nothing to mitigate.
+    expect(() => applyAction(freshState(), { actionId: 'mitigateWetlands' }, content)).toThrow(/No hall position sits on the pond/);
   });
 });

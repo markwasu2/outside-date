@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } f
 import { formatMonth } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
 import { hallGrossRent } from '../../engine/selectors';
+import { pondMitigated } from '../../engine/systems/construction';
 import { resolveSite } from '../../content/sites';
 import { STAGES } from '../../engine/types';
 import type { PlannedAction } from '../../engine/types';
@@ -290,14 +291,26 @@ export function MapGrid() {
                   border: `1px solid ${hall.stageIndex === -1 ? '#b0bec5' : (hall.pad ?? 'near') === 'near' ? '#2e7d32' : '#e65100'}`,
                 }}
                 title={
-                  hall.stageIndex === -1
-                    ? `${hall.id}: pad not chosen yet - near pads are limited`
-                    : (hall.pad ?? 'near') === 'near'
-                      ? `${hall.id}: near pad, adjacent to the substation`
-                      : `${hall.id}: far pad - feeder trenched, line losses monthly`
+                  hall.pondBlocked && !pondMitigated(draft)
+                    ? typeof draft.flags.pondMitigationDoneMonth === 'number'
+                      ? `${hall.id}: wetlands mitigation underway - the pond position opens month ${draft.flags.pondMitigationDoneMonth}`
+                      : `${hall.id}: this position is under the pond - mitigate the wetlands to build here`
+                    : hall.stageIndex === -1
+                      ? `${hall.id}: pad not chosen yet - near pads are limited`
+                      : (hall.pad ?? 'near') === 'near'
+                        ? `${hall.id}: near pad, adjacent to the substation`
+                        : `${hall.id}: far pad - feeder trenched, line losses monthly`
                 }
               >
-                {hall.stageIndex === -1 ? 'unplaced' : (hall.pad ?? 'near') === 'near' ? 'near pad' : 'far pad'}
+                {hall.pondBlocked && !pondMitigated(draft)
+                  ? typeof draft.flags.pondMitigationDoneMonth === 'number'
+                    ? 'mitigating'
+                    : 'pond'
+                  : hall.stageIndex === -1
+                    ? 'unplaced'
+                    : (hall.pad ?? 'near') === 'near'
+                      ? 'near pad'
+                      : 'far pad'}
               </div>
               <HallSprite
                 visual={visual}

@@ -18,6 +18,9 @@ export interface Hall {
   /** Phase 6 (spatial spike): which pad the hall broke ground on. Undefined on pre-spike
    * saves; treated as 'near' everywhere (those halls were always adjacent). */
   pad?: 'near' | 'far';
+  /** Phase 8: this hall's position is under the site's pond. It cannot break ground until the
+   * wetlands mitigation finishes (flags.pondMitigationDoneMonth). */
+  pondBlocked?: boolean;
   mwIT: number; // 25 in the Whale campaign
   stageIndex: number; // index into STAGES of the CURRENT stage, -1 = not started, 5 = complete
   stageActive: boolean; // a stage has been started and is accruing progress

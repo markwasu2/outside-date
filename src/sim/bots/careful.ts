@@ -3,6 +3,7 @@ import type { NegotiationChoices } from '../../engine/init';
 import type { GameState, PendingEvent, PlannedAction, Setup } from '../../engine/types';
 import {
   advanceHallCandidates,
+  mitigateWetlandsCandidate,
   capitalCandidates,
   type Bot,
   delaySwapCandidates,
@@ -64,6 +65,7 @@ function chooseActions(state: GameState, content: Content): PlannedAction[] {
   ) {
     candidates.push({ actionId: 'prepTestimony' });
   }
+  candidates.push(...mitigateWetlandsCandidate(state));
   candidates.push(...advanceHallCandidates(state));
   candidates.push(...readyLiquidCandidates(state));
   candidates.push(...importCrewsActiveCandidate(state));
