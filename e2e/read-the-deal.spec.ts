@@ -196,3 +196,17 @@ test("tutorial storm card carries a who-holds chip that opens the GC's stakehold
   }
   expect(stormSeen).toBe(true);
 });
+
+test('help lives in a reserved row and Got it can be clicked without covering the board', async ({ page }) => {
+  await startWhale(page);
+  const note = explainerPopovers(page).first();
+  await expect(note).toBeVisible();
+  const noteBox = await note.boundingBox();
+  const boardBox = await page.getByTestId('map-pond-slot').boundingBox();
+  expect(noteBox!.y + noteBox!.height).toBeLessThan(boardBox!.y);
+  await page.screenshot({ path: 'docs/screenshots/cold2/help-dock.png' });
+  await note.getByRole('button', { name: 'Got it' }).click();
+  // A real pointer click reaches the dismissal button; no force/DOM click needed.
+  await dismissExplainerIfUp(page);
+  await page.getByRole('button', { name: 'End month' }).click();
+});

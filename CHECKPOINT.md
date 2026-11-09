@@ -801,3 +801,20 @@ owns active threshold warnings; log history remains, events and other warnings
 | full gates | done: 508 vitest, 47 playwright, tsc, eslint, build |
 | visual check | done: docs/screenshots/cold2/banner-dedupe.png, 1280 desktop |
 | balance grid | skipped: display filter only |
+
+# Cold playthrough 2, fix 4 - nonblocking help
+
+Moved stat explainers into a reserved, scroll-capped row beneath the HUD and
+notice cards into a reserved row above the board. Neither floats over actions.
+Got it now receives real clicks; Escape also dismisses. No outside-mousedown
+dismissal: removing an in-flow row before mouseup shifted click targets.
+Transient notices hide while a choice modal is pending.
+
+| criterion | status |
+|---|---|
+| controls remain exposed | done: desktop screenshot inspected, explainer bottom above board |
+| real dismissal | done: pointer-click e2e, no force or DOM click |
+| full tests | done: 508 vitest, 48 playwright, tsc, build |
+| lint | src/tests/e2e clean; npm lint reveals 18 baseline screenshot-script errors, separate maintenance PR next |
+| visual check | docs/screenshots/cold2/help-dock.png, 1280x720 |
+| balance grid | skipped: UI layout only |
