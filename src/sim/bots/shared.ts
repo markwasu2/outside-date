@@ -24,8 +24,13 @@ const MIN_SAFE_RUNWAY_MONTHS = 3;
  * `cash < cost` guard (v1 of this gate blocked `orderTransformer` in every single month of a
  * smoke-test run, see Decisions log).
  */
-/** Reach for a capital lever once recurring outflow would drain cash in under this many months. */
-const LEVER_RUNWAY_MONTHS = 3.5;
+/**
+ * Reach for a capital lever once recurring outflow would drain cash in under this many
+ * months. Must clear the slowest lever's closing window (recap: 3 months, equity/mezz: 2)
+ * with margin for a surprise debit in between - at 3.5 the funds landed after the wall
+ * (Phase 11: careful/hard died the same month it levered up, 1000-seed postmortem).
+ */
+const LEVER_RUNWAY_MONTHS = 5;
 
 const DEFERRABLE_ACTIONS = new Set(['fundExtensions', 'importCrews']);
 

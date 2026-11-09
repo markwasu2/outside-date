@@ -202,7 +202,7 @@
     ],
     "levers": {
       "equityCall": {
-        "maxShareOfCommitted": 0.5,
+        "maxShareOfCommitted": 0.4,
         "maxCalls": 1,
         "cooldownMonths": 4,
         "premium": 0.25,

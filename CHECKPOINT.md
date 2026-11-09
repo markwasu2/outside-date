@@ -270,3 +270,72 @@ latest, so the mitigation route is urgent from month 1. Merged because the grids
   delivery (the pond on H1 is exactly the nastiness intended); seed 3 delivers at month 30.
 - phase7 farmland pad-choice shot clicks H2 (H1's popover is the mitigation route).
 - phase8 pond shot regenerated with the H1 chip and route row (p8-pond-blocked.png).
+
+# Phase 11: careful on hard - the capital-crisis retune (2026-11-09)
+
+Branch phase11-capital-lever-sizing (off main 5124380). Targets the last listed soft spot:
+careful/hard on whale. Phase 10's pond-on-H1 pushed it from the already-low 22-28% to 17.6%
+(1000 seeds), and careful - the safest archetype - was the WORST non-random bot on hard
+(careful 17.6, competent 28.0, greedy 37.7).
+
+## Diagnosis (1000-seed postmortems + single-seed timelines)
+
+Careful loses 60%+ of hard runs to `default` (cash < 0) around month 37-38, months before
+first revenue. The seed-1 timeline shows the whole spiral in one month: needsCapital fires
+only when the funding gap already exists, the bot pulls all three levers at maximum in the
+same month it dies - including a $712.5M equity call (50% of committed) with a $14.3M fee and
+a 25% partner premium - and the maxed partner strain immediately deals a partner_dispute
+(-$20M concede) that finishes the bankruptcy. The max raise itself was the killer.
+Rejected alternatives measured at 300+ seeds: gap-sized raises (careful normal 87-88.7, blows
+the 75 ceiling; competent normal 59-62, under its floor - every lever is single-use, so small
+raises spend the rescue and leave nothing for the next crisis); careful concede -> wait on
+partner_dispute (careful hard 4.7 - the all-halls pause trades default for valueless survival);
+supply_shock 2 -> 1.5 on hard (no movement, 14.0 -> 15.0).
+
+## The change (three knobs, one theme: stop the max-raise death spiral)
+
+1. content/tuning.json: equityCall maxShareOfCommitted 0.5 -> 0.4. The maximum call drops from
+   ~$712M to ~$358M on whale; fee and 25% premium dilution scale down with it. Game-visible
+   knob (the capital dialog's max-raise figure), not a bot hack.
+2. content/scenarios/whale.json: hard startingCash $205M -> $215M, parity with easy. Hard's
+   teeth are the forced farmland, the goodwill hit and the doubled supply shocks - not a
+   smaller checkbook than easy's.
+3. src/sim/bots/shared.ts: LEVER_RUNWAY_MONTHS 3.5 -> 5. Levers close in 1-3 months; at 3.5
+   months of runway the funds landed after the wall. Bots now reach for capital early enough
+   for it to arrive.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| careful/hard out of the pit, no longer the worst archetype | done: 17.6 -> 32.1 (1000 seeds), vs competent 38.6, greedy 40.2 |
+| competent/hard band 28-45% holds | done: 28.0 -> 38.6 |
+| whale normal bands hold | done: careful 71.5 -> 74.5 (60-75), competent 68.8 -> 70.3 (65-80), greedy 34.9 unchanged |
+| millbrook grids stable | done with a documented dip: careful 85.5 -> 81.4, competent 72.0 -> 67.5, greedy 22.9 unchanged - the earlier trigger costs fees on a scenario that rarely needs levers |
+| multiples in band | done: careful normal 1.38 (1.15-1.8), competent 1.54 (1.3-2.4), greedy 1.85 (1.2-2.0) |
+| balance.test.ts measured comments | done (Phase 11 lines on careful + competent/hard) |
+| full suite green | done: 472 vitest, 41 playwright, eslint, tsc, vite build |
+| no save bump | state shape unchanged (two content numbers + one bot constant) |
+
+## After grid (1000 seeds, whale; before in parens - baseline re-measured on main 5124380)
+
+| bot | easy | normal | hard |
+|-----|------|--------|------|
+| greedy | 73.0 (73.0) | 34.9 (34.9) | 40.2 (37.7) |
+| careful | 99.3 (99.1) | 74.5 (71.5) | 32.1 (17.6) |
+| competent | 96.1 (95.6) | 70.3 (68.8) | 38.6 (28.0) |
+
+Millbrook after (before): careful 81.4 (85.5), competent 67.5 (72.0), greedy 22.9 (22.9).
+
+Note: the phase-8/10 checkpoints carried a stale greedy-normal 47.1; re-measured on main it is
+34.9 (unchanged by this phase). Balance band 30-55 holds either way.
+
+## Tensions
+
+- Careful normal sits at 74.5, 0.5 under the 75 ceiling: any future change that helps careful's
+  cash handling on normal must re-check the ceiling first.
+- The millbrook dip is the price of the earlier trigger; it buys survival where campaigns
+  actually die. If millbrook matters more later, the trigger could key off projected
+  cost-to-complete coverage instead of recurring-burn runway.
+- No UI-surface change: the only player-facing number is the capital dialog's max-raise
+  figure, computed from tuning (covered by existing capital tests), so no new screenshots.
