@@ -206,3 +206,42 @@ careful 83.3/5.5/85.5, competent 56.8/4.9/72.0.
 - Millbrook's pond sites were left alone: with a one-hall lease, pondTakesHall would make the
   mitigation mandatory rather than a route. Farmland (whale) carries the mechanic.
 - load.test.ts counts unchanged: actions.json grew by one (actions are only count-bounded > 0).
+
+# Phase 9: riverbend-farm retune (2026-11-09)
+
+Branch phase9-riverbend-retune (off main a55a9a5). Targets the logged soft spots: greedy
+millbrook 6% and riverbend-farm ~5% for every bot - the cheapest site in the game was a trap,
+not a decision.
+
+## Done criteria
+
+| criterion | status |
+|-----------|--------|
+| riverbend-farm becomes a viable pick (was ~5% for all bots) | done: careful 5.5 -> 80.2, competent 4.9 -> 54.4, greedy 6.0 -> 22.9 (1000 seeds, normal) |
+| greedy millbrook main-grid soft spot | done: greedy normal 6.0 -> 22.9 (it picks the cheapest site, which was the trap) |
+| stays a decision, not the dominant pick | done: rail-yard 83.3/1.61x and depot 85.5/1.65x vs riverbend 80.2/1.67x for careful - riverbend trades ~3-5 win points for the best economics; measured alternatives rejected: pad+1+permit (22%, still a trap), pad+1+cured permit (83.5% AND best multiple, dominant) |
+| headline grids unchanged | done: millbrook main careful 85.5 / competent 72.0 (identical before/after); whale untouched (content diff is millbrook-only) |
+| full suite green | done: 472 vitest, 39 playwright (millbrook report-card e2e re-pinned 1.66x -> 1.58x: careful's value policy now sometimes picks the cured-permit farm), eslint, tsc, vite build |
+
+## The change (content-only)
+
+Riverbend's incentive becomes permitFastTrack on wetlands ("Easement already recorded: the
+wetlands permit comes cured at close") instead of the $1.5M cash grant; the +3 pad months stay
+as the site's teeth; site.permits empties so the cured permit no longer shows as something to
+chase. Measured: the binding constraint was the 8-month, 82%-odds wetlands permit on a
+month-30 delivery clock, not the pad months (pad 3->1 alone only reached 22%) and not study
+speed (6-10 -> 4-8 moved nothing).
+
+## After grid (1000 seeds, millbrook-relay normal, per site; Phase 8 in parens)
+
+| bot | rail-yard | riverbend-farm | depot-flats |
+|-----|-----------|----------------|-------------|
+| greedy | 23.0 (23.0) | 22.9 (6.0) | 32.7 (32.7) |
+| careful | 83.3 (83.3) | 80.2 (5.5) | 85.5 (85.5) |
+| competent | 56.8 (56.8) | 54.4 (4.9) | 72.0 (72.0) |
+
+## Screenshots (visually inspected)
+
+- /downloads/p9-riverbend-card.png: setup site cards - riverbend reads "Land $7.0M · +3 pad
+  months · study 6-10 mo" with "Easement already recorded: the wetlands permit comes cured at
+  close"; no "needs wetlands" chase item.
