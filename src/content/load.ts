@@ -7,6 +7,7 @@ import risksJson from '../../content/risks.json';
 import glossaryJson from '../../content/glossary.json';
 import codexJson from '../../content/codex.json';
 import castJson from '../../content/cast.json';
+import millbrookRelayJson from '../../content/scenarios/millbrook-relay.json';
 import whaleJson from '../../content/scenarios/whale.json';
 import tutorialEdge5Json from '../../content/scenarios/tutorial-edge5.json';
 
@@ -170,7 +171,12 @@ export function loadContent(): Content {
     checkRequireAtoms(event.requires, `content/events.json (event "${event.id}")`);
   }
 
-  const scenarios = { [whale.id]: whale, [tutorialEdge5.id]: tutorialEdge5 };
+  const millbrookRelay = parseOrThrow(
+    ScenarioSchema,
+    millbrookRelayJson,
+    'content/scenarios/millbrook-relay.json',
+  );
+  const scenarios = { [whale.id]: whale, [tutorialEdge5.id]: tutorialEdge5, [millbrookRelay.id]: millbrookRelay };
 
   const bundle = { tuning, actions, events, risks, glossary, codex, cast, scenarios };
   return parseOrThrow(ContentSchema, bundle, 'content bundle (aggregate)');

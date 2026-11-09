@@ -1,0 +1,165 @@
+{
+  "id": "millbrook-relay",
+  "halls": 1,
+  "hallMwIT": 20,
+  "maxMonths": 40,
+  "introText": "Millbrook Relay: one 20 MW hall on Richfield County's old rail yard, not another megasite. Jordan Ashe needs a regional relay for the Whale by month 30; month 34 is the outside date. Priya has room for a smaller power contract, not a free pass. Odell still wants testimony, Kwambai still wants discovery answered, and Calder wants the pad ready before the crew arrives. Senior debt and equity only. No expansion, no mezz, no spare year to find the missing transformer.",
+  "castIds": [
+    "utility_ceo",
+    "commissioner_friendly",
+    "commissioner_skeptical",
+    "ratepayer_lawyer",
+    "lenders_engineer",
+    "gc_foreman",
+    "tenant_rep"
+  ],
+  "scriptedEvents": [],
+  "docket": {
+    "enabled": true
+  },
+  "permitsRequired": [
+    "air",
+    "water",
+    "building"
+  ],
+  "coachTips": false,
+  "lease": {
+    "firstDeliveryMonth": 30,
+    "outsideDateMonths": 4,
+    "lateRemedy": "liquidatedDamages"
+  },
+  "tuningOverrides": {
+    "campaign": {
+      "startingCash": 65000000,
+      "monthlyBurn": 600000
+    },
+    "land": {
+      "megasite": 18000000,
+      "farmland": 7000000
+    },
+    "stages": [
+      {
+        "id": "pad",
+        "minMonths": 3,
+        "costShare": 0.1
+      },
+      {
+        "id": "steel",
+        "minMonths": 5,
+        "costShare": 0.25
+      },
+      {
+        "id": "shell",
+        "minMonths": 5,
+        "costShare": 0.25
+      },
+      {
+        "id": "fitout",
+        "minMonths": 6,
+        "costShare": 0.3
+      },
+      {
+        "id": "rfs",
+        "minMonths": 2,
+        "costShare": 0.1
+      }
+    ],
+    "chips": {
+      "liquidReadyCost": 4000000,
+      "hybridLiquidReadyCost": 6000000
+    },
+    "cooling": {
+      "hybrid": {
+        "capex": 8000000
+      }
+    },
+    "docket": {
+      "monthsToVote": 8,
+      "intervenorCount": 2
+    },
+    "power": {
+      "studyCost": 1000000,
+      "studyMonthsMin": 6,
+      "studyMonthsMax": 10,
+      "transformerLeadMonths": 16,
+      "transformerDeposit": 4000000,
+      "transformerBalance": 10000000,
+      "switchgearLeadMin": 7,
+      "switchgearLeadMax": 12,
+      "switchgearDeposit": 1500000,
+      "switchgearBalance": 4500000,
+      "substationBuildMonths": 2,
+      "interimGridMW": 12,
+      "substationCapacityMW": 40,
+      "plantBuildMonths": 20,
+      "plants": [
+        {
+          "id": "A",
+          "mwGrid": 20
+        },
+        {
+          "id": "B",
+          "mwGrid": 10
+        }
+      ]
+    },
+    "capital": {
+      "mezzOptions": [
+        {
+          "share": 0,
+          "rate": 0.12
+        }
+      ]
+    },
+    "insurance": {
+      "buildersRiskMonthly": 200000,
+      "dsuMonthly": 300000,
+      "deductible": 1000000
+    },
+    "events": {
+      "stormDamage": 10000000,
+      "fireDamage": 8000000
+    },
+    "crews": {
+      "importCost": 1500000
+    },
+    "covenant": {
+      "forcedTestMonth": 37
+    }
+  },
+  "difficulties": {
+    "easy": {
+      "flags": {
+        "fixedScope": true
+      },
+      "goodwillOverrides": {
+        "commission": 10,
+        "tenant": 10
+      },
+      "tuningOverrides": {
+        "campaign": {
+          "startingCash": 75000000
+        }
+      }
+    },
+    "normal": {
+      "flags": {
+        "fixedScope": true
+      }
+    },
+    "hard": {
+      "flags": {
+        "fixedScope": true
+      },
+      "goodwillOverrides": {
+        "commission": -10,
+        "tenant": -10
+      },
+      "tuningOverrides": {
+        "campaign": {
+          "startingCash": 60000000
+        }
+      }
+    }
+  }
+}
