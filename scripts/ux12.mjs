@@ -1,4 +1,4 @@
-/* global localStorage */
+/* global console, localStorage */
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
 const OUT = 'docs/screenshots/ux12';

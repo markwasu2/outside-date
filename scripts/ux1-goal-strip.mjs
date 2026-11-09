@@ -1,4 +1,4 @@
-/* global console, window, localStorage */
+/* global console, localStorage */
 // UX 1 goal strip screenshots at 800px and 1440px (top of board, whale scenario).
 // Run with the dev server up on :5173.
 import { mkdirSync } from 'node:fs';

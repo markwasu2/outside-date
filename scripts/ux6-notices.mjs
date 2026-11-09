@@ -1,4 +1,4 @@
-/* global localStorage, window */
+/* global console, localStorage, window */
 // UX 6: event notice cards with stakes. Bot run fires no-choice events/warnings instantly.
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';

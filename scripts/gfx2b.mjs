@@ -1,4 +1,4 @@
-/* global localStorage, window */
+/* global console, localStorage */
 // GFX 2 shot 2: the delivery truck in the laydown yard on the arrival month.
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';

@@ -1,4 +1,4 @@
-/* global localStorage, window */
+/* global console, localStorage, window */
 // UX legibility: hall captions, fixed-tile state words, collapsible legend. Desktop 1440.
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';

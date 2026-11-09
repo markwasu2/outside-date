@@ -1,4 +1,4 @@
-/* global localStorage, window */
+/* global console, localStorage, window */
 // UX 10: explained warnings - LD/abatement warning cards from lease.ts + HUD markets strip.
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
