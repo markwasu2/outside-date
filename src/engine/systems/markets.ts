@@ -41,7 +41,6 @@ export function tick(state: GameState, content: Content): GameState {
     const which = next(rng);
     rng = which.state;
     const mag = int(rng, Math.round(tuning.shockMin * 100), Math.round(tuning.shockMax * 100));
-    rng = mag.state;
     const key = which.value < 0.5 ? 'equipmentIndex' : which.value < 0.75 ? 'laborIndex' : 'contractorIndex';
     markets[key] = markets[key] + mag.value / 100;
   }

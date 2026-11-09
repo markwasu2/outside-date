@@ -2,6 +2,7 @@ import { applyAction } from '../../engine/actions';
 import { formatDollars } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
 import { resolveSite } from '../../content/sites';
+import { leadWithIndex, priceWithIndex } from '../../engine/systems/markets';
 import type { ActionDef, Content } from '../../content/schemas';
 import type { GameState, GoodwillGroup, PlannedAction } from '../../engine/types';
 
@@ -116,11 +117,48 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
   }
 
   if (objectId === 'substation') {
+    // Phase 5 (pillar K): the order dialog. Every kind offers a standard slot, a spot unit at
+    // roughly 2x, and (while a standard slot pends) a second supplier - all priced off the live
+    // equipment index so the dialog shows market numbers, not book numbers.
+    const index = state.markets.equipmentIndex;
+    const markets = resolveContent(state, content).tuning.markets;
+    const power = resolveContent(state, content).tuning.power;
     const rows: ActionRow[] = [
       row(content, state, 'commissionStudy', findDef(content, 'commissionStudy').label),
       row(content, state, 'orderTransformer', findDef(content, 'orderTransformer').label),
       row(content, state, 'orderSwitchgear', findDef(content, 'orderSwitchgear').label),
     ];
+    for (const kind of ['transformer', 'switchgear'] as const) {
+      if (kind === 'transformer' && state.skipTransformerOrder) continue;
+      const hasOrder = state.power.orders.some((o) => o.kind === kind);
+      const book =
+        kind === 'transformer' ? power.transformerDeposit + power.transformerBalance : power.switchgearDeposit + power.switchgearBalance;
+      if (!hasOrder) {
+        const spotPrice = priceWithIndex(Math.round(book * markets.spotPriceMult), index);
+        rows.push(
+          row(content, state, 'spotBuy', `Spot-buy the ${kind} (${formatDollars(spotPrice)}, ${markets.spotLeadMonths[kind]}mo)`, { kind }),
+        );
+      }
+      const standardPending = state.power.orders.some((o) => o.kind === kind && o.supplier === 'standard' && !o.arrived);
+      const altPending = state.power.orders.some((o) => o.kind === kind && o.supplier === 'alt');
+      if (standardPending && !altPending) {
+        const alt = markets.altSupplier[kind];
+        const altPrice = priceWithIndex(Math.round(book * alt.priceMult), index);
+        const altLead =
+          'leadMonths' in alt
+            ? leadWithIndex(alt.leadMonths, index, markets.leadElasticity)
+            : null;
+        rows.push(
+          row(
+            content,
+            state,
+            'secondSource',
+            `Second supplier for the ${kind} (${formatDollars(altPrice)}${altLead !== null ? `, ~${altLead}mo` : ''})`,
+            { kind },
+          ),
+        );
+      }
+    }
     // One cancel entry per open (not yet arrived) order.
     for (const order of state.power.orders) {
       if (order.arrived) continue;
@@ -162,8 +200,8 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
 }
 
 /** Laydown yard is read-only (D1): the open long-lead orders, for display with arrival info. */
-export function laydownOrders(state: GameState): { kind: string; arrivalMonth: number; arrived: boolean }[] {
-  return state.power.orders.map((o) => ({ kind: o.kind, arrivalMonth: o.arrivalMonth, arrived: o.arrived }));
+export function laydownOrders(state: GameState): { kind: string; arrivalMonth: number; arrived: boolean; supplier: string; price: number }[] {
+  return state.power.orders.map((o) => ({ kind: o.kind, arrivalMonth: o.arrivalMonth, arrived: o.arrived, supplier: o.supplier, price: o.price }));
 }
 
 /** One-line plain-English "what this is" per map object, shown in the popover header the first

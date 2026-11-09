@@ -218,14 +218,31 @@ describe('save migration (v1 -> v2 -> v3 -> v4)', () => {
   it('migrates a v1 save by adding an empty snapshot series', () => {
     const migrated = migrateSave({ ...base, version: 1 });
     expect(migrated).not.toBeNull();
-    expect(migrated?.version).toBe(4);
+    expect(migrated?.version).toBe(5);
     expect(migrated?.financialSnapshots).toEqual([]);
     expect(migrated?.dismissedCoachTips).toEqual(['hud']);
   });
 
-  it('passes a v4 save through unchanged', () => {
-    const v4 = { ...base, version: 4, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
-    expect(migrateSave(v4)).toBe(v4);
+  it('passes a v5 save through unchanged', () => {
+    const v5 = { ...base, version: 5, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
+    expect(migrateSave(v5)).toBe(v5);
+  });
+
+  it('migrates a v4 save to v5, seeding the market indexes and tagging open orders (Phase 5)', () => {
+    const v4State = {
+      ...base.state,
+      power: {
+        ...base.state.power,
+        orders: [{ kind: 'transformer', orderedMonth: 1, arrivalMonth: 19, deposit: 2000000, arrived: false }],
+      },
+    };
+    const v4 = { ...base, state: v4State, version: 4, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
+    const migrated = migrateSave(v4);
+    expect(migrated?.version).toBe(5);
+    expect(migrated?.state.markets).toEqual({ equipmentIndex: 1, laborIndex: 1, contractorIndex: 1 });
+    expect(migrated?.state.power.orders[0]?.supplier).toBe('standard');
+    // A legacy order's full price is reconstructed from the deposit and the tuner book balance.
+    expect(migrated?.state.power.orders[0]?.price).toBe(2000000 + content.tuning.power.transformerBalance);
   });
 
   it('migrates a v3 save to v4, mapping the legacy two-value site onto the scenario\'s sites (Phase 4)', () => {
@@ -234,7 +251,7 @@ describe('save migration (v1 -> v2 -> v3 -> v4)', () => {
     const legacyState = { ...base.state, setup: { ...base.state.setup, site: 'megasite' } };
     const v3 = { ...base, state: legacyState, version: 3, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
     const migrated = migrateSave(v3);
-    expect(migrated?.version).toBe(4);
+    expect(migrated?.version).toBe(5);
     expect(migrated?.state.setup.site).toBe('edge5-campus');
     // A save already on a current site id keeps it (the whale kept its legacy ids).
     const whaleState = { ...base.state, scenarioId: 'whale', setup: { ...base.state.setup, site: 'farmland' } };
@@ -249,7 +266,7 @@ describe('save migration (v1 -> v2 -> v3 -> v4)', () => {
     delete oldDebt.bridgeDrawn; delete oldDebt.bridgeAccruedPik; delete oldDebt.bridgeRate;
     const v2 = { ...base, state: { ...oldState, debt: oldDebt }, version: 2, financialSnapshots: [] };
     const migrated = migrateSave(v2);
-    expect(migrated?.version).toBe(4);
+    expect(migrated?.version).toBe(5);
     expect(migrated?.state.forecast).toEqual({
       cost: base.state.budgetAtClose,
       month: Math.min(...base.state.halls.map((h) => h.deliveryMonth)),
