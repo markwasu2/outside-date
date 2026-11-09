@@ -104,6 +104,26 @@ describe('selectors', () => {
     expect(withLd).toBeLessThan(base);
   });
 
+  it('runway includes post-conversion cash interest on totalDebt (4.8)', () => {
+    const state = freshState();
+    const withDebt: GameState = {
+      ...state,
+      debt: { ...state.debt, seniorDrawn: 500_000_000 },
+    };
+    // Pre-conversion, drawn senior capitalizes (no cash interest), so runway is unchanged.
+    expect(runway(withDebt, content)).toBeCloseTo(runway(state, content), 6);
+    // Post-conversion, interest is cash-paid on totalDebt and must shorten runway.
+    const converted: GameState = { ...withDebt, debt: { ...withDebt.debt, converted: true } };
+    const interest = (500_000_000 * content.tuning.covenant.permRate) / 12;
+    const baseNet = state.cash / runway(state, content);
+    expect(runway(converted, content)).toBeCloseTo(state.cash / (baseNet + interest), 6);
+    // A failed first attempt also switches to cash interest, at the stepped-up rate.
+    const failed: GameState = { ...withDebt, debt: { ...withDebt.debt, conversionFailedCount: 1 } };
+    const steppedInterest =
+      (500_000_000 * (withDebt.debt.seniorRate + content.tuning.covenant.stepUp)) / 12;
+    expect(runway(failed, content)).toBeCloseTo(state.cash / (baseNet + steppedInterest), 6);
+  });
+
   it('runway stops accruing LDs once the cap is reached or DSU covers the delay', () => {
     const state = freshState();
     const base = runway(state, content);

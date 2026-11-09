@@ -69,6 +69,17 @@ function monthlyOutflow(state: GameState, content: Content): number {
   if (state.insurance.buildersRisk) outflow += content.tuning.insurance.buildersRiskMonthly;
   if (state.insurance.dsu) outflow += content.tuning.insurance.dsuMonthly;
 
+  // Post-conversion cash interest (4.8), mirroring money.ts's payCashInterest: once the first
+  // conversion attempt has happened, interest is cash-paid monthly on totalDebt. The old runway
+  // ignored it, so a project bleeding interest could read as having infinite runway
+  // (engine-audit, 2026-11-08).
+  if (state.debt.converted || state.debt.conversionFailedCount > 0) {
+    const rate = state.debt.converted
+      ? content.tuning.covenant.permRate
+      : state.debt.seniorRate + content.tuning.covenant.stepUp;
+    outflow += (totalDebt(state) * rate) / 12;
+  }
+
   // Utility minimum charge (4.7), mirroring power.ts's chargeMinimum: payable on plant capacity
   // that is online or committed (a planned online month is set once the plant starts, and the
   // charge is unavoidable from then on - a committed step-up the old runway hid entirely), minus

@@ -1,6 +1,7 @@
 import type { Content } from '../../content/schemas';
 import type { GameState, Hall, PermitId } from '../types';
 import { STAGES } from '../types';
+import { formatDollars } from '../format';
 
 /**
  * Construction system (PLAN.md 4.5): per-month stage progress, cost incurrence and draw
@@ -255,7 +256,27 @@ export function optionSite(
   const cost = content.tuning.land[state.setup.site];
   const funded = tryFundAmount(state, cost);
   if (!funded.funded) throw new Error('Insufficient funding to option the site');
-  return { ...funded.state, flags: { ...funded.state.flags, siteOptioned: true } };
+  // Engine-audit (2026-11-08, playtest finding #8): the fee is real and flows through the
+  // capital-stack waterfall (land is part of `budgetAtClose`, per init.ts), so Cash often
+  // doesn't move and the charge looked invisible. Log the amount and where the money came
+  // from; applyAction skips its generic acknowledgment for this action to avoid a duplicate.
+  const sources: string[] = [];
+  const equityDelta = funded.state.equity.calledTotal - state.equity.calledTotal;
+  const mezzDelta = funded.state.debt.mezzDrawn - state.debt.mezzDrawn;
+  const seniorDelta = funded.state.debt.seniorDrawn - state.debt.seniorDrawn;
+  const cashDelta = state.cash - funded.state.cash;
+  if (equityDelta > 0) sources.push(`${formatDollars(equityDelta)} equity`);
+  if (mezzDelta > 0) sources.push(`${formatDollars(mezzDelta)} mezz`);
+  if (seniorDelta > 0) sources.push(`${formatDollars(seniorDelta)} senior`);
+  if (cashDelta > 0) sources.push(`${formatDollars(cashDelta)} cash`);
+  return {
+    ...funded.state,
+    flags: { ...funded.state.flags, siteOptioned: true },
+    log: [
+      ...funded.state.log,
+      { month: state.month, kind: 'action', text: `Option the site: ${formatDollars(cost)} (${sources.join(', ')}).` },
+    ],
+  };
 }
 
 export function advanceHall(
