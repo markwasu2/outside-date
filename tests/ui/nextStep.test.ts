@@ -54,7 +54,7 @@ describe('nextStep', () => {
     const state = freshState();
     state.power.studyStatus = 'pending';
     fileAllPermits(state);
-    state.power.orders.push({ kind: 'transformer', orderedMonth: state.month, arrivalMonth: state.month + 18, deposit: 0, arrived: false });
+    state.power.orders.push({ kind: 'transformer', orderedMonth: state.month, arrivalMonth: state.month + 18, deposit: 0, arrived: false, supplier: 'standard', price: 0 });
     expect(nextStep(state, content).actionId).toBe('orderSwitchgear');
   });
 
@@ -63,8 +63,8 @@ describe('nextStep', () => {
     state.power.studyStatus = 'pending';
     fileAllPermits(state);
     state.power.orders.push(
-      { kind: 'transformer', orderedMonth: state.month, arrivalMonth: state.month + 18, deposit: 0, arrived: false },
-      { kind: 'switchgear', orderedMonth: state.month, arrivalMonth: state.month + 9, deposit: 0, arrived: false },
+      { kind: 'transformer', orderedMonth: state.month, arrivalMonth: state.month + 18, deposit: 0, arrived: false, supplier: 'standard', price: 0 },
+      { kind: 'switchgear', orderedMonth: state.month, arrivalMonth: state.month + 9, deposit: 0, arrived: false, supplier: 'standard', price: 0 },
     );
     expect(state.docketEnabled).toBe(true);
     const step = nextStep(state, content);

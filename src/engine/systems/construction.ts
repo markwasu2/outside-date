@@ -3,6 +3,7 @@ import { resolveSite } from '../../content/sites';
 import type { GameState, Hall, PermitId } from '../types';
 import { STAGES } from '../types';
 import { formatDollars } from '../format';
+import { priceWithIndex } from './markets';
 
 /**
  * Construction system (PLAN.md 4.5): per-month stage progress, cost incurrence and draw
@@ -362,9 +363,10 @@ export function importCrews(
   state: GameState,
   _params: Record<string, string | number> | undefined,
   content: Content,
-  actionDef: { cash: number | 'dynamic' },
+  _actionDef: { cash: number | 'dynamic' },
 ): GameState {
-  if (typeof actionDef.cash !== 'number') throw new Error('importCrews expects a fixed cash cost');
+  // Phase 5 (pillar K): crew cost reads the labor demand index.
+  const cost = priceWithIndex(content.tuning.crews.importCost, state.markets.laborIndex);
   // QA pass 2, finding 5: while crews were already imported the action stayed legal and
   // re-charged the full price every month for zero added effect (one UI test run bought it
   // monthly and burned ~$90M). Refuse the double-buy; the UI's checkAction shows this reason
@@ -373,10 +375,10 @@ export function importCrews(
   if (typeof activeUntil === 'number' && state.month < activeUntil) {
     throw new Error(`Crews are already imported and active for ${activeUntil - state.month} more month(s)`);
   }
-  if (state.cash < actionDef.cash) throw new Error('Insufficient cash to import crews');
+  if (state.cash < cost) throw new Error('Insufficient cash to import crews');
   return {
     ...state,
-    cash: state.cash - actionDef.cash,
+    cash: state.cash - cost,
     flags: {
       ...state.flags,
       importCrewsUntil: state.month + content.tuning.crews.importMonths,
@@ -404,5 +406,23 @@ export function fixInspection(
     ...state,
     cash: state.cash - actionDef.cash,
     flags: { ...state.flags, [`inspectionFail:${hallId}`]: false },
+  };
+}
+
+/** Phase 5 (pillar K): mid-game GC switch. The setup-time contractor choice stops being
+ * permanent: flipping gmp <-> costPlus costs `markets.gcSwitchCost` scaled by the contractor
+ * demand index (a hot contractor market makes poaching a GC expensive). */
+export function switchGc(state: GameState, _params: Record<string, string | number> | undefined, content: Content): GameState {
+  const cost = priceWithIndex(content.tuning.markets.gcSwitchCost, state.markets.contractorIndex);
+  if (state.cash < cost) throw new Error('Insufficient cash to switch general contractor');
+  const next3 = state.setup.gc === 'gmp' ? 'costPlus' : 'gmp';
+  return {
+    ...state,
+    cash: state.cash - cost,
+    setup: { ...state.setup, gc: next3 },
+    log: [
+      ...state.log,
+      { month: state.month, kind: 'action', text: `Switched general contractor to ${next3 === 'gmp' ? 'GMP' : 'cost-plus'} (transition cost ${formatDollars(cost)}).` },
+    ],
   };
 }

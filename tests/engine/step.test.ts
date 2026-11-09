@@ -53,7 +53,7 @@ describe('step: scenario-scripted effects', () => {
     let state = { ...createGame(content, 'tutorial-edge5', setup, negotiation, 7), month: 4 };
     state = {
       ...state,
-      power: { ...state.power, orders: [{ kind: 'switchgear', orderedMonth: 0, arrivalMonth: 10, arrived: false, deposit: 0 }] },
+      power: { ...state.power, orders: [{ kind: 'switchgear', orderedMonth: 0, arrivalMonth: 10, arrived: false, deposit: 0, supplier: 'standard', price: 0 }] },
     };
 
     const beforeMonth5 = step(state, [], content).state;

@@ -105,7 +105,7 @@ describe('events: once-only cards never repeat', () => {
       ...state,
       power: {
         ...state.power,
-        orders: [{ kind: 'transformer', orderedMonth: 0, arrivalMonth: 10, arrived: false, deposit: 0 }],
+        orders: [{ kind: 'transformer', orderedMonth: 0, arrivalMonth: 10, arrived: false, deposit: 0, supplier: 'standard', price: 0 }],
       },
     };
     const first = drawEvent(state, content);
@@ -183,7 +183,7 @@ describe('events: per-card effects', () => {
       ...state,
       power: {
         ...state.power,
-        orders: [{ kind: 'transformer', orderedMonth: 0, arrivalMonth: 10, arrived: false, deposit: 0 }],
+        orders: [{ kind: 'transformer', orderedMonth: 0, arrivalMonth: 10, arrived: false, deposit: 0, supplier: 'standard', price: 0 }],
       },
     };
     const { state: next } = drawEvent(state, withCards([forced('supply_shock')]));
@@ -407,7 +407,7 @@ describe('events: per-card effects', () => {
       ...state,
       power: {
         ...state.power,
-        orders: [{ kind: 'transformer', orderedMonth: 0, arrivalMonth: 10, arrived: false, deposit: 0 }],
+        orders: [{ kind: 'transformer', orderedMonth: 0, arrivalMonth: 10, arrived: false, deposit: 0, supplier: 'standard', price: 0 }],
       },
     };
     const { state: next } = drawEvent(state, withCards([forced('transformer_factory_fire')]));

@@ -11,6 +11,7 @@ import {
   fundExtensions,
   importCrews,
   fixInspection,
+  switchGc,
 } from './systems/construction';
 import {
   filePermit,
@@ -19,7 +20,7 @@ import {
   answerDiscovery,
   meetIntervenor,
 } from './systems/regulation';
-import { commissionStudy, orderLongLead, cancelOrder } from './systems/power';
+import { commissionStudy, orderLongLead, cancelOrder, spotBuy, secondSource } from './systems/power';
 import { cureDraw } from './systems/money';
 import { equityCall, bridgeLoan, mezzTopUp, scopeDown, recap } from './systems/capital';
 import { confirmRackSchedule, delaySwap } from './systems/lease';
@@ -115,6 +116,9 @@ export const actionHandlers: Record<(typeof KNOWN_ACTION_HANDLERS)[number], Acti
   commissionStudy,
   orderLongLead,
   cancelOrder,
+  spotBuy,
+  secondSource,
+  switchGc,
   setInsurance,
   cureDraw,
   priceTakeout: priceTakeoutAction,

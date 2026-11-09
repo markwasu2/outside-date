@@ -1,4 +1,5 @@
 import { emptyCapital, type DifficultyId, type NegotiationChoices } from '../engine/init';
+import tuningJson from '../../content/tuning.json';
 import { migrateSiteId } from '../content/sites';
 import type { GameState } from '../engine/types';
 import type { FinancialSnapshot } from './financials';
@@ -9,7 +10,7 @@ import type { FinancialSnapshot } from './financials';
  * the amended closing table and bridge-loan fields to GameState; v2 saves are backfilled.
  * v4 (Phase 4, pillar A): `Setup.site` becomes a site id string from content/sites.json; v3
  * saves' two-value union members map to each scenario's replacement site. */
-export const SAVE_VERSION = 4;
+export const SAVE_VERSION = 5;
 const SAVE_KEY = 'outside-date-save';
 
 export interface SaveFile {
@@ -28,12 +29,13 @@ export interface SaveFile {
 export function migrateSave(parsed: unknown): SaveFile | null {
   if (!parsed || typeof parsed !== 'object') return null;
   const save = parsed as Partial<SaveFile> & { version?: number };
-  if (save.version === 4) return save as SaveFile;
-  if (save.version === 3) return upgradeV3(save as SaveFile);
-  if (save.version === 2) return upgradeV3(upgradeV2(save as SaveFile));
+  if (save.version === 5) return save as SaveFile;
+  if (save.version === 4) return upgradeV4(save as SaveFile);
+  if (save.version === 3) return upgradeV4(upgradeV3(save as SaveFile));
+  if (save.version === 2) return upgradeV4(upgradeV3(upgradeV2(save as SaveFile)));
   if (save.version === 1) {
     const v2 = { ...(save as Omit<SaveFile, 'version' | 'financialSnapshots'>), version: 2, financialSnapshots: [] };
-    return upgradeV3(upgradeV2(v2 as SaveFile));
+    return upgradeV4(upgradeV3(upgradeV2(v2 as SaveFile)));
   }
   return null;
 }
@@ -71,6 +73,29 @@ function upgradeV3(save: SaveFile): SaveFile {
     setup: { ...s.setup, site: migrateSiteId(s.scenarioId, s.setup.site) },
   };
   return { ...save, version: 4, state };
+}
+
+/** v4 -> v5 (Phase 5, pillar K): living markets arrive. Old saves were played at book prices,
+ * so every index starts at 1.0 and every pending order becomes a standard-supplier order
+ * priced at its tuning book value (deposit + balance, read from tuning.json so scenario
+ * overrides of the book price are not needed - v4 arrivals charged the tuning book balance). */
+function upgradeV4(save: SaveFile): SaveFile {
+  const s = save.state;
+  const bookBalance = (kind: 'transformer' | 'switchgear'): number =>
+    kind === 'transformer' ? tuningJson.power.transformerBalance : tuningJson.power.switchgearBalance;
+  const state: GameState = {
+    ...s,
+    markets: s.markets ?? { equipmentIndex: 1, laborIndex: 1, contractorIndex: 1 },
+    power: {
+      ...s.power,
+      orders: s.power.orders.map((o) => ({
+        ...o,
+        supplier: o.supplier ?? 'standard',
+        price: o.price ?? o.deposit + bookBalance(o.kind),
+      })),
+    },
+  };
+  return { ...save, version: 5, state };
 }
 
 /** Autosaves after every committed month (store.ts calls this from `endMonth`/`fastForward`/
