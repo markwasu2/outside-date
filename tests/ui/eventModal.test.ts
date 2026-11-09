@@ -76,10 +76,14 @@ describe('EventModal: describeChoiceEffects (finding #2)', () => {
     expect(text).not.toContain('{');
   });
 
-  it('returns empty string for a choice with no effects (governor_visit / decline)', () => {
-    const card = content.events.find((e) => e.id === 'governor_visit');
-    const text = describeChoiceEffects('decline', card ?? null);
-    expect(text).toBe('');
+  it('returns empty string for an effects-less choice with no bespoke stakes (not a UX 9 card)', () => {
+    const card = {
+      id: 'fake-empty',
+      title: 't',
+      body: 'b',
+      choices: [{ id: 'c1', label: 'Choice', effects: [] }],
+    } as unknown as Parameters<typeof describeChoiceEffects>[1];
+    expect(describeChoiceEffects('c1', card)).toBe('');
   });
 
   it('returns empty string when there is no matching event card (the synthetic docketVoteFail card)', () => {
@@ -103,5 +107,35 @@ describe('EventModal: describeChoiceEffects (finding #2)', () => {
       ],
     } as unknown as Parameters<typeof describeChoiceEffects>[1];
     expect(describeChoiceEffects('c1', card)).toBe('Has consequences');
+  });
+});
+
+describe('EventModal: bespoke choice stakes (UX 9)', () => {
+  it('governor_visit names the rebate, not "Has consequences"', () => {
+    const card = content.events.find((e) => e.id === 'governor_visit');
+    expect(describeChoiceEffects('host', card ?? null)).toContain('$20.0M equipment rebate');
+    expect(describeChoiceEffects('decline', card ?? null)).toBe('No visit, no rebate');
+  });
+
+  it('union_pla names the budget cost and the odds shift', () => {
+    const card = content.events.find((e) => e.id === 'union_pla');
+    expect(describeChoiceEffects('sign', card ?? null)).toContain('+2%');
+    expect(describeChoiceEffects('sign', card ?? null)).toContain('0.22 to 0.05');
+    expect(describeChoiceEffects('decline', card ?? null)).toContain('0.22');
+  });
+
+  it('tenant_slide_offer names the slip and the rent cut', () => {
+    const card = content.events.find((e) => e.id === 'tenant_slide_offer');
+    expect(describeChoiceEffects('accept', card ?? null)).toContain('slips 2 months');
+    expect(describeChoiceEffects('accept', card ?? null)).toContain('-2%');
+    expect(describeChoiceEffects('decline', card ?? null)).toBe('Dates and rent unchanged');
+  });
+
+  it('chip_generation stakes follow the hall tier', () => {
+    const card = content.events.find((e) => e.id === 'chip_generation');
+    expect(describeChoiceEffects('retrofit', card ?? null, 'liquid')).toContain('$4.0M per undelivered hall');
+    expect(describeChoiceEffects('retrofit', card ?? null, 'air')).toContain('$15.0M per undelivered hall');
+    expect(describeChoiceEffects('decline', card ?? null, 'air')).toContain('asset score -3');
+    expect(describeChoiceEffects('decline', card ?? null, 'liquid')).toBe('Tenant goodwill -15');
   });
 });
