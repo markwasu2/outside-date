@@ -895,3 +895,18 @@ the event modal so its Learn more route continues to work.
 | button actually on top | done: elementFromPoint test and real pointer click resolving the event |
 | full gates | done: 512 vitest, 53 e2e (52 + isolated long tutorial), lint, tsc, build |
 | balance grid | skipped: CSS stacking only |
+
+# Art pass 2d - substation buildout
+
+The substation plot now shows surveyed empty land until physical construction,
+a crane and incomplete gantries while building, then the completed substation
+only once done. A progress bar reads the actual remaining build months against
+the scenario-resolved duration. Study status no longer implies a finished site.
+
+| criterion | status |
+|---|---|
+| state-meaningful art | done: e2e walks none/building/done and checks image changes |
+| progress | done: visible only during building, derives from doneMonth and resolved duration |
+| visual | done: 1280x720 working-state screenshot inspected; all labels legible |
+| full gates | done: 512 vitest, 54 e2e (53 + isolated long tutorial), lint, tsc, build |
+| balance grid | skipped: display-only art and progress, engine untouched |
