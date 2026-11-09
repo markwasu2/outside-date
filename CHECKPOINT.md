@@ -826,3 +826,19 @@ window globals from two helpers. No game, engine or script behavior changed.
 Full npm lint is green again. Previous fix-4 tests (508 unit, 48 e2e), typecheck
 and build apply unchanged; no runtime files touched. Balance grid and visual
 checks are not applicable to comments declaring script globals.
+
+# Cold playthrough 2, fix 5 - real construction blockers
+
+Next step now uses the same hall-blocker projection as the tile captions. It
+skips blocked RFS halls instead of asking for an illegal construction advance.
+If none can advance, it names the power blocker, pending gear dates or funding
+check, substation completion date, and the automatic study/gear/build chain.
+No Build action was added, and no simulation behavior changed.
+
+| criterion | status |
+|---|---|
+| correct next move | done: four unit fixtures cover pending gear, building substation, another buildable hall, unpaid balance |
+| automatic chain | done: desktop e2e and screenshot show the same chain as power.ts |
+| full gates | done: 512 vitest, 49 playwright, tsc, full eslint, build |
+| visual check | docs/screenshots/cold2/real-blocker.png, 1280x720 |
+| balance grid | skipped: read-only UI advice, engine/tuning/bots unchanged |
