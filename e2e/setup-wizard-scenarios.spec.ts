@@ -13,7 +13,8 @@ test('Millbrook Relay wizard shows pinned lease and mezz terms plus resolved est
   await expect(page.getByRole('button', { name: /Y3 M7/ })).toBeDisabled();
   await expect(page.getByText('Delivery is fixed by this scenario at Y3 M7.')).toBeVisible();
   await expect(page.getByText('The late remedy is fixed by this scenario as liquidated damages.')).toBeVisible();
-  await expect(page.getByText(/outside date, 4 months after/)).toBeVisible();
+  // UX 2: "outside date" now carries its first-use inline gloss before the pinned-months text.
+  await expect(page.getByText(/outside date \(the deadline before the tenant can walk\), 4 months after/)).toBeVisible();
 
   await page.getByRole('button', { name: 'Next: Forecast' }).click();
 

@@ -2,6 +2,7 @@ import type { Content } from '../../content/schemas';
 import type { NegotiationChoices } from '../../engine/init';
 import { formatMonth } from '../../engine/format';
 import type { MinChargeLevel } from '../../engine/types';
+import { Gloss } from '../Gloss';
 
 interface Props {
   content: Content;
@@ -94,7 +95,7 @@ export function PowerScreen({ content, scenarioId, negotiation, onChange, onBack
         ))}
       </div>
 
-      <strong>Estimated MW arrival vs. hall need (assumes a first-try docket win)</strong>
+      <strong>Estimated MW arrival vs. hall need (assumes a first-try <Gloss id="docket" gloss="the regulator's case file for your power request">docket</Gloss> win)</strong>
       <div style={{ position: 'relative', height: rows.length * 16 + 10, background: '#f5f5f5', margin: '0.5rem 0 1rem' }}>
         {rows.map((row, i) => (
           <div

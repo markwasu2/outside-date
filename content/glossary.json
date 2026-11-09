@@ -355,5 +355,10 @@
     "id": "dilution",
     "term": "Dilution",
     "definition": "When new equity comes in at a premium, your slice of the project shrinks by more than the cash raised."
+  },
+  {
+    "id": "pad-months",
+    "term": "pad months",
+    "definition": "Months to clear and prepare the ground before vertical construction can start on a hall."
   }
 ]

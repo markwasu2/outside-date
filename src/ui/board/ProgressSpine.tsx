@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { formatMonth } from '../../engine/format';
 import type { GameState } from '../../engine/types';
+import { Gloss } from '../Gloss';
 import { useStore } from '../store';
 import { Term } from '../Term';
 import { nextStep } from './nextStep';
@@ -139,7 +140,7 @@ export function ProgressSpine() {
       </span>
 
       <span style={SECTION} title="Power docket status and intervenor meetings done over needed">
-        <Term id="docket">Docket</Term>: {docketSummary(state)}
+        <Gloss id="docket" gloss="the regulator's case file for your power request">Docket</Gloss>: {docketSummary(state)}
         {state.docketEnabled && meetingsNeeded > 0 && ` (meetings ${meetingsDone}/${meetingsNeeded})`}
       </span>
 

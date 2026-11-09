@@ -266,6 +266,11 @@ interface UIStore {
    * as seenBoardObjects (cleared by newGame/loadGame). */
   seenExplainers: string[];
   markExplainerSeen: (id: string) => void;
+  /** UX queue item 2 (2026-11-09): jargon ids whose inline plain-language gloss has already
+   * been shown this run - same UI-only seen-flag pattern as seenExplainers (cleared by
+   * newGame/loadGame, never persisted in the save file). */
+  seenGlosses: string[];
+  markGlossSeen: (id: string) => void;
   /** Phase 2 (D4/D5): the codex overlay's Stakeholders view is addressed by the reserved
    * selected id 'stakeholders'; `codexStakeholderFocus` names the role to highlight (set by
    * who-holds chips via openCodex's second argument). */
@@ -330,6 +335,9 @@ export const useStore = create<UIStore>((set, get) => ({
   seenExplainers: [],
   markExplainerSeen: (id) =>
     set((s) => (s.seenExplainers.includes(id) ? s : { seenExplainers: [...s.seenExplainers, id] })),
+  seenGlosses: [],
+  markGlossSeen: (id) =>
+    set((s) => (s.seenGlosses.includes(id) ? s : { seenGlosses: [...s.seenGlosses, id] })),
   codexStakeholderFocus: null,
 
   selectHall: (hallId) => set({ selectedHallId: hallId }),
@@ -512,6 +520,7 @@ export const useStore = create<UIStore>((set, get) => ({
       lastDifficultyId: difficultyId,
       financialSnapshots: [buildFinancialSnapshot(next, c)],
       seenExplainers: [],
+      seenGlosses: [],
       codexStakeholderFocus: null,
     });
     get().autosave();
@@ -541,6 +550,7 @@ export const useStore = create<UIStore>((set, get) => ({
           ? save.financialSnapshots
           : [buildFinancialSnapshot(save.state, content)],
       seenExplainers: [],
+      seenGlosses: [],
       codexStakeholderFocus: null,
     });
   },
