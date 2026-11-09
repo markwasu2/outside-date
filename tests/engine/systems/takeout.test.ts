@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { loadContent } from '../../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../../src/engine/init';
-import { priceTakeout } from '../../../src/engine/systems/takeout';
+import { priceTakeout, scorePreview } from '../../../src/engine/systems/takeout';
 import type { GameState, Setup } from '../../../src/engine/types';
 
 // events: [] so drawEvent never fires here; capRateSwing: 0 isolates the cap-rate-vs-score
@@ -132,5 +132,25 @@ describe('takeout: win/lose outcomes', () => {
     const lose = priceTakeout({ ...freshState(), debt: { ...freshState().debt, seniorDrawn: 5_000_000_000 } }, content);
     expect(lose.phase).toBe('ended');
     expect(lose.log.some((l) => l.kind === 'lose')).toBe(true);
+  });
+});
+
+describe('scorePreview (UX 11)', () => {
+  it('matches the takeout scores on the same state and totals to the sum of components', () => {
+    const state = stateAtCleanTakeout();
+    const preview = scorePreview(state, content);
+    const result = priceTakeout(state, content);
+    expect(preview.power).toBe(result.takeout!.scores.power);
+    expect(preview.tenant).toBe(result.takeout!.scores.tenant);
+    expect(preview.coverage).toBe(result.takeout!.scores.coverage);
+    expect(preview.asset).toBe(result.takeout!.scores.asset);
+    expect(preview.total).toBe(preview.power + preview.tenant + preview.coverage + preview.asset);
+    expect(preview.greatMultiple).toBe(content.tuning.takeout.greatMultiple);
+  });
+
+  it('is computable at month 0, before any delivery (rules surface early)', () => {
+    const preview = scorePreview(freshState(), content);
+    expect(preview.total).toBeGreaterThanOrEqual(0);
+    expect(preview.total).toBeLessThanOrEqual(100);
   });
 });
