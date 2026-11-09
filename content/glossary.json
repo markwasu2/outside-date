@@ -1,50 +1,324 @@
 [
-  { "id": "build-to-suit", "term": "build-to-suit", "definition": "A building constructed to one tenant's specifications, under a lease signed before it is finished.", "codexId": "build-to-suit-lease" },
-  { "id": "delivery-date", "term": "delivery date", "definition": "The date you promised to hand a finished hall over to the tenant, ready for service." },
-  { "id": "outside-date", "term": "outside date", "definition": "The last possible date to deliver before the tenant can walk away from that hall." },
-  { "id": "liquidated-damages", "term": "liquidated damages", "definition": "A pre-agreed daily cash penalty you owe the tenant for every day a hall is late." },
-  { "id": "rent-abatement", "term": "rent abatement", "definition": "Free rent months owed to the tenant later, instead of a cash penalty, to make up for a late hall." },
-  { "id": "triple-net-lease", "term": "triple-net lease", "definition": "A lease where the tenant pays taxes, insurance, and upkeep on top of rent." },
-  { "id": "escalator", "term": "escalator", "definition": "A scheduled yearly bump in rent, agreed in the lease ahead of time." },
-  { "id": "docket", "term": "docket", "definition": "The regulator's official case file for a request, like your power agreement, that needs a public vote." },
-  { "id": "intervenor", "term": "intervenor", "definition": "A group that formally joins a docket to argue for or against what you are asking for." },
-  { "id": "discovery", "term": "discovery", "definition": "A formal request for documents or answers from you during a regulatory case." },
-  { "id": "testimony", "term": "testimony", "definition": "Written or spoken evidence you file to support your case before a vote." },
-  { "id": "interconnection-study", "term": "interconnection study", "definition": "The utility's engineering review of how your campus will connect to and affect the grid." },
-  { "id": "transformer", "term": "transformer", "definition": "A large piece of electrical equipment that steps power up or down; it can take years to build and ship.", "codexId": "transformer-lead-times" },
-  { "id": "switchgear", "term": "switchgear", "definition": "Equipment that switches and protects electrical circuits; another long-lead item you have to order early.", "codexId": "switchgear-lead-times" },
-  { "id": "substation", "term": "substation", "definition": "The site facility that steps down grid power to a voltage your halls can use." },
-  { "id": "minimum-monthly-charge", "term": "minimum monthly charge", "definition": "A fee you pay the utility for power capacity you reserved but are not yet using." },
-  { "id": "pue", "term": "PUE", "definition": "Power usage effectiveness: total site power divided by power that reaches the computers. Lower is more efficient." },
-  { "id": "it-load", "term": "IT load", "definition": "The power actually used by computing equipment, not counting cooling or site overhead." },
-  { "id": "grid-draw", "term": "grid draw", "definition": "The amount of power your campus is actually pulling from the utility's grid." },
-  { "id": "mw", "term": "MW", "definition": "Megawatt: a unit of power. One megawatt can run roughly a thousand homes." },
-  { "id": "kw-month", "term": "kW-month", "definition": "A unit of rent: dollars charged per kilowatt of capacity, per month." },
-  { "id": "senior-loan", "term": "senior loan", "definition": "The first-priority construction loan; it gets paid back before any other debt or equity." },
-  { "id": "mezzanine", "term": "mezzanine", "definition": "A second loan layered between the senior loan and equity, riskier and more expensive than senior debt." },
-  { "id": "pik", "term": "PIK", "definition": "Paid-in-kind interest: interest that adds to the loan balance instead of being paid in cash." },
-  { "id": "equity", "term": "equity", "definition": "The ownership money in the deal; it is paid back last and takes the most risk." },
-  { "id": "capital-stack", "term": "capital stack", "definition": "The full mix of senior debt, mezzanine debt, and equity that funds a project." },
-  { "id": "ltc", "term": "LTC", "definition": "Loan-to-cost: the share of total project cost a loan will fund." },
-  { "id": "draw", "term": "draw", "definition": "A request to pull funds from a committed loan or equity source to pay that month's bills." },
-  { "id": "capitalized-interest", "term": "capitalized interest", "definition": "Loan interest added to the loan balance during construction instead of paid in cash." },
-  { "id": "covenant", "term": "covenant", "definition": "A rule in a loan agreement that you must keep meeting or risk default." },
-  { "id": "dscr", "term": "DSCR", "definition": "Debt service coverage ratio: income divided by debt payments owed. More headroom above the covenant trigger means more cushion before default.", "codexId": "crefc-rating-framework" },
-  { "id": "conversion", "term": "conversion", "definition": "The test a construction loan must pass to convert to cheaper, permanent financing." },
-  { "id": "step-up", "term": "step-up", "definition": "A higher interest rate charged after a loan fails its conversion test." },
-  { "id": "takeout", "term": "takeout", "definition": "Refinancing the construction loan with permanent debt once the project is stable." },
-  { "id": "cap-rate", "term": "cap rate", "definition": "Capitalization rate: a property's yearly income divided by its value. Lower cap rate means higher value." },
-  { "id": "noi", "term": "NOI", "definition": "Net operating income: rent collected minus the landlord's operating costs." },
-  { "id": "equity-multiple", "term": "equity multiple", "definition": "What you get back divided by what you put in, in equity." },
-  { "id": "builders-risk", "term": "builder's risk", "definition": "Insurance that covers physical damage to a project while it is under construction.", "codexId": "builders-risk" },
-  { "id": "dsu", "term": "delay in start-up (DSU)", "definition": "Insurance that covers lost income and extra costs caused by an insured construction delay.", "codexId": "dsu-insurance" },
-  { "id": "deductible", "term": "deductible", "definition": "The amount you pay out of pocket on an insurance claim before coverage kicks in." },
-  { "id": "gmp", "term": "GMP", "definition": "Guaranteed maximum price: a contract where the builder absorbs cost overruns past an agreed cap." },
-  { "id": "cost-plus", "term": "cost-plus", "definition": "A contract where you pay the builder's actual costs plus a fee, overruns included." },
-  { "id": "certificate-of-occupancy", "term": "certificate of occupancy", "definition": "The official sign-off that a building is safe and legal to use." },
-  { "id": "liquid-cooling", "term": "liquid cooling", "definition": "Cooling computer racks with liquid instead of air; needed for the densest chips." },
-  { "id": "rack", "term": "rack", "definition": "A standardized frame holding rows of computing equipment." },
-  { "id": "hyperscaler", "term": "hyperscaler", "definition": "A company that runs cloud or AI computing at a massive, global scale." },
-  { "id": "dark-value", "term": "dark value", "definition": "The reduced value assigned to a hall that is unfinished or sitting empty at sale time." },
-  { "id": "rating-agency", "term": "rating agency", "definition": "A firm that grades how likely a loan or bond is to be repaid.", "codexId": "crefc-rating-framework" }
+  {
+    "id": "build-to-suit",
+    "term": "build-to-suit",
+    "definition": "A building constructed to one tenant's specifications, under a lease signed before it is finished.",
+    "codexId": "build-to-suit-lease"
+  },
+  {
+    "id": "delivery-date",
+    "term": "delivery date",
+    "definition": "The date you promised to hand a finished hall over to the tenant, ready for service."
+  },
+  {
+    "id": "outside-date",
+    "term": "outside date",
+    "definition": "The last possible date to deliver before the tenant can walk away from that hall."
+  },
+  {
+    "id": "liquidated-damages",
+    "term": "liquidated damages",
+    "definition": "A pre-agreed daily cash penalty you owe the tenant for every day a hall is late."
+  },
+  {
+    "id": "rent-abatement",
+    "term": "rent abatement",
+    "definition": "Free rent months owed to the tenant later, instead of a cash penalty, to make up for a late hall."
+  },
+  {
+    "id": "triple-net-lease",
+    "term": "triple-net lease",
+    "definition": "A lease where the tenant pays taxes, insurance, and upkeep on top of rent."
+  },
+  {
+    "id": "escalator",
+    "term": "escalator",
+    "definition": "A scheduled yearly bump in rent, agreed in the lease ahead of time."
+  },
+  {
+    "id": "docket",
+    "term": "docket",
+    "definition": "The regulator's official case file for a request, like your power agreement, that needs a public vote."
+  },
+  {
+    "id": "intervenor",
+    "term": "intervenor",
+    "definition": "A group that formally joins a docket to argue for or against what you are asking for."
+  },
+  {
+    "id": "discovery",
+    "term": "discovery",
+    "definition": "A formal request for documents or answers from you during a regulatory case."
+  },
+  {
+    "id": "testimony",
+    "term": "testimony",
+    "definition": "Written or spoken evidence you file to support your case before a vote."
+  },
+  {
+    "id": "interconnection-study",
+    "term": "interconnection study",
+    "definition": "The utility's engineering review of how your campus will connect to and affect the grid."
+  },
+  {
+    "id": "transformer",
+    "term": "transformer",
+    "definition": "A large piece of electrical equipment that steps power up or down; it can take years to build and ship.",
+    "codexId": "transformer-lead-times"
+  },
+  {
+    "id": "switchgear",
+    "term": "switchgear",
+    "definition": "Equipment that switches and protects electrical circuits; another long-lead item you have to order early.",
+    "codexId": "switchgear-lead-times"
+  },
+  {
+    "id": "substation",
+    "term": "substation",
+    "definition": "The site facility that steps down grid power to a voltage your halls can use."
+  },
+  {
+    "id": "minimum-monthly-charge",
+    "term": "minimum monthly charge",
+    "definition": "A fee you pay the utility for power capacity you reserved but are not yet using."
+  },
+  {
+    "id": "pue",
+    "term": "PUE",
+    "definition": "Power usage effectiveness: total site power divided by power that reaches the computers. Lower is more efficient."
+  },
+  {
+    "id": "it-load",
+    "term": "IT load",
+    "definition": "The power actually used by computing equipment, not counting cooling or site overhead."
+  },
+  {
+    "id": "grid-draw",
+    "term": "grid draw",
+    "definition": "The amount of power your campus is actually pulling from the utility's grid."
+  },
+  {
+    "id": "mw",
+    "term": "MW",
+    "definition": "Megawatt: a unit of power. One megawatt can run roughly a thousand homes."
+  },
+  {
+    "id": "kw-month",
+    "term": "kW-month",
+    "definition": "A unit of rent: dollars charged per kilowatt of capacity, per month."
+  },
+  {
+    "id": "senior-loan",
+    "term": "senior loan",
+    "definition": "The first-priority construction loan; it gets paid back before any other debt or equity."
+  },
+  {
+    "id": "mezzanine",
+    "term": "mezzanine",
+    "definition": "A second loan layered between the senior loan and equity, riskier and more expensive than senior debt."
+  },
+  {
+    "id": "pik",
+    "term": "PIK",
+    "definition": "Paid-in-kind interest: interest that adds to the loan balance instead of being paid in cash."
+  },
+  {
+    "id": "equity",
+    "term": "equity",
+    "definition": "The ownership money in the deal; it is paid back last and takes the most risk."
+  },
+  {
+    "id": "capital-stack",
+    "term": "capital stack",
+    "definition": "The full mix of senior debt, mezzanine debt, and equity that funds a project."
+  },
+  {
+    "id": "ltc",
+    "term": "LTC",
+    "definition": "Loan-to-cost: the share of total project cost a loan will fund."
+  },
+  {
+    "id": "draw",
+    "term": "draw",
+    "definition": "A request to pull funds from a committed loan or equity source to pay that month's bills."
+  },
+  {
+    "id": "capitalized-interest",
+    "term": "capitalized interest",
+    "definition": "Loan interest added to the loan balance during construction instead of paid in cash."
+  },
+  {
+    "id": "covenant",
+    "term": "covenant",
+    "definition": "A rule in a loan agreement that you must keep meeting or risk default."
+  },
+  {
+    "id": "dscr",
+    "term": "DSCR",
+    "definition": "Debt service coverage ratio: income divided by debt payments owed. More headroom above the covenant trigger means more cushion before default.",
+    "codexId": "crefc-rating-framework"
+  },
+  {
+    "id": "conversion",
+    "term": "conversion",
+    "definition": "The test a construction loan must pass to convert to cheaper, permanent financing."
+  },
+  {
+    "id": "step-up",
+    "term": "step-up",
+    "definition": "A higher interest rate charged after a loan fails its conversion test."
+  },
+  {
+    "id": "takeout",
+    "term": "takeout",
+    "definition": "Refinancing the construction loan with permanent debt once the project is stable."
+  },
+  {
+    "id": "cap-rate",
+    "term": "cap rate",
+    "definition": "Capitalization rate: a property's yearly income divided by its value. Lower cap rate means higher value."
+  },
+  {
+    "id": "noi",
+    "term": "NOI",
+    "definition": "Net operating income: rent collected minus the landlord's operating costs."
+  },
+  {
+    "id": "equity-multiple",
+    "term": "equity multiple",
+    "definition": "What you get back divided by what you put in, in equity."
+  },
+  {
+    "id": "builders-risk",
+    "term": "builder's risk",
+    "definition": "Insurance that covers physical damage to a project while it is under construction.",
+    "codexId": "builders-risk"
+  },
+  {
+    "id": "dsu",
+    "term": "delay in start-up (DSU)",
+    "definition": "Insurance that covers lost income and extra costs caused by an insured construction delay.",
+    "codexId": "dsu-insurance"
+  },
+  {
+    "id": "deductible",
+    "term": "deductible",
+    "definition": "The amount you pay out of pocket on an insurance claim before coverage kicks in."
+  },
+  {
+    "id": "gmp",
+    "term": "GMP",
+    "definition": "Guaranteed maximum price: a contract where the builder absorbs cost overruns past an agreed cap."
+  },
+  {
+    "id": "cost-plus",
+    "term": "cost-plus",
+    "definition": "A contract where you pay the builder's actual costs plus a fee, overruns included."
+  },
+  {
+    "id": "certificate-of-occupancy",
+    "term": "certificate of occupancy",
+    "definition": "The official sign-off that a building is safe and legal to use."
+  },
+  {
+    "id": "liquid-cooling",
+    "term": "liquid cooling",
+    "definition": "Cooling computer racks with liquid instead of air; needed for the densest chips."
+  },
+  {
+    "id": "rack",
+    "term": "rack",
+    "definition": "A standardized frame holding rows of computing equipment."
+  },
+  {
+    "id": "hyperscaler",
+    "term": "hyperscaler",
+    "definition": "A company that runs cloud or AI computing at a massive, global scale."
+  },
+  {
+    "id": "dark-value",
+    "term": "dark value",
+    "definition": "The reduced value assigned to a hall that is unfinished or sitting empty at sale time."
+  },
+  {
+    "id": "rating-agency",
+    "term": "rating agency",
+    "definition": "A firm that grades how likely a loan or bond is to be repaid.",
+    "codexId": "crefc-rating-framework"
+  },
+  {
+    "id": "sources-and-uses",
+    "term": "sources and uses",
+    "definition": "The closing table: where the money comes from (senior loan, mezzanine, equity) and what it pays for (land, halls, power gear, working capital). The two sides must balance.",
+    "codexId": "the-bond"
+  },
+  {
+    "id": "draw-schedule",
+    "term": "draw schedule",
+    "definition": "How the loan and equity actually fund over time: each month of construction calls equity first, then mezzanine, then the senior loan, and only then your cash."
+  },
+  {
+    "id": "interest-reserve",
+    "term": "interest reserve",
+    "definition": "Before conversion, loan interest is added to the loan balance (capitalized) instead of paid in cash - the loan effectively funds its own interest while you build."
+  },
+  {
+    "id": "cash-waterfall",
+    "term": "cash waterfall",
+    "definition": "The order money leaves the project each month: burn, insurance, utility minimums and damages come out of cash, while construction is funded down the equity-mezz-senior stack first."
+  },
+  {
+    "id": "forward-noi",
+    "term": "forward NOI",
+    "definition": "The next twelve months of rent income, net of the landlord's cost share, from halls already delivered. Lenders divide it by annual debt payments to get your DSCR.",
+    "codexId": "crefc-rating-framework"
+  },
+  {
+    "id": "developer",
+    "term": "developer",
+    "definition": "The project sponsor: finds the site, wins the permits, signs the lease, raises the money and holds every risk nobody else agreed to take. In this game, that is you.",
+    "codexId": "stakeholder-developer"
+  },
+  {
+    "id": "general-contractor",
+    "term": "general contractor (GC)",
+    "definition": "The firm that runs the site: crews, schedule, subcontractors, inspections. A GMP contract moves cost overruns above the cap to the GC.",
+    "codexId": "stakeholder-gc"
+  },
+  {
+    "id": "utility",
+    "term": "utility",
+    "definition": "The power company: studies your grid connection, builds the plants and sets the minimum monthly charge. A higher minimum charge moves some plant-slip risk to it.",
+    "codexId": "stakeholder-utility"
+  },
+  {
+    "id": "construction-lender",
+    "term": "construction lender",
+    "definition": "The bank behind the senior loan. It releases money draw by draw, can freeze draws when progress looks wrong, and tests your DSCR covenant at conversion.",
+    "codexId": "stakeholder-lender"
+  },
+  {
+    "id": "insurer",
+    "term": "insurer",
+    "definition": "Carries what it prices: builder's risk for physical damage, DSU for lost rent after an insured delay. Anything you declined to cover stays with you.",
+    "codexId": "stakeholder-insurer"
+  },
+  {
+    "id": "ratepayers",
+    "term": "ratepayers",
+    "definition": "The utility's ordinary customers. Plants built for a campus that never uses them usually end up in everyone's rates - which is why their advocates intervene in your docket.",
+    "codexId": "stakeholder-ratepayers"
+  },
+  {
+    "id": "equity-partner",
+    "term": "equity partner",
+    "definition": "The investor supplying most of the committed equity. Its share decides how much of the final equity value is yours.",
+    "codexId": "stakeholder-partner"
+  },
+  {
+    "id": "commission",
+    "term": "utility commission",
+    "definition": "The regulator that votes on the docket letting the utility build for your load. Testimony, discovery and intervenor settlements move the vote.",
+    "codexId": "stakeholder-commission"
+  }
 ]

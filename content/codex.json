@@ -167,5 +167,93 @@
     "realAnchor": "Scope creep and change-order disputes as a primary cause of GMP construction overruns",
     "sourceUrl": "https://www.swktech.com/data-center-construction-budgets/",
     "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "stakeholder-developer",
+    "title": "The developer (you)",
+    "body": "The developer sponsors the whole project: finds the site, wins the permits, signs the lease, raises the capital stack, and carries every risk nobody else agreed to take. By default that means delivery delay, cost overruns, plant slip, refinancing, rate moves and labor. Sponsors of campuses this size rarely build alone: they form joint ventures with asset managers that supply most of the equity, keeping a minority stake and the lease.",
+    "realAnchor": "Meta / Blue Owl Capital joint venture for the Hyperion data center - the sponsor-developer structure this game's 'you' is modeled on",
+    "sourceUrl": "https://investor.atmeta.com/investor-news/press-release-details/2025/Meta-Announces-Joint-Venture-with-Funds-Managed-by-Blue-Owl-Capital-to-Develop-Hyperion-Data-Center/default.aspx",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "stakeholder-gc",
+    "title": "The general contractor (Foreman Ruth Calder)",
+    "body": "The general contractor runs the site: crews, schedule, subcontractors, inspections. Under a guaranteed maximum price (GMP) contract it absorbs cost overruns above the cap; under cost-plus they stay with you. The largest US data center contractors in 2025 were HITT Contracting, Holder Construction, DPR Construction, Turner Construction, Whiting-Turner Contracting and Mortenson, per Building Design+Construction's Giants 400 ranking.",
+    "realAnchor": "HITT, Holder, DPR, Turner, Whiting-Turner and Mortenson top Building Design+Construction's 2025 data center contractor ranking",
+    "sourceUrl": "https://www.bdcnetwork.com/giants-400/news/55321777/top-data-center-construction-firms-for-2025",
+    "verifiedOn": "2026-11-09"
+  },
+  {
+    "id": "stakeholder-utility",
+    "title": "The utility (Priya Natarajan)",
+    "body": "The utility studies your interconnection, builds the power plants and sets the minimum monthly charge. A higher minimum charge lowers slip odds and moves some plant-slip risk to the utility; plants that end up stranded are usually socialized to ratepayers through rates. Real example: Entergy Louisiana, which won approval for gas plants serving the Hyperion campus in a contested 2025 regulatory docket.",
+    "realAnchor": "Entergy Louisiana's generation docket serving the Meta campus (Louisiana PSC Docket No. U-37425)",
+    "sourceUrl": "https://lailluminator.com/2025/08/20/entergy-meta/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "stakeholder-tenant",
+    "title": "The tenant (Jordan Ashe, the Whale)",
+    "body": "The tenant signs the lease that makes the project financeable: delivery dates, rent, late remedies and the outside date. On the hybrid hall tier the tenant keeps chip-generation obsolescence risk; on air tier some of it shifts to you. Real example: Meta, which leases the Hyperion campus from a joint venture it formed with Blue Owl Capital while keeping a minority ownership stake.",
+    "realAnchor": "Meta, tenant of the Hyperion data center through its Blue Owl Capital joint venture",
+    "sourceUrl": "https://investor.atmeta.com/investor-news/press-release-details/2025/Meta-Announces-Joint-Venture-with-Funds-Managed-by-Blue-Owl-Capital-to-Develop-Hyperion-Data-Center/default.aspx",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "stakeholder-lender",
+    "title": "The construction lender (Marcus Teale)",
+    "body": "The construction lender funds the senior loan draw by draw, sends its own engineer to check progress before releasing money, freezes draws when something looks wrong, and tests the DSCR covenant at conversion. Real example: JPMorgan, which closed a $7.12 billion construction financing in May 2025 for a 1.2 gigawatt data center campus in Abilene, Texas leased to Oracle.",
+    "realAnchor": "JPMorgan's $7.12B construction financing for the Abilene, Texas data center campus",
+    "sourceUrl": "https://www.pei-privaterealestate.com/credit/jpmorgan-closes-7-1bn-financing-for-texas-data-center-mega-project/",
+    "verifiedOn": "2026-11-09"
+  },
+  {
+    "id": "stakeholder-insurer",
+    "title": "The insurer",
+    "body": "The insurer carries what it prices: builder's risk for physical damage during construction, and delay-in-start-up (DSU) cover for lost rent after an insured delay, each above a deductible. Decline the cover and the risk stays with you. Zurich Insurance says the average data center project now carries a value of $3 billion, up from $150 million five years earlier, and warns that a project that is not insurable will not get financed.",
+    "realAnchor": "Zurich Insurance on data center construction values and insurability (Commercial Risk)",
+    "sourceUrl": "https://www.commercialriskonline.com/insurance-availability-determines-viability-of-construction-projects-zurich/",
+    "verifiedOn": "2026-11-09"
+  },
+  {
+    "id": "stakeholder-equipment",
+    "title": "The equipment makers",
+    "body": "Transformer and switchgear makers hold your lead times. Their factories are the bottleneck: a fire or a backlog slips your order, and no contract clause makes a missing transformer arrive sooner. Hitachi Energy, the world's largest transformer maker, said in March 2026 that lead times for large power transformers had passed 30 months amid manufacturing bottlenecks.",
+    "realAnchor": "Hitachi Energy: large power transformer lead times past 30 months (Nikkei)",
+    "sourceUrl": "https://asia.nikkei.com/business/energy/wait-times-for-hitachi-energy-transformers-hit-more-than-30-months",
+    "verifiedOn": "2026-11-09"
+  },
+  {
+    "id": "stakeholder-ratepayers",
+    "title": "The ratepayers (Lucia Byrne, counsel)",
+    "body": "Ratepayers are the utility's ordinary customers. When a utility builds plants for a campus that never uses them, the stranded cost usually lands in everyone's rates, which is why ratepayer advocates intervene in dockets like this one. Real example: the contested Entergy Louisiana docket for the Meta campus, where advocates pressed the question of who pays if the promised load never shows up.",
+    "realAnchor": "Ratepayer advocates in Louisiana PSC Docket No. U-37425 (Entergy/Meta)",
+    "sourceUrl": "https://lailluminator.com/2025/08/20/entergy-meta/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "stakeholder-town",
+    "title": "The town and county",
+    "body": "The host community grants permits, abates taxes, supplies water and road extensions, and lives with the traffic, the noise and the wells. It holds the water-availability risk when your cooling choice leans on the local supply, and its goodwill moves with how you treat it. Real example: Richland Parish, Louisiana, the rural host of the Hyperion campus.",
+    "realAnchor": "Richland Parish, Louisiana, host community of Meta's Hyperion campus",
+    "sourceUrl": "https://www.datacenterdynamics.com/en/news/meta-expands-data-center-campus-in-richland-parish-louisiana-to-5gw-will-invest-50bn/",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "stakeholder-partner",
+    "title": "The equity partner",
+    "body": "Your equity partner supplies most of the committed equity and most of the second-guessing. The partner's share decides how much of the final equity value is yours, and a dispute with them slows everything. Real example: Blue Owl Capital, the asset manager holding the larger ownership stake in the Hyperion joint venture.",
+    "realAnchor": "Blue Owl Capital, majority equity partner in the Hyperion joint venture",
+    "sourceUrl": "https://investor.atmeta.com/investor-news/press-release-details/2025/Meta-Announces-Joint-Venture-with-Funds-Managed-by-Blue-Owl-Capital-to-Develop-Hyperion-Data-Center/default.aspx",
+    "verifiedOn": "2026-11-06"
+  },
+  {
+    "id": "stakeholder-commission",
+    "title": "The commission (Odell and Kwambai)",
+    "body": "The public utility commission votes on the docket that lets the utility build for your load. Commissioners answer to voters, not to you: testimony, discovery answers and intervenor settlements all move the vote, and a failed vote costs months. Real example: the Louisiana Public Service Commission, which fast-tracked approval of Entergy's $2.1 billion follow-on generation plan for the Meta campus in April 2026.",
+    "realAnchor": "Louisiana Public Service Commission fast-track vote on Entergy's $2.1B plan, April 2026",
+    "sourceUrl": "https://www.kplctv.com/2026/04/15/louisiana-psc-aproves-fast-track-entergy-21b-proposal-tied-meta-data-center/",
+    "verifiedOn": "2026-11-06"
   }
 ]
