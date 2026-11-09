@@ -5,7 +5,14 @@ import { resolveContent } from './resolve';
 /** Total outstanding debt (senior principal + capitalized interest, mezz principal + PIK). */
 export function totalDebt(state: GameState): number {
   const { debt } = state;
-  return debt.seniorDrawn + debt.seniorCapitalizedInterest + debt.mezzDrawn + debt.mezzAccruedPik;
+  return (
+    debt.seniorDrawn +
+    debt.seniorCapitalizedInterest +
+    debt.mezzDrawn +
+    debt.mezzAccruedPik +
+    debt.bridgeDrawn +
+    debt.bridgeAccruedPik
+  );
 }
 
 /** Grid MW actually available at the current month (4.7): interim grid + online plants, capped at substation capacity. */
@@ -33,10 +40,17 @@ export function requiredGridMW(state: GameState, content: Content): number {
  * Decisions log), which IS a durable rent-level change.
  */
 export function hallGrossRent(state: GameState, content: Content, hall: Hall): number {
-  if (!state.lease || hall.deliveredMonth === null) return 0;
+  if (hall.deliveredMonth === null) return 0;
+  return grossRentFor(state, content, hall, hall.deliveredMonth, state.month);
+}
+
+/** Gross monthly rent for a hall delivered in `deliveredMonth`, as of `atMonth` (Phase 3: shared by
+ * the live selectors and the engine's forward projection, so both pick up the same rent cuts). */
+export function grossRentFor(state: GameState, content: Content, hall: Hall, deliveredMonth: number, atMonth: number): number {
+  if (!state.lease) return 0;
   const tierRentMult = content.tuning.tiers[state.setup.hallTier].rentMult;
   const escalator = content.tuning.lease.escalator;
-  const years = Math.floor((state.month - hall.deliveredMonth) / 12);
+  const years = Math.max(0, Math.floor((atMonth - deliveredMonth) / 12));
   const base = hall.mwIT * 1000 * state.lease.rentPerKwMonth * tierRentMult * (1 + escalator) ** years;
   const cut = state.flags[`rentCutFraction:${hall.id}`];
   return base * (1 - (typeof cut === 'number' ? cut : 0));
@@ -54,6 +68,17 @@ export function forwardNoi(state: GameState, content: Content): number {
     .filter((h) => h.delivered && !h.terminated && h.deliveredMonth !== null)
     .reduce((sum, h) => sum + hallMonthlyNoi(state, content, h), 0);
   return monthlyNoi * 12;
+}
+
+/** Annual NOI if every live hall were delivered and paying at today's rent levels (lease cuts included). */
+export function stabilizedNoi(state: GameState, content: Content): number {
+  let monthly = 0;
+  for (const h of state.halls) {
+    if (h.terminated) continue;
+    const gross = grossRentFor(state, content, h, h.deliveredMonth ?? h.deliveryMonth, h.deliveredMonth ?? h.deliveryMonth);
+    monthly += gross - content.tuning.lease.landlordCostShare * gross;
+  }
+  return monthly * 12;
 }
 
 /** DSCR (4.12): forward NOI over annual debt service on total debt at the permanent rate. */
@@ -77,7 +102,7 @@ function monthlyOutflow(state: GameState, content: Content): number {
     const rate = state.debt.converted
       ? content.tuning.covenant.permRate
       : state.debt.seniorRate + content.tuning.covenant.stepUp;
-    outflow += (totalDebt(state) * rate) / 12;
+    outflow += ((totalDebt(state) - state.debt.bridgeDrawn - state.debt.bridgeAccruedPik) * rate) / 12;
   }
 
   // Utility minimum charge (4.7), mirroring power.ts's chargeMinimum: payable on plant capacity

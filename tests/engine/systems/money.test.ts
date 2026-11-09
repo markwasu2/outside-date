@@ -19,7 +19,11 @@ const negotiation: NegotiationChoices = {
 const setup: Setup = { site: 'megasite', hallTier: 'air', cooling: 'evaporative', gc: 'costPlus' };
 
 function freshState(seed = 1): GameState {
-  return createGame(content, 'whale', setup, negotiation, seed);
+  const state = createGame(content, 'whale', setup, negotiation, seed);
+  // Phase 3: the lender's commitment fee capitalizes on the first senior draw. These tests
+  // set drawn balances by hand and pin interest math exactly, so the fee is zeroed here and
+  // covered by its own test below.
+  return { ...state, flags: { ...state.flags, commitmentFeeDue: 0 } };
 }
 
 function runMonths(state: GameState, n: number): GameState {
@@ -199,5 +203,19 @@ describe('money: cureDraw', () => {
     state = { ...state, flags: { ...state.flags, drawFreeze: true } };
     state = applyAction(state, { actionId: 'cureDraw' }, content);
     expect(state.flags.drawFreeze).toBe(false);
+  });
+});
+
+describe('money: commitment fee (Phase 3, B)', () => {
+  it('capitalizes into the senior loan the first month it is drawn, once', () => {
+    let state = createGame(content, 'whale', setup, negotiation, 1);
+    const due = state.flags.commitmentFeeDue as number;
+    expect(due).toBe(Math.round(state.debt.seniorCommitment * content.tuning.forecast.commitmentFeeRate));
+    expect(state.debt.seniorCapitalizedInterest).toBe(0);
+    state = { ...state, debt: { ...state.debt, seniorDrawn: 100_000_000 } };
+    state = runMonths(state, 1);
+    const rate = state.debt.seniorRate;
+    expect(state.debt.seniorCapitalizedInterest).toBeCloseTo(due + ((100_000_000 + due) * rate) / 12, 0);
+    expect(state.flags.commitmentFeeDue).toBe(0);
   });
 });

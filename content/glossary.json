@@ -320,5 +320,40 @@
     "term": "utility commission",
     "definition": "The regulator that votes on the docket letting the utility build for your load. Testimony, discovery and intervenor settlements move the vote.",
     "codexId": "stakeholder-commission"
+  },
+  {
+    "id": "contingency",
+    "term": "Contingency",
+    "definition": "Money held back on top of your cost call for surprises. A bigger cushion makes the loan larger and costs a bigger lender fee."
+  },
+  {
+    "id": "cost-to-complete",
+    "term": "Cost-to-complete test",
+    "definition": "The lender checks that the money left to draw covers what is left to build. If it does not, the loan is out of balance and draws stop."
+  },
+  {
+    "id": "equity-call",
+    "term": "Equity call",
+    "definition": "You ask your partner to put in more cash. It fixes a shortfall, but your share dilutes and the new money counts against your equity multiple."
+  },
+  {
+    "id": "bridge-loan",
+    "term": "Bridge loan",
+    "definition": "A short, expensive loan from you or a sponsor. It pays interest in kind at about 14% and is repaid ahead of equity when you take out the project."
+  },
+  {
+    "id": "scope-down",
+    "term": "Scope-down",
+    "definition": "Cancel a hall you have not finished. You pay a termination fee and lose what you spent, and get some salvage back. The tenant will notice."
+  },
+  {
+    "id": "recapitalization",
+    "term": "Recap",
+    "definition": "A mid-construction refinance. The lender raises the loan for a fee and a higher rate, so you get cash now and a bigger bill at takeout."
+  },
+  {
+    "id": "dilution",
+    "term": "Dilution",
+    "definition": "When new equity comes in at a premium, your slice of the project shrinks by more than the cash raised."
   }
 ]

@@ -199,7 +199,47 @@
       0.2,
       0.3,
       0.5
-    ]
+    ],
+    "levers": {
+      "equityCall": {
+        "maxShareOfCommitted": 0.06,
+        "maxCalls": 3,
+        "cooldownMonths": 4,
+        "premium": 0.25,
+        "feeRate": 0.02,
+        "strainPerCall": 1
+      },
+      "bridgeLoan": {
+        "maxShareOfCost": 0.03,
+        "maxLoans": 2,
+        "cooldownMonths": 3,
+        "rate": 0.14,
+        "feeRate": 0.02
+      },
+      "mezzTopUp": {
+        "maxShareOfCost": 0.03,
+        "maxUses": 2,
+        "cooldownMonths": 3,
+        "ltcCap": 0.8,
+        "dscrFloor": 1.3,
+        "ratePremium": 0.02,
+        "feeRate": 0.02
+      },
+      "scopeDown": {
+        "feeShare": 0.06,
+        "salvageShare": 0.4,
+        "tenantGoodwill": -12,
+        "cooldownMonths": 6
+      },
+      "recap": {
+        "minMonth": 12,
+        "minSpentShare": 0.3,
+        "raiseShareOfCost": 0.04,
+        "feeRate": 0.015,
+        "rateStep": 0.0075,
+        "ltcCap": 0.78
+      }
+    }
   },
   "lease": {
     "baseRent": 160,
@@ -226,7 +266,7 @@
   "insurance": {
     "buildersRiskMonthly": 600000,
     "dsuMonthly": 1000000,
-    "deductible": 2000000
+    "deductible": 5000000
   },
   "covenant": {
     "dscrTrigger": 1.25,
@@ -255,12 +295,47 @@
     "marketBandHigh": 15000000
   },
   "events": {
-    "stormDamage": 44000000,
-    "fireDamage": 32000000,
+    "stormDamageShare": 0.28,
+    "fireDamageShare": 0.22,
+    "waterDamageShare": [
+      0.004,
+      0.01
+    ],
+    "theftShare": [
+      0.002,
+      0.006
+    ],
     "rateMoveBps": 0.0025
   },
   "crews": {
     "importCost": 4000000,
     "importMonths": 6
+  },
+  "forecast": {
+    "contingencyOptions": [
+      0,
+      0.05,
+      0.1,
+      0.15
+    ],
+    "costCallOptions": [
+      -0.05,
+      0,
+      0.05,
+      0.1
+    ],
+    "monthOffsetOptions": [
+      -2,
+      0,
+      2,
+      4
+    ],
+    "defaultContingency": 0.1,
+    "commitmentFeeRate": 0.0075,
+    "lateCallGoodwillPerMonth": 1,
+    "costToComplete": {
+      "startMonth": 6,
+      "toleranceShare": 0.02
+    }
   }
 }

@@ -1,5 +1,5 @@
 import type { Content } from '../../content/schemas';
-import type { GameState, Hall } from '../types';
+import type { ClaimRecord, GameState, Hall } from '../types';
 
 /**
  * Insurance system (PLAN.md 4.10 DSU trigger, 4.11 storm): builder's risk / DSU monthly
@@ -30,33 +30,50 @@ export function tick(state: GameState, content: Content): GameState {
 }
 
 /**
- * The storm card's full mechanic (4.11): the affected hall loses a month of progress
- * (`stageMonthsDone`, floored at 0); damage is paid from cash, minus the deductible if
- * builder's risk covers it, or in full otherwise; that hall's `insuredDelayMonths` gains 1
- * only if builder's risk was in force; a draw freeze is set unless DSU is active (DSU's
- * adjuster speeds the claim, per the content note on `events.json`'s `storm` card).
+ * Phase 3 (J): every loss runs through here. The gross loss is a share of the hit hall's cost
+ * (so it scales with the build); with builder's risk on, you keep the flat per-claim deductible
+ * and the policy pays the rest; without it you pay it all. Small losses (water, theft) are
+ * sized to sit inside the deductible, so the policy pays nothing on them and they cost the same
+ * with or without cover - only a rare large loss is what the premium buys. The claim is
+ * recorded on `state.claims` so the event card can show what the policy paid and what the
+ * deductible cost.
  */
-export function applyStormDamage(state: GameState, content: Content, hallId: string): GameState {
-  const hall = findHall(state, hallId);
-  const damage = content.tuning.events.stormDamage;
-  const hasBuildersRisk = state.insurance.buildersRisk;
-  const cashCost = hasBuildersRisk ? Math.min(damage, content.tuning.insurance.deductible) : damage;
+function settleLoss(
+  state: GameState,
+  content: Content,
+  hall: Hall,
+  cardId: string,
+  kind: ClaimRecord['kind'],
+  gross: number,
+): { state: GameState; claim: ClaimRecord } {
+  const insured = state.insurance.buildersRisk;
+  const deductible = insured ? Math.min(gross, content.tuning.insurance.deductible) : 0;
+  const outOfPocket = insured ? deductible : gross;
+  const claim: ClaimRecord = {
+    id: `${cardId}:${state.month}:${hall.id}`,
+    month: state.month,
+    cardId,
+    kind,
+    hallId: hall.id,
+    gross,
+    insured,
+    deductible,
+    paid: gross - outOfPocket,
+    outOfPocket,
+  };
+  return { state: { ...state, cash: state.cash - outOfPocket, claims: [...state.claims, claim] }, claim };
+}
 
-  const next = replaceHall({ ...state, cash: state.cash - cashCost }, hallId, {
-    ...hall,
-    stageMonthsDone: Math.max(0, hall.stageMonthsDone - 1),
-    insuredDelayMonths: hasBuildersRisk ? hall.insuredDelayMonths + 1 : hall.insuredDelayMonths,
-  });
-
-  if (state.insurance.dsu) return next;
+function drawFreezeUnlessDsu(state: GameState): GameState {
+  if (state.insurance.dsu) return state;
   // QA pass 2, finding 3: same silent-freeze fix as effects.ts's drawFreeze handler - the
   // storm sets the flag directly here, so it logs its own start line (Hud.tsx carries the
   // persistent indicator).
   return {
-    ...next,
-    flags: { ...next.flags, drawFreeze: true },
+    ...state,
+    flags: { ...state.flags, drawFreeze: true },
     log: [
-      ...next.log,
+      ...state.log,
       {
         month: state.month,
         kind: 'warning',
@@ -67,20 +84,54 @@ export function applyStormDamage(state: GameState, content: Content, hallId: str
 }
 
 /**
- * The fitout fire card's mechanic (events.json's `fitout_fire` note): like storm damage but
- * using `tuning.events.fireDamage`, -2 months of progress (not -1), insuredDelayMonths +2 (not
- * +1) when builder's risk is in force, and explicitly no draw freeze.
+ * Storm (4.11): the affected hall loses a month of progress; the loss is `stormDamageShare` of
+ * that hall's cost, settled through `settleLoss`; that hall's `insuredDelayMonths` gains 1 only
+ * if builder's risk was in force; a draw freeze is set unless DSU is active.
  */
+export function applyStormDamage(state: GameState, content: Content, hallId: string): GameState {
+  const hall = findHall(state, hallId);
+  const gross = Math.round(hall.costBudget * content.tuning.events.stormDamageShare);
+  const settled = settleLoss(state, content, hall, 'storm', 'storm', gross);
+  const next = replaceHall(settled.state, hallId, {
+    ...hall,
+    stageMonthsDone: Math.max(0, hall.stageMonthsDone - 1),
+    insuredDelayMonths: settled.claim.insured ? hall.insuredDelayMonths + 1 : hall.insuredDelayMonths,
+  });
+  return drawFreezeUnlessDsu(next);
+}
+
+/** Fitout fire: -2 months of progress, insuredDelayMonths +2 when insured, no draw freeze. */
 export function applyFireDamage(state: GameState, content: Content, hallId: string): GameState {
   const hall = findHall(state, hallId);
-  const damage = content.tuning.events.fireDamage;
-  const hasBuildersRisk = state.insurance.buildersRisk;
-  const cashCost = hasBuildersRisk ? Math.min(damage, content.tuning.insurance.deductible) : damage;
-
-  return replaceHall({ ...state, cash: state.cash - cashCost }, hallId, {
+  const gross = Math.round(hall.costBudget * content.tuning.events.fireDamageShare);
+  const settled = settleLoss(state, content, hall, 'fitout_fire', 'fire', gross);
+  return replaceHall(settled.state, hallId, {
     ...hall,
     stageMonthsDone: Math.max(0, hall.stageMonthsDone - 2),
-    insuredDelayMonths: hasBuildersRisk ? hall.insuredDelayMonths + 2 : hall.insuredDelayMonths,
+    insuredDelayMonths: settled.claim.insured ? hall.insuredDelayMonths + 2 : hall.insuredDelayMonths,
+  });
+}
+
+/**
+ * Small, frequent losses: water damage (also costs half a month of progress) and theft. `roll`
+ * in [0,1) picks the size inside the tuning band so the caller owns the seeded draw.
+ */
+export function applySmallLoss(
+  state: GameState,
+  content: Content,
+  hallId: string,
+  kind: 'water' | 'theft',
+  roll: number,
+): GameState {
+  const hall = findHall(state, hallId);
+  const [lo, hi] = kind === 'water' ? content.tuning.events.waterDamageShare : content.tuning.events.theftShare;
+  const gross = Math.round(hall.costBudget * (lo + roll * (hi - lo)));
+  const cardId = kind === 'water' ? 'water_damage' : 'theft';
+  const settled = settleLoss(state, content, hall, cardId, kind, gross);
+  if (kind === 'theft') return settled.state;
+  return replaceHall(settled.state, hallId, {
+    ...hall,
+    stageMonthsDone: Math.max(0, hall.stageMonthsDone - 0.5),
   });
 }
 

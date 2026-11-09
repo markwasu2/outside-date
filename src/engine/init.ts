@@ -1,7 +1,9 @@
 import type { Content } from '../content/schemas';
 import { mergeTuning } from '../content/load';
 import { createRng } from './rng';
+import { buildCloseTable } from './closing';
 import type {
+  CapitalState,
   GameState,
   Hall,
   Setup,
@@ -22,6 +24,15 @@ export interface NegotiationChoices {
   capital: { seniorIndex: number; mezzIndex: number; playerShareIndex: number };
   power: { minCharge: MinChargeLevel; plantBOffset: number };
   insurance: { dsu: boolean };
+  /** Phase 3 (B): the forecast call. Optional so older callers and saves keep working; defaults to
+   * no cost adjustment, the tuning's default contingency and no month offset. */
+  forecast?: { costCallPct: number; contingency: number; monthOffset: number };
+}
+
+/** The forecast the engine uses when a caller does not make one: your estimate as is, no reserve,
+ * delivery as leased. The wizard defaults to `tuning.forecast.defaultContingency` instead. */
+export function defaultForecastChoice(): { costCallPct: number; contingency: number; monthOffset: number } {
+  return { costCallPct: 0, contingency: 0, monthOffset: 0 };
 }
 
 const ALL_PERMIT_IDS: PermitId[] = ['air', 'water', 'wetlands', 'building', 'docketAmendment'];
@@ -32,6 +43,21 @@ function emptyPermits(): Record<PermitId, PermitState> {
     permits[id] = { id, status: 'none', decisionMonth: null };
   }
   return permits;
+}
+
+export function emptyCapital(): CapitalState {
+  return {
+    levers: {
+      equityCall: { count: 0, lastMonth: null },
+      bridgeLoan: { count: 0, lastMonth: null },
+      mezzTopUp: { count: 0, lastMonth: null },
+      scopeDown: { count: 0, lastMonth: null },
+      recap: { count: 0, lastMonth: null },
+    },
+    partnerStrain: 0,
+    equityCured: 0,
+    log: [],
+  };
 }
 
 export function createGame(
@@ -105,6 +131,16 @@ export function createGame(
   const budgetAtClose =
     landCost + halls.reduce((sum, h) => sum + h.costBudget, 0) + coolingCapex + powerEquip + perHallLiquid * halls.length;
 
+  // --- Forecast (Phase 3 B): the player's call, which lenders size the loan on ------------
+  const forecastChoice = negotiation.forecast ?? defaultForecastChoice();
+  const forecastCost = Math.round(budgetAtClose * (1 + forecastChoice.costCallPct));
+  const forecast = {
+    cost: forecastCost,
+    month: firstDeliveryMonth + forecastChoice.monthOffset,
+    contingency: forecastChoice.contingency,
+  };
+  const sizedBase = Math.round(forecastCost * (1 + forecast.contingency));
+
   // --- Capital stack ----------------------------------------------------
   const seniorOption =
     tuning.capital.seniorOptions[negotiation.capital.seniorIndex] ?? tuning.capital.seniorOptions[0];
@@ -114,14 +150,16 @@ export function createGame(
     throw new Error('createGame: tuning.capital.seniorOptions/mezzOptions must be non-empty');
   }
   const seniorLtc = scenario.capital?.seniorLtc ?? seniorOption.ltc;
-  const seniorCommitment = Math.round(seniorLtc * budgetAtClose);
-  const mezzCommitment = Math.round(mezzOption.share * budgetAtClose);
+  const seniorCommitment = Math.round(seniorLtc * sizedBase);
+  const mezzCommitment = Math.round(mezzOption.share * sizedBase);
+  // Upfront lender fee on the commitment, capitalized into the loan: the price of the cushion.
+  const commitmentFee = Math.round(seniorCommitment * tuning.forecast.commitmentFeeRate);
   // Equity funds its construction share PLUS working capital (the starting cash). Initializing
   // calledTotal to startingCash while committedTotal excluded it parked the whole working-capital
   // amount in the bank: it counted as "already contributed" without being available to spend,
   // starving construction by exactly that much.
   const workingCapital = scenario.capital?.playerEquityCash ?? tuning.campaign.startingCash;
-  const equityCommittedTotal = budgetAtClose - seniorCommitment - mezzCommitment + workingCapital;
+  const equityCommittedTotal = sizedBase - seniorCommitment - mezzCommitment + workingCapital;
 
   let playerShare: number;
   if (scenario.capital?.playerEquityCash !== undefined) {
@@ -158,6 +196,10 @@ export function createGame(
     }
   }
 
+  if (forecastChoice.monthOffset > 0) {
+    goodwill.tenant = Math.min(100, Math.max(0, goodwill.tenant - tuning.forecast.lateCallGoodwillPerMonth * forecastChoice.monthOffset));
+  }
+
   // --- Risks ------------------------------------------------------------
   const risks: RiskRow[] = content.risks.map((r) => ({
     id: r.id,
@@ -176,6 +218,8 @@ export function createGame(
 
   // --- Flags ------------------------------------------------------------
   const flags: Record<string, boolean | number> = {
+    // Capitalized into the loan on the first senior draw (money.ts), so totalDebt is still 0 at close.
+    commitmentFeeDue: commitmentFee,
     plantBOffsetMonths: negotiation.power.plantBOffset,
     ...(effectiveSetup.site === 'farmland'
       ? { farmlandExtraPadMonths: tuning.land.farmlandExtraPadMonths }
@@ -183,7 +227,7 @@ export function createGame(
     ...(difficulty?.flags ?? {}),
   };
 
-  return {
+  const state: GameState = {
     scenarioId,
     difficultyId,
     seed,
@@ -244,6 +288,9 @@ export function createGame(
       converted: false,
       conversionFailedCount: 0,
       stepUpActive: false,
+      bridgeDrawn: 0,
+      bridgeAccruedPik: 0,
+      bridgeRate: 0,
     },
     equity: {
       committedTotal: equityCommittedTotal,
@@ -260,6 +307,10 @@ export function createGame(
     scriptedDone: [],
     risks,
     budgetAtClose,
+    forecast,
+    capital: emptyCapital(),
+    claims: [],
+    closing: [],
     totalCostToDate: 0,
     log: [{ month: 0, kind: 'milestone', text: `Campaign "${scenarioId}" started.` }],
     outcome: null,
@@ -269,4 +320,5 @@ export function createGame(
     skipTransformerOrder: scenario.skipTransformerOrder ?? false,
     eventOddsMultipliers: difficulty?.eventOddsMultipliers ?? {},
   };
+  return { ...state, closing: [buildCloseTable(state, content.tuning === tuning ? content : { ...content, tuning }, workingCapital)] };
 }

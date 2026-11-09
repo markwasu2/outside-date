@@ -38,6 +38,7 @@ describe('reportCard: time grade', () => {
   });
 });
 
+// Phase 3 (B): cost is graded against the forecast call, not budgetAtClose.
 describe('reportCard: cost grade', () => {
   it.each([
     [1.0, 'A'],
@@ -47,7 +48,7 @@ describe('reportCard: cost grade', () => {
     [1.2, 'F'],
   ] as const)('cost ratio %f -> %s', (ratio, expected) => {
     const state = freshState();
-    const card = buildReportCard({ ...state, budgetAtClose: 1_000_000, totalCostToDate: ratio * 1_000_000 }, content, 0);
+    const card = buildReportCard({ ...state, forecast: { ...state.forecast, cost: 1_000_000 }, totalCostToDate: ratio * 1_000_000 }, content, 0);
     expect(card.cost).toBe(expected);
   });
 });

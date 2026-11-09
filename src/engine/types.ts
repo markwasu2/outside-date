@@ -103,12 +103,83 @@ export interface DebtState {
   converted: boolean;
   conversionFailedCount: number;
   stepUpActive: boolean;
+  /** Phase 3 (G): sponsor bridge loan principal, paid in kind (no cash interest). */
+  bridgeDrawn: Dollars;
+  bridgeAccruedPik: Dollars;
+  bridgeRate: number;
 }
 
 export interface EquityState {
   committedTotal: Dollars;
   calledTotal: Dollars;
   playerShare: number; // 0..1 of equity
+}
+
+/** Phase 3 (G): the five mid-game capital levers, in build order. */
+export type LeverId = 'equityCall' | 'bridgeLoan' | 'mezzTopUp' | 'scopeDown' | 'recap';
+export const LEVER_IDS: LeverId[] = ['equityCall', 'bridgeLoan', 'mezzTopUp', 'scopeDown', 'recap'];
+
+export interface LeverUse {
+  count: number;
+  lastMonth: Month | null;
+}
+
+export interface LeverLogEntry {
+  month: Month;
+  lever: LeverId;
+  /** Cash that reached the project (0 for a scope-down fee-only month). */
+  amount: Dollars;
+  /** Fees and carry charged on the spot (cash or capitalized). */
+  fee: Dollars;
+  note: string;
+}
+
+export interface CapitalState {
+  levers: Record<LeverId, LeverUse>;
+  /** Partner strain from equity calls; raises partner dispute odds and decays never. */
+  partnerStrain: number;
+  /** Total equity added by calls (not part of the closing table). */
+  equityCured: Dollars;
+  log: LeverLogEntry[];
+}
+
+/** Phase 3 (B): the call the player makes in the wizard, which lenders size on and the report card grades. */
+export interface Forecast {
+  /** Your total-cost call (what the report card grades actual spend against). */
+  cost: Dollars;
+  /** Your first-hall delivery month call. */
+  month: Month;
+  /** Reserve held on top of the cost call, as a share (0, 0.05, 0.10, 0.15). */
+  contingency: number;
+}
+
+/** Phase 3 (J): one insurance claim, so event cards can show what the policy paid vs the deductible. */
+export interface ClaimRecord {
+  id: string;
+  month: Month;
+  cardId: string;
+  kind: 'water' | 'theft' | 'storm' | 'fire';
+  hallId: string;
+  gross: Dollars;
+  insured: boolean;
+  deductible: Dollars;
+  paid: Dollars;
+  outOfPocket: Dollars;
+}
+
+export interface ClosingLine {
+  label: string;
+  amount: Dollars;
+}
+
+/** Phase 3: engine-owned sources and uses; a new row lands whenever a deal-changing event rescales commitments. */
+export interface ClosingTable {
+  month: Month;
+  label: string;
+  sources: ClosingLine[];
+  uses: ClosingLine[];
+  sourcesTotal: Dollars;
+  usesTotal: Dollars;
 }
 
 export interface Insurance {
@@ -188,6 +259,15 @@ export interface TakeoutResult {
   playerEquityValue: Dollars;
   valuePerMwIT: Dollars;
   reportCard: { time: Grade; cost: Grade; riskAllocation: Grade; community: Grade; value: Grade };
+  /** Phase 3: who gets paid, in order, out of campus value. */
+  repayments: RepaymentLine[];
+}
+
+export interface RepaymentLine {
+  id: 'senior' | 'bridge' | 'mezz' | 'equity';
+  label: string;
+  owed: Dollars;
+  paid: Dollars;
 }
 
 export interface GameState {
@@ -219,6 +299,10 @@ export interface GameState {
   scriptedDone: string[];
   risks: RiskRow[];
   budgetAtClose: Dollars;
+  forecast: Forecast;
+  capital: CapitalState;
+  claims: ClaimRecord[];
+  closing: ClosingTable[];
   totalCostToDate: Dollars;
   log: LogEntry[];
   outcome: Outcome | null;
