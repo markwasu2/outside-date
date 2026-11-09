@@ -1,112 +1,45 @@
-# CHECKPOINT - Phase 2: Read the Deal
+# Phase 3: Money That Moves - checkpoint
 
-## Goal
+Branch `phase3-money-that-moves`, base `1224076` (Phase 2). Not merged: row 6 is partial.
 
-The player can read the deal like a lender would: a financials drawer (sources & uses, draw
-schedule, DSCR trend, interest reserve, cash waterfall, forward NOI) snapshotted per committed
-month, first-time stat explainers, tabs that unlock as their systems come online, a stakeholders
-codex that names who holds each risk, and who-holds chips on risk rows and event cards. UI-only:
-no engine, sim, tuning, actions, or protected-test changes. The financial mirror reconciles
-against init.ts via tests instead of touching the engine.
+| # | Criterion | Status | Evidence |
+|---|---|---|---|
+| 1 | Five levers in build order, each with a visible cost in the multiple | PASS | `src/engine/systems/capital.ts`, `tests/engine/systems/capital.test.ts` (equity call dilution and called-equity denominator, bridge PIK and takeout priority, mezz gates, scope-down, recap gates) |
+| 2 | Forecast wizard step, HUD forecast vs actual, report-card grading, cost-to-complete | PASS | `ForecastScreen.tsx`, `Hud.tsx` (`hud-forecast`), `reportCard.ts` + `reportCardExplain.ts`, `costToComplete` tick; e2e `phase3-money.spec.ts` |
+| 3 | Hazard rework | PASS | storm 28% and fire 22% of the hit hall's cost, water 0.4-1% and theft 0.2-0.6% inside a $5M deductible; tests in `capital.test.ts` |
+| 4 | Event cards show policy paid vs deductible; codex links real cases | PASS | `EventModal.tsx` claim breakdown; 4 codex entries with source URLs; e2e |
+| 5 | Banner financing fixes deep-link to the Capital tab | PASS | `warnings.ts`, `tests/ui/warnings.test.ts`, e2e |
+| 6 | Engine DSCR/NOI projection and amended closing table | PARTIAL | Closing table: DONE (`closing.ts`, amended on the_ask, Financials drawer reads it). Engine-owned DSCR/NOI projection that picks up delay swaps, lease amendments and rent relief: NOT DONE (`stabilizedNoi` exists in selectors; a full `projectNoiAndDscr` does not) |
+| 7 | Before/after 1000-seed grid, careful/competent 60-75% on normal, balance.test updated | PASS | `docs/phase3-baseline-grid.md`, `docs/phase3-after-grid.md`; normal: careful 71.0, competent 72.5, greedy 50.2 |
+| 8 | typecheck | PASS | `npx tsc --noEmit` clean |
+| 9 | lint | PASS | `npm run lint` clean |
+| 10 | vitest | PASS | all files pass |
+| 11 | playwright | PASS | specs run in chunks, all passing (one browser download needed locally) |
+| 12 | build | PASS | `npm run build` |
+| 13 | Save version bump + v2->v3 migration tests | PASS | `SAVE_VERSION = 3`, `tests/ui/financials.test.ts` |
+| 14 | Visual check at 800 and 1440 | PASS | `docs/screenshots/phase3/*.png`, all opened and inspected. Known cosmetic: at 800px the map halls draw over the event dialog backdrop (pre-existing stacking) |
+| 15 | No TODO/FIXME/stub in touched files | PASS | grep clean |
 
-## Plan
+## Grid (win %, 1000 seeds, whale)
+Baseline (main) vs after. Full table with median multiples, hazards and lever use in `docs/phase3-after-grid.md`.
 
-- D1 financials drawer + per-committed-month snapshots persisted in the save file (save v2)
-- D2 first-time explainers with tap popovers (6 HUD stats)
-- D3 unlocking tabs with one-line "unlocks when" hints
-- D4 stakeholders codex (11 roles) + risk listing on the report card + end-screen recap
-- D5 who-holds chips on risk rows and event cards
-- Tests: tests/ui/{financials,tabUnlock,stakeholders}.test.ts, e2e/read-the-deal.spec.ts
-- Gates: typecheck, lint, vitest, playwright, build, protected-file check, visual check
+| bot | easy | normal | hard |
+|---|---|---|---|
+| random | 0.0 / 0.0 | 0.0 / 0.0 | 0.0 / 0.0 |
+| greedy | 56.6 / 66.4 | 38.3 / 50.2 | 24.4 / 48.9 |
+| careful | 99.3 / 99.1 | 73.3 / 71.0 | 47.9 / 60.0 |
+| competent | 94.9 / 94.6 | 75.0 / 72.5 | 48.1 / 52.6 |
 
-## Baseline (main HEAD 9e6a2ef, 2026-11-09)
+## Lever terms and hazard numbers
+Sizes are small (about 0.05-0.1% of cost per use) because the sim is a cash knife-edge: at 1% sizes careful hit 97%. Revisit with a human playtest.
+- Equity call: 2% fee, partner prices at 25% premium (you dilute), strain +1, max 1, cooldown 4.
+- Bridge: 14% PIK, 2% fee, repaid after senior and before mezz and equity.
+- Mezz top-up: only if LTC <= 80% and DSCR >= 1.3, 2% fee, +2 pts.
+- Scope-down: 6% fee, 40% salvage, tenant goodwill -12, cooldown 6.
+- Recap: month >= 12, >= 30% built, 1.5% fee, +75 bps, once.
+- Storm: odds .05 per month (about .15 per campaign), 33% of the hit hall (about $130M). Fire odds .004 at 22%. Water odds .035 and theft .025, both inside the $5M deductible.
 
-- npm run typecheck: PASS
-- npm run lint: FAIL (pre-existing: scripts/phase1-screenshots.mjs + scripts/probe-stages.mjs
-  trip no-undef on window/console - committed in Phase 1's squash after its lint run)
-- npx vitest run: 361 passed (39 files)
-- npx playwright test: 20 passed
-- npm run build: PASS
-
-## Done / left per deliverable
-
-| Deliverable | Done | Left |
-| --- | --- | --- |
-| D1 financials drawer | implemented (financials.ts, FinancialsDrawer.tsx, snapshots in save v2 + migration) | visual check |
-| D2 explainers | implemented (explainers.ts, StatExplainer.tsx, Hud wiring, seen-state) | visual check |
-| D3 unlocking tabs | implemented (tabUnlock.ts, TracksPanel hint + lock styling) | visual check |
-| D4 stakeholders codex | implemented (stakeholders.ts, StakeholdersView.tsx, codex entries, report-card listing, end recap) | visual check |
-| D5 who-holds chips | implemented (WhoHoldsChip.tsx on ReportCardScreen risk rows + EventModal cards) | visual check |
-
-## Output paths
-
-- Branch: phase2-read-the-deal
-- New UI modules: src/ui/{financials,stakeholders,tabUnlock,explainers}.ts, src/ui/components/{FinancialsDrawer,StakeholdersView,StatExplainer,WhoHoldsChip}.tsx
-- New tests: tests/ui/{financials,tabUnlock,stakeholders}.test.ts, e2e/read-the-deal.spec.ts
-- Screenshots: docs/screenshots/phase2/*
-
-## Done criteria
-
-| # | Criterion | Result | Evidence |
-| --- | --- | --- | --- |
-| 1 | D1 sources & uses reconcile to close totals; drawer shows draw schedule, DSCR trend, interest reserve, waterfall, forward NOI | PASS | tests/ui/financials.test.ts reconciles sources=uses against init.ts for all 3 scenarios incl. resolved tuning (tutorial overrides) and skipTransformerOrder; e2e test 1: drawer opens, totals equal, waterfall appears after month 1 |
-| 2 | D2 explainers auto-open once (first eligible), dismiss for good, re-open on tap | PASS | e2e/read-the-deal.spec.ts test 3: auto-open, Escape dismiss persists across months, tap target re-opens; seen-state in store |
-| 3 | D3 tabs lock with hints until their systems come online; Power unlocks after the study is commissioned | PASS | tests/ui/tabUnlock.test.ts pins every unlock rule vs real month-0 state; e2e test 2: 4 tabs locked at tutorial month 0, hint names the substation, Power unlocks after commissioning from the map popover |
-| 4 | D4 stakeholders codex lists 11 roles with cast, responsibilities, risks held, sourced real-world anchors | PASS | e2e test 4: all 11 stakeholder-cards visible; tests/ui/stakeholders.test.ts: every role has a codex entry, every entry has https sourceUrl + verifiedOn |
-| 5 | D5 who-holds chips on every risk row (report card) and every event card; chip opens the focused stakeholder | PASS | e2e test 5: tutorial month-7 storm card shows the chip, click opens the stakeholders view; stakeholders.test.ts: all 30 events + docketVoteFail mapped, all 9 RiskHolders covered, all 11 risks assigned |
-| 6 | npm run typecheck clean | PASS | npx tsc --noEmit clean |
-| 7 | npm run lint clean | PASS | npx eslint clean; includes the baseline repair below |
-| 8 | npx vitest run: all pass, count >= 361 + new | PASS | 393 passed, 42 files, 0 skips (361 baseline + 32 new in 3 files) |
-| 9 | npx playwright test: all pass, count >= 20 + new | PASS | 25 passed (20 baseline + 5 new read-the-deal specs), run per-spec on a 2-CPU box; smoke.spec.ts 2/2 green after the pointer-events fix |
-| 10 | npm run build succeeds | PASS | npm run build OK, 493 kB bundle |
-| 11 | Protected-file check prints nothing | PASS | git diff main...HEAD --stat on src/engine src/sim content/tuning.json content/actions.json tests/engine tests/sim tests/fixtures + all pre-existing e2e specs prints nothing |
-| 12 | Visual check done (screenshots opened, one line each) | PASS | 10 PNGs opened, notes in Visual check log |
-| 13 | Every named company has a source URL + date | PASS | content/codex.json: 32/32 entries carry https sourceUrl + verifiedOn (scripted check); new stakeholder sources: BDC Giants 400 (GCs, 2025-10-07), Zurich via Commercial Risk (insurer, 2026-06-16), Nikkei Asia (Hitachi Energy >30mo, 2026-03-25), PEI (JPMorgan $7.12B Abilene, 2025-05-29); reused Phase 1 verified URLs for developer/tenant/partner/utility/ratepayers/town/commission |
-| 14 | No TODO/FIXME/stub/placeholder left in touched files | PASS | grep over all new + touched files: clean |
-| 15 | npx vitest run tests/sim/balance.test.ts passes unchanged | PASS | file untouched (protected diff empty); passes inside the 393-test full run |
-
-## Decisions
-
-- tests/content/load.test.ts count bumps (the allowed exception): glossary.length 48 -> 61
-  (+13 finance/stakeholder terms), codex.length 21 -> 32 (+11 stakeholder entries). Logged here
-  per the special allowance.
-- Baseline lint repair (outside the allowed-files list, logged per instructions): added
-  `/* global window, console */` to scripts/phase1-screenshots.mjs and scripts/probe-stages.mjs -
-  lint failed on main before Phase 2 (scripts entered via the Phase 1 squash after its lint run).
-  No behavior change.
-- Save v2: financialSnapshots appended on every committed month (endMonth, fastForward,
-  resolveEventChoice); migrateSave upgrades v1 saves with an empty series and loadGame seeds one
-  snapshot from the loaded state so old saves show a usable drawer.
-- Locked tabs render a hint banner and dim their rows but keep them functional. A hard wall broke
-  zero-diff existing specs (tutorial permit filing, event setup flows) and the tutorial itself
-  (permits must be filable before the first hall starts). The lock communicates "this system
-  isn't online yet + how it comes online"; data-locked + locked-tab-hint pin the state.
-- Term popover and StatExplainer popover avoid role="dialog"/role="button" collisions: Term stays
-  a plain clickable span (accessible-name collision with the Power track tab, qa-fixes-2 #6), and
-  the explainer uses role="note" (always-on HUD popovers satisfied getByRole('dialog') lookups
-  meant for event modals, ui-qa-fixes #2).
-- Event-to-stakeholder mapping lives in src/ui/stakeholders.ts (EVENT_STAKEHOLDER, all 30 events
-  + the synthetic docketVoteFail card); who-holds derives the LIVE holder from state (DSU moves
-  stormDelay to the insurer).
-- DSCR trend in the drawer is a static projection computed from committed monthly snapshots, not
-  a re-simulation - the UI-only-mirror constraint (see NEEDS ENGINE).
-
-## NEEDS ENGINE
-
-- DSCR trend + forward NOI are UI-side projections from committed snapshots (fixed lease math);
-  an engine-owned projection would pick up mid-stream lease amendments, delay swaps and rent
-  relief automatically instead of the UI mirror having to re-derive them.
-- The sources & uses closing table is rebuilt from current setup choices; when an event amends
-  the deal mid-run (the_ask adds 2 halls), the UI mirror's uses grow while recorded commitments
-  don't, so sources != uses on such states (observed: $2.77B vs $3.54B on a bot state that took
-  the ask). The engine should emit an amended closing table when it applies deal-changing
-  effects.
-
-## Visual check log
-
-All 10 PNGs (5 states x 800px + 1440px viewports) opened and inspected:
-- p2-01-financials-drawer-whale: real Whale campaign at Y2 M3; closing table balances ($1.55B = $1.55B, senior/mezz/equity vs land/halls/cooling/power/fitout/working capital), draw-schedule bars (equity $235M of $492.6M drawn), interest reserve $0 folded in with $1.06B headroom, DSCR trend honestly reads "no readings yet" (n/a until first draw), waterfall below the fold (drawer scrolls). Clean at both widths. (An earlier capture from a bot-injected state showed sources $2.77B vs uses $3.54B - the ask-event drift noted under NEEDS ENGINE - so the final shot is from a campaign played by real clicks.)
-- p2-02-first-time-explainer: fresh Whale month 0, the Cash explainer card auto-opened (what/why/do + Got it), lock icons on Regulation/Power/Money/Chips. Readable at both widths; slight overlap of the next-step card, popover is pointer-events:none so nothing is blocked.
-- p2-03-locked-tabs-tutorial: tutorial month 0, Power tab active showing its unlock hint ("click the substation on the map") over dimmed-but-functional rows (study enabled, transformer disabled with its reason). Coach tip overlaps "Planned this month" - pre-existing behavior, unchanged.
-- p2-04-stakeholders-codex: Stakeholders view from the title Codex; role cards show cast (Ruth Calder, Priya Natarajan, Jordan Ashe, Marcus Teale), one-line responsibility, "Holds by default" risk lists, and the sourced real-world link with verified date.
-- p2-05-event-who-holds-chip: the tutorial's month-3 governor_visit card (first card the run reaches) carries the "Who holds this: The town and county" chip between the body and the choices; choices keep their cost previews ("Costs 1 AP next month").
+## Remaining
+1. `projectNoiAndDscr` engine projection (delay swaps, lease amendments, rent relief).
+2. Partner strain should raise partner_dispute odds.
+3. Decide whether lever sizes should be larger with a different balance lever.
