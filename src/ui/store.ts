@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { Content } from '../content/schemas';
+import type { ActionDef, Content } from '../content/schemas';
 import { loadContent } from '../content/load';
 import { applyAction } from '../engine/actions';
 import { createGame, type DifficultyId, type NegotiationChoices } from '../engine/init';
@@ -79,11 +79,26 @@ export function foldPlan(state: GameState, planContent: Content, plan: PlannedAc
 }
 
 /**
+ * UI-polish item 1: zero-AP actions (`cancelOrder`, `confirmRackSchedule`, `standDown`) have no AP
+ * budget to cap how many times they can be queued in one month engine-side, so without this check
+ * a player could click "Stand down: H1" repeatedly and stack identical no-op duplicate plan
+ * entries. True duplicate = same `actionId` and same `params` (by value, not identity) already
+ * present in `plan`; a different hall/kind (e.g. `standDown` on H1 vs H2) is not a duplicate.
+ */
+function isDuplicateZeroApAction(def: ActionDef, plan: PlannedAction[], action: PlannedAction): boolean {
+  if (def.ap !== 0) return false;
+  const sameParams = (a?: Record<string, string | number>, b?: Record<string, string | number>) =>
+    JSON.stringify(a ?? {}) === JSON.stringify(b ?? {});
+  return plan.some((queued) => queued.actionId === action.actionId && sameParams(queued.params, action.params));
+}
+
+/**
  * Whether `action` can be legally queued on top of `plan` right now: checks the remaining AP
- * budget (not enforced by `applyAction` itself, only by `step.ts`'s `validateActions`) and then
- * dry-runs the action via `applyAction`, discarding the result - the same probe-and-apply
- * pattern `foldPlan` uses, reused here so the engine's own handler preconditions are the single
- * source of truth for "is this legal", never duplicated in UI code.
+ * budget (not enforced by `applyAction` itself, only by `step.ts`'s `validateActions`), then the
+ * zero-AP duplicate check above, and then dry-runs the action via `applyAction`, discarding the
+ * result - the same probe-and-apply pattern `foldPlan` uses, reused here so the engine's own
+ * handler preconditions are the single source of truth for "is this legal", never duplicated in
+ * UI code.
  */
 export function checkAction(
   state: GameState,
@@ -97,6 +112,9 @@ export function checkAction(
   const remaining = state.apPerMonth - state.apUsedThisMonth - used;
   if (def.ap > 0 && def.ap > remaining) {
     return { ok: false, reason: `Needs ${def.ap} AP; only ${remaining} left this month` };
+  }
+  if (isDuplicateZeroApAction(def, plan, action)) {
+    return { ok: false, reason: 'Already queued this month' };
   }
   try {
     applyAction(foldPlan(state, planContent, plan), action, planContent);
@@ -335,8 +353,11 @@ export const useStore = create<UIStore>((set, get) => ({
  * file's own P10.5 comment) and land the result directly in the store, instead of scripting
  * hundreds of real clicks through every month. Gated by `import.meta.env.DEV` so it never ships
  * in a production build; only ever reads `window`, never written to from anywhere else.
+ * UI-polish: also gated on `typeof window !== 'undefined'` so this module can be imported from
+ * vitest's default node environment (e.g. tests/ui/checkAction.test.ts) without crashing - DEV
+ * is true under vitest too, but there's no `window` global there.
  */
-if (import.meta.env.DEV) {
+if (import.meta.env.DEV && typeof window !== 'undefined') {
   (
     window as unknown as {
       __debugRunBot?: (botId: string, scenarioId: string, difficulty: DifficultyId, seed: number) => void;

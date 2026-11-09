@@ -16,6 +16,20 @@ interface Props {
   onNext: () => void;
 }
 
+/** UI-polish item 5: one hand-written hint per `tuning.capital` option, index-aligned with
+ * `capital.seniorOptions`/`mezzOptions`/`playerShareOptions` - each under 90 characters. */
+export const SENIOR_HINTS = [
+  'Lowest leverage and cheapest rate, but ties up the most of your own equity.',
+  'A middle ground on leverage and rate.',
+  'Most leverage frees up equity, but the highest rate tightens DSCR headroom.',
+];
+export const MEZZ_HINTS = [
+  'No mezz: simplest stack, but senior + equity fund all of it.',
+  'Eases the equity check some, adds PIK debt that compounds over time.',
+  'Eases the equity check most, adds the heaviest PIK debt load.',
+];
+export const PLAYER_SHARE_HINTS = ['Smallest check, smallest share of future profit.', 'A middle-sized check and payout share.', 'Biggest check up front, biggest share of the upside.'];
+
 /** P7.4. All numbers (stacked bar, checks, runway, DSCR) come from a real `previewState()` -
  * see `./preview.ts` - rather than re-deriving the capital-stack math here. */
 export function CapitalScreen({ scenarioId, difficultyId, setup, negotiation, onChange, onBack, onNext }: Props) {
@@ -39,51 +53,57 @@ export function CapitalScreen({ scenarioId, difficultyId, setup, negotiation, on
       <strong>Senior loan</strong>
       <div style={{ display: 'flex', gap: '0.5rem', margin: '0.25rem 0 1rem' }}>
         {capital.seniorOptions.map((opt, i) => (
-          <button
-            key={i}
-            onClick={() => onChange({ ...negotiation.capital, seniorIndex: i })}
-            style={{
-              fontWeight: negotiation.capital.seniorIndex === i ? 'bold' : 'normal',
-              border: negotiation.capital.seniorIndex === i ? '2px solid #000' : '1px solid #999',
-              padding: '0.4rem 0.8rem',
-            }}
-          >
-            {(opt.ltc * 100).toFixed(1)}% LTC @ {(opt.rate * 100).toFixed(2)}%
-          </button>
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxWidth: 180 }}>
+            <button
+              onClick={() => onChange({ ...negotiation.capital, seniorIndex: i })}
+              style={{
+                fontWeight: negotiation.capital.seniorIndex === i ? 'bold' : 'normal',
+                border: negotiation.capital.seniorIndex === i ? '2px solid #000' : '1px solid #999',
+                padding: '0.4rem 0.8rem',
+              }}
+            >
+              {(opt.ltc * 100).toFixed(1)}% LTC @ {(opt.rate * 100).toFixed(2)}%
+            </button>
+            <span style={{ fontSize: '0.7rem', color: '#666' }}>{SENIOR_HINTS[i]}</span>
+          </div>
         ))}
       </div>
 
       <strong>Mezzanine</strong>
       <div style={{ display: 'flex', gap: '0.5rem', margin: '0.25rem 0 1rem' }}>
         {capital.mezzOptions.map((opt, i) => (
-          <button
-            key={i}
-            onClick={() => onChange({ ...negotiation.capital, mezzIndex: i })}
-            style={{
-              fontWeight: negotiation.capital.mezzIndex === i ? 'bold' : 'normal',
-              border: negotiation.capital.mezzIndex === i ? '2px solid #000' : '1px solid #999',
-              padding: '0.4rem 0.8rem',
-            }}
-          >
-            {opt.share === 0 ? 'None' : `${(opt.share * 100).toFixed(0)}% of budget @ ${(opt.rate * 100).toFixed(0)}% PIK`}
-          </button>
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxWidth: 180 }}>
+            <button
+              onClick={() => onChange({ ...negotiation.capital, mezzIndex: i })}
+              style={{
+                fontWeight: negotiation.capital.mezzIndex === i ? 'bold' : 'normal',
+                border: negotiation.capital.mezzIndex === i ? '2px solid #000' : '1px solid #999',
+                padding: '0.4rem 0.8rem',
+              }}
+            >
+              {opt.share === 0 ? 'None' : `${(opt.share * 100).toFixed(0)}% of budget @ ${(opt.rate * 100).toFixed(0)}% PIK`}
+            </button>
+            <span style={{ fontSize: '0.7rem', color: '#666' }}>{MEZZ_HINTS[i]}</span>
+          </div>
         ))}
       </div>
 
       <strong>Your equity share</strong>
       <div style={{ display: 'flex', gap: '0.5rem', margin: '0.25rem 0 1rem' }}>
         {capital.playerShareOptions.map((share, i) => (
-          <button
-            key={i}
-            onClick={() => onChange({ ...negotiation.capital, playerShareIndex: i })}
-            style={{
-              fontWeight: negotiation.capital.playerShareIndex === i ? 'bold' : 'normal',
-              border: negotiation.capital.playerShareIndex === i ? '2px solid #000' : '1px solid #999',
-              padding: '0.4rem 0.8rem',
-            }}
-          >
-            {(share * 100).toFixed(0)}%
-          </button>
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', maxWidth: 180 }}>
+            <button
+              onClick={() => onChange({ ...negotiation.capital, playerShareIndex: i })}
+              style={{
+                fontWeight: negotiation.capital.playerShareIndex === i ? 'bold' : 'normal',
+                border: negotiation.capital.playerShareIndex === i ? '2px solid #000' : '1px solid #999',
+                padding: '0.4rem 0.8rem',
+              }}
+            >
+              {(share * 100).toFixed(0)}%
+            </button>
+            <span style={{ fontSize: '0.7rem', color: '#666' }}>{PLAYER_SHARE_HINTS[i]}</span>
+          </div>
         ))}
       </div>
 

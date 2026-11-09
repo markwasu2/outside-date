@@ -14,21 +14,21 @@ interface Props {
   onNext: () => void;
 }
 
-const SITES: { id: Setup['site']; label: string; note: string }[] = [
+export const SITES: { id: Setup['site']; label: string; note: string }[] = [
   { id: 'megasite', label: 'Megasite', note: 'Pricier land, but no wetlands permit and no extra pad months.' },
   { id: 'farmland', label: 'Farmland', note: 'Cheaper land, but needs a wetlands permit and adds pad months.' },
 ];
-const TIERS: { id: HallTier; label: string; note: string }[] = [
+export const TIERS: { id: HallTier; label: string; note: string }[] = [
   { id: 'air', label: 'Air-cooled', note: 'Cheapest build and lowest rent; least future-proof against chip generations.' },
   { id: 'liquid', label: 'Liquid-cooled', note: 'Full cost and rent, but ready for the densest future chips.' },
   { id: 'hybrid', label: 'Hybrid-cooled', note: 'Slight discount off liquid; shares chip-obsolescence risk with the tenant.' },
 ];
-const COOLINGS: { id: CoolingChoice; label: string; note: string }[] = [
+export const COOLINGS: { id: CoolingChoice; label: string; note: string }[] = [
   { id: 'evaporative', label: 'Evaporative', note: 'No extra capex, but the biggest town/commission goodwill hit in a drought.' },
   { id: 'dry', label: 'Dry', note: 'No extra capex, worst power usage efficiency, no drought exposure.' },
   { id: 'hybrid', label: 'Hybrid', note: 'Capex upfront, for the best PUE/drought balance.' },
 ];
-const GCS: { id: GcContract; label: string; note: string }[] = [
+export const GCS: { id: GcContract; label: string; note: string }[] = [
   { id: 'costPlus', label: 'Cost-plus', note: 'No premium, but you hold all cost-overrun risk.' },
   { id: 'gmp', label: 'GMP', note: 'A price premium upfront, but the contractor holds overrun risk.' },
 ];
