@@ -2,6 +2,7 @@ import type { Content, EventCard } from '../../content/schemas';
 import type { GameState, GoodwillGroup, PendingEvent, StageId } from '../types';
 import { STAGES } from '../types';
 import { chance, shuffle } from '../rng';
+import { flavorPick } from '../flavor';
 import { applyEffect } from '../effects';
 import { resolveDocketVoteChoice } from './regulation';
 
@@ -176,7 +177,10 @@ function markFired(state: GameState, card: EventCard): GameState {
 
 function applyCard(state: GameState, card: EventCard, content: Content): { state: GameState; pending: PendingEvent | null } {
   let next = markFired(state, card);
-  next = { ...next, log: [...next.log, { month: next.month, kind: 'event', text: card.title }] };
+  // Flavor pick (see flavor.ts): one of [body, ...bodyVariants] per occurrence, hashed from the
+  // current rng state without advancing it, so the stream feeding every numeric roll is untouched.
+  const body = flavorPick(next.rng, `event-body:${card.id}`, [card.body, ...(card.bodyVariants ?? [])]);
+  next = { ...next, log: [...next.log, { month: next.month, kind: 'event', text: card.title, detail: body }] };
 
   // Automatic, no player choice (events.json note): town goodwill swings on the current climate
   // rather than a fixed closed-set effect, so it has no `effects` entries of its own.
@@ -196,11 +200,12 @@ function applyCard(state: GameState, card: EventCard, content: Content): { state
   // surface whatever it produced rather than re-deriving a pending event from the card's own
   // (intentionally empty, per its note) `choices` field.
   if (next.phase === 'awaitingChoice' && next.pending) {
-    return { state: next, pending: next.pending };
+    const pending: PendingEvent = { ...next.pending, body };
+    return { state: { ...next, pending }, pending };
   }
 
   if (card.choices && card.choices.length > 0) {
-    const pending: PendingEvent = { cardId: card.id, choices: card.choices.map((c) => ({ id: c.id, label: c.label })) };
+    const pending: PendingEvent = { cardId: card.id, choices: card.choices.map((c) => ({ id: c.id, label: c.label })), body };
     return { state: { ...next, phase: 'awaitingChoice', pending }, pending };
   }
 

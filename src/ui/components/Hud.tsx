@@ -133,11 +133,17 @@ export function Hud() {
       </div>
 
       <div style={{ display: 'flex', gap: '0.75rem' }}>
-        {(Object.keys(GOODWILL_LABELS) as GoodwillGroup[]).map((g) => (
-          <span key={g} title={`${GOODWILL_LABELS[g]} goodwill: ${draft.goodwill[g]}`}>
-            {goodwillFace(draft.goodwill[g])} {GOODWILL_LABELS[g]}: {draft.goodwill[g]}
-          </span>
-        ))}
+        {(Object.keys(GOODWILL_LABELS) as GoodwillGroup[]).map((g) => {
+          // Surface the cast behind each goodwill group (names + one-line personalities) in the
+          // existing tooltip; no new UI, just names where the group already renders.
+          const members = content.cast.cast.filter((m) => m.goodwillGroup === g);
+          const who = members.map((m) => `${m.name} (${m.role})${m.blurb ? ` - ${m.blurb}` : ''}`).join('\n');
+          return (
+            <span key={g} title={`${GOODWILL_LABELS[g]} goodwill: ${draft.goodwill[g]}${who ? `\n${who}` : ''}`}>
+              {goodwillFace(draft.goodwill[g])} {GOODWILL_LABELS[g]}: {draft.goodwill[g]}
+            </span>
+          );
+        })}
       </div>
 
       <button

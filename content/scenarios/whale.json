@@ -13,7 +13,8 @@
     "lenders_engineer",
     "gc_foreman",
     "union_manager",
-    "local_reporter"
+    "local_reporter",
+    "tenant_rep"
   ],
   "scriptedEvents": [],
   "docket": {

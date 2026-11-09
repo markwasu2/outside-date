@@ -154,12 +154,16 @@ export interface RiskRow {
 export interface PendingEvent {
   cardId: string;
   choices: { id: string; label: string }[];
+  /** The occurrence's picked body text (base body or a bodyVariant). Display only. */
+  body?: string;
 }
 
 export interface LogEntry {
   month: Month;
   kind: 'action' | 'event' | 'tick' | 'milestone' | 'warning' | 'lose' | 'win';
   text: string;
+  /** Optional second line (event body variant, cast visit line). Display only. */
+  detail?: string;
 }
 
 export type Phase = 'setup' | 'playing' | 'awaitingChoice' | 'takeoutAvailable' | 'ended';

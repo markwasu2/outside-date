@@ -35,7 +35,9 @@ export function EventModal() {
   const eventCard = isSynthetic ? null : content.events.find((e) => e.id === pending.cardId);
 
   const title = isSynthetic ? DOCKET_VOTE_FAIL_CARD.title : eventCard?.title ?? pending.cardId;
-  const body = isSynthetic ? DOCKET_VOTE_FAIL_CARD.body : eventCard?.body ?? '';
+  // pending.body carries this occurrence's flavor pick (base body or a bodyVariant), chosen by
+  // events.ts's applyCard when the card fired; the content-file body is the fallback.
+  const body = isSynthetic ? DOCKET_VOTE_FAIL_CARD.body : pending.body ?? eventCard?.body ?? '';
   const codexId = isSynthetic ? undefined : eventCard?.codexId;
 
   return (

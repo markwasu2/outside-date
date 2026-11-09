@@ -3,6 +3,11 @@
     "id": "storm",
     "title": "Storm off the gulf",
     "body": "A late-season storm tracks over Richfield County and sits on your site for a day. Crews pull back until the water clears.",
+    "bodyVariants": [
+      "The rain comes sideways for a day and the site turns to mud. Crews stand down until it drains.",
+      "A storm parks over Richfield County and the cranes go quiet. One of the halls loses ground to the weather.",
+      "Lightning on the horizon, water on the pad. The crew chief calls it before lunch."
+    ],
     "art": "storm",
     "odds": 0.28,
     "window": [24, 59],
@@ -15,6 +20,11 @@
     "id": "supply_shock",
     "title": "A shock up the supply chain",
     "body": "A fire at a parts supplier ripples through the grid-equipment market. Everyone's lead times just got longer, yours included.",
+    "bodyVariants": [
+      "A supplier fire halfway across the country lands on your desk as a revised lead time. Months, not weeks.",
+      "The parts market tightens overnight. Your expediter calls it a queue problem. It is now your queue problem.",
+      "Grid equipment is suddenly everyone's problem. A pending order of yours slips with the rest."
+    ],
     "art": "supply_shock",
     "odds": 0.05,
     "requires": ["orderPending:any"],
@@ -25,6 +35,11 @@
     "id": "labor_shortfall",
     "title": "Not enough hands",
     "body": "Fitout crews are scarce across the region this quarter. Your general contractor is stretched thin and it shows in the schedule.",
+    "bodyVariants": [
+      "The GC's phone keeps ringing with other offers. Fitout crews are thin this quarter.",
+      "Every job site in the county is hiring the same people. Your fitout crews feel it first.",
+      "Reyes warned you about steady crews. This quarter, steady is hard to find."
+    ],
     "art": "labor_shortfall",
     "odds": 0.22,
     "requires": ["anyHallStage:fitout", "notFlag:importCrewsActive"],
@@ -35,6 +50,11 @@
     "id": "outlook_cut",
     "title": "A rating agency cuts the outlook",
     "body": "A regional rating agency trims its outlook on data center campuses like yours, citing power delivery risk. Buyers get a little more cautious.",
+    "bodyVariants": [
+      "An analyst in a tower somewhere trims the outlook on campuses like yours. Exit math gets a little colder.",
+      "The agency cites power delivery risk. You have read this paragraph before, in other people's deals.",
+      "A one-notch outlook cut. Not a crisis. Not free either."
+    ],
     "art": "outlook_cut",
     "odds": 0.03,
     "window": [24, 59],
@@ -49,6 +69,11 @@
     "id": "the_ask",
     "title": "The tenant wants more",
     "body": "The Whale's expansion team calls. They want two more halls on your campus, same terms, same you. It is a vote of confidence and a lot more rope.",
+    "bodyVariants": [
+      "The Whale's expansion team has a slide deck and a favor: two more halls, same terms, same you.",
+      "The tenant calls before your coffee is cool. They want to double down on the campus.",
+      "More halls, same handshake. The Whale's team makes it sound simple. It is not simple."
+    ],
     "art": "the_ask",
     "codexId": "expansion-docket",
     "scripted": true,
@@ -65,6 +90,11 @@
     "id": "chip_generation",
     "title": "The next generation of racks",
     "body": "The tenant's hardware team wants to leap to the next rack generation mid-build. Whether that is free, expensive, or a fight depends on what you are cooling with.",
+    "bodyVariants": [
+      "The tenant's hardware team has a new rack generation and a strong preference for it. Mid-build, naturally.",
+      "New silicon, new racks, same delivery date. The tenant's engineers are excited. Your scheduler is not.",
+      "The hardware roadmap moved. The tenant wants the campus to move with it."
+    ],
     "art": "chip_generation",
     "codexId": "gb200-rack",
     "scripted": true,
@@ -77,6 +107,11 @@
     "id": "drought",
     "title": "A dry summer",
     "body": "Richfield County is in a drought watch. Your cooling choice is about to matter to people who live downstream of your water permit.",
+    "bodyVariants": [
+      "The county posts a drought watch. Suddenly everyone downstream of your permit is paying attention.",
+      "A dry summer, and your cooling choice is a topic at the diner again.",
+      "The river gauge is low, and people know whose towers are whose."
+    ],
     "art": "drought",
     "odds": 0.08,
     "seasonMonths": [5, 7],
@@ -91,6 +126,11 @@
     "id": "subpoena",
     "title": "A subpoena from the docket",
     "body": "Commission Staff wants your internal load forecasts, every draft. You can hand them over or fight the request in front of the commissioners.",
+    "bodyVariants": [
+      "Commission Staff wants every draft of your load forecast. All of them. In writing.",
+      "A discovery request lands: internal forecasts, every version. Your lawyer sighs audibly.",
+      "Staff is asking for documents you would rather summarize. That is not how discovery works."
+    ],
     "art": "subpoena",
     "odds": 0.10,
     "once": true,
@@ -122,6 +162,11 @@
     "id": "tax_check",
     "title": "The county assessor comes by",
     "body": "Now that something is actually standing, Richfield County wants to talk about the property tax abatement everyone signed off on. It goes fine. It usually does.",
+    "bodyVariants": [
+      "The assessor walks the site, asks about the abatement, and leaves satisfied. A good county meeting.",
+      "Now that steel is standing, the county wants to talk taxes. The abatement holds. Everyone nods.",
+      "The assessor's visit goes fine. Signed abatements are beautiful things."
+    ],
     "art": "tax_check",
     "codexId": "tax-check",
     "scripted": true,
@@ -133,6 +178,11 @@
     "id": "draw_freeze",
     "title": "The lender's engineer flags a draw",
     "body": "Your monthly draw request does not match the paperwork on file. Until someone sorts it out, the lender is not releasing funds.",
+    "bodyVariants": [
+      "The lender's engineer does not like the paperwork on this month's draw. No funds until it matches.",
+      "A signature is missing somewhere, so the draw sits. The lender is polite and immovable.",
+      "Your draw request and the file do not agree. The money waits until they do."
+    ],
     "art": "draw_freeze",
     "odds": 0.05,
     "requires": ["constructionActive"],
@@ -143,6 +193,11 @@
     "id": "fitout_fire",
     "title": "Fire in fitout",
     "body": "An electrical fault sparks a small fire in a hall under fitout. No one is hurt. The hall is a different story.",
+    "bodyVariants": [
+      "A fault in a panel sparks during fitout. The extinguishers work. The schedule does not.",
+      "Smoke in a hall under fitout. Everyone is fine. The hall needs work.",
+      "One electrical fault, one small fire, one harder week in fitout."
+    ],
     "art": "fitout_fire",
     "odds": 0.05,
     "requires": ["anyHallStage:fitout"],
@@ -153,6 +208,11 @@
     "id": "overrun",
     "title": "The budget line that moved",
     "body": "Steel prices moved again and your general contractor wants to talk about a change order. Under a cost-plus deal, that bill is yours.",
+    "bodyVariants": [
+      "Steel moved again. Your GC slides a change order across the table.",
+      "The cost-plus clause wakes up hungry. Steel prices are the reason this time.",
+      "A budget line twitches upward. Under cost-plus, that twitch is yours."
+    ],
     "art": "overrun",
     "odds": 0.06,
     "requires": ["anyHallStageIn:steel|fitout", "notGc:gmp"],
@@ -162,6 +222,11 @@
     "id": "inspection_fail",
     "title": "A failed inspection",
     "body": "The county inspector walks the site and does not like what they see. Work stops on that hall until it is fixed.",
+    "bodyVariants": [
+      "The inspector walks the hall, stops twice, and starts writing. Work stops until this clears.",
+      "A clipboard, a frown, a failed inspection. That hall sits until you fix it.",
+      "The county inspector finds what your punch list missed. The hall pauses."
+    ],
     "art": "inspection_fail",
     "odds": 0.06,
     "requires": ["anyHallStageIn:shell|fitout"],
@@ -172,6 +237,11 @@
     "id": "rate_up",
     "title": "Rates move up",
     "body": "The Fed's latest move pushes floating construction rates up. Cap rates follow, a little.",
+    "bodyVariants": [
+      "The Fed moves, your floating rate follows, and the exit math tightens a notch.",
+      "Money gets a little more expensive this month. Your senior draw notices first.",
+      "Rates tick up. Construction debt does not send a card, it just costs more."
+    ],
     "art": "rate_up",
     "odds": 0.04,
     "requires": [],
@@ -184,6 +254,11 @@
     "id": "rate_down",
     "title": "Rates move down",
     "body": "A softer inflation print gives the market room to breathe. Your floating rate eases, and so does the exit math.",
+    "bodyVariants": [
+      "A soft inflation print, a kinder tape. Your floating rate exhales.",
+      "Rates ease. The model looks a little friendlier this month.",
+      "Cheaper money, for now. The senior rate drifts down."
+    ],
     "art": "rate_down",
     "odds": 0.04,
     "requires": [],
@@ -196,6 +271,11 @@
     "id": "town_hall",
     "title": "Millbrook calls a town hall",
     "body": "The town wants a night with you, a microphone, and their questions. Showing up costs an evening. Not showing up costs more.",
+    "bodyVariants": [
+      "Millbrook books the VFW hall and puts your name on a flyer. Questions will be asked.",
+      "The town wants a microphone, a folding chair, and you. On a weeknight.",
+      "A town hall is called. Attendance is technically optional."
+    ],
     "art": "town_hall",
     "odds": 0.06,
     "requires": [],
@@ -209,6 +289,11 @@
     "id": "newspaper_profile",
     "title": "The Clarion runs a profile",
     "body": "Sam Okafor's piece on the campus runs this week. How it reads depends on how the town feels about you right now.",
+    "bodyVariants": [
+      "The Clarion's piece runs above the fold. What it says depends on what Millbrook already thinks.",
+      "Sam Okafor's profile of the campus runs this week. The town reads itself in it.",
+      "The profile is out. The quotes are accurate. The tone is earned."
+    ],
     "art": "newspaper_profile",
     "odds": 0.05,
     "requires": [],
@@ -219,6 +304,11 @@
     "id": "tenant_slide_offer",
     "title": "The tenant offers to slide a date",
     "body": "The Whale's deal team floats an idea: push one undelivered hall's date out a bit in exchange for a small rent break. No hard feelings either way.",
+    "bodyVariants": [
+      "The Whale's deal team proposes a trade: a later date on one hall, a small break on rent.",
+      "A friendly call from the tenant: slide one delivery date, shave the rent a touch. Your call.",
+      "The tenant offers to move a date. Two months of slack for two points of rent."
+    ],
     "art": "tenant_slide_offer",
     "odds": 0.04,
     "window": [24, 59],
@@ -234,6 +324,11 @@
     "id": "governor_visit",
     "title": "The Governor wants a tour",
     "body": "Governor Voss is in Richfield County and wants photos at your site. It is good press, if you can spare the afternoon.",
+    "bodyVariants": [
+      "The Governor's office wants a tour and a photo. The advance team is already picking angles.",
+      "Governor Voss is nearby and cameras are available. Your site is the backdrop, if you agree.",
+      "A gubernatorial drop-by is proposed. Hard hats will be provided. Yours, specifically."
+    ],
     "art": "governor_visit",
     "scripted": true,
     "scriptedMonth": 3,
@@ -248,6 +343,11 @@
     "id": "union_pla",
     "title": "A project labor agreement, on the table",
     "body": "The trades council offers a project labor agreement: steady crews, fair terms, a small premium on the budget. Reyes is waiting on your answer.",
+    "bodyVariants": [
+      "The trades council brings a draft agreement: steady crews, fair terms, a small premium.",
+      "Reyes lays the agreement on the table and waits. Steady labor has a price.",
+      "The council offers a project labor agreement. Your budget notices the premium. Your schedule notices the calm."
+    ],
     "art": "union_pla",
     "odds": 0.05,
     "window": [12, 40],
@@ -264,6 +364,11 @@
     "id": "transformer_factory_fire",
     "title": "Fire at the transformer plant",
     "body": "A fire shuts down the factory building your transformer. The lead time just got a lot longer.",
+    "bodyVariants": [
+      "The factory building your transformer is a smoking roof today. The lead time is a rumor now.",
+      "A fire at the transformer plant. Your unit is fine, probably. The queue in front of it is not.",
+      "The call comes from the factory: fire, shutdown, new dates. None of the dates are soon."
+    ],
     "art": "transformer_factory_fire",
     "codexId": "transformer-lead-times",
     "odds": 0.02,
@@ -275,6 +380,11 @@
     "id": "restudy",
     "title": "The interconnection study needs another look",
     "body": "The utility's planners want to rerun part of your interconnection study after a nearby project changed its load profile.",
+    "bodyVariants": [
+      "A neighboring project changed its load, so the utility wants to rerun part of your study.",
+      "The planners found a new wrinkle in the load flow. Your study goes back for another look.",
+      "Someone else's project moved, and yours waits a few more months for the rerun."
+    ],
     "art": "restudy",
     "odds": 0.04,
     "requires": ["studyPending"],
@@ -284,6 +394,11 @@
     "id": "partner_dispute",
     "title": "Your equity partner pushes back",
     "body": "Your partner does not like a call you made and wants either a bigger share or a pause while lawyers talk. Pick your cost.",
+    "bodyVariants": [
+      "Your equity partner reads the same numbers and likes them less. Lawyers are mentioned.",
+      "A disagreement over a call you made. The options are share or schedule.",
+      "Your partner wants a bigger slice or a pause. Pick the one that costs less."
+    ],
     "art": "partner_dispute",
     "odds": 0.03,
     "once": true,
@@ -298,6 +413,11 @@
     "id": "neighbor_wells",
     "title": "Neighbors worry about their wells",
     "body": "Families near the site say their wells are running low and point at your cooling towers. Evaporative cooling drinks a lot of water.",
+    "bodyVariants": [
+      "Two families on the county road say their wells are low, and they know where to point.",
+      "Well complaints, three of them, all aimed at your cooling towers.",
+      "The neighbors' wells are the talk of the feed store. Your towers get the blame."
+    ],
     "art": "neighbor_wells",
     "codexId": "water-registration",
     "odds": 0.06,
@@ -309,6 +429,11 @@
     "id": "heat_wave_commissioning",
     "title": "A heat wave during commissioning",
     "body": "A heat wave rolls through right as a hall is ready to commission. Equipment runs hot and tests slip a little.",
+    "bodyVariants": [
+      "Triple digits during commissioning. The equipment runs hot and the tests slip.",
+      "A heat wave picks the exact week a hall goes through commissioning. Of course it does.",
+      "The thermometer wins a round. Commissioning tests slide a little."
+    ],
     "art": "heat_wave_commissioning",
     "odds": 0.05,
     "seasonMonths": [6, 8],
@@ -319,6 +444,11 @@
     "id": "equipment_rebate",
     "title": "The rebate comes through",
     "body": "The equipment rebate the Governor's office promised finally clears. It is real money, and it is yours.",
+    "bodyVariants": [
+      "The rebate the Governor's office promised finally clears. Eight figures, real money.",
+      "A wire from the state: the equipment rebate. It was worth the paperwork.",
+      "The rebate lands. The Governor's office kept its word."
+    ],
     "art": "equipment_rebate",
     "codexId": "equipment-rebate-law",
     "scripted": true,
@@ -330,6 +460,11 @@
     "id": "good_weather",
     "title": "A good stretch of weather",
     "body": "Clear skies and mild temperatures for weeks. Every crew on site is ahead of where they expected to be.",
+    "bodyVariants": [
+      "Weeks of clear skies. Every crew is ahead of where the schedule says they should be.",
+      "Mild, dry, boring weather. Exactly what a job site wants.",
+      "The forecast gives you a month of gifts. The crews spend it well."
+    ],
     "art": "good_weather",
     "odds": 0.05,
     "requires": ["constructionActive"],
@@ -339,6 +474,11 @@
     "id": "hiring_fair",
     "title": "A regional hiring fair",
     "body": "The county is running a hiring fair for skilled trades. Sponsoring a booth costs a little cash and buys some goodwill, plus a steadier crew for a while.",
+    "bodyVariants": [
+      "The county fairgrounds fill with tradespeople and folding tables. A booth has your name on it, if you pay.",
+      "A regional hiring fair is coming. Sponsoring one is cheaper than a crew shortage.",
+      "The county runs a hiring fair. For a small fee, your banner can hang over a booth."
+    ],
     "art": "hiring_fair",
     "odds": 0.04,
     "requires": [],
@@ -361,6 +501,11 @@
     "id": "commissioner_turnover",
     "title": "A commissioner's term ends",
     "body": "One of the sitting commissioners is replaced mid-docket. The new seat starts from the middle, not from whatever you had built up.",
+    "bodyVariants": [
+      "A commissioner's term ends mid-docket. The new seat has no history with you, good or bad.",
+      "Turnover at the commission. The new member starts at neutral, because of course they do.",
+      "A new face at the dais. Whatever you built with the old one stays with the old one."
+    ],
     "art": "commissioner_turnover",
     "odds": 0.03,
     "once": true,
@@ -371,6 +516,11 @@
     "id": "interconnect_queue_jump",
     "title": "A favor in the interconnection queue",
     "body": "Arcadia Public Power has room to move your study up the queue. They only do that for developers they trust.",
+    "bodyVariants": [
+      "The utility has room in the queue and moves your study up. Trust, it turns out, is a schedule item.",
+      "Arcadia Public Power shuffles the queue and your study lands a few months sooner.",
+      "A quiet favor from the utility: your interconnection study jumps the line."
+    ],
     "art": "interconnect_queue_jump",
     "odds": 0.03,
     "once": true,

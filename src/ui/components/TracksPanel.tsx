@@ -116,9 +116,11 @@ function buildRows(tab: TrackTab, state: GameState, content: Content, selectedHa
       action: { actionId: 'answerDiscovery' },
     });
     for (const intervenor of state.docket.intervenors) {
+      // Render the intervenor's display name from content, not the raw id ("riverkeepers").
+      const name = content.cast.intervenors.find((i) => i.id === intervenor.id)?.name ?? intervenor.id;
       rows.push({
         key: `meetIntervenor:${intervenor.id}`,
-        label: `Meet ${intervenor.id}`,
+        label: `Meet ${name}`,
         help: meetIntervenor.help,
         ap: meetIntervenor.ap,
         cashLabel: cashLabel(meetIntervenor, state, content),
@@ -303,7 +305,10 @@ function describeAction(action: PlannedAction, content: Content): string {
   const permitId = action.params?.['permitId'];
   if (typeof permitId === 'string') return `${def.label}: ${permitId}`;
   const intervenorId = action.params?.['intervenorId'];
-  if (typeof intervenorId === 'string') return `${def.label}: ${intervenorId}`;
+  if (typeof intervenorId === 'string') {
+    const name = content.cast.intervenors.find((i) => i.id === intervenorId)?.name ?? intervenorId;
+    return `${def.label}: ${name}`;
+  }
   const group = action.params?.['group'];
   if (typeof group === 'string') return `${def.label}: ${group}`;
   return def.label;
@@ -371,12 +376,17 @@ export function TracksPanel() {
           {GOODWILL_GROUPS.map((group) => {
             const action: PlannedAction = { actionId: 'visitCast', params: { group } };
             const check = checkAction(state, content, plan, action);
+            // Who you'd be visiting: the group's cast members and their one-line personalities,
+            // in the button's existing tooltip.
+            const members = content.cast.cast.filter((m) => m.goodwillGroup === group);
+            const who = members.map((m) => `${m.name} (${m.role})${m.blurb ? ` - ${m.blurb}` : ''}`).join('\n');
+            const visitTitle = check.ok ? `${visitCastDef.help}${who ? `\n${who}` : ''}` : check.reason;
             return (
               <div key={group} style={{ marginBottom: '0.25rem', opacity: check.ok ? 1 : 0.5 }}>
                 <button
                   disabled={!check.ok}
                   onClick={() => queueAction(action)}
-                  title={check.ok ? visitCastDef.help : check.reason}
+                  title={visitTitle}
                   data-testid="action-row-button"
                   style={{ width: '100%', textAlign: 'left', padding: '0.3rem', cursor: check.ok ? 'pointer' : 'not-allowed' }}
                 >

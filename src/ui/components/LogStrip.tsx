@@ -27,6 +27,7 @@ export function LogStrip() {
       {entries.map((entry, i) => (
         <div key={i}>
           [{formatMonth(entry.month)}] {entry.text}
+          {entry.detail && <div style={{ color: '#666' }}>{entry.detail}</div>}
         </div>
       ))}
     </div>
