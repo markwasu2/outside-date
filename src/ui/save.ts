@@ -1,11 +1,12 @@
-import type { DifficultyId, NegotiationChoices } from '../engine/init';
+import { emptyCapital, type DifficultyId, type NegotiationChoices } from '../engine/init';
 import type { GameState } from '../engine/types';
 import type { FinancialSnapshot } from './financials';
 
 /** P10.1: bump this whenever `SaveFile`'s shape changes incompatibly. v2 (Phase 2, D1) adds
  * `financialSnapshots`; v1 saves migrate by starting an empty series (the drawer then records
- * from the next committed month on). */
-export const SAVE_VERSION = 2;
+ * from the next committed month on). v3 (Phase 3) adds the forecast call, capital levers, claims,
+ * the amended closing table and bridge-loan fields to GameState; v2 saves are backfilled. */
+export const SAVE_VERSION = 3;
 const SAVE_KEY = 'outside-date-save';
 
 export interface SaveFile {
@@ -24,11 +25,33 @@ export interface SaveFile {
 export function migrateSave(parsed: unknown): SaveFile | null {
   if (!parsed || typeof parsed !== 'object') return null;
   const save = parsed as Partial<SaveFile> & { version?: number };
-  if (save.version === 2) return save as SaveFile;
+  if (save.version === 3) return save as SaveFile;
+  if (save.version === 2) return upgradeV2(save as SaveFile);
   if (save.version === 1) {
-    return { ...(save as Omit<SaveFile, 'version' | 'financialSnapshots'>), version: 2, financialSnapshots: [] };
+    const v2 = { ...(save as Omit<SaveFile, 'version' | 'financialSnapshots'>), version: 2, financialSnapshots: [] };
+    return upgradeV2(v2 as SaveFile);
   }
   return null;
+}
+
+/** v2 -> v3: the forecast defaults to "called it exactly, no contingency" (cost = the budget
+ * at close, month = the first lease delivery), so an old save is graded as before. Levers start
+ * unused, there are no claims, and the closing table starts empty (the Financials drawer falls
+ * back to its own sources and uses until the next deal change amends it). */
+function upgradeV2(save: SaveFile): SaveFile {
+  const s = save.state as GameState & Partial<Pick<GameState, 'forecast' | 'capital' | 'claims' | 'closing'>>;
+  const firstDelivery = Math.min(...s.halls.map((h) => h.deliveryMonth));
+  const debt = s.debt as GameState['debt'] & Partial<Pick<GameState['debt'], 'bridgeDrawn' | 'bridgeAccruedPik' | 'bridgeRate'>>;
+  const state: GameState = {
+    ...s,
+    forecast: s.forecast ?? { cost: s.budgetAtClose, month: Number.isFinite(firstDelivery) ? firstDelivery : 0, contingency: 0 },
+    capital: s.capital ?? emptyCapital(),
+    claims: s.claims ?? [],
+    closing: s.closing ?? [],
+    debt: { ...debt, bridgeDrawn: debt.bridgeDrawn ?? 0, bridgeAccruedPik: debt.bridgeAccruedPik ?? 0, bridgeRate: debt.bridgeRate ?? 0.14 },
+    takeout: s.takeout ? { ...s.takeout, repayments: s.takeout.repayments ?? [] } : null,
+  };
+  return { ...save, version: 3, state };
 }
 
 /** Autosaves after every committed month (store.ts calls this from `endMonth`/`fastForward`/

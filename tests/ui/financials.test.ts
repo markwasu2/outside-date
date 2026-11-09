@@ -199,7 +199,7 @@ function snap1Cash(snaps: { cash: number }[]): number {
   return snaps[1]?.cash ?? 0;
 }
 
-describe('save migration (v1 -> v2)', () => {
+describe('save migration (v1 -> v2 -> v3)', () => {
   const base = {
     state: fresh('tutorial-edge5'),
     lastNegotiation: negotiation,
@@ -210,18 +210,36 @@ describe('save migration (v1 -> v2)', () => {
   it('migrates a v1 save by adding an empty snapshot series', () => {
     const migrated = migrateSave({ ...base, version: 1 });
     expect(migrated).not.toBeNull();
-    expect(migrated?.version).toBe(2);
+    expect(migrated?.version).toBe(3);
     expect(migrated?.financialSnapshots).toEqual([]);
     expect(migrated?.dismissedCoachTips).toEqual(['hud']);
   });
 
-  it('passes a v2 save through unchanged', () => {
-    const v2 = { ...base, version: 2, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
-    expect(migrateSave(v2)).toBe(v2);
+  it('passes a v3 save through unchanged', () => {
+    const v3 = { ...base, version: 3, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
+    expect(migrateSave(v3)).toBe(v3);
+  });
+
+  it('backfills the Phase 3 fields when migrating a v2 save', () => {
+    const { forecast, capital, claims, closing, ...oldState } = base.state;
+    void forecast; void capital; void claims; void closing;
+    const oldDebt = { ...oldState.debt } as Record<string, unknown>;
+    delete oldDebt.bridgeDrawn; delete oldDebt.bridgeAccruedPik; delete oldDebt.bridgeRate;
+    const v2 = { ...base, state: { ...oldState, debt: oldDebt }, version: 2, financialSnapshots: [] };
+    const migrated = migrateSave(v2);
+    expect(migrated?.version).toBe(3);
+    expect(migrated?.state.forecast).toEqual({
+      cost: base.state.budgetAtClose,
+      month: Math.min(...base.state.halls.map((h) => h.deliveryMonth)),
+      contingency: 0,
+    });
+    expect(migrated?.state.claims).toEqual([]);
+    expect(migrated?.state.capital.log).toEqual([]);
+    expect(migrated?.state.debt.bridgeDrawn).toBe(0);
   });
 
   it('rejects unknown versions and garbage', () => {
-    expect(migrateSave({ ...base, version: 3 })).toBeNull();
+    expect(migrateSave({ ...base, version: 4 })).toBeNull();
     expect(migrateSave(null)).toBeNull();
     expect(migrateSave('nope')).toBeNull();
   });
