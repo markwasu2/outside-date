@@ -89,7 +89,7 @@ function CampusGame() {
   const setBoardPopover = useStore((s) => s.setBoardPopover);
   const selectHall = useStore((s) => s.selectHall);
   const error = useStore((s) => s.error);
-  const step = nextStep(state, content);
+  const step = nextStep(draft, content);
   const takeoutQueued = plan.some((a) => a.actionId === 'priceTakeout');
   const alerts = warnings(state, content);
   useEffect(() => { if (requestedTab) setDrawer('actions'); }, [requestedTab]);
@@ -113,7 +113,7 @@ function CampusGame() {
         <button aria-expanded={drawer === 'actions'} onClick={() => setDrawer(drawer === 'actions' ? null : 'actions')}>Plan</button>
       </header>
       <div data-testid="next-step-card" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 18px', fontSize: 12, background: '#e8e1cf', borderBottom: '1px solid #cdbf9f', flexShrink: 0 }}>
-        <span style={{ flex: 1 }}><strong>Next: {step.title}</strong> - {step.why}</span>
+        <span style={{ flex: 1 }}><strong>{plan.length ? 'After planned actions: ' : 'Next: '}{step.title}</strong> - {step.why}</span>
         <button data-testid="next-step-show-me" onClick={showMe}>Show me</button>
       </div>
       <div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minHeight: 0, position: 'relative' }}>

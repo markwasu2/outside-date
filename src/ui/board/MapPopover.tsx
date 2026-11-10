@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 
 import { formatMonth } from '../../engine/format';
 import { checkAction, useStore } from '../store';
@@ -9,12 +9,12 @@ import { boardActionsForObject, boardObjectTagline, laydownOrders } from './acti
 /**
  * Phase 1 (D1/D6): the context popover anchored to a map object. Lists the actions that object
  * owns with AP + cash cost, disabled with the human-readable reason when not allowed, and queues
- * in one click. Closes on Esc, outside click (backdrop), or after queueing. The first time an
+ * in one click. Closes on Esc, outside click (backdrop), without closing after queueing. The first time an
  * object is opened in a run, the header carries a one-line "what this is" teaching line (D6).
  */
 
-export const POPOVER_WIDTH = 250;
-export const POPOVER_MAX_HEIGHT = 280;
+export const POPOVER_WIDTH = 300;
+export const POPOVER_MAX_HEIGHT = 360;
 
 interface MapPopoverProps {
   objectId: string;
@@ -36,7 +36,9 @@ const OBJECT_TITLES: Record<string, string> = {
 
 export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
   const [officeView, setOfficeView] = useState<'permits' | 'money' | 'capital'>('permits');
-  const state = useStore((s) => s.state);
+  const committed = useStore((s) => s.state);
+  const state = useStore((s) => s.draft);
+  const [feedback, setFeedback] = useState('');
   const content = useStore((s) => s.content);
   const plan = useStore((s) => s.plan);
   const queueAction = useStore((s) => s.queueAction);
@@ -117,6 +119,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
             Close
           </button>
         </div>
+        {feedback && <div role="status" style={{ background: '#e6efdf', padding: 6, marginBottom: 6 }}>{feedback} </div>}
         {showTeaching && (
           <div data-testid="popover-teaching" style={{ color: '#555', marginBottom: 6, lineHeight: 1.3 }}>
             {tagline.before}
@@ -127,8 +130,8 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
 
         {objectId === 'laydownYard' && (() => {
           const row = buildRows('construction', state, content, null).find((r) => r.key === 'importCrews')!;
-          const check = checkAction(state, content, plan, row.action);
-          return <button data-testid="popover-action" disabled={!check.ok} title={check.ok ? row.help : check.reason} onClick={() => { queueAction(row.action); onClose(); }} style={{ width: '100%', padding: 6, marginBottom: 8 }}>{row.label} ({row.ap} AP, {row.cashLabel})</button>;
+          const check = checkAction(committed, content, plan, row.action);
+          return <button data-testid="popover-action" disabled={!check.ok} title={check.ok ? row.help : check.reason} onClick={() => { queueAction(row.action); setFeedback(`${row.label} planned. Review or undo from Plan. End month to commit.`); }} style={{ width: '100%', padding: 6, marginBottom: 8 }}>{row.label} ({row.ap} AP, {row.cashLabel})</button>;
         })()}
         {objectId === 'siteOffice' && (
           <div style={{ display: 'flex', gap: 4, marginBottom: 8, flexWrap: 'wrap' }}>
@@ -165,16 +168,15 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
           <div style={{ color: '#777' }}>Nothing to do here right now.</div>
         ) : (
           rows.map((r) => {
-            const check = checkAction(state, content, plan, r.action);
+            const check = checkAction(committed, content, plan, r.action);
             return (
-              <button
-                key={r.key}
+              <Fragment key={r.key}><button
                 disabled={!check.ok}
                 title={check.ok ? r.help : check.reason}
                 data-testid="popover-action"
                 onClick={() => {
                   queueAction(r.action);
-                  onClose();
+                  setFeedback(`${r.label} planned. Review or undo from Plan. End month to commit.`);
                 }}
                 style={{
                   display: 'block',
@@ -194,6 +196,8 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
                 </div>
                 <div style={{ fontSize: '0.7rem', color: check.ok ? '#555' : '#b71c1c' }}>{check.ok ? r.help : check.reason}</div>
               </button>
+              {!check.ok && <button style={{ fontSize: 11, marginBottom: 6 }} onClick={() => setFeedback(`${r.label}: ${check.reason}`)}>Why unavailable: {r.label}?</button>}
+              </Fragment>
             );
           })
         )}
