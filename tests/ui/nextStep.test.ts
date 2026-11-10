@@ -258,3 +258,15 @@ it('explains the automatic hookup when this month has enough capacity but the ha
  expect(step.why).toContain('End month runs'); expect(step.why).toContain('does not deliver it');
  expect(step.actionId).toBeUndefined();
 });
+
+
+it('distinguishes delivered and terminated halls while waiting to close',()=>{
+ const s=freshState();s.halls.forEach((h,i)=>{h.delivered=i<3;h.terminated=i===3;});
+ expect(nextStep(s,content).why).toContain('3 of 4 halls are delivered. 1 hall was terminated.');
+ expect(nextStep(s,content).why).not.toContain('Every hall is delivered');
+ s.debt.converted=true;s.flags.conversionMonth=40;
+ expect(nextStep(s,content).why).toContain('3 of 4 halls are delivered. 1 hall was terminated.');
+ expect(nextStep(s,content).why).toContain('rent must season until');
+ s.halls[2]!.delivered=false;s.halls[2]!.terminated=true;
+ expect(nextStep(s,content).why).toContain('2 of 4 halls are delivered. 2 halls were terminated.');
+});

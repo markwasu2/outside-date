@@ -1,3 +1,16 @@
+# Replay: closing wait reconciles terminated halls
+
+Personal EASY Whale replay: H4 was cancelled to cure a lender freeze, and H1-H3 delivered. The 3/4 HUD and terminated H4 contradicted the waiting explanation "Every hall is delivered." Both lender-retest and rent-seasoning explanations now state the delivered total and terminated count. Full-delivery wording is unchanged.
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | Closing waits distinguish delivered and terminated halls | PASS | nextStep.ts; unit checks both wait phases and singular/plural cancellation |
+| 2 | Real board agrees with 3/4 HUD and terminated H4 | PASS | e2e/terminated-closing-cue.spec.ts; docs/screenshots/cold2/terminated-closing-cue.png, pixels inspected at 1280x720 |
+| 3 | Full regression gates | PASS | 571 unit, 116 browser (64 + 50 bounded specs and both real-click full journeys), lint, tsc, production build |
+| 4 | Engine, bot, tuning and save shape untouched | PASS | UI copy only; no migration required; 1000-seed grids not applicable |
+
+Existing production bundle-size warning remains. Full browser run hit the execution timeout after 108 passing tests; all specs then reran in two bounded groups plus both journeys and passed.
+
 # UX 8: report card Time reason counts halls like the HUD (queue item 8)
 
 Branch `ux8-hall-count-reconcile` off main ed1fe1f. HUD said "Halls 3/4" while the report

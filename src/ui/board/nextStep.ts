@@ -67,12 +67,16 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
   const active = state.halls.filter(h=>!h.terminated);
   if(active.length && active.every(h=>h.delivered)) {
     const conversionMonth = state.flags.conversionMonth;
+    const terminated = state.halls.length - active.length;
+    const deliverySummary = terminated
+      ? `${active.length} of ${state.halls.length} halls are delivered. ${terminated} ${terminated === 1 ? 'hall was' : 'halls were'} terminated.`
+      : 'Every hall is delivered.';
     return {
       title:state.debt.converted ? 'Let the rent season before closing' : 'Wait for the lender retest',
       waiting:true,
       why:state.debt.converted && typeof conversionMonth === 'number'
-        ? `Every hall is delivered. The loan converted; rent must season until ${formatMonth(conversionMonth+resolved.tuning.takeout.seasoningMonths)}. End the month to advance this clock. Then Price the takeout at the site office to finish.`
-        : 'Every hall is delivered. The lender retests income against debt payments each month before the closing window can open. Check financing at the site office; End month runs the next test.',
+        ? `${deliverySummary} The loan converted; rent must season until ${formatMonth(conversionMonth+resolved.tuning.takeout.seasoningMonths)}. End the month to advance this clock. Then Price the takeout at the site office to finish.`
+        : `${deliverySummary} The lender retests income against debt payments each month before the closing window can open. Check financing at the site office; End month runs the next test.`,
       objectId:'siteOffice',
     };
   }
