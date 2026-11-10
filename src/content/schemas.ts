@@ -353,6 +353,18 @@ export const EventChoiceSchema = z.object({
   effects: z.array(EffectSchema).default([]),
 });
 
+/** A graduated decision dial for a two-choice card: the player sets a level on a scale between
+ * two poles instead of picking one of two buttons. Convention: level 0 reproduces the old
+ * low-commitment choice's effects exactly and the last level reproduces the old high-commitment
+ * choice's effects exactly, so bots (which still answer with the old choice ids) and the balance
+ * band are untouched; the levels in between are new, hand-authored interpolations. resolveChoice
+ * accepts 'level:N' for these cards (src/engine/systems/events.ts). */
+export const EventScaleSchema = z.object({
+  minLabel: z.string(),
+  maxLabel: z.string(),
+  levels: z.array(z.object({ label: z.string(), effects: z.array(EffectSchema).default([]) })).min(2),
+});
+
 export const EventCardSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -376,6 +388,7 @@ export const EventCardSchema = z.object({
   once: z.boolean().default(false),
   effects: z.array(EffectSchema).default([]),
   choices: z.array(EventChoiceSchema).optional(),
+  scale: EventScaleSchema.optional(),
   /** Implementation guidance for mechanics too specific for the generic effect set; see PLAN.md 6.2 row. */
   note: z.string().optional(),
 });

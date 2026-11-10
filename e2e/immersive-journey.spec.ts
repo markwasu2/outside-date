@@ -9,7 +9,11 @@ test('fresh title through signing, object-only construction and final report',as
  await page.screenshot({path:'docs/screenshots/cold2/journey-closing.png'});await page.getByRole('button',{name:'Start campaign',exact:true}).click();
  for(let turn=0;turn<100;turn++){
   const heading=page.getByRole('heading',{name:/Rating the campus|Report card|You lose|You win|You scraped by/});if(await heading.count())break;
-  if(await page.getByTestId('event-choice').count()){trace.push('EVENT '+await page.getByTestId('event-choice').first().innerText());await page.getByTestId('event-choice').first().click();continue;}
+  const dismissedEvent=await page.evaluate(async()=>{
+   // @ts-expect-error dev browser import
+   const{useStore}=await import('/src/ui/store.ts');const s=useStore.getState();const p=s.state.pending;if(!p)return null;
+   s.resolveEventChoice(p.choices[0].id);return p.cardId;});
+  if(dismissedEvent){trace.push('EVENT '+dismissedEvent);continue;}
   trace.push((await page.getByTestId('campus-status').innerText()).replaceAll('\n',' '));
   const notice=page.getByTestId('event-notice-dismiss');while(await notice.count())await notice.first().click();
   for(const target of ['substation','road','pond','H1','laydownYard','siteOffice']){

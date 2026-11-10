@@ -3,12 +3,16 @@ import { test, type Page } from '@playwright/test';
 /** Phase 5 evidence screenshots - written to /downloads for inspection and the report. */
 
 async function dismissEventIfUp(page: Page) {
-  const dialog = page.getByRole('dialog');
-  if ((await dialog.count()) > 0) {
-    await page.getByTestId('event-choice').first().click();
+  // Resolves the pending card via its first (old-style) choice id, whether the card renders
+  // choice buttons or a decision scale.
+  return page.evaluate(async () => {
+    // @ts-expect-error dev browser import
+    const {useStore} = await import('/src/ui/store.ts');
+    const s = useStore.getState(); const p = s.state.pending;
+    if (!p) return false;
+    s.resolveEventChoice(p.choices[0].id);
     return true;
-  }
-  return false;
+  });
 }
 
 async function dismissExplainers(page: Page) {
