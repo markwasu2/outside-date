@@ -1,4 +1,6 @@
 import type { Content } from '../content/schemas';
+import { formatMonth } from '../engine/format';
+import { resolveContent } from '../engine/resolve';
 import { dscr, requiredGridMW } from '../engine/selectors';
 import type { GameState } from '../engine/types';
 
@@ -18,7 +20,7 @@ function energizedGridMW(state: GameState, content: Content): number {
  * scoring; these return prose for the rating scene).
  */
 export function powerExplain(state: GameState, content: Content): string {
-  const slipped = state.power.plants.filter((p) => p.slipped);
+  const slipped = state.power.plants.filter((p) => p.slipped || (p.onlineMonth !== null && p.plannedOnlineMonth !== null && p.onlineMonth > p.plannedOnlineMonth));
   if (slipped.length > 0) {
     const parts = slipped.map((p) => {
       const slip =
@@ -29,7 +31,14 @@ export function powerExplain(state: GameState, content: Content): string {
   }
   const required = requiredGridMW(state, content);
   const energized = energizedGridMW(state, content);
-  if (required > 0 && energized >= required) return 'Every power plant came online on schedule, powering the full campus.';
+  const resolved = resolveContent(state, content);
+  const earliestApproval = resolved.tuning.docket.monthsToVote;
+  const approved = state.flags.docketApprovedMonth;
+  if (typeof approved === 'number' && approved > earliestApproval) {
+    const delay = approved - earliestApproval;
+    return `No plant construction slip after docket approval, but the docket approved in ${formatMonth(approved)}, ${delay} months after the first-try setup estimate. The power score measures energized capacity and construction slips, not docket delay.`;
+  }
+  if (required > 0 && energized >= required) return 'The full campus is energized. No plant construction slip was recorded after docket approval.';
   if (state.power.minCharge === 'low') return 'A low minimum charge left less grid capacity energized.';
   return 'Grid capacity never quite caught up to the full campus load.';
 }
