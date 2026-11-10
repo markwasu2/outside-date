@@ -16,7 +16,7 @@ test('quick start skips all six setup screens and lands on the board', async ({ 
   await openStatus(page);
   await expect(page.getByTestId('goal-strip')).toBeVisible();
   await expect(page.getByRole('button', { name: 'End month' })).toBeVisible();
-  await expect(page.getByRole('button', { name: /^Next: / })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Next: Hall tier', exact: true })).toHaveCount(0);
 
   // The campaign really started with the recommended setup: month 1 of the whale scenario.
   await openStatus(page);

@@ -3,7 +3,8 @@ import { filterActions, openStatus, closePanel } from './campusNavigation';
 
 test('desktop opens on one campus canvas with details on demand and End month persistent', async ({ page }) => {
   await page.goto('/'); await page.getByTestId('quick-start').click();
-  await page.getByRole('button',{name:'Start planning',exact:true}).click();
+
+  await expect(page.getByTestId('monthly-decisions-help')).toHaveCount(0);await expect(page.getByTestId('action-desk')).toHaveCount(0);
   await expect(page.getByTestId('actions-drawer')).toHaveCount(0);
   await expect(page.getByTestId('status-drawer')).toHaveCount(0);
   const map = await page.getByTestId('map-root').boundingBox();
