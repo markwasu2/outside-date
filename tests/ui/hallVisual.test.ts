@@ -25,6 +25,7 @@ describe('hallVisual', () => {
     const state = freshState();
     const v = hallVisual(state.halls[0]!, stageMinMonths(state, content));
     expect(v.stage).toBe('notStarted');
+    expect(v.baseStage).toBe('notStarted');
     expect(v.progress0to1).toBe(0);
     expect(v.flags).toEqual({ paused: false, terminated: false, active: false });
   });
@@ -33,6 +34,8 @@ describe('hallVisual', () => {
     const state = freshState();
     const mins = stageMinMonths(state, content);
     const hall = state.halls[0]!;
+    hall.stageIndex = 1; // steel
+    expect(hallVisual(hall, mins).baseStage).toBe('pad');
     hall.stageIndex = 0; // pad
     hall.stageMonthsDone = 1;
     expect(hallVisual(hall, mins).progress0to1).toBeCloseTo(1 / mins[0]!);

@@ -67,6 +67,9 @@ export function hallBlocker(state: GameState, content: Content, hall: Hall): str
 export function hallCaption(state: GameState, content: Content, hall: Hall): string {
   if (hall.terminated) return 'Terminated';
   if (hall.delivered) return 'Delivered';
+  if (state.flags[`inspectionFail:${hall.id}`]) return 'Stopped - failed inspection';
+  if (hall.stageActive && state.flags.drawFreeze) return 'Paused - lender draw freeze';
+  if (hall.stageActive && hall.pausedThisMonth) return 'Paused this month';
   if (hall.stageActive) {
     const current = hall.stageIndex >= 0 ? STAGES[hall.stageIndex] : undefined;
     return `${STAGE_WORDS[current ?? 'pad'] ?? 'Pad'} - building`;
