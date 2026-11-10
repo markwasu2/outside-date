@@ -1302,3 +1302,18 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done:529 unit,79 e2e bounded groups,lint,tsc,build; test selectors explicitly scope map vs new location buttons |
 | visual | inspected:1280 and1440 desk with readable campus, location/result/cost and persistent month commit |
 | grid | skipped:UI discovery only, unequal budget redesign next |
+
+# User priority - unequal monthly developer focus, not a flat instruction count
+
+| criterion | status |
+|---|---|
+| rule | done: 6 focus points; routine permit/insurance/inspection work 1, major commitments 2, recap 4, existing quick tasks free |
+| explanation | done: header/live reservation, first-month explanation and persistent desk name focus; money/crew capacity/time separate |
+| plan | done: specific permit/group/hall target and per-instruction focus visible in desk; add/remove remains reversible |
+| real mix | done: browser queues four instructions for five points; 2-point order blocked at 1 left; month reset confirmed |
+| saves | done: v8 doubles legacy budget/used/event debt once, preserves money/hall dates, reopens rule help; migration tests |
+| balance | done: before/after 1000-seed grids both scenarios/all bots/all difficulties; Whale normal careful73.4%,competent69.7%; no bot changes or relaxed bands |
+| docket guard | done: base vote chance45% to44% maintains existing first-vote failure floor after cheaper permit filing |
+| full gates | done:531 unit;80 e2e in bounded groups (Millbrook fixed exact seed result repinned to simulator1.8106279793x);lint,tsc,build |
+| visual | inspected:1280 intro and four-instruction plan/shortfall;1440 desk; clear count/cost/End month |
+| caveat | attention is a deliberate game abstraction, not a literal estimate of workdays; existing bundle-size warning remains |

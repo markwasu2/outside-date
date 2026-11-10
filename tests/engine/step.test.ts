@@ -23,14 +23,24 @@ function freshState() {
 describe('step: AP validation', () => {
   it('throws when the plan costs more AP than remain this month', () => {
     const state = freshState();
-    // apPerMonth is 3 (tuning.campaign.apPerMonth); every 1-AP action repeated 4x exceeds it.
+    // Four major commitments exceed the six-point monthly focus budget.
     const plan = [
-      { actionId: 'filePermit', params: { permitId: 'air' } },
-      { actionId: 'fileDocket' },
-      { actionId: 'prepTestimony' },
-      { actionId: 'answerDiscovery' },
+      { actionId: 'optionSite' },
+      { actionId: 'commissionStudy' },
+      { actionId: 'orderTransformer' },
+      { actionId: 'orderSwitchgear' },
     ];
     expect(() => step(state, plan, content)).toThrow(ActionError);
+  });
+
+  it('fits unequal task mixes rather than a fixed count of three', () => {
+    const state = freshState();
+    const small = { actionId: 'filePermit', params: { permitId: 'air' } };
+    const major = { actionId: 'commissionStudy' };
+    expect(validateActions(state, [major, major, major], content)).toBe(6);
+    expect(validateActions(state, Array.from({ length: 6 }, () => small), content)).toBe(6);
+    expect(validateActions(state, [major, major, small, small], content)).toBe(6);
+    expect(() => validateActions(state, [major, major, major, small], content)).toThrow(ActionError);
   });
 
   it('zero-AP actions do not count against the AP budget', () => {

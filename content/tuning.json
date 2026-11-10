@@ -1,7 +1,7 @@
 {
   "campaign": {
     "maxMonths": 60,
-    "apPerMonth": 3,
+    "apPerMonth": 6,
     "startingCash": 185000000,
     "monthlyBurn": 2000000,
     "_comment": "SENSITIVITY: startingCash (working capital) vs monthlyBurn is a knife-edge - at 1000-run sims, 185M/2M lands competent at ~67% win; 175M drops it to ~37%; 150M to 0%. Change either value only with a full 1000-run balance sim (npm run sim) before and after."
@@ -110,7 +110,7 @@
     "testimonyBonus": 0.08,
     "testimonyCap": 0.24,
     "settleBonus": 0.05,
-    "voteBase": 0.45,
+    "voteBase": 0.44,
     "minOdds": 0.1,
     "maxOdds": 0.92,
     "appealMonths": 6,

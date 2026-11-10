@@ -3,7 +3,7 @@ import type { GameState, PlannedAction } from '../../engine/types';
 import { resolveContent } from '../../engine/resolve';
 import { formatMonth } from '../../engine/format';
 
-export const actionCostWords=(cost:number)=>cost===0?'No monthly action used':`Uses ${cost} action${cost===1?'':'s'}`;
+export const actionCostWords=(cost:number)=>cost===0?'No focus cost':`Uses ${cost} focus point${cost===1?'':'s'}`;
 export function decisionResult(action:PlannedAction,state:GameState,content:Content,fallback:string):string {
  const t=resolveContent(state,content).tuning;
  switch(action.actionId){

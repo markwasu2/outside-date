@@ -10,8 +10,8 @@ const content = loadContent();
 // committing would actually do.
 describe('EventModal: describeEffect (finding #2)', () => {
   it('describes an owedAp effect as an AP cost next month', () => {
-    const effect: Effect = { type: 'owedAp', args: [1] };
-    expect(describeEffect(effect)).toBe("Uses 1 of next month's actions");
+    const effect: Effect = { type: 'owedAp', args: [2] };
+    expect(describeEffect(effect)).toBe("Uses 2 focus points next month");
   });
 
   it('describes a negative cash effect with the dollar amount', () => {

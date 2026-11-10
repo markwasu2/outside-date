@@ -2,7 +2,7 @@
   {
     "id": "optionSite",
     "track": "land",
-    "ap": 1,
+    "ap": 2,
     "cash": "dynamic",
     "label": "Option the site",
     "help": "Locks land (cost set by the site choice at setup). Required before the pad stage. One time only.",
@@ -11,7 +11,7 @@
   {
     "id": "fundExtensions",
     "track": "land",
-    "ap": 1,
+    "ap": 2,
     "cash": 8000000,
     "label": "Fund road and school extensions",
     "help": "Town +8. Skip it past month 12 and town takes a one-time -8.",
@@ -32,7 +32,7 @@
   {
     "id": "fileDocket",
     "track": "regulation",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "File the power docket",
     "help": "Opens the power docket for a vote. Needs the interconnection study pending or done.",
@@ -44,7 +44,7 @@
   {
     "id": "prepTestimony",
     "track": "regulation",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Prepare testimony",
     "help": "Raises the vote odds, up to a cap. Two months in a row costs commission -1.",
@@ -56,7 +56,7 @@
   {
     "id": "answerDiscovery",
     "track": "regulation",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Answer discovery",
     "help": "Clears an outstanding discovery request before it slips the vote.",
@@ -68,7 +68,7 @@
   {
     "id": "meetIntervenor",
     "track": "regulation",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Meet an intervenor",
     "help": "Progress toward settling with one intervenor.",
@@ -83,7 +83,7 @@
   {
     "id": "commissionStudy",
     "track": "power",
-    "ap": 1,
+    "ap": 2,
     "cash": 2000000,
     "label": "Commission the interconnection study",
     "help": "Starts the study clock that gates the docket filing.",
@@ -92,7 +92,7 @@
   {
     "id": "orderTransformer",
     "track": "power",
-    "ap": 1,
+    "ap": 2,
     "cash": "dynamic",
     "label": "Order the transformer",
     "help": "Long lead time. Order it early.",
@@ -104,7 +104,7 @@
   {
     "id": "orderSwitchgear",
     "track": "power",
-    "ap": 1,
+    "ap": 2,
     "cash": "dynamic",
     "label": "Order the switchgear",
     "help": "Long lead time. Order it early.",
@@ -144,7 +144,7 @@
   {
     "id": "cureDraw",
     "track": "money",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Cure a draw freeze",
     "help": "Ends an active draw freeze so construction draws resume.",
@@ -156,7 +156,7 @@
   {
     "id": "priceTakeout",
     "track": "money",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Price the takeout",
     "help": "Runs the refinance and rating scene. Only once the takeout window is open.",
@@ -174,7 +174,7 @@
   {
     "id": "readyLiquid",
     "track": "chips",
-    "ap": 1,
+    "ap": 2,
     "cash": "dynamic",
     "label": "Ready liquid cooling",
     "help": "Gets a hall ready for liquid-cooled racks (cost depends on tier).",
@@ -186,7 +186,7 @@
   {
     "id": "delaySwap",
     "track": "chips",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Ask for a delay swap",
     "help": "Asks the tenant to slide one hall's delivery and outside dates.",
@@ -201,7 +201,7 @@
   {
     "id": "advanceHall",
     "track": "construction",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Advance construction",
     "help": "Starts the next construction stage on a hall. Cost flows through draws.",
@@ -213,7 +213,7 @@
   {
     "id": "importCrews",
     "track": "construction",
-    "ap": 1,
+    "ap": 2,
     "cash": 4000000,
     "label": "Import crews",
     "help": "Prevents a labor shortfall from slowing fitout, for 6 months.",
@@ -246,7 +246,7 @@
   {
     "id": "visitCast",
     "track": "any",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Visit a cast member",
     "help": "+4 goodwill to one group. Once per group every 3 months.",
@@ -258,7 +258,7 @@
   {
     "id": "equityCall",
     "track": "money",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Call equity from your partner",
     "help": "Your partner funds a shortfall. Your share dilutes, a fee comes off the top, and the new money counts against your equity multiple.",
@@ -270,7 +270,7 @@
   {
     "id": "bridgeLoan",
     "track": "money",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Take a sponsor bridge loan",
     "help": "Short, about 14% paid in kind. Repaid ahead of equity at takeout.",
@@ -282,7 +282,7 @@
   {
     "id": "mezzTopUp",
     "track": "money",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Top up the mezz",
     "help": "More mezz with a fee, only while loan to cost and coverage allow.",
@@ -294,7 +294,7 @@
   {
     "id": "scopeDown",
     "track": "money",
-    "ap": 1,
+    "ap": 2,
     "cash": 0,
     "label": "Scope down: cancel a hall",
     "help": "Terminate a hall. You pay a fee, lose what you spent and get some salvage back.",
@@ -306,7 +306,7 @@
   {
     "id": "recap",
     "track": "money",
-    "ap": 2,
+    "ap": 4,
     "cash": 0,
     "label": "Recap mid-construction",
     "help": "Raise the senior loan for a fee and a higher rate. Once per game.",
@@ -315,7 +315,7 @@
   {
     "id": "spotBuy",
     "track": "power",
-    "ap": 1,
+    "ap": 2,
     "cash": "dynamic",
     "label": "Spot-buy equipment",
     "help": "No queue: full price up front at about 2x book, delivered fast.",
@@ -327,7 +327,7 @@
   {
     "id": "secondSource",
     "track": "power",
-    "ap": 1,
+    "ap": 2,
     "cash": "dynamic",
     "label": "Second-source the order",
     "help": "A parallel order with another supplier; first to arrive wins, the loser cancels for a fee.",
@@ -339,7 +339,7 @@
   {
     "id": "switchGc",
     "track": "construction",
-    "ap": 1,
+    "ap": 2,
     "cash": "dynamic",
     "label": "Switch general contractor",
     "help": "Flip between GMP and cost-plus mid-game for a transition cost.",
@@ -348,7 +348,7 @@
   {
     "id": "mitigateWetlands",
     "track": "land",
-    "ap": 1,
+    "ap": 2,
     "cash": 6000000,
     "label": "Mitigate the wetlands pond",
     "help": "Drains and offsets the pond so the hall position it took can be built. Needs the wetlands permit; takes 4 months.",

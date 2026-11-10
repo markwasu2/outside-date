@@ -218,13 +218,13 @@ describe('save migration (v1 -> v2 -> v3 -> v4 -> v5 -> v6 -> v7)', () => {
   it('migrates a v1 save by adding an empty snapshot series', () => {
     const migrated = migrateSave({ ...base, version: 1 });
     expect(migrated).not.toBeNull();
-    expect(migrated?.version).toBe(7);
+    expect(migrated?.version).toBe(8);
     expect(migrated?.financialSnapshots).toEqual([]);
     expect(migrated?.dismissedCoachTips).toEqual(['hud']);
   });
 
-  it('passes a v7 save through unchanged', () => {
-    const v7 = { ...base, version: 7, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
+  it('passes a v8 save through unchanged', () => {
+    const v7 = { ...base, version: 8, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
     expect(migrateSave(v7)).toBe(v7);
   });
 
@@ -232,7 +232,7 @@ describe('save migration (v1 -> v2 -> v3 -> v4 -> v5 -> v6 -> v7)', () => {
     const v6State = { ...base.state, halls: base.state.halls.map((h) => ({ ...h, pondBlocked: undefined })) };
     const v6 = { ...base, state: v6State, version: 6, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
     const migrated = migrateSave(v6);
-    expect(migrated?.version).toBe(7);
+    expect(migrated?.version).toBe(8);
     expect(migrated?.state.halls.every((h) => h.pondBlocked === false)).toBe(true);
   });
 
@@ -241,7 +241,7 @@ describe('save migration (v1 -> v2 -> v3 -> v4 -> v5 -> v6 -> v7)', () => {
     const v5State = { ...base.state, halls: base.state.halls.map((h) => ({ ...h, pad: undefined })) };
     const v5 = { ...base, state: v5State, version: 5, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
     const migrated = migrateSave(v5);
-    expect(migrated?.version).toBe(7);
+    expect(migrated?.version).toBe(8);
     expect(migrated?.state.halls.every((h) => h.pad === 'near')).toBe(true);
   });
 
@@ -255,7 +255,7 @@ describe('save migration (v1 -> v2 -> v3 -> v4 -> v5 -> v6 -> v7)', () => {
     };
     const v4 = { ...base, state: v4State, version: 4, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
     const migrated = migrateSave(v4);
-    expect(migrated?.version).toBe(7);
+    expect(migrated?.version).toBe(8);
     expect(migrated?.state.markets).toEqual({ equipmentIndex: 1, laborIndex: 1, contractorIndex: 1 });
     expect(migrated?.state.power.orders[0]?.supplier).toBe('standard');
     // A legacy order's full price is reconstructed from the deposit and the tuner book balance.
@@ -268,7 +268,7 @@ describe('save migration (v1 -> v2 -> v3 -> v4 -> v5 -> v6 -> v7)', () => {
     const legacyState = { ...base.state, setup: { ...base.state.setup, site: 'megasite' } };
     const v3 = { ...base, state: legacyState, version: 3, financialSnapshots: [buildFinancialSnapshot(base.state, content)] };
     const migrated = migrateSave(v3);
-    expect(migrated?.version).toBe(7);
+    expect(migrated?.version).toBe(8);
     expect(migrated?.state.setup.site).toBe('edge5-campus');
     // A save already on a current site id keeps it (the whale kept its legacy ids).
     const whaleState = { ...base.state, scenarioId: 'whale', setup: { ...base.state.setup, site: 'farmland' } };
@@ -283,7 +283,7 @@ describe('save migration (v1 -> v2 -> v3 -> v4 -> v5 -> v6 -> v7)', () => {
     delete oldDebt.bridgeDrawn; delete oldDebt.bridgeAccruedPik; delete oldDebt.bridgeRate;
     const v2 = { ...base, state: { ...oldState, debt: oldDebt }, version: 2, financialSnapshots: [] };
     const migrated = migrateSave(v2);
-    expect(migrated?.version).toBe(7);
+    expect(migrated?.version).toBe(8);
     expect(migrated?.state.forecast).toEqual({
       cost: base.state.budgetAtClose,
       month: Math.min(...base.state.halls.map((h) => h.deliveryMonth)),
@@ -292,6 +292,18 @@ describe('save migration (v1 -> v2 -> v3 -> v4 -> v5 -> v6 -> v7)', () => {
     expect(migrated?.state.claims).toEqual([]);
     expect(migrated?.state.capital.log).toEqual([]);
     expect(migrated?.state.debt.bridgeDrawn).toBe(0);
+  });
+
+  it('scales a real v7 budget, spent focus and event debt exactly once without changing money or dates', () => {
+    const old = { ...base, version: 7, financialSnapshots: [],
+      state: { ...base.state, apPerMonth: 3, apUsedThisMonth: 1, flags: { ...base.state.flags, apOwedNextMonth: 1 } } };
+    const migrated = migrateSave(old)!;
+    expect(migrated.state.apPerMonth).toBe(6);
+    expect(migrated.state.apUsedThisMonth).toBe(2);
+    expect(migrated.state.flags.apOwedNextMonth).toBe(2);
+    expect(migrated.state.cash).toBe(old.state.cash);
+    expect(migrated.state.halls).toBe(old.state.halls);
+    expect(migrateSave(migrated)).toBe(migrated);
   });
 
   it('rejects unknown versions and garbage', () => {

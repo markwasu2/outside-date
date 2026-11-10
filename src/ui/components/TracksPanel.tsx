@@ -376,7 +376,7 @@ export function hallFilterLabel(selectedHallId: string | null, hallIds: string[]
 
 const GOODWILL_GROUPS: GoodwillGroup[] = ['town', 'commission', 'utility', 'tenant'];
 
-function describeAction(action: PlannedAction, content: Content): string {
+export function describeAction(action: PlannedAction, content: Content): string {
   const def = findDef(content, action.actionId);
   const hallId = action.params?.['hallId'];
   if (typeof hallId === 'string') return `${def.label}: ${hallId}`;
