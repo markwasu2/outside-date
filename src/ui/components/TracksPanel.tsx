@@ -1,3 +1,4 @@
+import { hallAdvanceLabel } from '../board/legibility';
 import { useEffect, useState } from 'react';
 
 import type { Content } from '../../content/schemas';
@@ -324,9 +325,10 @@ export function buildRows(tab: TrackTab, state: GameState, content: Content, sel
     },
   ];
   for (const hallId of focusHallIds) {
+    const hall = state.halls.find((h) => h.id === hallId);
     rows.push({
       key: `advanceHall:${hallId}`,
-      label: `Advance construction: ${hallId}`,
+      label: hall ? hallAdvanceLabel(hall) : `Advance construction: ${hallId}`,
       help: advanceHall.help,
       ap: advanceHall.ap,
       cashLabel: cashLabel(advanceHall, state, content),

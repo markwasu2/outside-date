@@ -19,7 +19,7 @@ test('fresh title through signing, object-only construction and final report',as
     await popup.getByRole('button',{name:'Permits & people',exact:true}).click();
    }
    // Only intentional build/prerequisite actions; no generic click-all, no bot or state injection.
-   const wanted=/Cure|Commission the interconnection|Order the switchgear|Option the site|File building permit|File water permit|File air permit|near pad|Advance construction|Fix inspection|Cure the draw freeze|Confirm the rack schedule/;
+   const wanted=/Cure|Commission the interconnection|Order the switchgear|Option the site|File building permit|File water permit|File air permit|near pad|Advance construction|Start commissioning|Fix inspection|Cure the draw freeze|Confirm the rack schedule/;
    const seen=new Set<string>();
    for(let pass=0;pass<12;pass++){
     const rows=popup.getByTestId('popover-action');let clicked=false;

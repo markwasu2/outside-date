@@ -227,7 +227,7 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
   );
   if (buildable) {
     return {
-      title: `Advance construction on ${buildable.id}`,
+      title: buildable.stageIndex === 4 ? `Start commissioning on ${buildable.id}` : `Advance construction on ${buildable.id}`,
       why: `${buildable.id} is idle. Its delivery date is ${formatMonth(buildable.deliveryMonth)} and its outside date is ${formatMonth(
         buildable.outsideMonth,
       )} - keep the crew moving.`,
