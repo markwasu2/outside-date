@@ -44,3 +44,11 @@ it('names the remaining testimony gain and folds capped preparation without chan
  const before=JSON.stringify(s),text=decisionResult(a,s,c,'');
  expect(text).toContain('already at its 24% cap');expect(text).toContain('adds no vote chance');expect(text).toContain('commission goodwill -1');expect(isContextOnlyAction(a,s,c)).toBe(true);expect(JSON.stringify(s)).toBe(before);
 });
+
+it('names the previous-month trigger without suggesting a same-month repeat penalty',()=>{
+ const c=loadContent(),s=createGame(c,'whale',DEFAULT_SETUP,DEFAULT_NEGOTIATION,1),a={actionId:'prepTestimony'};
+ s.month=4;s.docket.status='open';s.flags.lastPrepTestimonyMonth=3;
+ expect(decisionResult(a,s,c,'')).toContain('You prepared last month, so preparing in consecutive months');
+ s.flags.lastPrepTestimonyMonth=4;expect(decisionResult(a,s,c,'')).not.toContain('goodwill -1');
+ s.flags.lastPrepTestimonyMonth=2;expect(decisionResult(a,s,c,'')).not.toContain('goodwill -1');
+});

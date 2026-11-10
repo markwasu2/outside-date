@@ -15,7 +15,7 @@ export function decisionResult(action:PlannedAction,state:GameState,content:Cont
  case 'fileDocket':return 'Starts the regulator\'s power-approval case. You must prepare testimony and meet opposing groups before the vote. Filing is not approval.';
  case 'prepTestimony':{
  const gain=Math.max(0,Math.min(t.docket.testimonyBonus,t.docket.testimonyCap-state.docket.testimonyBonus));
- const consequence=state.flags.lastPrepTestimonyMonth===state.month-1?' Preparing again this month also costs commission goodwill -1.':'';
+ const consequence=state.flags.lastPrepTestimonyMonth===state.month-1?' You prepared last month, so preparing in consecutive months also costs commission goodwill -1.':'';
  return gain===0?`Testimony is already at its ${Math.round(t.docket.testimonyCap*100)}% cap. More preparation spends focus but adds no vote chance.${consequence}`:`Adds ${Math.round(gain*100)} percentage points to the testimony bonus, up to ${Math.round(t.docket.testimonyCap*100)}%.${consequence}`;
  }
  case 'optionSite':return 'Secures this land using your funding commitments. Required before you can break ground; it does not build a hall yet.';
