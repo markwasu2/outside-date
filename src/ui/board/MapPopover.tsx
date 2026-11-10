@@ -105,7 +105,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
                 data-testid="popover-action"
                 onClick={() => {
                   queueAction(r.action);
-                  setFeedback(`${r.label} planned. Review or undo from Plan. End month to commit.`);
+                  setFeedback(`${r.label} - done. Undo is at the bottom of What can I do? until you end the month.`);
                 }}
                 style={{
                   display: 'block',
@@ -173,7 +173,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
         {objectId === 'laydownYard' && (() => {
           const row = buildRows('construction', state, content, null).find((r) => r.key === 'importCrews')!;
           const check = checkAction(committed, content, plan, row.action);
-          return <button data-testid="popover-action" disabled={!check.ok} title={check.ok ? row.help : check.reason} onClick={() => { queueAction(row.action); setFeedback(`${row.label} planned. Review or undo from Plan. End month to commit.`); }} style={{ width: '100%', padding: 6, marginBottom: 8 }}>{row.label} ({actionCostWords(row.ap)}; {row.cashLabel})</button>;
+          return <button data-testid="popover-action" disabled={!check.ok} title={check.ok ? row.help : check.reason} onClick={() => { queueAction(row.action); setFeedback(`${row.label} - done. Undo is at the bottom of What can I do? until you end the month.`); }} style={{ width: '100%', padding: 6, marginBottom: 8 }}>{row.label} ({actionCostWords(row.ap)}; {row.cashLabel})</button>;
         })()}
         {objectId === 'siteOffice' && <DocketBrief state={state} content={content} />}
         {objectId === 'siteOffice' && (

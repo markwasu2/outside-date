@@ -113,6 +113,28 @@ export function step(
   return runWorldTick(drawn.state, content);
 }
 
+/**
+ * Applies ONE action immediately, mid-month, without advancing the clock or drawing an event
+ * (the UI's do-it-now model: clicking an action is doing it; End month only advances time).
+ * Validates the action against this month's remaining focus budget exactly as `step()` would,
+ * applies it, and charges its AP to `apUsedThisMonth` so later clicks and the End-month tick
+ * see the spend. Event draws stay at End month, so a month of immediate actions followed by
+ * `step(state, [], content)` is identical to the old queue-then-commit `step(state, actions)`.
+ */
+export function applyImmediateAction(
+  state: GameState,
+  action: PlannedAction,
+  content: Content,
+): GameState {
+  if (state.phase !== 'playing') {
+    throw new ActionError(`applyImmediateAction() called while phase is "${state.phase}", expected "playing"`);
+  }
+  content = resolveContent(state, content);
+  const apCost = validateActions(state, [action], content);
+  const charged: GameState = { ...state, apUsedThisMonth: state.apUsedThisMonth + apCost };
+  return applyAction(charged, action, content);
+}
+
 /** Applies a pending event's chosen branch (4.2 step 3), then runs the world tick. */
 export function resolveEvent(
   state: GameState,

@@ -10,7 +10,7 @@ interface HallSpriteProps {
   /** Extra warning state the pure function cannot see (needs the current month / state flags). */
   late: boolean;
   failedInspection: boolean;
-  /** A queued action targets this hall in the current plan: draw the ghost outline. */
+  /** An action already applied this month targets this hall: mark it "Done". */
   queuedGhost: boolean;
   /** Net monthly rent once delivered (rent ticker); null while under construction. */
   rent: number | null;
@@ -43,13 +43,13 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
         )}
       </div>
 
-      {/* queued ghost: dashed outline while any queued action targets this hall */}
+      {/* done marker: an action applied this month targets this hall */}
       {queuedGhost && (
         <div
           data-testid="queued-ghost"
-          title="An action is queued for this hall this month"
+          title="You acted on this hall this month"
           style={{ position: 'absolute', left: '50%', bottom: '17%', transform: 'translateX(-50%)', padding: '2px 7px', fontSize: 10, background: '#e6ecff', color: '#253e7b', border: '1px solid #7186b4', borderRadius: 4, pointerEvents: 'none' }}
-        >Planned</div>
+        >Done</div>
       )}
 
       {/* warning pips */}

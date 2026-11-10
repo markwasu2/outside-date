@@ -12,7 +12,7 @@ import type { PlannedAction } from '../../engine/types';
 import { STAGE_ART, TILE_ART, SUBSTATION_ART, PLANT_ART, type TileArt } from '../art';
 import { LEGEND_ENTRIES, hallBlocker, hallCaption, pondStateWords, substationStateWords } from '../board/legibility';
 import { COOLING_ART, DELIVERY_TRUCK, EQUIP_ART } from '../art';
-import { useStore } from '../store';
+import { checkAction, useStore } from '../store';
 import { usePrefersReducedMotion } from '../board/boardStyles';
 import { monthDeltas } from '../board/deltas';
 import { hallVisual, stageMinMonths } from '../board/hallVisual';
@@ -134,8 +134,8 @@ export function hallAreaLayout(hallCount: number): { columns: number; rows: numb
   return { columns: Math.ceil(hallCount / 2), rows: 2 };
 }
 
-/** D2/D8: whether the current plan queues any action that belongs to this map object - drives
- * the dashed "queued" ghost outline. */
+/** D2/D8, updated for do-it-now actions: whether any action already applied this month belongs
+ * to this map object - drives the "Done" marker, so a click leaves a visible trace on the campus. */
 function objectHasQueuedAction(objectId: string, plan: PlannedAction[], hallIds: string[]): boolean {
   if (hallIds.includes(objectId)) {
     return plan.some((a) => a.params?.['hallId'] === objectId);
@@ -158,18 +158,18 @@ function objectHasQueuedAction(objectId: string, plan: PlannedAction[], hallIds:
   }
 }
 
-/** Small dashed ghost outline for non-hall map objects (halls get theirs inside HallSprite). */
+/** Small "Done" marker for non-hall map objects (halls get theirs inside HallSprite). */
 function QueuedGhost() {
   return (
     <div
       data-testid="queued-ghost"
-      title="An action is queued for this object this month"
+      title="You acted on this object this month"
       style={{ position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)', padding: '2px 7px', background: '#e6ecff', color: '#253e7b', border: '1px solid #7186b4', borderRadius: 4, fontSize: 10, pointerEvents: 'none' }}
-    >Planned</div>
+    >Done</div>
   );
 }
 
-export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;waiting?:boolean;onShow:()=>void}} = {}) {
+export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;waiting?:boolean;onShow:()=>void;actionId?:string;params?:Record<string,string|number>}} = {}) {
   const draft = useStore((s) => s.draft);
   const state = useStore((s) => s.state);
   const prevState = useStore((s) => s.prevState);
@@ -179,6 +179,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
   const selectHall = useStore((s) => s.selectHall);
   const boardPopover = useStore((s) => s.boardPopover);
   const setBoardPopover = useStore((s) => s.setBoardPopover);
+  const queueAction = useStore((s) => s.queueAction);
   const reducedMotion = usePrefersReducedMotion();
 
   // D4/D9: month-over-month deltas between the last two committed states.
@@ -704,7 +705,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
       )}
 
       {cue && <div data-testid="next-step-card" title={cue.why} style={{position:'absolute',...cuePos,zIndex:31,maxWidth:300,padding:'6px 8px',border:'1px solid #65866b',borderRadius:8,background:'#fffdf3ed',boxShadow:'0 3px 12px #0002',fontSize:12,display:'flex',alignItems:'center',gap:8}}>
-        <button aria-expanded={cueExpanded} onClick={()=>setCueExpanded(!cueExpanded)} style={{background:'none',border:0,padding:0,textAlign:'left',fontWeight:'bold',color:'inherit'}}>{cue.title}</button><button data-testid="next-step-show-me" aria-expanded={cue.waiting ? cueExpanded : undefined} onClick={cue.waiting ? ()=>setCueExpanded(!cueExpanded) : ()=>{setCueExpanded(false);cue.onShow();}} style={{whiteSpace:'nowrap'}}>{cue.waiting ? 'Why wait?' : 'Show me'}</button>{cueExpanded && <div data-testid="next-step-explanation" style={{pointerEvents:'none',position:'absolute',top:'100%',left:0,width:280,padding:10,background:'#fffdf3',border:'1px solid #65866b',borderRadius:6,lineHeight:1.4}}>{cue.why}</div>}<span aria-hidden="true" style={{position:'absolute',bottom:-12,left:18,color:'#325b48'}}>▼</span>
+        <button aria-expanded={cueExpanded} onClick={()=>setCueExpanded(!cueExpanded)} style={{background:'none',border:0,padding:0,textAlign:'left',fontWeight:'bold',color:'inherit'}}>{cue.title}</button><button data-testid="next-step-show-me" aria-expanded={cue.waiting ? cueExpanded : undefined} onClick={cue.waiting ? ()=>setCueExpanded(!cueExpanded) : ()=>{setCueExpanded(false);cue.onShow();}} style={{whiteSpace:'nowrap'}}>{cue.waiting ? 'Why wait?' : 'Show me'}</button>{!cue.waiting && cue.actionId && (()=>{const action={actionId:cue.actionId,params:cue.params};const check=checkAction(state,content,plan,action);return check.ok?<button data-testid="next-step-do-it" onClick={()=>{setCueExpanded(false);queueAction(action);}} style={{whiteSpace:'nowrap',background:'#325b48',color:'#fff',border:'1px solid #274737',borderRadius:5,padding:'3px 8px'}}>Do it now</button>:null;})()}{cueExpanded && <div data-testid="next-step-explanation" style={{pointerEvents:'none',position:'absolute',top:'100%',left:0,width:280,padding:10,background:'#fffdf3',border:'1px solid #65866b',borderRadius:6,lineHeight:1.4}}>{cue.why}</div>}<span aria-hidden="true" style={{position:'absolute',bottom:-12,left:18,color:'#325b48'}}>▼</span>
       </div>}
 
       {boardPopover && popoverPos && (

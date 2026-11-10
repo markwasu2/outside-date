@@ -7,7 +7,7 @@ import {actionCostWords,decisionResult} from './decisionWords';
 /** A permanent action desk, not a hidden tab: each instruction names its campus location. */
 export function ActionDesk(){
  const state=useStore(s=>s.state),draft=useStore(s=>s.draft),content=useStore(s=>s.content),plan=useStore(s=>s.plan);
- const queue=useStore(s=>s.queueAction),remove=useStore(s=>s.removeAction),open=useStore(s=>s.setBoardPopover),select=useStore(s=>s.selectHall);
+ const queue=useStore(s=>s.queueAction),undoLast=useStore(s=>s.undoLastAction),open=useStore(s=>s.setBoardPopover),select=useStore(s=>s.selectHall);
  const [showBlocked,setShowBlocked]=useState(false);
  const groups:{title:string;place:string;id:string;rows:ActionRow[]}[]=[
   {title:'Land & access',place:'Road at the top of campus',id:'road',rows:buildRows('land',draft,content,null)},
@@ -21,7 +21,7 @@ export function ActionDesk(){
   {title:'People & relationships',place:'People on site · lower left',id:'people',rows:boardActionsForObject('siteOffice',draft,content).filter(r=>r.action.actionId==='visitCast')},
  ];
  return <aside data-testid="action-desk" aria-label="What you can do this month" style={{width:320,flexShrink:0,background:'#fffaf0',borderLeft:'1px solid #bcae8d',display:'flex',flexDirection:'column',fontSize:12,minHeight:0}}>
-  <div style={{padding:10,borderBottom:'1px solid #d9cfb9'}}><strong style={{fontSize:16}}>What can I do?</strong><div>Choose here or click the same object on campus. 1 focus: permits, insurance, inspection fixes. 2: major commitments. 4: recap. Money is separate. Each choice shows its cost and result.</div>
+  <div style={{padding:10,borderBottom:'1px solid #d9cfb9'}}><strong style={{fontSize:16}}>What can I do?</strong><div>Choose here or click the same object on campus - it happens right away, and Undo takes back the last one. 1 focus: permits, insurance, inspection fixes. 2: major commitments. 4: recap. Money is separate. Each choice shows its cost and result.</div>
    <label style={{display:'block',marginTop:7}}><input type="checkbox" checked={showBlocked} onChange={e=>setShowBlocked(e.target.checked)}/> Also show unavailable choices</label>
   </div>
   <div style={{overflowY:'auto',flex:1,minHeight:0,padding:8}}>
@@ -34,15 +34,16 @@ export function ActionDesk(){
       <strong>{r.label}</strong><div style={{color:'#345b36',margin:'3px 0'}}>{actionCostWords(r.ap)} · {r.cashLabel}</div>
       <div style={{lineHeight:1.4}}>{decisionResult(r.action,draft,content,r.help)}</div>
       {!check.ok&&<div style={{color:'#8d3224',marginTop:4}}>Unavailable: {check.reason}</div>}
-      <button data-testid="desk-add-action" disabled={!check.ok} onClick={()=>queue(r.action)} style={{marginTop:5}}>Add to this month's plan</button>
+      <button data-testid="desk-add-action" disabled={!check.ok} onClick={()=>queue(r.action)} style={{marginTop:5}}>Do it now</button>
      </div>)}
     </section>;
    })}
    {!groups.some(g=>g.rows.some(r=>checkAction(state,content,plan,r.action).ok))&&<p>No available instructions fit this month's remaining budget. Review your plan or end the month to let work progress.</p>}
   </div>
-  <div style={{padding:9,borderTop:'1px solid #d9cfb9',maxHeight:150,overflowY:'auto'}}><strong>This month's plan ({plan.length})</strong>
-   {!plan.length&&<div>Nothing planned. You can leave focus unused.</div>}
-   {plan.map((a,i)=><div key={i} style={{display:'flex',justifyContent:'space-between',gap:5,marginTop:4}}><span>{describeAction(a,content)} · {content.actions.find(d=>d.id===a.actionId)?.ap} focus</span><button onClick={()=>remove(i)}>Remove</button></div>)}
+  <div style={{padding:9,borderTop:'1px solid #d9cfb9',maxHeight:150,overflowY:'auto'}}><strong>Done this month ({plan.length})</strong>
+   {!plan.length&&<div>Nothing done yet. You can leave focus unused.</div>}
+   {plan.map((a,i)=><div key={i} style={{marginTop:4}}><span>{describeAction(a,content)} · {content.actions.find(d=>d.id===a.actionId)?.ap} focus</span></div>)}
+   {plan.length>0&&<button data-testid="undo-last-action" onClick={undoLast} style={{marginTop:6}}>Undo last: {describeAction(plan[plan.length-1]!,content)}</button>}
   </div>
  </aside>;
 }

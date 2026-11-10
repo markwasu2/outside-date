@@ -4,7 +4,6 @@ import type { Content } from '../../content/schemas';
 import { formatDollars, formatMonth, formatMonths } from '../../engine/format';
 import { dscr, forwardNoi, hallGrossRent, runway } from '../../engine/selectors';
 import type { GameState, GoodwillGroup } from '../../engine/types';
-import { totalApCost } from '../../engine/step';
 import { exportSaveToFile, SAVE_VERSION } from '../save';
 import { STAT_EXPLAINERS } from '../explainers';
 import { usePrefersReducedMotion } from '../board/boardStyles';
@@ -191,7 +190,7 @@ export function Hud({ hideFastForward = false }: { hideFastForward?: boolean }) 
   const fastForward = useStore((s) => s.fastForward);
   const [ffBusy, setFfBusy] = useState(false);
 
-  const apUsed = draft.apUsedThisMonth + totalApCost(plan, content);
+  const apUsed = draft.apUsedThisMonth;
   const apTotal = draft.apPerMonth;
   // Item 8: `runway()` (engine/selectors.ts) is the single source of truth for the HUD figure -
   // never a hand-rolled recompute here. `naiveMonths` below is cash/burn-only (ignores hall

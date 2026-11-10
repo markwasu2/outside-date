@@ -7,7 +7,7 @@ import { applyAction } from '../engine/actions';
 import { formatDollars } from '../engine/format';
 import { createGame, type DifficultyId, type NegotiationChoices } from '../engine/init';
 import { runway } from '../engine/selectors';
-import { fastForward as engineFastForward, fastForwardPause, resolveEvent, step, totalApCost } from '../engine/step';
+import { applyImmediateAction, fastForward as engineFastForward, fastForwardPause, resolveEvent, step } from '../engine/step';
 import type { GameState, PlannedAction, Setup } from '../engine/types';
 import { BotRng } from '../sim/rng';
 import { BOTS, playOneGame } from '../sim/runSim';
@@ -151,40 +151,39 @@ function isDuplicateZeroApAction(def: ActionDef, plan: PlannedAction[], action: 
 }
 
 /**
- * Whether `action` can be legally queued on top of `plan` right now: checks the remaining AP
- * budget (not enforced by `applyAction` itself, only by `step.ts`'s `validateActions`), then the
- * zero-AP duplicate check above, and then dry-runs the action via `applyAction`, discarding the
- * result - the same probe-and-apply pattern `foldPlan` uses, reused here so the engine's own
- * handler preconditions are the single source of truth for "is this legal", never duplicated in
- * UI code.
+ * Whether `action` can be legally done right now: checks the remaining focus budget (already
+ * charged to `state.apUsedThisMonth` by each do-it-now click, and otherwise enforced only by
+ * `step.ts`'s `validateActions`), then the zero-AP same-month duplicate check against
+ * `doneThisMonth` (the actions already applied this month), and then dry-runs the action via
+ * `applyAction`, discarding the result - the same probe-and-apply pattern `foldPlan` uses,
+ * reused here so the engine's own handler preconditions are the single source of truth for
+ * "is this legal", never duplicated in UI code.
  */
 export function checkAction(
   state: GameState,
   planContent: Content,
-  plan: PlannedAction[],
+  doneThisMonth: PlannedAction[],
   action: PlannedAction,
 ): { ok: true } | { ok: false; reason: string } {
   const def = planContent.actions.find((a) => a.id === action.actionId);
   if (!def) return { ok: false, reason: `Unknown action id: "${action.actionId}"` };
-  const used = totalApCost(plan, planContent);
-  const remaining = state.apPerMonth - state.apUsedThisMonth - used;
+  const remaining = state.apPerMonth - state.apUsedThisMonth;
   if (def.ap > 0 && def.ap > remaining) {
     return { ok: false, reason: `Uses ${def.ap} focus point${def.ap === 1 ? '' : 's'}; only ${remaining} left this month` };
   }
-  if (isDuplicateZeroApAction(def, plan, action)) {
-    return { ok: false, reason: 'Already queued this month' };
+  if (isDuplicateZeroApAction(def, doneThisMonth, action)) {
+    return { ok: false, reason: 'Already done this month' };
   }
-  const folded = foldPlan(state, planContent, plan);
   try {
-    const after = applyAction(folded, action, planContent);
+    const after = applyAction(state, action, planContent);
     // QA pass 2, finding 1 (tutorial cash trap): a handler's own `cash < cost` check still
     // passes when the cost exactly empties the bank - e.g. the tutorial's $8.0M "Fund road and
-    // school extensions" at exactly $8.0M cash, queueing an instant month-1 default. Refuse any
-    // queue that cuts cash AND leaves under one month of runway; the reason renders in place of
+    // school extensions" at exactly $8.0M cash, an instant month-1 default. Refuse any action
+    // that cuts cash AND leaves under one month of runway; the reason renders in place of
     // the row's help text, the same pattern every other disabled row uses. UI-only: engine
     // handlers and the sim bots (which carry their own runway gate in src/sim/bots/shared.ts)
     // are deliberately untouched.
-    if (after.cash < folded.cash && runway(after, planContent) < 1) {
+    if (after.cash < state.cash && runway(after, planContent) < 1) {
       return {
         ok: false,
         reason: `Would leave ${formatDollars(after.cash)} cash, under a month of runway - an instant loss at end of month`,
@@ -195,8 +194,8 @@ export function checkAction(
     const message = e instanceof Error ? e.message : String(e);
     // Explain an engine-confirmed stage rejection without changing engine legality.
     if (action.actionId === 'advanceHall' && message.includes('prerequisites not met')) {
-      const hall = folded.halls.find(h => h.id === action.params?.hallId);
-      const reason = hall ? hallAdvanceReason(folded, planContent, hall) : null;
+      const hall = state.halls.find(h => h.id === action.params?.hallId);
+      const reason = hall ? hallAdvanceReason(state, planContent, hall) : null;
       if (reason) return { ok: false, reason };
     }
     return { ok: false, reason: humanizeActionError(message) };
@@ -205,11 +204,19 @@ export function checkAction(
 
 interface UIStore {
   content: Content;
-  /** The last committed GameState (only advances via `endMonth`/`resolveEventChoice`). */
+  /** The live GameState. Do-it-now actions apply to it immediately; `endMonth`/`resolveEventChoice`
+   * advance the clock. */
   state: GameState;
-  /** This month's queued-but-not-yet-committed actions; acts as its own undo stack (P6.1). */
+  /** Actions already applied this month, in order - the visible "This month" list and the undo
+   * scope (`snapshots[i]` is the state before `plan[i]`). Cleared when the month advances. */
   plan: PlannedAction[];
-  /** `state` with `plan` folded on top, for live preview; recomputed on every mutation. */
+  /** Pre-action snapshots backing one-level-at-a-time undo of this month's applied actions. */
+  snapshots: GameState[];
+  /** The takeout priced but not yet committed: set by `openTakeoutPreview`, applied by
+   * `commitTakeout`, discarded by `cancelTakeout`. Never saved; pricing alone never ends a run. */
+  takeoutPreview: GameState | null;
+  /** Mirror of `state` kept for the many components that read `draft` (a legacy of the old
+   * queue-then-commit preview). Always equals `state` outside the takeout preview. */
   draft: GameState;
   selectedHallId: string | null;
   openPanel: OpenPanel | null;
@@ -275,8 +282,15 @@ interface UIStore {
   setOpenPanel: (panel: OpenPanel | null) => void;
   setScreen: (screen: Screen) => void;
   clearError: () => void;
+  /** Do the action now: validates, applies it to `state` at once (campus/cash/focus react
+   * immediately), records it in `plan` and pushes an undo snapshot. `priceTakeout` is the one
+   * exception: it opens the priced-close preview instead, which only `commitTakeout` applies. */
   queueAction: (action: PlannedAction) => void;
-  removeAction: (index: number) => void;
+  /** Reverts the most recent do-it-now action this month (LIFO). No-op with nothing applied. */
+  undoLastAction: () => void;
+  openTakeoutPreview: () => void;
+  commitTakeout: () => void;
+  cancelTakeout: () => void;
   undo: () => void;
   endMonth: () => void;
   dismissCoachTip: (id: string) => void;
@@ -310,6 +324,8 @@ export const useStore = create<UIStore>((set, get) => ({
   content,
   state: initialState(),
   plan: [],
+  snapshots: [],
+  takeoutPreview: null,
   draft: initialState(),
   selectedHallId: null,
   openPanel: null,
@@ -349,43 +365,77 @@ export const useStore = create<UIStore>((set, get) => ({
   clearError: () => set({ error: null }),
 
   queueAction: (action) => {
-    const { state, content: c, plan } = get();
+    const { state, content: c, plan, snapshots, muted } = get();
+    // The priced close is the one choice that still gets an explicit confirm: pricing opens a
+    // preview of the ending numbers and only "Commit the close" applies it (PR142's guard
+    // against ending from a misclick, kept without the old plan queue).
+    if (action.actionId === 'priceTakeout') {
+      get().openTakeoutPreview();
+      return;
+    }
     const result = checkAction(state, c, plan, action);
     if (!result.ok) {
       set({ error: result.reason });
       return;
     }
-    const newPlan = [...plan, action];
-    set({ plan: newPlan, draft: foldPlan(state, c, newPlan), error: null });
+    try {
+      const applied = applyImmediateAction(state, action, c);
+      const next = applyWarningCrossings(state, applied, c, muted);
+      set({ state: next, draft: next, plan: [...plan, action], snapshots: [...snapshots, state], error: null });
+      get().autosave();
+    } catch (e) {
+      set({ error: humanizeActionError(e instanceof Error ? e.message : String(e)) });
+    }
   },
 
-  removeAction: (index) => {
-    const { state, content: c, plan } = get();
-    const without = plan.filter((_, i) => i !== index);
-    // Removing an earlier action can invalidate a later one that depended on it (e.g. removing
-    // optionSite after queueing advanceHall's pad stage); re-validate in order and drop any
-    // action that no longer applies, rather than crashing or silently keeping a stale plan.
-    const validPlan: PlannedAction[] = [];
-    let working = state;
-    for (const action of without) {
-      try {
-        working = applyAction(working, action, c);
-        validPlan.push(action);
-      } catch {
-        // dropped: depended on the removed action
-      }
-    }
-    set({ plan: validPlan, draft: working, error: null });
+  undoLastAction: () => {
+    const { plan, snapshots } = get();
+    if (plan.length === 0 || snapshots.length === 0) return;
+    const prev = snapshots[snapshots.length - 1]!;
+    set({ state: prev, draft: prev, plan: plan.slice(0, -1), snapshots: snapshots.slice(0, -1), error: null });
+    get().autosave();
   },
+
+  openTakeoutPreview: () => {
+    const { state, content: c, plan } = get();
+    const action: PlannedAction = { actionId: 'priceTakeout' };
+    const result = checkAction(state, c, plan, action);
+    if (!result.ok) {
+      set({ error: result.reason });
+      return;
+    }
+    try {
+      set({ takeoutPreview: applyAction(state, action, c), error: null });
+    } catch (e) {
+      set({ error: humanizeActionError(e instanceof Error ? e.message : String(e)) });
+    }
+  },
+
+  commitTakeout: () => {
+    const { state, takeoutPreview, content: c, muted } = get();
+    if (!takeoutPreview) return;
+    set((s) => ({
+      state: takeoutPreview,
+      draft: takeoutPreview,
+      prevState: state,
+      takeoutPreview: null,
+      plan: [],
+      snapshots: [],
+      error: null,
+      financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(takeoutPreview, c)),
+    }));
+    playTransitionSounds(state, takeoutPreview, c, muted);
+    get().autosave();
+  },
+
+  cancelTakeout: () => set({ takeoutPreview: null }),
 
   undo: () => {
-    const { plan, removeAction } = get();
-    if (plan.length === 0) return;
-    removeAction(plan.length - 1);
+    get().undoLastAction();
   },
 
   endMonth: () => {
-    const { state, content: c, plan, muted } = get();
+    const { state, content: c, muted } = get();
     // Fix 12 (playtest-fixes): a pending event modal must be resolved before the month can end -
     // `step()` throws otherwise. The modal-pending UI (TracksPanel's End month button) is already
     // disabled in this state, but a click that lands between React's state update and the
@@ -397,35 +447,22 @@ export const useStore = create<UIStore>((set, get) => ({
       return;
     }
     try {
-      // P10.5 bug fix: `step()` only runs during 'playing' (by design - the monthly world tick
-      // shouldn't fire once the takeout window is open) and throws otherwise. The only action
-      // TracksPanel offers once `phase` is 'takeoutAvailable' is `priceTakeout` itself, a pure
-      // state transition straight to 'ended' - commit the already-validated plan directly via
-      // `foldPlan` (the same helper the draft preview already uses) instead of routing it through
-      // `step()`'s tick pipeline. Without this, "End month" could never actually end a campaign -
-      // it would just surface step()'s phase-mismatch error (caught via live preview during P9.1/
-      // P9.2 verification, which had worked around it with a direct store-state injection instead
-      // of real clicks; see Decisions log).
+      // The takeout window ends the campaign only through the priced-close preview
+      // (`openTakeoutPreview`/`commitTakeout`); End month stays a friendly dead end here.
       if (state.phase === 'takeoutAvailable') {
-        const next = foldPlan(state, c, plan);
-        set((s) => ({
-          state: next,
-          prevState: state,
-          plan: [],
-          draft: next,
-          error: null,
-          financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(next, c)),
-        }));
-        playTransitionSounds(state, next, c, muted);
-        get().autosave();
+        set({ error: 'Price the takeout to finish the campaign.' });
         return;
       }
-      const result = step(state, plan, c);
+      // Do-it-now actions already applied (and charged focus) at click time, so End month just
+      // advances the clock: `step(state, [])` draws the monthly event and runs the world tick,
+      // exactly as if this month's actions had been queued and committed together.
+      const result = step(state, [], c);
       const next = applyWarningCrossings(state, result.state, c, muted);
       set((s) => ({
         state: next,
         prevState: state,
         plan: [],
+        snapshots: [],
         draft: next,
         error: null,
         financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(next, c)),
@@ -439,8 +476,7 @@ export const useStore = create<UIStore>((set, get) => ({
   },
 
   fastForward: () => {
-    const { state, content: c, plan, muted } = get();
-    if (plan.length > 0) return;
+    const { state, content: c, muted } = get();
     // Fix 12 (playtest-fixes): fast-forward is a no-op while a modal is pending (engine's own
     // `fastForward` loop condition is `phase === 'playing'`), which silently does nothing and
     // reads as a freeze. Guard explicitly with a visible reason instead.
@@ -467,6 +503,7 @@ export const useStore = create<UIStore>((set, get) => ({
       prevState: state,
       draft: next,
       plan: [],
+      snapshots: [],
       error: null,
       financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(next, c)),
     }));
@@ -486,6 +523,7 @@ export const useStore = create<UIStore>((set, get) => ({
         state: result.state,
         draft: result.state,
         plan: [],
+        snapshots: [],
         error: null,
         financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(result.state, c)),
       }));
@@ -502,6 +540,8 @@ export const useStore = create<UIStore>((set, get) => ({
       state: next,
       draft: next,
       plan: [],
+      snapshots: [],
+      takeoutPreview: null,
       selectedHallId: null,
       openPanel: null,
       error: null,
@@ -526,6 +566,8 @@ export const useStore = create<UIStore>((set, get) => ({
       state: save.state,
       draft: save.state,
       plan: [],
+      snapshots: [],
+      takeoutPreview: null,
       selectedHallId: null,
       openPanel: null,
       error: null,

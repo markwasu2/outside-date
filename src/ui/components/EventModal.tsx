@@ -136,7 +136,55 @@ export function describeEffect(effect: Effect): string {
 /** Joins every effect on a choice into one preview line, deduped so e.g. two generically-described
  * effects don't both read "Has consequences, Has consequences". Empty string (renders nothing) for
  * a choice with no effects, or when the choice can't be matched back to its content definition
- * (the synthetic `docketVoteFail` card's choices have no `content.events` entry at all). */
+ * (the synthetic `docketVoteFail` card's choices have no `content.events` entry at all).
+ *
+ * Do-it-now stakes pass: when the live `state` is available, generic cash/goodwill/focus effects
+ * resolve against it, so a choice reads like a weighed decision ("Town goodwill 54 -> 62 -
+ * permit and vote odds") instead of an abstract delta the player has to price themselves. */
+export function describeEffectWithState(effect: Effect, state: GameState): string {
+  if (effect.type === 'cash') {
+    const amount = effect.args[0];
+    if (typeof amount === 'number' && amount !== 0) {
+      const sign = amount > 0 ? '+' : '';
+      const after = state.cash + amount;
+      return `Cash ${sign}${formatDollars(amount)} (${amount > 0 ? 'raises you to' : 'leaves'} ${formatDollars(after)})`;
+    }
+  }
+  if (effect.type === 'goodwill') {
+    const group = effect.args[0];
+    const delta = effect.args[1];
+    const probabilityArg = effect.args[2];
+    const probabilistic = typeof probabilityArg === 'string' && probabilityArg.startsWith('p:');
+    if (typeof group === 'string' && typeof delta === 'number' && !probabilistic && group in state.goodwill) {
+      const before = state.goodwill[group as GoodwillGroup];
+      const after = Math.min(100, Math.max(0, before + delta));
+      const label = GOODWILL_LABELS[group as GoodwillGroup] ?? group;
+      const stakes: Record<string, string> = {
+        town: 'permit and docket-vote odds',
+        commission: 'permit and docket-vote odds',
+        utility: 'plant slip odds',
+        tenant: 'outside-date flexibility and exit value',
+      };
+      const stake = stakes[group];
+      return `${label} goodwill ${before} \u2192 ${after}${stake ? ` (${stake})` : ''}`;
+    }
+  }
+  if (effect.type === 'owedAp') {
+    const n = effect.args[0];
+    if (typeof n === 'number') {
+      return `Uses ${n} of next month's ${state.apPerMonth} focus points`;
+    }
+  }
+  if (effect.type === 'playerShare') {
+    const delta = effect.args[0];
+    if (typeof delta === 'number' && delta !== 0) {
+      const after = Math.max(0, state.equity.playerShare + delta);
+      return `Your equity share ${delta > 0 ? '+' : '-'}${Math.round(Math.abs(delta) * 100)} percentage points (to ${Math.round(after * 100)}%)`;
+    }
+  }
+  return describeEffect(effect);
+}
+
 /** UX 9: cards whose real stakes live in bespoke handlers or flags, not closed-set effects, so
  * the generic preview read "Has consequences" or nothing at all. Text mirrors each card's
  * events.json note and its engine handler (resolveChoice / cardOdds): governor_visit's
@@ -173,13 +221,14 @@ export function describeChoiceEffects(
   choiceId: string,
   eventCard: EventCard | null | undefined,
   hallTier?: string,
+  state?: GameState,
 ): string {
   if (!eventCard) return '';
   const bespoke = BESPOKE_CHOICE_STAKES[eventCard.id]?.(hallTier ?? 'liquid')[choiceId];
   if (bespoke) return bespoke;
   const def = eventCard.choices?.find((c) => c.id === choiceId);
   if (!def || def.effects.length === 0) return '';
-  const parts = def.effects.map(describeEffect);
+  const parts = def.effects.map((e) => (state ? describeEffectWithState(e, state) : describeEffect(e)));
   return Array.from(new Set(parts)).join(', ');
 }
 
@@ -313,7 +362,7 @@ export function EventModal() {
         })()}
         <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
           {pending.choices.map((choice) => {
-            const costText = isSynthetic ? describeVoteChoice(choice.id, resolveContent(draft, content).tuning.docket) : describeChoiceEffects(choice.id, eventCard, draft.setup.hallTier);
+            const costText = isSynthetic ? describeVoteChoice(choice.id, resolveContent(draft, content).tuning.docket) : describeChoiceEffects(choice.id, eventCard, draft.setup.hallTier, draft);
             return (
               <button
                 key={choice.id}
