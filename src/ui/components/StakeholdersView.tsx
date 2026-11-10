@@ -24,10 +24,7 @@ export function StakeholdersView() {
 
   return (
     <div data-testid="stakeholders-view">
-      <button onClick={() => openCodex(undefined)} style={{ marginTop: '1rem' }}>
-        Back to list
-      </button>
-      <h3>Stakeholders: who holds which risk</h3>
+      <h3 style={{ marginTop: 0 }}>Stakeholders: who holds which risk</h3>
       <p style={{ fontSize: '0.8rem', color: '#666', marginTop: 0 }}>
         The people across the table, what each is responsible for, and the real-world examples behind them.
       </p>

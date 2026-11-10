@@ -51,110 +51,125 @@ export function CodexModal() {
       }}
     >
       <div
+        role="dialog"
+        aria-labelledby="codex-heading"
+        aria-modal="true"
+        data-testid="codex-dialog"
         onClick={(e) => e.stopPropagation()}
         style={{
           background: '#fff',
           borderRadius: 8,
-          padding: '1.5rem',
-          width: 600,
-          maxWidth: '90vw',
-          maxHeight: '80vh',
-          overflowY: 'auto',
+          width: 648,
+          maxWidth: 'calc(100vw - 32px)',
+          maxHeight: '86vh',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          boxSizing: 'border-box',
           fontFamily: 'sans-serif',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ margin: 0 }}>Codex</h2>
-          <button onClick={closeCodex}>Close</button>
-        </div>
-
-        {showStakeholders ? (
-          <StakeholdersView />
-        ) : selected ? (
-          <div>
+        <header style={{ padding: '1.5rem 1.5rem 0', flexShrink: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+            <h2 id="codex-heading" style={{ margin: 0 }}>Codex</h2>
+            <button onClick={closeCodex}>Close</button>
+          </div>
+          {selectedId && (
             <button onClick={() => openCodex(undefined)} style={{ marginTop: '1rem' }}>
               Back to list
             </button>
-            <h3>
-              {selected.title}
-              {selected.needsVerification && (
-                <span
-                  style={{
-                    marginLeft: '0.5rem',
-                    fontSize: '0.7rem',
-                    color: '#a40',
-                    border: '1px solid #a40',
-                    borderRadius: 4,
-                    padding: '0.1rem 0.4rem',
-                  }}
-                >
-                  unverified
-                </span>
-              )}
-            </h3>
-            <p>{selected.body}</p>
-            <p style={{ fontSize: '0.8rem', color: '#666' }}>
-              Real-world anchor: {selected.realAnchor}
-              <br />
-              <a href={selected.sourceUrl} target="_blank" rel="noreferrer">
-                Source
-              </a>{' '}
-              - verified {selected.verifiedOn}
-            </p>
-          </div>
-        ) : (
-          <div>
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search the codex..."
-              style={{ width: '100%', padding: '0.5rem', marginTop: '1rem', marginBottom: '0.5rem', boxSizing: 'border-box' }}
-            />
-            {/* Phase 2 (D4): the Stakeholders view sits next to the searchable entry list. */}
-            <button
-              data-testid="codex-stakeholders-button"
-              onClick={() => openCodex('stakeholders')}
-              style={{
-                display: 'block',
-                width: '100%',
-                textAlign: 'left',
-                padding: '0.5rem',
-                marginBottom: '1rem',
-                border: '1px solid #6a5acd',
-                borderRadius: 4,
-                background: '#f3f0ff',
-                cursor: 'pointer',
-              }}
-            >
-              Stakeholders: who holds which risk
-            </button>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {filtered.map((entry) => (
-                <li key={entry.id} style={{ marginBottom: '0.5rem' }}>
-                  <button
-                    onClick={() => openCodex(entry.id)}
+          )}
+        </header>
+        <div
+          key={selectedId ?? 'list'}
+          data-testid="codex-reading-area"
+          style={{ padding: '1.5rem', overflowY: 'auto', minHeight: 0 }}
+        >
+          {showStakeholders ? (
+            <StakeholdersView />
+          ) : selected ? (
+            <div>
+              <h3 style={{ marginTop: 0 }}>
+                {selected.title}
+                {selected.needsVerification && (
+                  <span
                     style={{
-                      display: 'block',
-                      width: '100%',
-                      textAlign: 'left',
-                      padding: '0.5rem',
-                      border: '1px solid #ddd',
+                      marginLeft: '0.5rem',
+                      fontSize: '0.7rem',
+                      color: '#a40',
+                      border: '1px solid #a40',
                       borderRadius: 4,
-                      background: '#fafafa',
-                      cursor: 'pointer',
+                      padding: '0.1rem 0.4rem',
                     }}
                   >
-                    {entry.title}
-                    {entry.needsVerification && (
-                      <span style={{ marginLeft: '0.5rem', fontSize: '0.7rem', color: '#a40' }}>unverified</span>
-                    )}
-                  </button>
-                </li>
-              ))}
-              {filtered.length === 0 && <p style={{ color: '#888' }}>No codex entries match.</p>}
-            </ul>
-          </div>
-        )}
+                    unverified
+                  </span>
+                )}
+              </h3>
+              <p>{selected.body}</p>
+              <p style={{ fontSize: '0.8rem', color: '#666' }}>
+                Real-world anchor: {selected.realAnchor}
+                <br />
+                <a href={selected.sourceUrl} target="_blank" rel="noreferrer">
+                  Source
+                </a>{' '}
+                - verified {selected.verifiedOn}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search the codex..."
+                style={{ width: '100%', padding: '0.5rem', marginTop: '1rem', marginBottom: '0.5rem', boxSizing: 'border-box' }}
+              />
+              {/* Phase 2 (D4): the Stakeholders view sits next to the searchable entry list. */}
+              <button
+                data-testid="codex-stakeholders-button"
+                onClick={() => openCodex('stakeholders')}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '0.5rem',
+                  marginBottom: '1rem',
+                  border: '1px solid #6a5acd',
+                  borderRadius: 4,
+                  background: '#f3f0ff',
+                  cursor: 'pointer',
+                }}
+              >
+                Stakeholders: who holds which risk
+              </button>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {filtered.map((entry) => (
+                  <li key={entry.id} style={{ marginBottom: '0.5rem' }}>
+                    <button
+                      onClick={() => openCodex(entry.id)}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        textAlign: 'left',
+                        padding: '0.5rem',
+                        border: '1px solid #ddd',
+                        borderRadius: 4,
+                        background: '#fafafa',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {entry.title}
+                      {entry.needsVerification && (
+                        <span style={{ marginLeft: '0.5rem', fontSize: '0.7rem', color: '#a40' }}>unverified</span>
+                      )}
+                    </button>
+                  </li>
+                ))}
+                {filtered.length === 0 && <p style={{ color: '#888' }}>No codex entries match.</p>}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
