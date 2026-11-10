@@ -151,3 +151,9 @@ it('prioritizes frozen draws and failed inspections over waiting or other prereq
  state.flags.drawFreeze=false;state.flags['inspectionFail:H1']=true;
  expect(nextStep(state,content).params).toEqual({hallId:'H1'});
 });
+
+it('routes land purchase to the road where the actual site-option action lives',()=>{
+ const state=powerWaitingState();state.power.studyStatus='done';state.power.substationStatus='done';
+ state.docket.status='approved';state.permitsRequired=[];state.flags.siteOptioned=false;state.flags.siteOptionedAtStart=false;
+ expect(nextStep(state,content).objectId).toBe('road');expect(nextStep(state,content).actionId).toBe('optionSite');
+});
