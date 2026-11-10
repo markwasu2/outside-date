@@ -57,7 +57,9 @@ function useKeyboardShortcuts() {
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (screen !== 'game' || phase !== 'playing') return;
+      if (screen !== 'game' || phase !== 'playing' || e.repeat || e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+      const target = e.target instanceof Element ? e.target : null;
+      if (target?.closest('input,textarea,select,button,a,[role=button],[contenteditable=true],[role=dialog]')) return;
       if (e.key === ' ') {
         e.preventDefault();
         endMonth();
@@ -140,7 +142,7 @@ function CampusGame() {
         <span style={{ flex: 1 }}>{error ? error : plan.length ? `${plan.length} action${plan.length === 1 ? '' : 's'} planned. Cash above previews the plan.` : 'Click a hall, office or power site to build and manage your campus.'}</span>
         {plan.length > 0 && <button onClick={() => setDrawer('actions')}>Review plan</button>}
         {state.phase === 'takeoutAvailable' && !takeoutQueued && <button data-testid="price-takeout-banner" onClick={() => queueAction({ actionId: 'priceTakeout' })}>Price the takeout to finish the campaign</button>}
-        <button style={{ padding: '10px 30px', background: '#325b48', border: '1px solid #274737', borderRadius: 6, color: 'white', fontWeight: 'bold', cursor: 'pointer' }} disabled={state.phase === 'awaitingChoice' || (state.phase === 'takeoutAvailable' && !takeoutQueued)} onClick={endMonth}>End month</button>
+        <button style={{ padding: '10px 30px', background: '#325b48', border: '1px solid #274737', borderRadius: 6, color: 'white', fontWeight: 'bold', cursor: 'pointer' }} disabled={state.phase === 'awaitingChoice' || (state.phase === 'takeoutAvailable' && !takeoutQueued)} onClick={(e) => { if (e.detail < 2) endMonth(); }}>End month</button>
       </footer>
       <LedgerDrawer hideTrigger /><FinancialsDrawer hideTrigger /><EventModal />
     </div>
