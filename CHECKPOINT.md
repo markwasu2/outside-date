@@ -1534,3 +1534,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | visual fix | opening a real object closes the cue explanation so it cannot sit behind the popup |
 | gates | 555 unit, 98 browser (96 bounded + 2 complete journeys), lint, tsc, build; 1280px wait/partial explanation/closing popup inspected |
 | scope | UI guidance only; no engine/save/bot/odds change; one player's expansion loss is not a balance verdict |
+
+# Personal expanded-Whale replay - due is not yet unpaid
+
+| criterion | status |
+|---|---|
+| observed | switchgear and transformer turned red with slot-loss countdown in their scheduled arrival month, then arrived normally on End month |
+| cause | state month is the upcoming tick; arrival-month equality has not yet attempted funding |
+| fixed | due month says due this month, without red unpaid warning; tooltip and yard popup explain the delivery/balance tick; after an unsuccessful tick the existing overdue countdown remains |
+| gates | 555 unit, 99 browser (97 bounded + 2 complete journeys), lint, tsc, build; due/unpaid 1280px screenshots inspected |
+| scope | UI display boundary only; no engine/save/bot/rule changes |
