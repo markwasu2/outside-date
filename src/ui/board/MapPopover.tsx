@@ -115,7 +115,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
           padding: '0.4rem',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+        <div data-testid="popover-header" style={{ position:'sticky',top:-7,zIndex:2,background:'#fffdf7',padding:'5px 0',display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4, borderBottom:'1px solid #d9cfb9' }}>
           <strong>{title}</strong>
           <button onClick={onClose} aria-label="Close" style={{ border: '1px solid #b9ab8e', borderRadius: 4, background: '#f4ead5', padding: '3px 8px', cursor: 'pointer', fontSize: '0.8rem' }}>
             Close

@@ -1342,3 +1342,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | gates | done:534 unit,81 browser in bounded groups,lint,tsc,build |
 | pixels | inspected:1280 and1440 full-width campus, readable small cue and persistent End month; details absent until requested |
 | caveat | compact top bar retains month, cash, focus and controls so the player can still act; this is not a literal interface-free screenshot |
+
+# Playtest 5 - popup ergonomics at desktop size
+
+| criterion | status |
+|---|---|
+| Close | done: sticky popup title/Close remains visible while scrolling long action lists |
+| resize | done: popup reanchors and clamps when map resizes, including opening the optional Actions desk |
+| interaction | done: direct road-to-hall switch and outside dismissal tested, no click-eating backdrop |
+| scope | layout only, no engine/save/bot change; no grid needed |
+| gates | done:534 unit,82 browser tests bounded groups,lint,tsc,build |
+| pixels | inspected:1280 scrolled office with Close visible and map/End month accessible |

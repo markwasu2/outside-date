@@ -206,15 +206,21 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;o
       setPopoverPos(null);
       return;
     }
-    const r = el.getBoundingClientRect();
-    const cr = container.getBoundingClientRect();
-    const anchorLeft = r.left - cr.left;
-    const anchorRight = r.right - cr.left;
-    let left = anchorRight + 6;
-    if (anchorLeft > cr.width / 2) left = anchorLeft - 6 - POPOVER_WIDTH;
-    left = Math.max(0, Math.min(left, cr.width - POPOVER_WIDTH));
-    const top = Math.max(0, Math.min(r.top - cr.top, cr.height - POPOVER_MAX_HEIGHT));
-    setPopoverPos({ left, top });
+    const place = () => {
+      const r = el.getBoundingClientRect();
+      const cr = container.getBoundingClientRect();
+      const anchorLeft = r.left - cr.left;
+      const anchorRight = r.right - cr.left;
+      let left = anchorRight + 6;
+      if (anchorLeft > cr.width / 2) left = anchorLeft - 6 - POPOVER_WIDTH;
+      left = Math.max(0, Math.min(left, cr.width - POPOVER_WIDTH));
+      const top = Math.max(0, Math.min(r.top - cr.top, cr.height - POPOVER_MAX_HEIGHT));
+      setPopoverPos({ left, top });
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(container);
+    return () => observer.disconnect();
   }, [boardPopover]);
 
   const [cueExpanded,setCueExpanded] = useState(false);
