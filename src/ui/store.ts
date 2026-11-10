@@ -1,3 +1,4 @@
+import { milestoneWords } from './board/milestoneWords';
 import { create } from 'zustand';
 
 import type { ActionDef, Content } from '../content/schemas';
@@ -31,7 +32,7 @@ function deliveredCount(state: GameState): number {
  * always matches the one that actually fired. Exported for tests. `state`/`content` here are the
  * already-stopped state fast-forward returned, same as what the engine's guard itself read. */
 export function fastForwardStopReason(state: GameState, content: Content): string {
-  return `Fast-forward stopped: ${fastForwardPause(state,content) ?? 'a construction handoff is ready - choose its next stage.'}`;
+  return `Fast-forward stopped: ${milestoneWords(fastForwardPause(state,content) ?? 'a construction handoff is ready - choose its next stage.')}`;
 }
 
 /** Phase 1 (D8): fires each threshold warning once per crossing - diffs the warnings() lists
