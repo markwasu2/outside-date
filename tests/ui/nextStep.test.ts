@@ -142,5 +142,5 @@ it('skips a blocked hall when another hall can really advance', () => {
 });
 it('names the funding check when gear is due but its balance is unpaid', () => {
   const state = powerWaitingState(); state.month = 40;
-  expect(nextStep(state, content).why).toContain('check Money');
+  expect(nextStep(state, content).why).toContain('check the site office for funding');
 });

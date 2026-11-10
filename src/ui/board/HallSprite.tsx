@@ -43,27 +43,13 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
         )}
       </div>
 
-      {/* stage progress strip: the month-to-month build feedback the old growing SVG gave */}
-      {underConstruction && (
-        <div
-          data-testid="stage-progress"
-          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 6, background: 'rgba(0,0,0,0.25)', borderRadius: '0 0 6px 6px', pointerEvents: 'none' }}
-          aria-hidden="true"
-        >
-          <div
-            className="board-anim"
-            style={{ width: `${Math.round(progress0to1 * 100)}%`, height: '100%', background: '#7fb069', transition: 'width 0.6s ease', borderRadius: '0 0 6px 6px' }}
-          />
-        </div>
-      )}
-
       {/* queued ghost: dashed outline while any queued action targets this hall */}
       {queuedGhost && (
         <div
           data-testid="queued-ghost"
           title="An action is queued for this hall this month"
-          style={{ position: 'absolute', inset: 1, border: '2px dashed rgba(30, 60, 200, 0.8)', borderRadius: 4, pointerEvents: 'none' }}
-        />
+          style={{ position: 'absolute', left: '50%', bottom: '17%', transform: 'translateX(-50%)', padding: '2px 7px', fontSize: 10, background: '#e6ecff', color: '#253e7b', border: '1px solid #7186b4', borderRadius: 4, pointerEvents: 'none' }}
+        >Planned</div>
       )}
 
       {/* warning pips */}
@@ -173,7 +159,7 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
       )}
 
       {/* keep the stage icon whisper-small in a corner so the tile still reads at a glance */}
-      <span style={{ position: 'absolute', bottom: 2, left: 3, fontSize: '0.65rem', opacity: 0.8 }}>{look?.icon}</span>
+      
     </div>
   );
 }

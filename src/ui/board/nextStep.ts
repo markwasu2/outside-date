@@ -196,10 +196,10 @@ export function nextStep(state: GameState, content: Content): NextStep {
       const wait = power.substationStatus === 'building'
         ? `Substation construction is underway until ${formatMonth(power.substationDoneMonth ?? state.month)}.`
         : power.substationStatus === 'none' && pending.length
-          ? pending.map((o) => `${o.kind} ${state.month >= o.arrivalMonth ? 'is due now; check Money if its balance cannot be funded' : `arrives ${formatMonth(o.arrivalMonth)}`}`).join('; ') + '.'
+          ? pending.map((o) => `${o.kind} ${state.month >= o.arrivalMonth ? 'is due now; check the site office for funding if its balance cannot be paid' : `arrives ${formatMonth(o.arrivalMonth)}`}`).join('; ') + '.'
           : power.substationStatus === 'none'
             ? `Study ${power.studyStatus === 'pending' ? `finishes ${formatMonth(power.studyDoneMonth ?? state.month)}` : 'complete'}; gear installs automatically on the next monthly tick when both orders have arrived.`
-            : 'Substation is complete; the next source of capacity is the power plants. Check their online dates in Power.';
+            : 'Substation is complete; the next source of capacity is the power plants. Check their online dates at the power plants.';
       return { title: `${blocked.id}: waiting on power hookup`, why: `${wait} ${chain} End the month to advance these clocks.`, objectId: 'substation' };
     }
     return { title: `${blocked.id}: ${blocker}`, why: 'This prerequisite blocks its next stage. Resolve it before advancing construction.', objectId: blocker.includes('permit') ? 'siteOffice' : blocked.id };

@@ -610,7 +610,7 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
             awaitingChoice
               ? 'Resolve the pending event before ending the month'
               : takeoutOpen && !takeoutQueued
-                ? 'The takeout window is open - price the takeout (above, or the Money tab) to finish the campaign'
+                ? 'The takeout window is open - price the takeout (above, or search the plan for takeout) to finish the campaign'
                 : undefined
           }
           style={{ marginTop: '0.5rem', width: '100%', padding: '0.5rem' }}

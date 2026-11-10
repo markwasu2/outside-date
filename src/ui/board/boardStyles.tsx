@@ -17,9 +17,16 @@ export function BoardStyles() {
         overflow: visible !important;
       }
       [data-campus-scene] [data-scene-object][aria-pressed="true"] {
-        outline: 2px dashed #345e49;
-        outline-offset: -5px;
-        border-radius: 18px;
+        outline: none;
+      }
+      [data-campus-scene] [data-scene-object]:focus-visible {
+        outline: 2px solid #345e49;
+      }
+      [data-campus-scene] [data-scene-object][aria-pressed="true"] [data-testid^="caption-"] {
+        box-shadow: 0 0 0 2px #345e49;
+      }
+      [data-campus-scene] [data-scene-object][aria-pressed="true"] > img {
+        filter: drop-shadow(0 0 7px #325b48) !important;
       }
       [data-campus-scene] [data-scene-object] > img { filter: drop-shadow(0 8px 4px #4a3b252a); }
       [data-campus-scene] [data-testid="map-road"] { background: transparent !important; }

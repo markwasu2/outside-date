@@ -49,10 +49,10 @@ function cashLevers(state: GameState, content?: Content): WarningFix[] {
     fixes.push({ label: `Cancel the ${openOrder.kind} order (partial refund)`, objectId: 'substation' });
   }
   if (state.insurance.dsu || state.insurance.buildersRisk) {
-    fixes.push({ label: "Drop DSU or builder's risk cover", tab: 'money' });
+    fixes.push({ label: "Review insurance at the site office", tab: 'money' });
   }
   if (content && allLeverQuotes(state, content).some((q) => q.available)) {
-    fixes.push({ label: 'Raise capital: bridge loan, equity call, mezz (Capital tab)', tab: 'capital' });
+    fixes.push({ label: 'Raise capital: bridge loan, equity call, mezz at the site office', tab: 'capital' });
   }
   const swapHall = state.halls.find((h) => !h.delivered && !h.terminated);
   if (swapHall && state.flags.rackScheduleConfirmed) {
@@ -229,8 +229,8 @@ export function warnings(state: GameState, content: Content): BoardWarning[] {
       id: 'insurance-builders-risk',
       level: 'notice',
       title: "Builder's risk is off during construction",
-      detail: 'A storm or fire right now lands entirely on your cash. Cover costs a monthly premium on the Money tab.',
-      fixes: [{ label: "Turn on builder's risk (Money tab)", tab: 'money' }],
+      detail: 'A storm or fire right now lands entirely on your cash. Cover costs a monthly premium at the site office.',
+      fixes: [{ label: "Review builder's risk at the site office", tab: 'money' }],
     });
   }
 

@@ -162,8 +162,8 @@ function QueuedGhost() {
     <div
       data-testid="queued-ghost"
       title="An action is queued for this object this month"
-      style={{ position: 'absolute', inset: 1, border: '2px dashed rgba(30, 60, 200, 0.8)', borderRadius: 4, pointerEvents: 'none' }}
-    />
+      style={{ position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)', padding: '2px 7px', background: '#e6ecff', color: '#253e7b', border: '1px solid #7186b4', borderRadius: 4, fontSize: 10, pointerEvents: 'none' }}
+    >Planned</div>
   );
 }
 
@@ -262,13 +262,11 @@ export function MapGrid() {
       <div {...selectableCellProps(boardPopover === 'road', () => openObject('road', null))} ref={(el) => { if (el) { el.dataset.campusObject = 'road'; cellRefs.current.set('road', el); } }} data-testid="map-road" style={{ cursor: 'pointer', gridColumn: '1 / 13', gridRow: '1 / 2', position: 'relative', background: TILE_ART.road.bg, ...cellStyle }}>
         <ArtLayer img={TILE_ART.road.img} />
         <span style={ART_CHIP}>
-          {TILE_ART.road.icon} {TILE_ART.road.label}
+          {TILE_ART.road.label}
         </span>
         {siteTheme.poles > 0 && (
           <span data-testid="road-poles" title={`${siteTheme.poles} transmission poles at the road`} style={{ ...ART_CHIP, marginLeft: 6 }}>
-            {Array.from({ length: siteTheme.poles }, (_, i) => (
-              <span key={i}>{'\u{1F5FC}'}</span>
-            ))}
+            {siteTheme.poles} poles
           </span>
         )}
       </div>
@@ -293,7 +291,7 @@ export function MapGrid() {
       >
         <ArtLayer img={TILE_ART.siteOffice.img} />
         <span style={ART_CHIP}>
-          {TILE_ART.siteOffice.icon} {TILE_ART.siteOffice.label}
+          {TILE_ART.siteOffice.label}
         </span>
         {objectHasQueuedAction('siteOffice', plan, hallIds) && <QueuedGhost />}
       </div>
@@ -321,7 +319,7 @@ export function MapGrid() {
       >
         <ArtLayer img={siteTheme.pond ? TILE_ART.pond.img : TILE_ART.dryField.img} />
         <span style={ART_CHIP}>
-          {siteTheme.pond ? `${TILE_ART.pond.icon} ${TILE_ART.pond.label}` : '\u{1F33E} Low field'}
+          {siteTheme.pond ? TILE_ART.pond.label : 'Low field'}
         </span>
         <span style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{siteTheme.pond ? pondStateWords(draft) : 'Water permit'}</span>
         {objectHasQueuedAction('pond', plan, hallIds) && <QueuedGhost />}
@@ -402,7 +400,7 @@ export function MapGrid() {
                   maxWidth: '90%',
                 }}
               >
-                {hallCaption(draft, content, hall)}
+                {hallCaption(draft, content, hall)}{hall.stageActive && !hall.delivered && !hall.terminated ? ` (${Math.round(visual.progress0to1 * 100)}%)` : ''}
               </div>
               {/* Phase 6 (spatial spike): the pad chip. Unbroken halls are unplaced; broken
                   ground fixes near (adjacent to the substation, free) or far (feeder + line
@@ -495,7 +493,7 @@ export function MapGrid() {
           />
         )}
         <div style={ART_CHIP}>
-          {TILE_ART.laydownYard.icon} {TILE_ART.laydownYard.label}
+          {TILE_ART.laydownYard.label}
           {/* Phase 7 (scarcity pack): the yard holds a fixed number of crates; show the load. */}
           <span style={{ color: '#6d4c41', fontSize: '0.65rem' }} data-testid="yard-capacity">
             {' '}
@@ -577,24 +575,17 @@ export function MapGrid() {
           dimmed={power.studyStatus === 'none' && power.substationStatus === 'none'}
         />
         <div style={ART_CHIP}>
-          {TILE_ART.substation.icon} {TILE_ART.substation.label}
+          {TILE_ART.substation.label}
         </div>
         <div style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{substationStateWords(draft)}</div>
         {power.studyStatus === 'pending' && (
           <div style={ART_CHIP}>
-            {'\u{1F4CB}'} study{studyMonthsLeft !== null ? `: ${Math.max(0, studyMonthsLeft)}mo left` : ''}
+            Study{studyMonthsLeft !== null ? `: ${Math.max(0, studyMonthsLeft)}mo left` : ''}
           </div>
         )}
         {power.substationStatus === 'building' && (
           <div style={ART_CHIP}>
-            {'\u{1F3D7}\uFE0F'} done {power.substationDoneMonth !== null ? formatMonth(power.substationDoneMonth) : 'soon'}
-          </div>
-        )}
-        {power.substationStatus === 'building' && (
-          <div role="progressbar" aria-label="Substation construction" aria-valuemin={0} aria-valuemax={100}
-            aria-valuenow={Math.round(Math.max(0, Math.min(1, 1 - ((power.substationDoneMonth ?? draft.month) - draft.month) / resolveContent(draft, content).tuning.power.substationBuildMonths)) * 100)}
-            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 6, background: '#d7c9ac', pointerEvents: 'none' }}>
-            <div style={{ width: `${Math.round(Math.max(0, Math.min(1, 1 - ((power.substationDoneMonth ?? draft.month) - draft.month) / resolveContent(draft, content).tuning.power.substationBuildMonths)) * 100)}%`, height: '100%', background: '#397a55' }} />
+            Done {power.substationDoneMonth !== null ? formatMonth(power.substationDoneMonth) : 'soon'}
           </div>
         )}
         {objectHasQueuedAction('substation', plan, hallIds) && <QueuedGhost />}
@@ -609,7 +600,7 @@ export function MapGrid() {
         aria-label="Power plants"
         title="Power plants"
       >
-        <div>{'\u{1F50C}'} Plants</div>
+        <div style={ART_CHIP}>Power plants</div>
         {/* GFX 2: the gear that is actually on site - arrived long-lead orders plus the cooling
             plant the setup chose. Small sprites with tooltips; chips keep the words. */}
         <div style={{ display: 'flex', gap: 4, marginTop: 3, position: 'relative' }}>
@@ -652,7 +643,7 @@ export function MapGrid() {
               title={online ? `Plant ${p.id}: online (${p.mwGrid} MW)` : planned ? `Plant ${p.id}: ${p.slipped ? 'delayed' : 'building'}, online ${formatMonth(targetMonth ?? 0)}` : `Plant ${p.id}: waiting for approved docket`}
               style={{ flex: 1, minWidth: 0, position: 'relative', borderRadius: 3, overflow: 'hidden', background: online ? '#e4efd9' : '#ede3d0', border: '1px solid #8d6e63', display: 'flex', flexDirection: 'column' }}>
               {planned ? <img src={online ? PLANT_ART.online : PLANT_ART.building} alt="" aria-hidden="true" draggable={false} style={{ width: '100%', flex: 1, minHeight: 0, objectFit: 'cover', pointerEvents: 'none' }} />
-                : <div style={{ flex: 1, display: 'grid', placeItems: 'center', border: '1px dashed #ae9a77', color: '#776a53', fontSize: 20 }}>{'\u{1F4CB}'}</div>}
+                : <div style={{ flex: 1, display: 'grid', placeItems: 'center', border: '1px dashed #ae9a77', color: '#776a53', fontSize: 11 }}>Permitting</div>}
               <div style={{ fontSize: '0.6rem', padding: 2, textAlign: 'center', background: online ? '#d6e9c9' : '#fff8e9' }}>
                 <strong>{p.id} {online ? 'online' : planned ? p.slipped ? 'delayed' : 'building' : 'waiting'}</strong><br />
                 {online ? `${p.mwGrid} MW` : planned ? formatMonth(targetMonth ?? 0) : 'needs docket'}
