@@ -18,6 +18,11 @@ test('opening choices stay on the land and only close starts the campaign',async
   await page.screenshot({path:'docs/screenshots/cold2/opening-power-1440.png'});
   await page.getByRole('button',{name:'Next: Insurance',exact:true}).click();
   await expect(page.getByRole('button',{name:'End month',exact:true})).toHaveCount(0);
+  await page.getByRole('button',{name:'Review closing table',exact:true}).click();
+  await expect(page.getByTestId('closing-review')).toContainText('forecast cushion and working capital');
+  await expect(page.getByTestId('closing-review')).toContainText('The loans and equity are commitments, not free cash');
+  await expect(page.getByTestId('closing-review')).toContainText('Campaign cutoff Y6 M1');
+  await page.screenshot({path:'docs/screenshots/cold2/opening-closing-review.png'});
   await page.getByRole('button',{name:'Start campaign',exact:true}).click();
   await expect(page.getByTestId('campus-status')).toContainText('Y1 M1');
 });

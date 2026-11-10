@@ -19,6 +19,7 @@ async function startWhaleCampaign(page: Page) {
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();
   await page.getByRole('button', { name: 'Next: Power' }).click();
   await page.getByRole('button', { name: 'Next: Insurance' }).click();
+  await page.getByRole('button',{name:'Review closing table',exact:true}).click();
   await page.getByRole('button', { name: 'Start campaign' }).click();
 }
 

@@ -18,6 +18,7 @@ test('wizard: the forecast step lets you call cost, contingency and month', asyn
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();
   await page.getByRole('button', { name: 'Next: Power' }).click();
   await page.getByRole('button', { name: 'Next: Insurance' }).click();
+  await page.getByRole('button',{name:'Review closing table',exact:true}).click();
   await page.getByRole('button', { name: 'Start campaign' }).click();
   await openStatus(page);
   await expect(page.getByTestId('hud-forecast')).toContainText('Call:');
@@ -28,6 +29,7 @@ test('runway warning deep-links to the Capital tab, where a lever can be queued'
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();
   await page.getByRole('button', { name: 'Next: Power' }).click();
   await page.getByRole('button', { name: 'Next: Insurance' }).click();
+  await page.getByRole('button',{name:'Review closing table',exact:true}).click();
   await page.getByRole('button', { name: 'Start campaign' }).click();
   await page.waitForFunction(() => typeof (window as unknown as { __debugSetCash?: unknown }).__debugSetCash === 'function');
   await page.evaluate(() => (window as unknown as { __debugSetCash: (n: number) => void }).__debugSetCash(9_000_000));
@@ -43,6 +45,7 @@ test('event card shows what the policy paid and the deductible', async ({ page }
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();
   await page.getByRole('button', { name: 'Next: Power' }).click();
   await page.getByRole('button', { name: 'Next: Insurance' }).click();
+  await page.getByRole('button',{name:'Review closing table',exact:true}).click();
   await page.getByRole('button', { name: 'Start campaign' }).click();
   await page.waitForFunction(() => typeof (window as unknown as { __debugLoss?: unknown }).__debugLoss === 'function');
   await page.evaluate(() => (window as unknown as { __debugLoss: (k: string) => void }).__debugLoss('storm'));

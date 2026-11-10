@@ -14,6 +14,7 @@ async function startCampaign(page: Page, siteId: string) {
   for (const n of ['Next: Hall tier', 'Next: Cooling', 'Next: Contractor', 'Next: Lease', 'Next: Forecast', 'Next: Capital stack', 'Next: Power', 'Next: Insurance']) {
     await page.getByRole('button', { name: n }).click();
   }
+  await page.getByRole('button',{name:'Review closing table',exact:true}).click();
   await page.getByRole('button', { name: 'Start campaign' }).click();
   await page.getByTestId('map-root').waitFor();
   // Dismiss the month-1 stat explainers so the map reads clean in the evidence shot. They

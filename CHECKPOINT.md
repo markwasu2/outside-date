@@ -1128,3 +1128,15 @@ have transparent edges; the power timeline labels stay inside the panel.
 | visual | done: actual1280 cooling/crew panels inspected, all options and Next visible |
 | grid | skipped: navigation/layout only, no rules/save changes |
 | next | closing-table review before signing, remaining playthrough truth fixes and full first-time journey |
+
+# Immersive opening stage 3 - review before signing
+
+| criterion | status |
+|---|---|
+| actual closing table | done: preview engine's recorded sources/uses shown before signing, not re-derived estimates |
+| budget jump explained | done: separates project cost basis from funded forecast cushion/working capital and opening cash |
+| commitments explained | done: loans/equity are drawn as costs arrive, not free cash; equity share, first hall date, deadline and cover visible |
+| final decision | done: insurance leads to review, Start campaign only after review; back/edit still available |
+| full gates | done: 521 unit, 66 e2e, lint, tsc, build |
+| visual | done: actual1440 closing review inspected, both totals/terms/Start visible |
+| grid | skipped: UI-only, engine/save shape unchanged |
