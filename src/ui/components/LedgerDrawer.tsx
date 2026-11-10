@@ -1,5 +1,7 @@
 import { formatMonth } from '../../engine/format';
-import { ledger } from '../../engine/selectors';
+import { resolveContent } from '../../engine/resolve';
+import type { Content } from '../../content/schemas';
+import { ledger, type LedgerEntry } from '../../engine/selectors';
 import type { GameState, PermitId } from '../../engine/types';
 import { useStore } from '../store';
 
@@ -22,13 +24,13 @@ function permitIdFor(label: string): string | undefined {
  * kinds" so adding resolution tracking here never silently changes behavior for kinds this fix
  * wasn't asked to touch (orderArrival/plantOnline/conversionTest/takeoutWindow keep their
  * original date-only overdue behavior below). */
-const RESOLUTION_TRACKED_KINDS = new Set(['hallDelivery', 'hallOutside', 'permit', 'docketVote', 'discovery', 'studyDone']);
+const RESOLUTION_TRACKED_KINDS = new Set(['hallDelivery', 'hallOutside', 'permit', 'docketVote', 'discovery', 'studyDone', 'orderArrival', 'plantOnline', 'conversionTest', 'takeoutWindow']);
 
 /** Whether the underlying milestone behind a tracked-kind entry has actually resolved, independent
  * of whether its target month has passed. Only meaningful for kinds in `RESOLUTION_TRACKED_KINDS`.
  * Exported so tests/ui can cover the QA finding #4 fix without rendering the component. */
 export function isResolved(state: GameState, entry: { kind: string; label: string }): boolean {
-  if (entry.kind === 'hallDelivery') return !!hallFor(state, entry.label, ' delivery')?.delivered;
+  if (entry.kind === 'hallDelivery') { const h = hallFor(state, entry.label, ' delivery'); return !!h?.delivered || !!h?.terminated; }
   if (entry.kind === 'hallOutside') {
     const hall = hallFor(state, entry.label, ' outside date');
     return !!hall?.delivered || !!hall?.terminated;
@@ -41,6 +43,13 @@ export function isResolved(state: GameState, entry: { kind: string; label: strin
   if (entry.kind === 'docketVote') return state.docket.status !== 'open';
   if (entry.kind === 'discovery') return !state.docket.discoveryOutstanding;
   if (entry.kind === 'studyDone') return state.power.studyStatus === 'done';
+  if (entry.kind === 'orderArrival') {
+    const kind = entry.label.replace(' arrival','').toLowerCase();
+    return state.power.substationStatus !== 'none' || state.power.orders.some(o => o.kind === kind && o.arrived);
+  }
+  if (entry.kind === 'plantOnline') return state.power.plants.some(p => entry.label === `Plant ${p.id} online` && p.onlineMonth !== null && p.onlineMonth <= state.month);
+  if (entry.kind === 'conversionTest') return state.debt.converted;
+  if (entry.kind === 'takeoutWindow') return state.phase === 'takeoutAvailable' || state.phase === 'ended';
   return false;
 }
 
@@ -54,13 +63,14 @@ function isOverdueUnresolved(state: GameState, entry: { month: number; kind: str
 
 /** Red if overdue and not yet resolved, amber if due within 2 months, else the default color. */
 function riskColor(state: GameState, entry: { month: number; kind: string; label: string }): string {
+  if (isResolved(state, entry)) return '#60705d';
   if (isOverdueUnresolved(state, entry)) return '#c62828';
   if (entry.month - state.month <= 2 && entry.month >= state.month) return '#b8860b';
   return '#333';
 }
 
 function isSlipped(state: GameState, entry: { month: number; kind: string; label: string }): boolean {
-  if (entry.kind === 'hallDelivery') return entry.month < state.month && !hallFor(state, entry.label, ' delivery')?.delivered;
+  if (entry.kind === 'hallDelivery') return entry.month < state.month && !isResolved(state,entry);
   return false;
 }
 
@@ -70,10 +80,26 @@ function isSlipped(state: GameState, entry: { month: number; kind: string; label
  * unresolved past-due entries read "(overdue)" now - a granted permit, a passed vote, a finished
  * study, etc. stop being mislabeled forever once resolved. Exported for tests/ui. */
 export function urgencyText(state: GameState, entry: { month: number; kind: string; label: string }, slipped: boolean): string {
+  if (entry.kind === 'takeoutWindow') return '';
+  if (isResolved(state,entry)) return ' (complete)';
   if (slipped) return ' (overdue)';
   if (isOverdueUnresolved(state, entry)) return ' (overdue)';
   if (entry.month - state.month <= 2 && entry.month >= state.month) return ' (due soon)';
   return '';
+}
+
+/** Display-only current obligations. The engine ledger also gates fast-forward and is unchanged. */
+export function currentLedger(state: GameState, content: Content): LedgerEntry[] {
+ const resolved=resolveContent(state,content);
+ const entries=ledger(state,content).filter(e => !isResolved(state,e) && e.kind !== 'takeoutWindow' && e.kind !== 'conversionTest');
+ if(!state.debt.converted)entries.push({kind:'conversionTest',month:Math.max(state.month,resolved.tuning.covenant.forcedTestMonth),label:state.debt.conversionFailedCount ? 'Conversion retest (monthly until passed)' : 'Conversion test (earlier if all halls delivered)'});
+ if(state.phase==='takeoutAvailable')entries.push({kind:'takeoutWindow',month:state.month,label:'Takeout available now'});
+ else if(state.phase!=='ended'){
+  const conversion=state.flags.conversionMonth;
+  if(typeof conversion==='number' && conversion+resolved.tuning.takeout.seasoningMonths>state.month)entries.push({kind:'seasoning',month:Math.min(state.maxMonths,conversion+resolved.tuning.takeout.seasoningMonths),label:'Seasoning ends (takeout waits for in-window halls)'});
+  entries.push({kind:'campaignCutoff',month:state.maxMonths,label:'Campaign cutoff / latest takeout'});
+ }
+ return entries.sort((a,b)=>a.month-b.month);
 }
 
 export function LedgerDrawer({ hideTrigger = false }: { hideTrigger?: boolean }) {
@@ -94,7 +120,7 @@ export function LedgerDrawer({ hideTrigger = false }: { hideTrigger?: boolean })
     );
   }
 
-  const entries = ledger(draft, content);
+  const entries = currentLedger(draft, content);
 
   return (
     <div
@@ -114,10 +140,11 @@ export function LedgerDrawer({ hideTrigger = false }: { hideTrigger?: boolean })
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem', borderBottom: '1px solid #ccc' }}>
-        <strong>Ledger</strong>
+        <strong>Upcoming obligations</strong>
         <button onClick={() => setOpenPanel('ledger')}>close</button>
       </div>
       <div style={{ padding: '0.5rem' }}>
+        <p style={{fontSize:11}}>Resolved permits, delivered or terminated halls, completed study, installed equipment and online plants leave this list. Past events remain in the log. Takeout also waits for unfinished halls still inside their outside dates, up to the campaign cutoff.</p>
         {entries.map((entry, i) => {
           const slipped = isSlipped(draft, entry);
           return (
@@ -127,7 +154,7 @@ export function LedgerDrawer({ hideTrigger = false }: { hideTrigger?: boolean })
                 display: 'flex',
                 justifyContent: 'space-between',
                 color: riskColor(draft, entry),
-                textDecoration: slipped ? 'line-through' : 'none',
+                textDecoration: 'none',
                 marginBottom: '0.2rem',
               }}
             >
