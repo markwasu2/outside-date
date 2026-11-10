@@ -34,3 +34,13 @@ it('folds completed docket upkeep without hiding a request or an unsettled meeti
  s.docket.status='failedOnce';expect(isContextOnlyAction({actionId:'prepTestimony'},s)).toBe(false);
  s.docket.status='approved';expect(isContextOnlyAction({actionId:'prepTestimony'},s)).toBe(true);expect(isContextOnlyAction({actionId:'answerDiscovery'},s)).toBe(true);
 });
+
+
+it('names the remaining testimony gain and folds capped preparation without changing state',()=>{
+ const c=loadContent(),s=createGame(c,'whale',DEFAULT_SETUP,DEFAULT_NEGOTIATION,1),a={actionId:'prepTestimony'};
+ s.docket.status='open';s.docket.testimonyBonus=c.tuning.docket.testimonyCap-c.tuning.docket.testimonyBonus/2;
+ expect(decisionResult(a,s,c,'')).toContain('Adds 4 percentage points');expect(isContextOnlyAction(a,s,c)).toBe(false);
+ s.docket.testimonyBonus=c.tuning.docket.testimonyCap;s.flags.lastPrepTestimonyMonth=s.month-1;
+ const before=JSON.stringify(s),text=decisionResult(a,s,c,'');
+ expect(text).toContain('already at its 24% cap');expect(text).toContain('adds no vote chance');expect(text).toContain('commission goodwill -1');expect(isContextOnlyAction(a,s,c)).toBe(true);expect(JSON.stringify(s)).toBe(before);
+});

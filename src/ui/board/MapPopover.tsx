@@ -214,10 +214,10 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
           <div style={{ color: '#777' }}>Nothing to do here right now.</div>
         ) : (
           <>
-            {rows.filter(r=>!isContextOnlyAction(r.action,state)).map(renderRow)}
-            {rows.some(r=>isContextOnlyAction(r.action,state)) && <details data-testid="context-only-actions" style={{marginTop:8,fontSize:12,color:'#665b4c'}}>
-              <summary style={{cursor:'pointer',padding:'6px 0'}}>Already underway or not needed ({rows.filter(r=>isContextOnlyAction(r.action,state)).length})</summary>
-              {rows.filter(r=>isContextOnlyAction(r.action,state)).map(renderRow)}
+            {rows.filter(r=>!isContextOnlyAction(r.action,state,content)).map(renderRow)}
+            {rows.some(r=>isContextOnlyAction(r.action,state,content)) && <details data-testid="context-only-actions" style={{marginTop:8,fontSize:12,color:'#665b4c'}}>
+              <summary style={{cursor:'pointer',padding:'6px 0'}}>Already underway or not needed ({rows.filter(r=>isContextOnlyAction(r.action,state,content)).length})</summary>
+              {rows.filter(r=>isContextOnlyAction(r.action,state,content)).map(renderRow)}
             </details>}
           </>
         )}
