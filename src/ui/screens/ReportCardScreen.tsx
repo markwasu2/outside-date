@@ -28,18 +28,14 @@ export function fiveMostConsequentialDecisions(log: LogEntry[]): LogEntry[] {
   return log.filter((e) => e.kind === 'action' || e.kind === 'event').slice(-5);
 }
 
-/** The engine always logs a `warning` entry at the moment something terminal happens (e.g.
- * lease.ts's "missed its outside date and was terminated"), in the same step() call immediately
- * before loseCheck.ts's own generic `Game over: <reason>.` entry - far more specific than the
- * lose `reason` enum alone. Falls back to the generic reason text (already mapped by
- * `LOSE_REASON_TEXT` above) when no warning entry exists, e.g. a plain cash-out with nothing else
- * to report. Exported for tests. */
-export function proximateCauseOfDeath(log: LogEntry[], fallback: string): string {
-  for (let i = log.length - 1; i >= 0; i -= 1) {
-    const entry = log[i];
-    if (entry?.kind === 'warning') return entry.text;
-  }
-  return fallback;
+/** A later warning in the final tick is not necessarily what ended the campaign.
+ * Only use a same-tick termination warning for an all-terminated loss. Other terminal
+ * conditions use their explicit outcome reason, never a stale or unrelated warning. */
+export function proximateCauseOfDeath(log: LogEntry[], fallback: string, reason: string): string {
+  if (reason !== 'allTerminated') return fallback;
+  const terminal = [...log].reverse().find(entry => entry.kind === 'lose');
+  if (!terminal) return fallback;
+  return [...log].reverse().find(entry => entry.month === terminal.month && entry.kind === 'warning' && /missed its outside date and was terminated\./.test(entry.text))?.text ?? fallback;
 }
 
 export interface FinalStats {
@@ -166,7 +162,7 @@ export function ReportCardScreen() {
     const lossFallback = outcome?.kind === 'lose' ? (LOSE_REASON_TEXT[outcome.reason] ?? outcome.reason) : 'Unknown.';
     const stats = finalStats(draft);
     const decisions = fiveMostConsequentialDecisions(draft.log);
-    const cause = proximateCauseOfDeath(draft.log, lossFallback);
+    const cause = proximateCauseOfDeath(draft.log, lossFallback, outcome?.kind === 'lose' ? outcome.reason : '');
     return (
       <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
         <h1>

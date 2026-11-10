@@ -69,24 +69,23 @@ describe('ReportCardScreen: fiveMostConsequentialDecisions (fix 16)', () => {
   });
 });
 
-describe('ReportCardScreen: proximateCauseOfDeath (fix 16)', () => {
-  it('prefers the most recent warning entry over the generic fallback', () => {
-    const log: LogEntry[] = [
-      entry(10, 'action', 'Something routine.'),
-      entry(12, 'warning', 'H1 missed its outside date and was terminated.'),
-      entry(12, 'lose', 'Game over: allTerminated.'),
-    ];
-    expect(proximateCauseOfDeath(log, 'Every hall was terminated by the tenant.')).toBe('H1 missed its outside date and was terminated.');
+describe('ReportCardScreen: terminal cause', () => {
+  it('names same-tick termination even when conversion warns afterward', () => {
+    const log: LogEntry[] = [entry(12, 'warning', 'H1 missed its outside date and was terminated.'), entry(12, 'warning', 'Conversion test failed (DSCR 0.00); interest steps up and is now cash-paid.'), entry(12, 'lose', 'Game over: allTerminated.')];
+    expect(proximateCauseOfDeath(log, 'Every hall was terminated by the tenant.', 'allTerminated')).toBe('H1 missed its outside date and was terminated.');
   });
-
-  it('falls back to the generic reason text when no warning entry exists', () => {
-    const log: LogEntry[] = [entry(5, 'tick', 'A month passed.'), entry(5, 'lose', 'Game over: default.')];
-    expect(proximateCauseOfDeath(log, 'You ran out of cash.')).toBe('You ran out of cash.');
+  it('does not substitute an unrelated warning for cash default', () => {
+    expect(proximateCauseOfDeath([entry(5, 'warning', 'Conversion test failed.'),entry(5, 'lose', 'Game over: default.')], 'You ran out of cash.', 'default')).toBe('You ran out of cash.');
   });
-
-  it('picks the LAST warning, not the first, when several occurred', () => {
-    const log: LogEntry[] = [entry(3, 'warning', 'An early warning.'), entry(9, 'warning', 'The final warning.')];
-    expect(proximateCauseOfDeath(log, 'fallback')).toBe('The final warning.');
+  it('does not reuse an old termination warning for the final loss', () => {
+    const log: LogEntry[] = [entry(3, 'warning', 'H1 missed its outside date and was terminated.'),entry(9, 'lose', 'Game over: allTerminated.')];
+    expect(proximateCauseOfDeath(log, 'Every hall was terminated by the tenant.', 'allTerminated')).toBe('Every hall was terminated by the tenant.');
+  });
+  it('uses explicit docket and equity outcomes even beside other warnings', () => {
+    for(const reason of ['docketDead','equityWiped'])expect(proximateCauseOfDeath([entry(5,'warning','Unrelated warning.')], reason, reason)).toBe(reason);
+  });
+  it('uses the explicit loss when no terminal log exists', () => {
+    expect(proximateCauseOfDeath([], 'Every hall was terminated by the tenant.', 'allTerminated')).toBe('Every hall was terminated by the tenant.');
   });
 });
 
