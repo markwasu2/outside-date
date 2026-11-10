@@ -17,15 +17,15 @@ const LOSE_REASON_TEXT: Record<string, string> = {
   equityWiped: 'The takeout wiped out your equity.',
 };
 
-/** Fix 16 (playtest-fixes): a loss that happens before the takeout window ever opens used to show
- * only a one-line reason and two buttons - no sense of the campaign's final shape or what led
- * there. `LogEntry` (engine/types.ts) carries no numeric impact field, so "most consequential"
- * can't be ranked by a dollar figure the engine doesn't track; instead this surfaces the last 5
- * entries that represent a real decision point (a player action, or an event the player had to
- * choose how to respond to) - the ones closest to, and most directly tied to, how the campaign
- * actually ended. Excludes routine `tick`/`warning`/`milestone` entries. Exported for tests. */
-export function fiveMostConsequentialDecisions(log: LogEntry[]): LogEntry[] {
+/** Recent activity is chronology, not a ranking of consequence. Keep the label
+ * honest: random events and routine visits can appear here too. */
+export function recentCampaignActivity(log: LogEntry[]): LogEntry[] {
   return log.filter((e) => e.kind === 'action' || e.kind === 'event').slice(-5);
+}
+
+/** The causal docket warnings were excluded by the action/event-only activity list. */
+export function docketFailureTrail(log: LogEntry[]): LogEntry[] {
+  return log.filter(e => e.kind === 'warning' && e.text === 'The power docket failed its vote.');
 }
 
 /** A later warning in the final tick is not necessarily what ended the campaign.
@@ -167,7 +167,7 @@ export function ReportCardScreen() {
   if (!takeout) {
     const lossFallback = outcome?.kind === 'lose' ? (LOSE_REASON_TEXT[outcome.reason] ?? outcome.reason) : 'Unknown.';
     const stats = finalStats(draft);
-    const decisions = fiveMostConsequentialDecisions(draft.log);
+    const decisions = recentCampaignActivity(draft.log);
     const cause = proximateCauseOfDeath(draft.log, lossFallback, outcome?.kind === 'lose' ? outcome.reason : '');
     return (
       <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
@@ -195,9 +195,14 @@ export function ReportCardScreen() {
             </li>
           </ul>
 
-          <h3>5 most consequential decisions</h3>
+          {outcome?.kind === 'lose' && outcome.reason === 'docketDead' && <section data-testid="docket-failure-trail">
+            <h3>Why the docket ended the campaign</h3>
+            <p>The docket failed {draft.docket.failCount} votes. A second failed vote ends the docket, so the utility cannot build the plants for your campus.</p>
+            <ul>{docketFailureTrail(draft.log).map((entry, i) => <li key={i}>[{formatMonth(entry.month)}] {entry.text}</li>)}</ul>
+          </section>}
+          <h3>Recent campaign activity</h3>
           {decisions.length === 0 ? (
-            <p style={{ color: '#666' }}>Nothing notable happened before the end.</p>
+            <p style={{ color: '#666' }}>No recent actions or events were recorded.</p>
           ) : (
             <ol>
               {decisions.map((d, i) => (
