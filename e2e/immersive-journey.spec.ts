@@ -3,6 +3,7 @@ import fs from 'node:fs';
 test('fresh title through signing, object-only construction and final report',async({page})=>{
  test.setTimeout(180_000);await page.setViewportSize({width:1440,height:900});
  const trace:string[]=[];const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.addInitScript(() => { Math.random = () => 1 / 1_000_000_000; });
  await page.goto('/');await page.locator('select').first().selectOption('tutorial-edge5');await page.getByRole('button',{name:'New game',exact:true}).click();
  for(const name of ['Next: Hall tier','Next: Cooling','Next: Contractor','Next: Lease','Next: Forecast','Next: Capital stack','Next: Power','Next: Insurance','Review closing table'])await page.getByRole('button',{name,exact:true}).click();
  await page.screenshot({path:'docs/screenshots/cold2/journey-closing.png'});await page.getByRole('button',{name:'Start campaign',exact:true}).click();
@@ -40,6 +41,7 @@ test('fresh title through signing, object-only construction and final report',as
  expect(trace.filter(t=>t.startsWith('PLAN ')).length).toBeGreaterThan(5);
  expect(trace).toContain('PRICE TAKEOUT');
  await expect(page.getByRole('heading',{name:'Report card',exact:true})).toBeVisible();
+ await expect(page.getByTestId('power-timing-closeout')).toHaveCount(0);
  trace.push('END '+await page.locator('body').innerText());fs.writeFileSync('/tmp/immersive-journey-trace.txt',trace.join('\n'));
  await page.screenshot({path:'docs/screenshots/cold2/journey-report.png'});expect(errors).toEqual([]);
 });

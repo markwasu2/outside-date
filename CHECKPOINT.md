@@ -1227,3 +1227,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | scope | tutorial-edge5 through full setup, random campaign seed; Whale full cold real-click journey remains outstanding |
 | remaining | tutorial report shows irrelevant plant/docket timing despite no docket; ledger stale rows; event target naming and discovery frequency review |
 | grid | skipped: next-step/UI routing only, engine/save unchanged |
+
+# Closeout only explains plant timing when the scenario uses a docket
+
+| criterion | status |
+|---|---|
+| irrelevant panel | done: no-docket scenario omits first-try approval/plant schedule panel |
+| journey stability | done: pin title's random campaign seed to 1 in test, not state injection; random seed had legitimately lost before takeout on retry |
+| full gates | done: 525 unit, 74 e2e in bounded groups, lint, tsc, build |
+| visual | inspected: tutorial final report starts directly with grades, no irrelevant plant/docket claim |
+| grid | skipped: presentation/test only, engine/save unchanged |
