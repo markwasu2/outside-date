@@ -140,3 +140,24 @@ describe('conversion: mezz PIK stops on pass', () => {
     expect(state.debt.mezzAccruedPik).toBe(0);
   });
 });
+
+describe('seasoned conversion preserves valid hall construction windows', () => {
+  function seasoned(month: number) {
+    const s = freshState(month);
+    return {...s,debt:{...s.debt,converted:true},flags:{...s.flags,conversionMonth:0}};
+  }
+  it('waits for an unfinished hall through its outside month, without undoing conversion', () => {
+    const s=seasoned(57);s.halls.forEach(h=>{h.delivered=true;});
+    s.halls[0]!.delivered=false;s.halls[0]!.outsideMonth=57;
+    const next=tick(s,content);expect(next.phase).toBe('playing');expect(next.debt.converted).toBe(true);
+    expect(tick({...s,month:58},content).phase).toBe('takeoutAvailable');
+  });
+  it('does not wait for delivered or terminated halls',()=>{
+    const s=seasoned(57);s.halls.forEach(h=>{h.delivered=true;});s.halls[0]!.delivered=false;s.halls[0]!.terminated=true;
+    expect(tick(s,content).phase).toBe('takeoutAvailable');
+  });
+  it('never extends the campaign hard stop even if an expansion outside date is later',()=>{
+    const s=seasoned(60);s.halls[0]!.outsideMonth=70;
+    expect(s.maxMonths).toBe(60);expect(tick(s,content).phase).toBe('takeoutAvailable');
+  });
+});

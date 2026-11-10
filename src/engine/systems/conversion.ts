@@ -68,6 +68,10 @@ function checkSeasoning(state: GameState, content: Content): GameState {
   const conversionMonth = state.flags.conversionMonth;
   if (typeof conversionMonth !== 'number' || state.phase !== 'playing') return state;
   if (state.month < conversionMonth + content.tuning.takeout.seasoningMonths) return state;
+  // A seasoned loan does not end a still-valid construction window. The campaign
+  // hard stop in step.ts remains unchanged and takes precedence at maxMonths.
+  const inWindow = state.halls.some((h) => !h.delivered && !h.terminated && state.month <= h.outsideMonth);
+  if (inWindow && state.month < state.maxMonths) return state;
   return { ...state, phase: 'takeoutAvailable' };
 }
 
