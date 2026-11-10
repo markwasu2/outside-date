@@ -20,6 +20,21 @@ export function substationWords(state: GameState): string {
  return 'The substation starts automatically when the study is done and the switchgear and required transformer have arrived. No separate build instruction is needed.';
 }
 
+/** Preview the existing ordered hookup allocation, without advancing any game state. */
+export function canConnectOnNextTick(state: GameState, content: Content, hallId: string): boolean {
+ const resolved = resolveContent(state, content);
+ const available = availableGridMW(state, resolved);
+ const pue = resolved.tuning.cooling[state.setup.cooling].pue;
+ let committed = 0;
+ for (const hall of state.halls) {
+  const need = hall.mwIT * pue;
+  const fits = committed + need <= available;
+  if (hall.id === hallId) return !hall.energized && fits;
+  if (hall.energized || fits) committed += need;
+ }
+ return false;
+}
+
 /** Explain capacity without promising a plant roll or a hall delivery date. */
 export function powerCapacityWords(state: GameState,content: Content): string {
  const resolved=resolveContent(state,content),pue=resolved.tuning.cooling[state.setup.cooling].pue;
@@ -27,5 +42,5 @@ export function powerCapacityWords(state: GameState,content: Content): string {
  const waiting=state.halls.find(h=>!h.energized&&!h.delivered&&!h.terminated);
  const free=Math.max(0,available-reserved);
  const source=state.power.plants.filter(p=>p.onlineMonth===null||p.onlineMonth>state.month).map(p=>({id:p.id,month:p.onlineMonth??p.plannedOnlineMonth})).filter(p=>p.month!==null).sort((a,b)=>a.month!-b.month!)[0];
- return `${available.toFixed(1)} MW available; ${reserved.toFixed(1)} MW committed to energized halls.${waiting?` ${waiting.id} needs ${(waiting.mwIT*pue).toFixed(1)} MW; ${free.toFixed(1)} MW is uncommitted.`:''}${source?` Next scheduled capacity: Plant ${source.id}, ${formatMonth(source.month!)}. Plant dates can slip.`:state.docketEnabled&&state.docket.status!=='approved'?' Plants wait for docket approval.':''} Power hookups happen automatically as capacity becomes available.`;
+ return `${available.toFixed(1)} MW available; ${reserved.toFixed(1)} MW committed to energized halls.${waiting?` ${waiting.id} needs ${(waiting.mwIT*pue).toFixed(1)} MW; ${free.toFixed(1)} MW is uncommitted.`:''}${source?` Next scheduled capacity: Plant ${source.id}, ${formatMonth(source.month!)}. Plant dates can slip.`:state.docketEnabled&&state.docket.status!=='approved'?' Plants wait for docket approval.':''}${waiting && canConnectOnNextTick(state,content,waiting.id) ? ` Capacity is ready for ${waiting.id}. End month runs the automatic hookup; then start ready-for-service work at the hall.` : ' Power hookups happen automatically as capacity becomes available.'}`;
 }

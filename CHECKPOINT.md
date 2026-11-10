@@ -1647,3 +1647,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | fixed dialog header and return navigation above a separately scrolling reading area; entry changes reset reading scroll; focused role remains highlighted and visible |
 | gates | 567 unit, 111 browser (110 across bounded shards including immersive journey plus full Whale journey), lint, tsc, build; actual 1280px scrolled-Codex pixels inspected; 600x540 fit/Escape and event-return regression tests |
 | scope | optional read-only UI only; no engine, save, bot or tuning change, no migration required; audio toggle state checked but sound not verified by listening; existing bundle-size warning remains |
+
+# Personal optional-help replay - distinguish available power from the next hookup tick
+
+| criterion | status |
+|---|---|
+| personal run | Whale normal closed Y5 M8, 4/4 delivered, 3 late, $1.78B campus, $158.5M equity, 1.01x; event-help navigation verified on live #111 |
+| observed | in Plant B's online month H4 cue said waiting for plant capacity while the popup correctly showed 104 MW uncommitted against 30 MW needed; next monthly tick connected it |
+| fixed | when current capacity fits the ordered allocation, explain End month runs the automatic hookup, then ready-for-service work still needs a hall instruction; real capacity shortages keep their plant explanation |
+| gates | 570 unit, 112 browser (110 bounded plus both complete journeys), lint, tsc, build; actual 1280px contextual cue pixels inspected; allocation boundary, order and resolved-cooling coverage |
+| scope | UI preview only, no power-system order, simulation, save, bot or tuning changes; no migration required; existing bundle-size warning remains |

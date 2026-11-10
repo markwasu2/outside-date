@@ -246,3 +246,15 @@ it('endgame clock cues explain waiting while the closing instruction still opens
  s.debt.converted=true;s.flags.conversionMonth=40;expect(nextStep(s,content)).toMatchObject({title:'Let the rent season before closing',waiting:true});
  s.phase='takeoutAvailable';expect(nextStep(s,content).waiting).not.toBe(true);expect(nextStep(s,content).actionId).toBe('priceTakeout');
 });
+
+
+it('explains the automatic hookup when this month has enough capacity but the hall is not yet connected', () => {
+ const s = powerWaitingState(); s.month = 50; s.power.substationStatus = 'done'; s.power.interimGridMW = 32;
+ s.halls.slice(0,3).forEach(h => {h.energized = true; h.delivered = true;});
+ s.power.plants.forEach(p => p.onlineMonth = 50);
+ const step = nextStep(s,content);
+ expect(step.title).toBe('H4: ready for automatic power hookup');
+ expect(step.waiting).toBe(true); expect(step.objectId).toBe('powerPlants');
+ expect(step.why).toContain('End month runs'); expect(step.why).toContain('does not deliver it');
+ expect(step.actionId).toBeUndefined();
+});

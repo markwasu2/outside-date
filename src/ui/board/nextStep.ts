@@ -4,7 +4,7 @@ import { resolveContent } from '../../engine/resolve';
 import { leadWithIndex } from '../../engine/systems/markets';
 import type { GameState } from '../../engine/types';
 import { projectedFitoutMonth } from './warnings';
-import { powerCapacityWords } from './powerWords';
+import { canConnectOnNextTick, powerCapacityWords } from './powerWords';
 import { hallBlocker } from './legibility';
 import { permitReviewWords } from './permitWords';
 
@@ -246,7 +246,13 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
       return {title:'End the month',why:`Wetlands mitigation is underway until ${formatMonth(done)}. End month advances this clock; no further mitigation instruction is needed. ${blocked.id} can break ground once it finishes.`,objectId:blocked.id};
     }
     if (blocker === 'waiting on power hookup') {
-      if(power.substationStatus==='done')return {title:`${blocked.id}: waiting for plant capacity`,why:powerCapacityWords(state,content),objectId:'powerPlants'};
+      if (power.substationStatus === 'done') {
+        if (canConnectOnNextTick(state, content, blocked.id)) {
+          return {title: `${blocked.id}: ready for automatic power hookup`, waiting: true,
+            why: `Capacity is available for ${blocked.id}. End month runs its automatic power hookup. Then start ready-for-service work at the hall; a hookup alone does not deliver it.`, objectId: 'powerPlants'};
+        }
+        return {title: `${blocked.id}: waiting for plant capacity`, why: powerCapacityWords(state, content), objectId: 'powerPlants'};
+      }
       const pending = power.orders.filter((o) => !o.arrived);
       const chain = 'The substation builds itself once the study is complete and the gear is installed.';
       const wait = power.substationStatus === 'building'
