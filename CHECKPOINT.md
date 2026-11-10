@@ -1,3 +1,16 @@
+# Replay: financed work never looks free
+
+Personal Hard Whale replay found the wetlands choice saying $6.0M in its title but $0 in its cost badge. Far-pad feeders and legal liquid-readiness work had the same bank-debit problem: equity/mezz/senior funds the cost before cash. Their labels now use the existing site-option total-and-funding breakdown. Missing prerequisites retain the full resolved cost with a capital-stack explanation. Charges are unchanged.
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | Wetlands, far-pad feeders and liquid readiness show full financed cost | PASS | board/actions.ts shares funding breakdown; boardActions tests legal and disabled wetlands, near/far pads and both liquid tiers |
+| 2 | Costs are visible and readable on real clickable cards | PASS | e2e/funded-action-prices.spec.ts; docs/screenshots/cold2/funded-wetlands-price.png, 1280x720 pixels inspected |
+| 3 | Full regression gates | PASS | 573 unit; 117 browser (63 + 52 bounded specs and both full real-click journeys); lint, tsc, production build |
+| 4 | Engine, bot, tuning and saves unchanged | PASS | UI quote display only; no migration or 1000-seed balance grids needed |
+
+Existing bundle-size warning remains. Hard replay saved at Y2 M1, mitigation underway, H2/H3 started on near pads, H4 ready for far pad.
+
 # Replay: closing wait reconciles terminated halls
 
 Personal EASY Whale replay: H4 was cancelled to cure a lender freeze, and H1-H3 delivered. The 3/4 HUD and terminated H4 contradicted the waiting explanation "Every hall is delivered." Both lender-retest and rent-seasoning explanations now state the delivered total and terminated count. Full-delivery wording is unchanged.
