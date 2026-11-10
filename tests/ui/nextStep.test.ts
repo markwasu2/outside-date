@@ -178,3 +178,16 @@ it('routes an energized substation capacity wait to the plants, not back to the 
  state.power.plants[0]!.plannedOnlineMonth=40;
  const step=nextStep(state,content);expect(step.title).toBe('H1: waiting for plant capacity');expect(step.objectId).toBe('powerPlants');expect(step.why).toContain('12.0 MW available');expect(step.actionId).toBeUndefined();
 });
+
+it('never calls a partial cutoff campus finished',()=>{
+ const s=freshState();s.phase='takeoutAvailable';s.halls[0]!.delivered=true;
+ expect(nextStep(s,content).title).toBe('Close the campus as it stands');
+ expect(nextStep(s,content).why).toContain('3 of 4 halls remain undelivered');
+ expect(nextStep(s,content).why).toContain('ends construction');
+});
+it('explains the real monthly work rather than promising a construction milestone',()=>{
+ const s=powerWaitingState();s.power.substationStatus='done';s.halls.forEach(h=>{h.energized=true;h.stageActive=true;});
+ expect(nextStep(s,content).title).toBe('End the month');
+ expect(nextStep(s,content).why).toContain('Use End month below');
+ expect(nextStep(s,content).why).toContain('tenant deadline');
+});

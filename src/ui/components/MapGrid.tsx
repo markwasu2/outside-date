@@ -169,7 +169,7 @@ function QueuedGhost() {
   );
 }
 
-export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;onShow:()=>void}} = {}) {
+export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;waiting?:boolean;onShow:()=>void}} = {}) {
   const draft = useStore((s) => s.draft);
   const state = useStore((s) => s.state);
   const prevState = useStore((s) => s.prevState);
@@ -703,7 +703,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;o
       )}
 
       {cue && <div data-testid="next-step-card" title={cue.why} style={{position:'absolute',...cuePos,zIndex:31,maxWidth:300,padding:'6px 8px',border:'1px solid #65866b',borderRadius:8,background:'#fffdf3ed',boxShadow:'0 3px 12px #0002',fontSize:12,display:'flex',alignItems:'center',gap:8}}>
-        <button aria-expanded={cueExpanded} onClick={()=>setCueExpanded(!cueExpanded)} style={{background:'none',border:0,padding:0,textAlign:'left',fontWeight:'bold',color:'inherit'}}>{cue.title}</button><button data-testid="next-step-show-me" onClick={cue.onShow} style={{whiteSpace:'nowrap'}}>Show me</button>{cueExpanded && <div style={{position:'absolute',top:'100%',left:0,width:280,padding:10,background:'#fffdf3',border:'1px solid #65866b',borderRadius:6,lineHeight:1.4}}>{cue.why}</div>}<span aria-hidden="true" style={{position:'absolute',bottom:-12,left:18,color:'#325b48'}}>▼</span>
+        <button aria-expanded={cueExpanded} onClick={()=>setCueExpanded(!cueExpanded)} style={{background:'none',border:0,padding:0,textAlign:'left',fontWeight:'bold',color:'inherit'}}>{cue.title}</button><button data-testid="next-step-show-me" aria-expanded={cue.waiting ? cueExpanded : undefined} onClick={cue.waiting ? ()=>setCueExpanded(!cueExpanded) : ()=>{setCueExpanded(false);cue.onShow();}} style={{whiteSpace:'nowrap'}}>{cue.waiting ? 'Why wait?' : 'Show me'}</button>{cueExpanded && <div style={{position:'absolute',top:'100%',left:0,width:280,padding:10,background:'#fffdf3',border:'1px solid #65866b',borderRadius:6,lineHeight:1.4}}>{cue.why}</div>}<span aria-hidden="true" style={{position:'absolute',bottom:-12,left:18,color:'#325b48'}}>▼</span>
       </div>}
 
       {boardPopover && popoverPos && (
