@@ -32,5 +32,5 @@ it('folds completed docket upkeep without hiding a request or an unsettled meeti
  const action={actionId:'meetIntervenor',params:{intervenorId:'test'}};
  expect(isContextOnlyAction(action,s)).toBe(false);s.docket.intervenors[0]!.settled=true;expect(isContextOnlyAction(action,s)).toBe(true);
  s.docket.status='failedOnce';expect(isContextOnlyAction({actionId:'prepTestimony'},s)).toBe(false);
- s.docket.status='approved';expect(isContextOnlyAction({actionId:'prepTestimony'},s)).toBe(true);
+ s.docket.status='approved';expect(isContextOnlyAction({actionId:'prepTestimony'},s)).toBe(true);expect(isContextOnlyAction({actionId:'answerDiscovery'},s)).toBe(true);
 });

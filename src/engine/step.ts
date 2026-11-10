@@ -3,7 +3,7 @@ import type { Effect } from '../content/schemas';
 import type { GameState, LogEntry, PlannedAction } from './types';
 import { applyAction } from './actions';
 import { applyEffect } from './effects';
-import { fastForwardMilestones, dscr, runway } from './selectors';
+import { fastForwardMilestones, hasLiveDiscovery, dscr, runway } from './selectors';
 import { drawEvent, resolveChoice } from './systems/events';
 import { resolveContent } from './resolve';
 import { tick as marketsTick } from './systems/markets';
@@ -200,7 +200,7 @@ export function fastForwardPause(state: GameState, content: Content): string | n
   if(testActive&&Number.isFinite(coverage)&&coverage-resolved.tuning.covenant.dscrTrigger<0.1)return 'DSCR headroom is critically thin - use End month to continue one at a time.';
   if(state.flags.drawFreeze)return 'the lender draw freeze needs your attention.';
   if(state.halls.some(h=>!h.delivered&&!h.terminated&&state.flags[`inspectionFail:${h.id}`]))return 'a failed inspection needs your attention.';
-  if(state.docket.discoveryOutstanding)return 'a discovery response needs your attention.';
+  if(hasLiveDiscovery(state))return 'a discovery response needs your attention.';
   return null;
 }
 

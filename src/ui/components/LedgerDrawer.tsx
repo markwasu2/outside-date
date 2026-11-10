@@ -1,7 +1,7 @@
 import { formatMonth } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
 import type { Content } from '../../content/schemas';
-import { ledger, type LedgerEntry } from '../../engine/selectors';
+import { hasLiveDiscovery, ledger, type LedgerEntry } from '../../engine/selectors';
 import type { GameState, PermitId } from '../../engine/types';
 import { useStore } from '../store';
 
@@ -41,7 +41,7 @@ export function isResolved(state: GameState, entry: { kind: string; label: strin
     return permit ? permit.status !== 'pending' : false;
   }
   if (entry.kind === 'docketVote') return state.docket.status !== 'open';
-  if (entry.kind === 'discovery') return !state.docket.discoveryOutstanding;
+  if (entry.kind === 'discovery') return !hasLiveDiscovery(state);
   if (entry.kind === 'studyDone') return state.power.studyStatus === 'done';
   if (entry.kind === 'orderArrival') {
     const kind = entry.label.replace(' arrival','').toLowerCase();

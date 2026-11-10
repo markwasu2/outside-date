@@ -83,3 +83,10 @@ describe('current obligations',()=>{
   expect(rows.some(e=>e.label==='Takeout window opens')).toBe(false);
  });
 });
+
+it('discovery on a closed docket stays historical, not overdue or currently owed',()=>{
+ const s=freshState();s.month=20;s.docket.status='approved';s.docket.discoveryOutstanding=true;s.docket.discoveryDueMonth=10;
+ expect(isResolved(s,{kind:'discovery',label:'Discovery response due'})).toBe(true);
+ expect(currentLedger(s,content).some(e=>e.kind==='discovery')).toBe(false);
+ s.docket.status='open';expect(isResolved(s,{kind:'discovery',label:'Discovery response due'})).toBe(false);
+});

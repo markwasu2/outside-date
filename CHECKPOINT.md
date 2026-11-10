@@ -1491,3 +1491,15 @@ have transparent edges; the power timeline labels stay inside the panel.
 | safety | no invented retrospective expense; hybrid and known decline states have exact wording; existing risk and grade calculations unchanged |
 | gates | 548 unit, 94 browser (92 bounded plus 2 complete journeys), lint, tsc, build; 1280px scope and chip-row pixels inspected |
 | scope | report presentation only, no engine/save/bot/rule change; existing saves interpreted without mutation |
+
+# Personal Millbrook replay - stop stale discovery blocking an approved docket
+
+| criterion | status |
+|---|---|
+| personal run | Millbrook Relay normal closed Y3 M11, 1/1 delivered late but before outside date, $611.3M campus, $135.0M equity, 2.21x; live clicks |
+| observed | request raised during the vote tick retained its flag after approval; map said End month but Fast forward blocked every empty month |
+| fixed | one live-discovery selector gates pause, milestones, ledger and primary popup; only an open docket can owe a response |
+| safety | historical flag preserved, open requests still block; no engine tick, RNG, bot or odds changes; no save migration needed |
+| grids | fresh before/after 1000-seed Whale and Millbrook, all four bots and all difficulties, byte-identical; Whale normal careful73.4%, competent69.7% |
+| gates | 550 unit, 95 browser (93 bounded plus 2 complete journeys), lint, tsc, build; 1280px advanced wait inspected |
+| evidence | docs/qa/closed-discovery contains all four grids |
