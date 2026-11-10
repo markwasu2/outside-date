@@ -136,3 +136,22 @@ it('liquid readiness names the funded total at each hall tier',()=>{
  expect(cashLabel(findDef(content,'readyLiquid'),s,content,{hallId:'H1'})).toBe(`${price} total, from ${price} equity`);
  }
 });
+
+it('a second-source race offers one truthful cancellation, identical on map and desk', async () => {
+ const {buildRows} = await import('../../src/ui/components/TracksPanel');
+ const {applyAction} = await import('../../src/engine/actions');
+ const s=freshState();
+ s.power.orders=[
+ {kind:'transformer',orderedMonth:1,arrivalMonth:24,arrived:false,deposit:100,price:500,supplier:'standard'},
+ {kind:'transformer',orderedMonth:2,arrivalMonth:22,arrived:false,deposit:100,price:500,supplier:'alt'},
+ {kind:'switchgear',orderedMonth:1,arrivalMonth:10,arrived:true,deposit:100,price:500,supplier:'standard'}];
+ const map=boardActionsForObject('substation',s,content).filter(r=>r.action.actionId==='cancelOrder');
+ const desk=buildRows('power',s,content,null).filter(r=>r.action.actionId==='cancelOrder');
+ expect(map).toHaveLength(1);expect(desk).toEqual(map);
+ expect(map[0]!.label).toBe('Cancel transformer order (second supplier)');
+ expect(map[0]!.help).toContain('standard supplier stays on order');
+ const next=applyAction(s,map[0]!.action,content);
+ expect(next.power.orders.filter(o=>o.kind==='transformer').map(o=>o.supplier)).toEqual(['standard']);
+ const remaining=boardActionsForObject('substation',next,content).filter(r=>r.action.actionId==='cancelOrder');
+ expect(remaining).toHaveLength(1);expect(remaining[0]!.label).toBe('Cancel transformer order (standard supplier)');
+});

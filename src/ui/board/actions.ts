@@ -22,6 +22,22 @@ export interface ActionRow {
   action: PlannedAction;
 }
 
+/** Match the engine's one cancellation per equipment kind: alternate first, then
+ * the remaining pending order. Never imply that two identical actions pick suppliers. */
+export function cancelOrderRows(state: GameState, content: Content): ActionRow[] {
+  const rows: ActionRow[] = [];
+  for (const kind of ['transformer', 'switchgear'] as const) {
+    const pending = state.power.orders.filter(o => o.kind === kind && !o.arrived);
+    const target = pending.find(o => o.supplier === 'alt') ?? pending[0];
+    if (!target) continue;
+    const supplier = target.supplier === 'alt' ? 'second supplier' : target.supplier === 'spot' ? 'spot' : 'standard supplier';
+    const entry = row(content, state, 'cancelOrder', `Cancel ${kind} order (${supplier})`, { kind });
+    if (pending.length > 1) entry.help += ' The standard supplier stays on order.';
+    rows.push(entry);
+  }
+  return rows;
+}
+
 /** Resolves a 'dynamic' cash cost to a concrete number where it's actually deterministic given
  * current state (see store.ts/Decisions log); returns null when it genuinely varies/unknown. */
 export function dynamicCash(def: ActionDef, state: GameState, content: Content): number | null {
@@ -232,11 +248,7 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
         );
       }
     }
-    // One cancel entry per open (not yet arrived) order.
-    for (const order of state.power.orders) {
-      if (order.arrived) continue;
-      rows.push(row(content, state, 'cancelOrder', `Cancel ${order.kind} order`, { kind: order.kind }));
-    }
+    rows.push(...cancelOrderRows(state, content));
     return rows;
   }
 
