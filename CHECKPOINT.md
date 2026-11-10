@@ -1,3 +1,17 @@
+# Replay: expansion reveals the power ceiling before accepting
+
+Personal Hard Whale dry-cooling expansion reached 5/6 delivered at Y5 M11. H6 needed 33.8MW against 25.3MW free, with both plants already online, yet guidance implied waiting for more plant capacity. Expansion disclosed money and pad costs but not the permanent capacity gap. It now compares the six-hall cooling load with final grid/plant supply before the choice. A fully online undersized campus says no more capacity is scheduled and waiting cannot close the gap. Engine allocation, power supply and cooling are unchanged.
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | Expansion previews power needed and final planned supply before yes/no | PASS | expansionPowerWords + EventModal; dry: 202.5MW vs194MW, 8.5MW short; hybrid fits |
+| 2 | Exhausted capacity no longer promises another plant | PASS | noMorePowerScheduled, nextStep, powerCapacityWords; future plant and next-tick hookup paths preserved |
+| 3 | Both disclosure and choice remain readable/clickable | PASS | e2e/expansion-power.spec.ts, three 1280x720 screenshots inspected (disclosure, scrolled choices, final shortage) |
+| 4 | Full gates | PASS | 575 unit; 119 browser (65 + 52 bounded specs plus both full real-click journeys); lint, tsc, production build |
+| 5 | No engine, bot, tuning or save change | PASS | UI-only; no migration or balance grids required |
+
+Existing bundle-size warning remains. Personal Hard replay remains saved Y5 M11 for published wording verification before closing.
+
 # Replay: financed work never looks free
 
 Personal Hard Whale replay found the wetlands choice saying $6.0M in its title but $0 in its cost badge. Far-pad feeders and legal liquid-readiness work had the same bank-debit problem: equity/mezz/senior funds the cost before cash. Their labels now use the existing site-option total-and-funding breakdown. Missing prerequisites retain the full resolved cost with a capital-stack explanation. Charges are unchanged.

@@ -41,3 +41,27 @@ it('uses resolved scenario cooling for the next hookup preview',()=>{
  expect(canConnectOnNextTick(s,c,'H1')).toBe(true);
  s.power.interimGridMW=24;expect(canConnectOnNextTick(s,c,'H1')).toBe(false);
 });
+
+
+it('warns before accepting expansion when dry cooling exceeds final supply',async()=>{
+ const {applyEffect}=await import('../../src/engine/effects');
+ const {expansionPowerWords,plannedPowerMW}=await import('../../src/ui/board/powerWords');
+ const c=loadContent(),s=createGame(c,'whale',{...DEFAULT_SETUP,cooling:'dry'},DEFAULT_NEGOTIATION,1);
+ const after=applyEffect(s,{type:'addAskHalls',args:[]},c);
+ expect(plannedPowerMW(after,c)).toBe(194);
+ expect(expansionPowerWords(after,c)).toContain('6 halls need 202.5 MW');
+ expect(expansionPowerWords(after,c)).toContain('8.5 MW short');
+ after.setup.cooling='hybrid';expect(expansionPowerWords(after,c)).toContain('Full delivery fits once');
+});
+
+it('does not promise more power after every source is online',async()=>{
+ const {applyEffect}=await import('../../src/engine/effects');
+ const {powerCapacityWords,noMorePowerScheduled}=await import('../../src/ui/board/powerWords');
+ const c=loadContent(),s=applyEffect(createGame(c,'whale',{...DEFAULT_SETUP,cooling:'dry'},DEFAULT_NEGOTIATION,1),{type:'addAskHalls',args:[]},c);
+ s.month=50;s.power.substationStatus='done';s.power.plants.forEach(p=>p.onlineMonth=40);s.halls.forEach((h,i)=>h.energized=i<5);
+ expect(noMorePowerScheduled(s)).toBe(true);expect(powerCapacityWords(s,c)).toContain('No further power capacity is scheduled');
+ expect(powerCapacityWords(s,c)).toContain('Waiting will not close this gap');
+ s.power.plants[1]!.onlineMonth=null;s.power.plants[1]!.plannedOnlineMonth=55;
+ expect(noMorePowerScheduled(s)).toBe(false);expect(powerCapacityWords(s,c)).toContain('Next scheduled capacity');
+ expect(powerCapacityWords(s,c)).not.toContain('Waiting will not close');
+});
