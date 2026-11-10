@@ -36,5 +36,8 @@ test('expansion choice states the real campaign cutoff before either answer',asy
   });
   await expect(page.getByTestId('expansion-cutoff')).toContainText('Y6 M1');
   await expect(page.getByTestId('expansion-cutoff')).toContainText('Expansion does not extend this deadline');
-  await page.screenshot({path:'docs/screenshots/cold2/expansion-cutoff.png'});
+  await expect(page.getByTestId('expansion-funding')).toContainText('equity +');
+  await expect(page.getByTestId('expansion-funding')).toContainText('extra pad months');
+  await expect(page.getByTestId('expansion-funding')).toContainText('line losses once delivered');
+  await page.screenshot({path:'docs/screenshots/cold2/expansion-funding.png'});
 });
