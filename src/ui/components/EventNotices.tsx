@@ -67,6 +67,7 @@ export function dedupeNotices(notices: Notice[]): Notice[] {
 const NOTICE_TTL_MS = 9000;
 
 export function EventNotices() {
+  const boardPopover = useStore((s) => s.boardPopover);
   const draft = useStore((s) => s.draft);
   const content = useStore((s) => s.content);
   const state = useStore((s) => s.state);
@@ -105,7 +106,7 @@ export function EventNotices() {
       .filter((e) => e.text !== pendingTitle)
       .map((e, i) => ({
         key: `${e.month}-${seenCount.current}-${i}`,
-        title: e.text,
+        title: e.text.replace('(Money tab)', '(site office: Insurance & lender)'),
         body: [e.detail, eventOccurrenceDetail(draft, content.events.find(c=>c.title===e.text)?.id??'',e.month,prevState)].filter(Boolean).join(' ') || undefined,
         stakes: noticeStakes(e, content),
         warning: e.kind === 'warning',
@@ -121,7 +122,7 @@ export function EventNotices() {
   // and fix buttons. Never repeat that same warning in a transient card.
   const bannerTitles = new Set(warnings(state, content).map((w) => w.title));
   const visible = notices.filter((n) => !isBannerDuplicate(n, bannerTitles));
-  if (!draft || draft.phase === 'awaitingChoice' || visible.length === 0) return null;
+  if (!draft || boardPopover || draft.phase === 'awaitingChoice' || visible.length === 0) return null;
 
   const latest = visible[visible.length - 1]!;
   return <CampusNotice notice={latest} remaining={visible.length - 1} onDismiss={() => setNotices((prev) => prev.filter((n) => n.key !== latest.key))} />;
