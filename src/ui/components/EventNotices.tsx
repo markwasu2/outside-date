@@ -6,6 +6,7 @@ import { describeEffect } from './EventModal';
 import { eventCampusTarget, eventOccurrenceDetail, type CampusTarget } from '../board/eventCampus';
 import { useCampusAnchor } from '../board/useCampusAnchor';
 import { useStore } from '../store';
+import { logDetailWords } from '../board/logWords';
 import { warnings } from '../board/warnings';
 
 /** UX 6 (playthrough): big moments - a no-choice event card (discovery, goodwill swing, rate
@@ -117,7 +118,7 @@ export function EventNotices() {
       .map((e, i) => ({
         key: `${e.month}-${seenCount.current}-${i}`,
         title: e.text.replace('(Money tab)', '(site office: Insurance & lender)'),
-        body: [e.detail, eventOccurrenceDetail(draft, content.events.find(c=>c.title===e.text)?.id??'',e.month,prevState)].filter(Boolean).join(' ') || undefined,
+        body: [logDetailWords(e.detail), eventOccurrenceDetail(draft, content.events.find(c=>c.title===e.text)?.id??'',e.month,prevState)].filter(Boolean).join(' ') || undefined,
         stakes: noticeStakes(e, content),
         warning: e.kind === 'warning',
         target: eventCampusTarget(draft, content.events.find((c) => c.title === e.text)?.id ?? '', e.month, prevState),

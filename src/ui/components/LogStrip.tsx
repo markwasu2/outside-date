@@ -1,3 +1,4 @@
+import { logDetailWords } from '../board/logWords';
 import { useState } from 'react';
 
 import type { Content } from '../../content/schemas';
@@ -132,7 +133,7 @@ export function LogStrip() {
                 {' '}(pending)
               </span>
             )}
-            {entry.detail && <div style={{ color: '#666' }}>{entry.detail}</div>}
+            {entry.detail && <div style={{ color: '#666' }}>{logDetailWords(entry.detail)}</div>}
           </div>
         );
       })}
