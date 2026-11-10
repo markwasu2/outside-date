@@ -97,7 +97,7 @@ function CampusGame() {
   const dismissCoachTip = useStore(s => s.dismissCoachTip);
   const [showBasics, setShowBasics] = useState(false);
   const actionsLeft = Math.max(0, draft.apPerMonth - draft.apUsedThisMonth - totalApCost(plan,content));
-  const step = nextStep(draft, content);
+  const step = nextStep(draft, content, actionsLeft);
   const takeoutQueued = plan.some((a) => a.actionId === 'priceTakeout');
   const alerts = warnings(state, content);
   useEffect(() => { if (requestedTab) setDrawer('actions'); }, [requestedTab]);

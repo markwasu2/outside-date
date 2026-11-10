@@ -157,3 +157,10 @@ it('routes land purchase to the road where the actual site-option action lives',
  state.docket.status='approved';state.permitsRequired=[];state.flags.siteOptioned=false;state.flags.siteOptionedAtStart=false;
  expect(nextStep(state,content).objectId).toBe('road');expect(nextStep(state,content).actionId).toBe('optionSite');
 });
+
+
+it('does not direct the player to an instruction that cannot fit remaining focus',()=>{
+ const s=freshState();expect(nextStep(s,content,1)).toMatchObject({title:'End the month',objectId:'substation'});
+ expect(nextStep(s,content,1).why).toContain('needs 2 focus points; you have 1 left');
+ expect(nextStep(s,content,2).actionId).toBe('commissionStudy');
+});
