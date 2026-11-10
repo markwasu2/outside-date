@@ -1606,3 +1606,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | Why wait shows the actual arrival/build clock directly on the campus; touching the substation still opens its actions |
 | gates | 563 unit, 104 browser (102 bounded plus 2 complete journeys), lint, tsc, build; 1280px equipment and construction clocks inspected |
 | scope | one read-only waiting marker plus tests; no engine, bot, tuning or save changes, no migration needed; existing bundle-size warning remains |
+
+# Personal Riverbend replay - name the terminal loss, not the last warning
+
+| criterion | status |
+|---|---|
+| personal run | Millbrook normal, Riverbend Farm, liquid/dry, cost-plus, low leverage; lost Y4 M2 with 0/1 delivered after docket failure and delayed plant capacity; actual live clicks, not a balance verdict |
+| observed | ending correctly said every hall terminated, but Post-mortem blamed a later same-tick conversion-test warning |
+| fixed | use same-tick termination detail only for allTerminated; other losses keep the explicit outcome reason, never an unrelated or old warning |
+| gates | 565 unit, 105 browser (103 bounded plus 2 complete journeys), lint, tsc, build; 1280px terminal explanation inspected |
+| scope | report-only, no simulation, save, bot or tuning changes; no migration required; existing bundle-size warning remains |
