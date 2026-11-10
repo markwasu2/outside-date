@@ -1164,3 +1164,15 @@ have transparent edges; the power timeline labels stay inside the panel.
 | visual | inspected: 1280 campus after focused Space at Y1 M2 |
 | grid | skipped: UI input handling only, engine/save unchanged |
 | event semantics | checked: resolveEvent completes the pending month's world tick once, no extra step added |
+
+# Playthrough 4 - keep object decisions live within the plan
+
+| criterion | status |
+|---|---|
+| persistence | done: object popovers stay open after adding an action, confirm planned not committed |
+| current rows | done: rows/teaching/order data read the draft, legality validates committed state plus full plan |
+| Next | done: follows draft immediately; explicitly says After planned actions, removing action restores prior Next |
+| unavailable | done: visible inline reasons retained plus clickable Why unavailable affordance and readable status explanation |
+| full gates | done: 521 unit, 70 e2e, lint, tsc, build |
+| visual | inspected: 1280 substation popup with unavailable explanation and enabled switchgear visible |
+| grid | skipped: UI-only, engine/save shape unchanged |

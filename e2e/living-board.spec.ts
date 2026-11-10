@@ -42,7 +42,9 @@ test('tutorial: substation popover queues the study from the map, and the month 
 
   // D1: the popover lists the same study action the Power track offers - queue it from the map.
   await popover.getByTestId('popover-action').filter({ hasText: 'Commission the interconnection study' }).click();
-  await expect(popover).toHaveCount(0);
+  await expect(popover).toBeVisible();
+  await expect(popover.getByRole('status')).toContainText('planned.');
+  await expect(page.getByTestId('next-step-card')).not.toContainText('Commission the interconnection study');
   await expect(page.getByTestId('queued-ghost').first()).toBeVisible();
 
   // End month: the plan clears and the study is visibly underway on the board.
