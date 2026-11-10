@@ -1637,3 +1637,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | borderline losses read just under 1.00x in both report sentences; exact break-even, larger losses and gains keep ordinary formatting |
 | gates | 567 unit, 108 browser (106 bounded plus both complete journeys), lint, tsc, build; actual 1280px final report pixels inspected |
 | scope | report-only; no simulation, save, bot or tuning changes; no migration needed; existing bundle-size warning remains |
+
+# Personal optional-help replay - keep Codex navigation in reach
+
+| criterion | status |
+|---|---|
+| personal run | Whale normal through Y1 M6, power orders, permits, hall pads and Governor visit; optional guide/scoring, focus help, sound toggle and event Who holds this path exercised with actual clicks |
+| observed | focused Stakeholders scroll and long-list reading moved Codex title, Close and Back to list offscreen; Escape and backdrop remained available |
+| fixed | fixed dialog header and return navigation above a separately scrolling reading area; entry changes reset reading scroll; focused role remains highlighted and visible |
+| gates | 567 unit, 111 browser (110 across bounded shards including immersive journey plus full Whale journey), lint, tsc, build; actual 1280px scrolled-Codex pixels inspected; 600x540 fit/Escape and event-return regression tests |
+| scope | optional read-only UI only; no engine, save, bot or tuning change, no migration required; audio toggle state checked but sound not verified by listening; existing bundle-size warning remains |
