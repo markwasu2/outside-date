@@ -1237,3 +1237,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 525 unit, 74 e2e in bounded groups, lint, tsc, build |
 | visual | inspected: tutorial final report starts directly with grades, no irrelevant plant/docket claim |
 | grid | skipped: presentation/test only, engine/save unchanged |
+
+# Current ledger obligations, not stale milestone alarms
+
+| criterion | status |
+|---|---|
+| resolved | done: omit delivered/terminated hall dates, resolved permits/vote/discovery/study, fulfilled equipment, online plants and completed conversion |
+| conversion | done: monthly retest after failure; no old forced-test date presented as overdue after conversion |
+| takeout | done: remove invented max-minus-seasoning opening; show actual availability, future seasoning and real hard cutoff with in-window wait explanation |
+| scope | engine ledger/fast-forward unchanged; display-only projection |
+| full gates | done: 526 unit, 75 e2e bounded groups, lint, tsc, build; final seasoning-copy condition focused ledger test rechecked |
+| visual | inspected: 1280 future obligations omit completed rows and old opening date |
