@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
 import type { Setup } from '../../src/engine/types';
-import { boardActionsForObject, boardObjectTagline, laydownOrders, cashLabel, findDef } from '../../src/ui/board/actions';
+import { boardActionsForObject, boardObjectTagline, laydownOrders, laydownSummary, cashLabel, findDef } from '../../src/ui/board/actions';
 
 // Phase 1 (D1): the board popover's action list must match what the TracksPanel would offer for
 // the same object - boardActionsForObject is the single shared source. These tests pin the
@@ -98,4 +98,14 @@ describe('boardObjectTagline', () => {
     const tag = boardObjectTagline(state.halls[0]!.id, state);
     expect(tag.termId).toBe('build-to-suit');
   });
+});
+
+
+it('yard summary counts pending and arrived reservations, and frees installed crates',()=>{
+ const s=freshState();
+ s.power.orders=[{kind:'transformer',orderedMonth:0,arrivalMonth:10,arrived:false,deposit:0,price:0,supplier:'standard'},
+ {kind:'switchgear',orderedMonth:0,arrivalMonth:8,arrived:true,deposit:0,price:0,supplier:'standard'}];
+ expect(laydownSummary(s,content)).toMatchObject({reserved:2,capacity:3,inTransit:1,onSite:1,installed:false});
+ s.power.orders=[];s.power.substationStatus='building';
+ expect(laydownSummary(s,content)).toMatchObject({reserved:0,inTransit:0,onSite:0,installed:true});
 });

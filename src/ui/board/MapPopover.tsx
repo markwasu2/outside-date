@@ -6,7 +6,7 @@ import { buildRows } from '../components/TracksPanel';
 import { actionCostWords, decisionResult } from './decisionWords';
 import { DocketBrief } from './DocketBrief';
 import { Term } from '../Term';
-import { boardActionsForObject, boardObjectTagline, laydownOrders } from './actions';
+import { boardActionsForObject, boardObjectTagline, laydownSummary } from './actions';
 
 /**
  * Phase 1 (D1/D6): the context popover anchored to a map object. Lists the actions that object
@@ -89,7 +89,8 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
     : objectId === 'people' ? boardActionsForObject('siteOffice', state, content).filter((r) => r.action.actionId === 'visitCast' || r.action.actionId === 'meetIntervenor')
     : boardActionsForObject(objectId, state, content);
   const tagline = boardObjectTagline(objectId, state);
-  const orders = objectId === 'laydownYard' ? laydownOrders(state) : [];
+  const yard = laydownSummary(state,content);
+  const orders = objectId === 'laydownYard' ? yard.orders : [];
 
   return (
     <>
@@ -152,10 +153,11 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
           <>
             {/* Phase 7 (scarcity pack): the yard is a real constraint now - show the load. */}
             <div style={{ color: '#555', marginBottom: 4 }} data-testid="yard-popover-capacity">
-              {orders.length} of {content.tuning.spatial.laydownCapacity} crate slots in use
+              {yard.reserved} of {yard.capacity} crate slots in use
             </div>
+            <div data-testid="yard-reservation-detail" style={{marginBottom:8,lineHeight:1.4}}>{yard.reserved ? `${yard.inTransit} in transit, ${yard.onSite} on site. Pending orders reserve a slot too.` : yard.installed ? 'Equipment is installed at the substation. Its crates no longer use yard slots.' : 'No slots reserved. Pending orders and arrived crates use slots until installed or cancelled.'}</div>
             {orders.length === 0 ? (
-              <div style={{ color: '#777' }}>No equipment on order yet. Order the transformer and switchgear from the substation.</div>
+              <div style={{ color: '#777' }}>{yard.installed ? 'No further substation orders needed.' : 'Order equipment from the substation.'}</div>
             ) : (
             orders.map((o) => (
               <div key={`${o.kind}-${o.supplier}-${o.arrivalMonth}`} style={{ padding: '3px 0', borderBottom: '1px solid #eee' }}>

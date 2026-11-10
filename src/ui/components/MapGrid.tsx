@@ -17,6 +17,7 @@ import { usePrefersReducedMotion } from '../board/boardStyles';
 import { monthDeltas } from '../board/deltas';
 import { hallVisual, stageMinMonths } from '../board/hallVisual';
 import { HallSprite } from '../board/HallSprite';
+import { laydownSummary } from '../board/actions';
 import { MapPopover, POPOVER_MAX_HEIGHT, POPOVER_WIDTH } from '../board/MapPopover';
 
 /** GFX 1: the generated isometric tile art sits under the tile's content as a
@@ -247,6 +248,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;o
   };
 
   const power = draft.power;
+  const yard = laydownSummary(draft,content);
   const substationEnergized = power.substationStatus === 'done';
   const studyMonthsLeft = power.studyStatus === 'pending' && power.studyDoneMonth !== null ? power.studyDoneMonth - draft.month : null;
 
@@ -518,7 +520,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;o
           {/* Phase 7 (scarcity pack): the yard holds a fixed number of crates; show the load. */}
           <span style={{ color: '#6d4c41', fontSize: '0.65rem' }} data-testid="yard-capacity">
             {' '}
-            {power.orders.length}/{resolveContent(draft, content).tuning.spatial.laydownCapacity}
+            {yard.reserved}/{yard.capacity}
           </span>
         </div>
         {power.orders.length === 0 && (
