@@ -1554,3 +1554,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | replay verification | live #101 Tutorial closed Y2 M8, $119.8M campus, $15.1M equity, 1.89x; due-month crates/Why wait/permit dates confirmed with live pixels |
 | gates | 556 unit, 100 browser (98 bounded + 2 journeys), lint, tsc, build; 1280px deadline notice inspected |
 | scope | UI formatter only; no engine/save/bot/rule change |
+
+# Personal hard-Millbrook replay - restart denied permit clocks early
+
+| criterion | status |
+|---|---|
+| personal run | Millbrook hard closed Y4 M5, 1/1 delivered late, $405.7M campus, $70.4M equity, 1.30x; actual live clicks, no balance conclusion |
+| observed | denied water permit vanished from next-step guidance until construction reached its blocker; months of review could have restarted earlier |
+| fixed | denied required permits join unfiled permits in longest-review-first guidance; Refile cue explains a new review and opens the existing file action |
+| safety | pending/granted permits are not refiled; focus guard preserved; engine already allows denied refiling |
+| gates | 558 unit, 101 browser (99 bounded + 2 complete journeys), lint, tsc, build; 1280px expanded map cue inspected |
+| scope | UI guidance only; no engine/save/bot/tuning change, no migration required; existing bundle-size warning remains |
