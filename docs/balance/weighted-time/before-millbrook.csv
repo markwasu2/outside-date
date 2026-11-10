@@ -1,0 +1,14 @@
+grid: millbrook-relay, 1000 seeds from 1
+bot,difficulty,winRate,medianMultiple,medianFirstDelivery
+random,easy,0.0,0.00,null
+random,normal,0.0,0.00,null
+random,hard,0.0,0.00,null
+greedy,easy,23.4,1.30,33
+greedy,normal,22.9,1.38,33
+greedy,hard,20.9,1.41,33
+careful,easy,90.0,1.60,31
+careful,normal,85.5,1.65,31
+careful,hard,76.6,1.67,31
+competent,easy,77.5,1.58,31
+competent,normal,69.6,1.64,31
+competent,hard,63.8,1.66,31

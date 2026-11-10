@@ -13,8 +13,9 @@ import type { FinancialSnapshot } from './financials';
  * v6 (Phase 7, scarcity pack): `Hall.pad` joins the state; v5 saves' halls default to 'near',
  * the only pad kind that existed when they were written.
  * v7 (Phase 8, the pond takes a hall): `Hall.pondBlocked` joins; v6 saves' halls were all
- * buildable, so they default to not blocked. */
-export const SAVE_VERSION = 7;
+ * buildable, so they default to not blocked.
+ * v8: weighted monthly focus doubles legacy budget/spend/event debt; the new costs live in content. */
+export const SAVE_VERSION = 8;
 const SAVE_KEY = 'outside-date-save';
 
 export interface SaveFile {
@@ -31,6 +32,24 @@ export interface SaveFile {
  * v2: adds an empty financialSnapshots series; the full GameState is already in the save, so
  * nothing else needs backfilling. Exported for tests. */
 export function migrateSave(parsed: unknown): SaveFile | null {
+  if (parsed && typeof parsed === 'object' && (parsed as SaveFile).version === 8) return parsed as SaveFile;
+  const legacy = migrateLegacySave(parsed);
+  if (!legacy) return null;
+  // v7 -> v8: two focus points replace one old action. Preserve the fraction already
+  // spent and any event debt, rather than resetting the player's month for free.
+  const owed = legacy.state.flags.apOwedNextMonth;
+  return {
+    ...legacy, version: 8,
+    dismissedCoachTips: legacy.dismissedCoachTips.filter(t => t !== 'monthly-decisions'),
+    state: { ...legacy.state,
+      apPerMonth: legacy.state.apPerMonth * 2,
+      apUsedThisMonth: legacy.state.apUsedThisMonth * 2,
+      flags: { ...legacy.state.flags, ...(typeof owed === 'number' ? { apOwedNextMonth: owed * 2 } : {}) },
+    },
+  };
+}
+
+function migrateLegacySave(parsed: unknown): SaveFile | null {
   if (!parsed || typeof parsed !== 'object') return null;
   const save = parsed as Partial<SaveFile> & { version?: number };
   if (save.version === 7) return save as SaveFile;

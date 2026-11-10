@@ -40,7 +40,7 @@ export function validateActions(state: GameState, actions: PlannedAction[], cont
   const remaining = state.apPerMonth - state.apUsedThisMonth;
   if (apCost > remaining) {
     throw new ActionError(
-      `Action plan costs ${apCost} AP but only ${remaining} AP remain this month (of ${state.apPerMonth}/month)`,
+      `Plan costs ${apCost} focus points but only ${remaining} remain this month (of ${state.apPerMonth}/month)`,
     );
   }
   return apCost;

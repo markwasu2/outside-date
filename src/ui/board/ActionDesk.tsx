@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {useStore,checkAction} from '../store';
 import {boardActionsForObject,type ActionRow} from './actions';
-import {buildRows} from '../components/TracksPanel';
+import {buildRows,describeAction} from '../components/TracksPanel';
 import {actionCostWords,decisionResult} from './decisionWords';
 
 /** A permanent action desk, not a hidden tab: each instruction names its campus location. */
@@ -21,7 +21,7 @@ export function ActionDesk(){
   {title:'People & relationships',place:'People on site · lower left',id:'people',rows:boardActionsForObject('siteOffice',draft,content).filter(r=>r.action.actionId==='visitCast')},
  ];
  return <aside data-testid="action-desk" aria-label="What you can do this month" style={{width:320,flexShrink:0,background:'#fffaf0',borderLeft:'1px solid #bcae8d',display:'flex',flexDirection:'column',fontSize:12,minHeight:0}}>
-  <div style={{padding:10,borderBottom:'1px solid #d9cfb9'}}><strong style={{fontSize:16}}>What can I do?</strong><div>Choose here or click the same object on campus. Each choice shows its cost and result before you add it to Plan.</div>
+  <div style={{padding:10,borderBottom:'1px solid #d9cfb9'}}><strong style={{fontSize:16}}>What can I do?</strong><div>Choose here or click the same object on campus. 1 focus: permits, insurance, inspection fixes. 2: major commitments. 4: recap. Money is separate. Each choice shows its cost and result.</div>
    <label style={{display:'block',marginTop:7}}><input type="checkbox" checked={showBlocked} onChange={e=>setShowBlocked(e.target.checked)}/> Also show unavailable choices</label>
   </div>
   <div style={{overflowY:'auto',flex:1,minHeight:0,padding:8}}>
@@ -41,8 +41,8 @@ export function ActionDesk(){
    {!groups.some(g=>g.rows.some(r=>checkAction(state,content,plan,r.action).ok))&&<p>No available instructions fit this month's remaining budget. Review your plan or end the month to let work progress.</p>}
   </div>
   <div style={{padding:9,borderTop:'1px solid #d9cfb9',maxHeight:150,overflowY:'auto'}}><strong>This month's plan ({plan.length})</strong>
-   {!plan.length&&<div>Nothing planned. You can leave actions unused.</div>}
-   {plan.map((a,i)=><div key={i} style={{display:'flex',justifyContent:'space-between',gap:5,marginTop:4}}><span>{content.actions.find(d=>d.id===a.actionId)?.label}{a.params?.hallId?` · ${a.params.hallId}`:''}</span><button onClick={()=>remove(i)}>Remove</button></div>)}
+   {!plan.length&&<div>Nothing planned. You can leave focus unused.</div>}
+   {plan.map((a,i)=><div key={i} style={{display:'flex',justifyContent:'space-between',gap:5,marginTop:4}}><span>{describeAction(a,content)} · {content.actions.find(d=>d.id===a.actionId)?.ap} focus</span><button onClick={()=>remove(i)}>Remove</button></div>)}
   </div>
  </aside>;
 }

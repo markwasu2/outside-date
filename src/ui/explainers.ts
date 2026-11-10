@@ -42,10 +42,10 @@ export const STAT_EXPLAINERS: StatExplainer[] = [
   },
   {
     id: 'ap',
-    title: 'Actions this month',
-    what: 'This is your attention budget as the developer. An instruction reserves the number of actions shown on it; some use none.',
+    title: 'Focus this month',
+    what: 'This is your attention budget as the developer. Small tasks cost 1 focus point, major commitments cost 2 and a recap costs 4. Quick confirmations are free.',
     why: 'The monthly limit makes you choose what needs your attention now. Workers keep building and reviews keep running after you start them.',
-    doText: 'Use actions on the next blocker first. Plan is reversible until End month. Your budget resets each month, but unused actions do not carry over.',
+    doText: 'Use actions on the next blocker first. Plan is reversible until End month. Your budget resets each month, but unused focus does not carry over.',
     trigger: (draft) => draft.apUsedThisMonth > 0,
   },
   {

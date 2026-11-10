@@ -304,7 +304,7 @@ export function Hud({ hideFastForward = false }: { hideFastForward?: boolean }) 
 
       <StatExplainer id="ap" autoOpen={firstEligibleExplainer === 'ap'}>
         <div title="Your monthly attention budget. Jobs already started keep running.">
-          Actions this month: {Math.max(0,apTotal-apUsed)} of {apTotal} left
+          Focus this month: {Math.max(0,apTotal-apUsed)} of {apTotal} left
         </div>
       </StatExplainer>
 

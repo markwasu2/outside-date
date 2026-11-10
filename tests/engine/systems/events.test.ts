@@ -264,7 +264,7 @@ describe('events: per-card effects', () => {
     const complied = resolveChoice(pendingState, 'comply', baseContent);
     expect(complied.cash).toBe(state.cash - 1_000_000);
     expect(complied.goodwill.commission).toBe(state.goodwill.commission + 5);
-    expect(complied.flags.apOwedNextMonth).toBe(1);
+    expect(complied.flags.apOwedNextMonth).toBe(2);
 
     const fought = resolveChoice(pendingState, 'fight', baseContent);
     expect(fought.goodwill.town).toBeLessThanOrEqual(state.goodwill.town - 5);
@@ -339,7 +339,7 @@ describe('events: per-card effects', () => {
     expect(pending?.choices.map((c) => c.id).sort()).toEqual(['attend', 'skip']);
 
     const attended = resolveChoice(pendingState, 'attend', baseContent);
-    expect(attended.flags.apOwedNextMonth).toBe(1);
+    expect(attended.flags.apOwedNextMonth).toBe(2);
     expect(attended.goodwill.town).toBe(state.goodwill.town + 8);
 
     const skipped = resolveChoice(pendingState, 'skip', baseContent);
@@ -377,7 +377,7 @@ describe('events: per-card effects', () => {
     expect(pending?.choices.map((c) => c.id).sort()).toEqual(['decline', 'host']);
 
     const hosted = resolveChoice(pendingState, 'host', baseContent);
-    expect(hosted.flags.apOwedNextMonth).toBe(1);
+    expect(hosted.flags.apOwedNextMonth).toBe(2);
     expect(hosted.flags.rebateUnlocked).toBe(true);
 
     const declined = resolveChoice(pendingState, 'decline', baseContent);
