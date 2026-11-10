@@ -25,7 +25,11 @@ test('desktop opens on one campus canvas with details on demand and End month pe
   await page.evaluate(async () => {
     // @ts-expect-error dev browser import
     const {useStore} = await import('/src/ui/store.ts');
-    const s = useStore.getState(); while (s.state.pending) s.resolveEventChoice(s.state.pending.choices[0].id);
+    for (let i=0; i<10; i++) {
+      const s = useStore.getState();
+      if (!s.state.pending) break;
+      s.resolveEventChoice(s.state.pending.choices[0].id);
+    }
   });
   await expect(page.getByTestId('campus-status')).toContainText('Y1 M2');
 });
