@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import type { Content } from '../../content/schemas';
 import type { GameState, GoodwillGroup, PlannedAction } from '../../engine/types';
 import { actionCostWords, decisionResult } from '../board/decisionWords';
-import { cashLabel, findDef, cancelOrderRows } from '../board/actions';
+import { cashLabel, findDef, cancelOrderRows, secondSupplierLabel } from '../board/actions';
 import { checkAction, useStore } from '../store';
 import type { TrackTab } from '../store';
 import { tabUnlocks } from '../tabUnlock';
@@ -185,7 +185,7 @@ export function buildRows(tab: TrackTab, state: GameState, content: Content, sel
       if (orders.some((o) => o.supplier === 'standard' && !o.arrived) && !orders.some((o) => o.supplier === 'alt')) {
         rows.push({
           key: `secondSource:${kind}`,
-          label: `Second supplier for the ${kind}`,
+          label: secondSupplierLabel(kind, state, content),
           help: secondSource.help,
           ap: secondSource.ap,
           cashLabel: cashLabel(secondSource, state, content, { kind }),
