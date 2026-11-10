@@ -1151,3 +1151,16 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 521 unit, 66 e2e, lint, tsc, build |
 | visual | done: 1280 card inspected, full funding/pad text and both choices fit |
 | grid | skipped: precommit disclosure only, engine and saves unchanged |
+
+# Playthrough 4 - one month per intended input
+
+| criterion | status |
+|---|---|
+| keyboard | done: global shortcuts ignore editors, controls, dialogs, handled keys, modified keys and held-key repeats |
+| native activation | done: focused End month Space advances once, not native click plus global shortcut |
+| mouse | done: double click End month advances once |
+| regression | done: action-search text with spaces/f/l leaves month unchanged; body Space advances once even held |
+| full gates | done: 521 unit, 68 e2e before added body-repeat case, all 3 focused cases green; lint, tsc, build |
+| visual | inspected: 1280 campus after focused Space at Y1 M2 |
+| grid | skipped: UI input handling only, engine/save unchanged |
+| event semantics | checked: resolveEvent completes the pending month's world tick once, no extra step added |
