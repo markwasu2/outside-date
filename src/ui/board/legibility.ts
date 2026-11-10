@@ -18,7 +18,7 @@ export const STAGE_WORDS: Record<string, string> = {
   steel: 'Steel frame',
   shell: 'Shell',
   fitout: 'Fit-out',
-  rfs: 'Ready for service',
+  rfs: 'Commissioning',
   delivered: 'Delivered',
 };
 
@@ -91,14 +91,14 @@ export function hallCaption(state: GameState, content: Content, hall: Hall): str
   if (hall.stageActive && hall.pausedThisMonth) return 'Paused this month';
   if (hall.stageActive) {
     const current = hall.stageIndex >= 0 ? STAGES[hall.stageIndex] : undefined;
-    return `${STAGE_WORDS[current ?? 'pad'] ?? 'Pad'} - building`;
+    return current === 'rfs' ? 'Commissioning - testing' : `${STAGE_WORDS[current ?? 'pad'] ?? 'Pad'} - building`;
   }
   const blocker = hallBlocker(state, content, hall);
   if (hall.stageIndex === -1) {
     return blocker ? `Not started - ${blocker}` : 'Not started - ready to break ground';
   }
   const next = STAGES[hall.stageIndex];
-  const words = STAGE_WORDS[next ?? 'rfs'] ?? 'Ready for service';
+  const words = STAGE_WORDS[next ?? 'rfs'] ?? 'Commissioning';
   return blocker ? `${words} - ${blocker}` : `${words} - ready`;
 }
 
@@ -125,7 +125,7 @@ export function pondStateWords(state: GameState): string {
 /** Legend panel content: what the chips, icons and stage art mean. Kept as data so the panel
  * and its test read the same source. */
 export const LEGEND_ENTRIES: { symbol: string; meaning: string }[] = [
-  { symbol: 'Hall art', meaning: 'the stage itself: dirt field, pad, steel frame, shell, fit-out, ready-for-service, delivered' },
+  { symbol: 'Hall art', meaning: 'the stage itself: dirt field, pad, steel frame, shell, fit-out, commissioning (ready-for-service checks), delivered' },
   { symbol: 'Caption line', meaning: 'the stage in words, plus what the hall is waiting on' },
   { symbol: 'Green strip', meaning: 'progress through the current stage' },
   { symbol: 'near pad / far pad', meaning: 'pad position; far pads trench a feeder and pay monthly line losses' },
@@ -136,3 +136,8 @@ export const LEGEND_ENTRIES: { symbol: string; meaning: string }[] = [
   { symbol: '🚨', meaning: 'failed inspection - fix it to resume' },
   { symbol: 'Substation / pond / yard', meaning: 'fixed tiles, labeled by state under their art' },
 ];
+
+/** Name the last stage as work still to do, not a promise the hall is already ready. */
+export function hallAdvanceLabel(hall: Hall): string {
+  return hall.stageIndex === 4 ? `Start commissioning: ${hall.id}` : `Advance construction: ${hall.id}`;
+}

@@ -1,3 +1,4 @@
+import { hallAdvanceLabel } from './legibility';
 import { applyAction } from '../../engine/actions';
 import { formatDollars } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
@@ -188,7 +189,7 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
         ),
       );
     } else {
-      rows.push(row(content, state, 'advanceHall', `Advance construction: ${hall.id}`, { hallId: hall.id }));
+      rows.push(row(content, state, 'advanceHall', hallAdvanceLabel(hall), { hallId: hall.id }));
     }
     // Liquid-cooling readiness only exists on liquid/hybrid tiers (air halls have no liquid loop).
     if (state.setup.hallTier === 'liquid' || state.setup.hallTier === 'hybrid') {

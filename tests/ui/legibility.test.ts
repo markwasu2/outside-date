@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
 import type { Setup } from '../../src/engine/types';
-import { hallCaption, pondStateWords, substationStateWords } from '../../src/ui/board/legibility';
+import { hallAdvanceLabel, hallCaption, pondStateWords, substationStateWords } from '../../src/ui/board/legibility';
 
 // UX legibility: hall tiles name their stage in words plus what they are waiting on; fixed
 // tiles name their state. These pin the caption/blocker projection against the engine's own
@@ -62,7 +62,19 @@ describe('hallCaption', () => {
     hall.stageActive = false;
     state.permits['air'].status = 'granted';
     hall.energized = false;
-    expect(hallCaption(state, content, hall)).toBe('Ready for service - waiting on power hookup');
+    expect(hallCaption(state, content, hall)).toBe('Commissioning - waiting on power hookup');
+  });
+
+  it('commissioning is unfinished testing, not a ready hall', () => {
+    const state = freshState();
+    const hall = state.halls[0]!;
+    hall.stageIndex = 4; hall.energized = true;
+    state.permits.air.status = 'granted';
+    hall.stageActive = false;
+    expect(hallAdvanceLabel(hall)).toBe('Start commissioning: H1');
+    expect(hallCaption(state, content, hall)).toBe('Commissioning - ready');
+    hall.stageActive = true;
+    expect(hallCaption(state, content, hall)).toBe('Commissioning - testing');
   });
 
   it('delivered and terminated read plainly', () => {
