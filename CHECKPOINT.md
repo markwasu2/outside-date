@@ -1353,3 +1353,15 @@ have transparent edges; the power timeline labels stay inside the panel.
 | scope | layout only, no engine/save/bot change; no grid needed |
 | gates | done:534 unit,82 browser tests bounded groups,lint,tsc,build |
 | pixels | inspected:1280 scrolled office with Close visible and map/End month accessible |
+
+# Playtest 5 - ending numbers appear immediately
+
+| criterion | status |
+|---|---|
+| scores | done: actual final scores on first rendered rating frame, never placeholder0 |
+| value | done: cap rate,campus value,debt repaid and player equity immediately readable |
+| motion | decorative bars enter without delaying or counting the numeric results; reduced-motion disables entry |
+| continuation | one Continue button available immediately; no mandatory four-second staged reveal |
+| scope | rating UI only,report data/engine/save/balance unchanged |
+| gates | done:534 unit,83 browser tests bounded groups,lint,tsc,build |
+| visual | inspected:1280 ending shows all score/value numbers and Continue beside actual campus |
