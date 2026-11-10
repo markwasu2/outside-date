@@ -1742,3 +1742,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | engine | `EventScaleSchema`; resolveChoice accepts `level:N` through the generic effect path; tenant_slide_offer's bespoke handler interpolates slide months and rent cut by level; addAskHalls takes an optional hall count (the ask's middle level adds one hall) |
 | gates | 644 unit, affected browser specs rewritten to drive the slider (stakes at both poles, keyboard-set levels, commit) and passing, lint, tsc, build |
 | scope | event decisions only; bots, saves, tuning and unscaled cards (docket vote, chip generation, notices) unchanged |
+
+# Cold tutorial playthrough - first-minute intro, wait-month prep, three small bugs
+
+| criterion | status |
+|---|---|
+| ask | Mark: play the tutorial cold, assume nothing, judge fun and understandability from the first screen with game-design principles, fix what you find |
+| findings | understandable via the Next-card conveyor but it teaches obedience not decisions; first minute not clear (no goal, no loop, no welcome - the plain goal sentence was buried in the Status & guide drawer); action feedback strong (instant cash/focus/world response); false dead months (Next card said only End the month with full focus while free prep sat in Actions); the storm draw-freeze said what/where but never why; Touch-the-campus hint never cleared; drawer cash briefly disagreed with the top bar |
+| fixed | fresh tutorial games get a short non-blocking welcome card (plain goal, monthly loop, pointer at the Next card; auto-clears after first action, Got it persisted in the save); wait-month Next cards add a While-you-wait line naming free/prep actions (rack-schedule confirm, unfiled permits); drawer cash reads committed state; the Touch-the-campus hint clears after the first action; the storm draw-freeze notice names its cause (storm damage, no delay-in-start-up cover) |
+| gates | 644 unit, 143 browser across 8 shards, lint, tsc, build; deployed bundle byte-identical to the tested build; fixes re-verified live in a cold cloud-browser playthrough with screenshots |
+| scope | UI copy/components and one log line in insurance.ts; no engine behavior, tuning, save, bot or migration changes; existing bundle-size warning remains |
