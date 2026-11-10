@@ -129,7 +129,7 @@ function SourcesUsesTable({ snap }: { snap: FinancialSnapshot | undefined }) {
   );
 }
 
-export function FinancialsDrawer() {
+export function FinancialsDrawer({ hideTrigger = false }: { hideTrigger?: boolean }) {
   const content = useStore((s) => s.content);
   const state = useStore((s) => s.state);
   const snapshots = useStore((s) => s.financialSnapshots);
@@ -137,6 +137,7 @@ export function FinancialsDrawer() {
   const setOpenPanel = useStore((s) => s.setOpenPanel);
 
   if (openPanel !== 'financials') {
+    if (hideTrigger) return null;
     return (
       <button
         data-testid="open-financials"
@@ -182,7 +183,7 @@ export function FinancialsDrawer() {
         boxShadow: '0 0 8px rgba(0,0,0,0.2)',
         fontFamily: 'sans-serif',
         fontSize: '0.8rem',
-        zIndex: 40,
+        zIndex: 800,
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem', borderBottom: '1px solid #ccc' }}>

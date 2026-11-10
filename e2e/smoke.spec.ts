@@ -1,3 +1,4 @@
+import { openActions } from './campusNavigation';
 import { expect, test, type Page } from '@playwright/test';
 
 /**
@@ -35,6 +36,7 @@ async function queueEveryLegalAction(page: Page) {
     // immediately swaps the whole TracksPanel out for RatingScene. Bail out of any remaining tabs
     // once that's happened instead of clicking tab buttons that no longer exist.
     if ((await page.getByRole('heading', { name: 'Rating the campus' }).count()) > 0) return;
+    await openActions(page);
     await page.getByRole('button', { name: tabName, exact: true }).click();
     const queuedNames = new Set<string>();
     for (let guard = 0; guard < 20; guard += 1) {

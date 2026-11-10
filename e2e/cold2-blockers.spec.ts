@@ -16,7 +16,7 @@ test('RFS nudge names the power blocker and automatic substation chain', async (
     for (const h of next.halls) { h.stageIndex = 4; h.stageActive = false; h.energized = false; }
     useStore.setState({ state: next, draft: next, seenExplainers: ['cash','runway','ap','nextOutsideDate','dscrHeadroom','goodwill'] });
   });
-  await expect(page.getByText('H1: waiting on power hookup', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('next-step-card').getByText('Next: H1: waiting on power hookup', { exact: true })).toBeVisible();
   await expect(page.getByText(/The substation builds itself once/)).toBeVisible();
   await page.screenshot({ path: 'docs/screenshots/cold2/real-blocker.png' });
 });

@@ -1,3 +1,4 @@
+import { openStatus } from './campusNavigation';
 import { expect, test } from '@playwright/test';
 
 async function startWhaleToForecast(page: import('@playwright/test').Page) {
@@ -17,6 +18,7 @@ test('wizard: the forecast step lets you call cost, contingency and month', asyn
   await page.getByRole('button', { name: 'Next: Power' }).click();
   await page.getByRole('button', { name: 'Next: Insurance' }).click();
   await page.getByRole('button', { name: 'Start campaign' }).click();
+  await openStatus(page);
   await expect(page.getByTestId('hud-forecast')).toContainText('Call:');
 });
 
@@ -28,6 +30,7 @@ test('runway warning deep-links to the Capital tab, where a lever can be queued'
   await page.getByRole('button', { name: 'Start campaign' }).click();
   await page.waitForFunction(() => typeof (window as unknown as { __debugSetCash?: unknown }).__debugSetCash === 'function');
   await page.evaluate(() => (window as unknown as { __debugSetCash: (n: number) => void }).__debugSetCash(9_000_000));
+  await openStatus(page);
   await page.getByRole('button', { name: /Raise capital/ }).first().click();
   await expect(page.getByTestId('capital-summary')).toBeVisible();
   await page.getByRole('button', { name: /sponsor bridge loan/i }).first().click();
@@ -86,6 +89,7 @@ test('a threshold warning appears in the banner without a duplicate notice card'
     const next = { ...low, log: [...low.log, ...crossings] };
     useStore.setState({ state: next, draft: next });
   });
+  await openStatus(page);
   await expect(page.getByTestId('warning-banner')).toContainText('Runway under 3 months');
   await expect(page.getByTestId('event-notice')).toHaveCount(0);
   await page.screenshot({ path: 'docs/screenshots/cold2/banner-dedupe.png' });

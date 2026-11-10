@@ -577,7 +577,9 @@ export function MapGrid() {
 
       {/* D3: plant A/B as generator icons, planned -> online. */}
       <div
-        style={{ gridColumn: '11 / 13', gridRow: '4 / 8', background: '#bcaaa4', ...cellStyle, justifyContent: 'flex-start', padding: 4 }}
+        {...selectableCellProps(boardPopover === 'powerPlants', () => openObject('powerPlants', null))}
+        ref={(el) => { if (el) cellRefs.current.set('powerPlants', el); }}
+        style={{ cursor: 'pointer', gridColumn: '11 / 13', gridRow: '4 / 8', background: '#bcaaa4', ...cellStyle, justifyContent: 'flex-start', padding: 4 }}
         title="Power plants"
       >
         <div>{'\u{1F50C}'} Plants</div>

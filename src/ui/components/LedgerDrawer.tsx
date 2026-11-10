@@ -76,13 +76,14 @@ export function urgencyText(state: GameState, entry: { month: number; kind: stri
   return '';
 }
 
-export function LedgerDrawer() {
+export function LedgerDrawer({ hideTrigger = false }: { hideTrigger?: boolean }) {
   const draft = useStore((s) => s.draft);
   const content = useStore((s) => s.content);
   const openPanel = useStore((s) => s.openPanel);
   const setOpenPanel = useStore((s) => s.setOpenPanel);
 
   if (openPanel !== 'ledger') {
+    if (hideTrigger) return null;
     return (
       <button
         onClick={() => setOpenPanel('ledger')}
@@ -99,6 +100,7 @@ export function LedgerDrawer() {
     <div
       style={{
         position: 'fixed',
+        zIndex: 800,
         bottom: 0,
         right: 0,
         width: '320px',

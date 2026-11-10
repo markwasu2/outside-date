@@ -1,3 +1,4 @@
+import { openActions } from './campusNavigation';
 import { expect, test } from '@playwright/test';
 
 /**
@@ -9,6 +10,7 @@ import { expect, test } from '@playwright/test';
 test('finding #1: the Regulation tab never shows a docketAmendment permit row', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Tutorial' }).click();
+  await openActions(page);
   await page.getByRole('button', { name: 'Regulation', exact: true }).click();
 
   await expect(page.getByText('File air permit')).toBeVisible();
@@ -24,6 +26,7 @@ test('finding #3: selecting a hall on the map shows a filter banner, and "Show a
 
   await expect(page.getByText('Showing H1 only')).toHaveCount(0);
   await page.getByRole('button', { name: /H1/ }).first().click();
+  await openActions(page);
   await expect(page.getByText('Showing H1 only')).toBeVisible();
 
   await page.getByRole('button', { name: 'Show all' }).click();

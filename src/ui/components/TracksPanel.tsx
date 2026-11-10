@@ -391,7 +391,7 @@ function describeAction(action: PlannedAction, content: Content): string {
   return def.label;
 }
 
-export function TracksPanel() {
+export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }) {
   const [tab, setTab] = useState<TrackTab>('land');
   // Phase 1 (D8): a warning-fix button can ask this panel to switch tabs (e.g. "Cure the draw
   // freeze (Money tab)"). The request lives in the store because the banner renders far away
@@ -617,7 +617,7 @@ export function TracksPanel() {
             <button onClick={() => removeAction(i)}>remove</button>
           </div>
         ))}
-        {takeoutOpen && !takeoutQueued && (
+        {!hideEndMonth && takeoutOpen && !takeoutQueued && (
           <button
             data-testid="price-takeout-banner"
             onClick={() => queueAction({ actionId: 'priceTakeout' })}
@@ -634,7 +634,7 @@ export function TracksPanel() {
             Price the takeout to finish the campaign
           </button>
         )}
-        <button
+        {!hideEndMonth && <button
           onClick={endMonth}
           disabled={(takeoutOpen && !takeoutQueued) || awaitingChoice}
           title={
@@ -647,7 +647,7 @@ export function TracksPanel() {
           style={{ marginTop: '0.5rem', width: '100%', padding: '0.5rem' }}
         >
           End month
-        </button>
+        </button>}
       </div>
     </div>
   );

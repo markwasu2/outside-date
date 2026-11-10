@@ -1,3 +1,4 @@
+import { openActions, openStatus, closePanel } from './campusNavigation';
 import { expect, test, type Page } from '@playwright/test';
 
 /**
@@ -62,6 +63,7 @@ test('Whale: the financials drawer opens with sources equal to uses at close', a
   await startWhale(page);
   await dismissExplainerIfUp(page);
 
+  await openStatus(page);
   await page.getByTestId('open-financials').click();
   await expect(page.getByTestId('financials-drawer')).toBeVisible();
   await expect(page.getByTestId('sources-uses-table')).toBeVisible();
@@ -84,6 +86,7 @@ test('Whale: the financials drawer opens with sources equal to uses at close', a
   await page.getByRole('button', { name: 'End month' }).click();
   await dismissExplainerIfUp(page);
   await dismissEventIfUp(page);
+  await openStatus(page);
   await page.getByTestId('open-financials').click();
   await expect(page.getByTestId('cash-waterfall')).toBeVisible();
   await expect(page.getByTestId('dscr-trend')).toBeVisible();
@@ -96,15 +99,20 @@ test('tutorial: tabs lock until their systems come online', async ({ page }) => 
 
   // Month 0: Land and Construction are open; the rest are locked with hints.
   for (const id of ['power', 'money', 'regulation', 'chips']) {
+    await openActions(page);
     await expect(page.getByTestId(`track-tab-${id}`)).toHaveAttribute('data-locked', 'true');
   }
+  await openActions(page);
   await expect(page.getByTestId('track-tab-land')).toHaveAttribute('data-locked', 'false');
+  await openActions(page);
   await expect(page.getByTestId('track-tab-construction')).toHaveAttribute('data-locked', 'false');
 
   // A locked tab shows its unlock hint instead of dead ends.
+  await openActions(page);
   await page.getByTestId('track-tab-power').click();
   await expect(page.getByTestId('locked-tab-hint')).toContainText('substation');
 
+  await closePanel(page);
   // Commission the study from the substation map popover (the action the hint names).
   await page.getByRole('button', { name: /Substation/ }).click();
   await page
@@ -118,15 +126,19 @@ test('tutorial: tabs lock until their systems come online', async ({ page }) => 
   await dismissEventIfUp(page);
 
   // Power unlocks from the committed state; the tab now shows its real rows.
+  await openActions(page);
   await expect(page.getByTestId('track-tab-power')).toHaveAttribute('data-locked', 'false');
+  await openActions(page);
   await page.getByTestId('track-tab-power').click();
   await expect(page.getByTestId('locked-tab-hint')).toHaveCount(0);
+  await openActions(page);
   await expect(page.getByTestId('track-tab-money')).toHaveAttribute('data-locked', 'true');
 });
 
 test('the first eligible stat explainer auto-opens once and stays dismissed', async ({ page }) => {
   await startWhale(page);
 
+  await openStatus(page);
   // Exactly one explainer auto-opens on a fresh run (the first eligible one, 'cash').
   const explainer = explainerPopovers(page);
   await expect(explainer).toHaveCount(1);
@@ -141,6 +153,7 @@ test('the first eligible stat explainer auto-opens once and stays dismissed', as
   await dismissExplainerIfUp(page);
   await expect(page.locator(`[data-testid="stat-explainer-${id}"]`)).toHaveCount(0);
 
+  await openStatus(page);
   // Tapping the stat target re-opens its card on demand.
   await page.getByTestId(`stat-explainer-target-${id}`).click();
   await expect(page.locator(`[data-testid="stat-explainer-${id}"]`)).toBeVisible();
@@ -197,13 +210,15 @@ test("tutorial storm card carries a who-holds chip that opens the GC's stakehold
   expect(stormSeen).toBe(true);
 });
 
-test('help lives in a reserved row and Got it can be clicked without covering the board', async ({ page }) => {
+test('help stays in the on-demand guide and Got it accepts a real click', async ({ page }) => {
   await startWhale(page);
+  await openStatus(page);
   const note = explainerPopovers(page).first();
   await expect(note).toBeVisible();
   const noteBox = await note.boundingBox();
   const boardBox = await page.getByTestId('map-pond-slot').boundingBox();
-  expect(noteBox!.y + noteBox!.height).toBeLessThan(boardBox!.y);
+  expect(noteBox!.x).toBeGreaterThan(boardBox!.x);
+  // Help is confined to the on-demand side panel, not an automatic board overlay.
   await page.screenshot({ path: 'docs/screenshots/cold2/help-dock.png' });
   await note.getByRole('button', { name: 'Got it' }).click();
   // A real pointer click reaches the dismissal button; no force/DOM click needed.

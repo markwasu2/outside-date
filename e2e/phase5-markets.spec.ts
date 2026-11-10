@@ -1,3 +1,4 @@
+import { openStatus, closePanel } from './campusNavigation';
 import { expect, test, type Page } from '@playwright/test';
 
 /**
@@ -20,12 +21,14 @@ test('markets: HUD strip, order dialog supplier options, and a supplier-tagged c
   await page.getByRole('button', { name: 'Tutorial' }).click();
 
   // The market strip reads 1.00x across the board on a fresh game.
+  await openStatus(page);
   const strip = page.getByTestId('hud-markets');
   await expect(strip).toBeVisible();
   await expect(strip).toContainText('E 1.00x');
   await expect(strip).toContainText('L 1.00x');
   await expect(strip).toContainText('C 1.00x');
 
+  await closePanel(page);
   // Commission the study and advance one month, the same flow living-board.spec.ts proves
   // unlocks the switchgear order in the tutorial.
   const substation = page.getByRole('button', { name: /Substation/ });

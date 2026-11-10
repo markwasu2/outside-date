@@ -1,3 +1,4 @@
+import { openStatus, closePanel } from './campusNavigation';
 import { expect, test, type Page } from '@playwright/test';
 
 /**
@@ -25,10 +26,13 @@ test('tutorial: substation popover queues the study from the map, and the month 
 
   // D7/D8: the progress spine and its Next step card are up from month 0; no warnings on a fresh
   // healthy state.
+  await openStatus(page);
   await expect(page.getByTestId('progress-spine')).toBeVisible();
   await expect(page.getByTestId('next-step-card')).toContainText('interconnection study');
+  await openStatus(page);
   await expect(page.getByTestId('warning-banner')).toHaveCount(0);
 
+  await closePanel(page);
   // D1/D6: clicking the substation opens its popover with the first-open teaching line.
   const substation = page.getByRole('button', { name: /Substation/ });
   await substation.click();
