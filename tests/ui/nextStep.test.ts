@@ -172,3 +172,9 @@ it('names the closing path instead of end-month after delivery',()=>{
  expect(nextStep(s,content).why).toContain('rent must season until');
  s.phase='takeoutAvailable';expect(nextStep(s,content)).toMatchObject({title:'Price the finished campus',actionId:'priceTakeout',objectId:'siteOffice'});
 });
+
+it('routes an energized substation capacity wait to the plants, not back to the hookup',()=>{
+ const state=powerWaitingState();state.power.substationStatus='done';state.power.interimGridMW=12;
+ state.power.plants[0]!.plannedOnlineMonth=40;
+ const step=nextStep(state,content);expect(step.title).toBe('H1: waiting for plant capacity');expect(step.objectId).toBe('powerPlants');expect(step.why).toContain('12.0 MW available');expect(step.actionId).toBeUndefined();
+});

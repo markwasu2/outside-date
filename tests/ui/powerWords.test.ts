@@ -10,3 +10,11 @@ it('explains automatic construction and never asks an approved docket to pass ag
  s.power.substationStatus='done';expect(substationWords(s)).toContain('energized');
  s.docketEnabled=false;expect(plantWords(p,s)).toContain('Local grid supply');
 });
+
+it('names the remaining capacity gap and scheduled source without promising delivery',async()=>{
+ const {powerCapacityWords}=await import('../../src/ui/board/powerWords');
+ const c=loadContent(),s=createGame(c,'millbrook-relay',{...DEFAULT_SETUP,hallTier:'hybrid',cooling:'hybrid'},DEFAULT_NEGOTIATION,1);
+ s.power.substationStatus='done';s.power.interimGridMW=12;s.power.plants[0]!.plannedOnlineMonth=29;
+ const text=powerCapacityWords(s,c);expect(text).toContain('12.0 MW available');expect(text).toContain('H1 needs 25.0 MW');expect(text).toContain('Plant A, Y3 M6');expect(text).toContain('can slip');
+ s.halls[0]!.energized=true;expect(powerCapacityWords(s,c)).toContain('25.0 MW committed');
+});

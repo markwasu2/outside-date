@@ -1503,3 +1503,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | grids | fresh before/after 1000-seed Whale and Millbrook, all four bots and all difficulties, byte-identical; Whale normal careful73.4%, competent69.7% |
 | gates | 550 unit, 95 browser (93 bounded plus 2 complete journeys), lint, tsc, build; 1280px advanced wait inspected |
 | evidence | docs/qa/closed-discovery contains all four grids |
+
+# Personal Millbrook replay - name the actual capacity wait
+
+| criterion | status |
+|---|---|
+| observed | finished fitout waited months after substation energization; cue still sent player to the substation for power hookup |
+| fixed | energized-substation wait routes to plants; popup states available MW, committed MW, next hall requirement, free MW and next scheduled source |
+| truth | uses resolved scenario cooling PUE and existing capacity selector; scheduled date explicitly can slip; hookups automatic, not a new action |
+| gates | 552 unit, 96 browser (94 bounded plus 2 complete journeys), lint, tsc, build; 1280px capacity popup inspected |
+| scope | UI guidance only, no engine/save/bot/rule change |
