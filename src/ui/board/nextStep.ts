@@ -18,6 +18,10 @@ import { permitReviewWords } from './permitWords';
 export interface NextStep {
   title: string;
   why: string;
+  /** Cold-playthrough fix: on wait months, useful prep (free confirmations, unfiled permits)
+   * sat one click away in the Actions panel while the card only said 'End the month' - dead
+   * months that taught players waiting is normal. Names what can be done while the clock runs. */
+  whileYouWait?: string;
   /** Map object the "Show me" button should select and open. */
   objectId: string;
   /** The next step is a clock, not an instruction. Explain it without opening an action list. */
@@ -48,8 +52,23 @@ export function nextStep(state: GameState, content: Content, remainingFocus = st
     title:'End the month',
     why:`${next.title} needs ${cost} focus points; you have ${remainingFocus} left. End the month to refresh focus, or undo your last action from the desk.`,
     objectId:next.objectId,
+    whileYouWait: whileYouWait(state, remainingFocus),
   };
+  if (next.waiting || next.title === 'End the month') {
+    return { ...next, whileYouWait: whileYouWait(state, remainingFocus) };
+  }
   return next;
+}
+
+/** Prep worth doing on a wait month: free confirmations and unfiled permits the player can
+ * afford right now. Kept short; the Actions panel has the full list. */
+function whileYouWait(state: GameState, remainingFocus: number): string | undefined {
+  const prep: string[] = [];
+  if (!state.flags.rackScheduleConfirmed) prep.push('confirm the rack schedule (free, +tenant goodwill)');
+  const unfiled = state.permitsRequired.filter((id) => ['none', 'denied'].includes(state.permits[id]?.status ?? ''));
+  if (unfiled.length > 0 && remainingFocus >= 1) prep.push(`file the ${unfiled.join(' and ')} permit${unfiled.length > 1 ? 's' : ''} (1 focus each)`);
+  if (prep.length === 0) return undefined;
+  return `While you wait, you can ${prep.join('; ')} - find them in Actions.`;
 }
 
 function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
