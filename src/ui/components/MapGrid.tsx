@@ -167,7 +167,7 @@ function QueuedGhost() {
   );
 }
 
-export function MapGrid() {
+export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;onShow:()=>void}} = {}) {
   const draft = useStore((s) => s.draft);
   const state = useStore((s) => s.state);
   const prevState = useStore((s) => s.prevState);
@@ -216,6 +216,21 @@ export function MapGrid() {
     const top = Math.max(0, Math.min(r.top - cr.top, cr.height - POPOVER_MAX_HEIGHT));
     setPopoverPos({ left, top });
   }, [boardPopover]);
+
+  const [cueExpanded,setCueExpanded] = useState(false);
+  useEffect(()=>setCueExpanded(false),[cue?.title]);
+  const [cuePos,setCuePos] = useState({left:12,top:12});
+  const cueId = cue?.objectId;
+  useEffect(() => {
+    const container=containerRef.current;
+    if(!container || !cueId)return;
+    const place=()=>{
+      const el=cellRefs.current.get(cueId);if(!el)return;
+      const r=el.getBoundingClientRect(),cr=container.getBoundingClientRect();
+      setCuePos({left:Math.max(8,Math.min(r.left-cr.left,cr.width-310)),top:Math.max(8,Math.min(r.top-cr.top-46,cr.height-60))});
+    };
+    place();const observer=new ResizeObserver(place);observer.observe(container);return()=>observer.disconnect();
+  },[cueId]);
 
   // Popover opens (never toggles) on cell click: closing is handled by Esc, outside mousedown,
   // queueing an action, or the popover's own close button (D1). Toggling here would race the
@@ -676,6 +691,10 @@ export function MapGrid() {
           />
         </svg>
       )}
+
+      {cue && <div data-testid="next-step-card" title={cue.why} style={{position:'absolute',...cuePos,zIndex:31,maxWidth:300,padding:'6px 8px',border:'1px solid #65866b',borderRadius:8,background:'#fffdf3ed',boxShadow:'0 3px 12px #0002',fontSize:12,display:'flex',alignItems:'center',gap:8}}>
+        <button aria-expanded={cueExpanded} onClick={()=>setCueExpanded(!cueExpanded)} style={{background:'none',border:0,padding:0,textAlign:'left',fontWeight:'bold',color:'inherit'}}>{cue.title}</button><button data-testid="next-step-show-me" onClick={cue.onShow} style={{whiteSpace:'nowrap'}}>Show me</button>{cueExpanded && <div style={{position:'absolute',top:'100%',left:0,width:280,padding:10,background:'#fffdf3',border:'1px solid #65866b',borderRadius:6,lineHeight:1.4}}>{cue.why}</div>}<span aria-hidden="true" style={{position:'absolute',bottom:-12,left:18,color:'#325b48'}}>▼</span>
+      </div>}
 
       {boardPopover && popoverPos && (
         <MapPopover

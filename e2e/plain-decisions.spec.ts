@@ -3,6 +3,7 @@ test('first month explains role, goal, limit and consequence before reserving an
  await page.goto('/');await page.getByRole('button',{name:'Tutorial',exact:true}).click();
  const count=page.getByTestId('actions-remaining'),help=page.getByTestId('monthly-decisions-help');
  await expect(count).toHaveText('Focus this month: 6 of 6 left');
+ await expect(help).toHaveCount(0);await count.click();
  await expect(help).toContainText('limited time and attention');await expect(help).toContainText('unused focus does not carry over');await expect(help).toContainText('Goal:');
  await page.screenshot({path:'docs/screenshots/cold2/monthly-decisions-intro.png'});
  await page.setViewportSize({width:1440,height:900});await page.screenshot({path:'docs/screenshots/cold2/monthly-decisions-1440.png'});await page.setViewportSize({width:1280,height:720});

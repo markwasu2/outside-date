@@ -1,6 +1,7 @@
 import {test,expect} from '@playwright/test';
 test('four unequal instructions fit together and a major task cannot spend the final point',async({page})=>{
- await page.goto('/');await page.getByRole('button',{name:'Tutorial',exact:true}).click();await page.getByRole('button',{name:'Start planning',exact:true}).click();
+ await page.goto('/');await page.getByRole('button',{name:'Tutorial',exact:true}).click();
+ await page.getByRole('button',{name:'Actions',exact:true}).click();
  const count=page.getByTestId('actions-remaining');
  await page.locator('[data-campus-object="substation"]').click();
  await page.getByTestId('popover-action').filter({hasText:'Commission the interconnection study'}).click();

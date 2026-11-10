@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 test('action desk is visible without a tab or search and names each campus location',async({page})=>{
- await page.goto('/');await page.getByRole('button',{name:'Tutorial',exact:true}).click();await page.getByRole('button',{name:'Start planning',exact:true}).click();
- const desk=page.getByTestId('action-desk');await expect(desk).toBeVisible();
+ await page.goto('/');await page.getByRole('button',{name:'Tutorial',exact:true}).click();
+ await expect(page.getByTestId('action-desk')).toHaveCount(0);await page.getByRole('button',{name:'Actions',exact:true}).click();const desk=page.getByTestId('action-desk');await expect(desk).toBeVisible();
  const power=desk.locator('section').filter({has:page.getByRole('heading',{name:'Power connection',exact:true})});
  await expect(power).toContainText('Substation · upper right');await expect(power).toContainText('Uses 2 focus points');await expect(power).toContainText('does not give you power immediately');
  await power.getByTestId('action-location').click();await expect(page.getByTestId('map-popover')).toContainText('Substation');

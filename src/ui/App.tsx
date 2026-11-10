@@ -78,6 +78,7 @@ function useKeyboardShortcuts() {
 
 /** Desktop campus-first stage: the map owns the canvas; detail stays on demand. */
 function CampusGame() {
+  const [deskOpen, setDeskOpen] = useState(false);
   const [drawer, setDrawer] = useState<'status' | 'actions' | null>(null);
   const state = useStore((s) => s.state);
   const draft = useStore((s) => s.draft);
@@ -93,9 +94,8 @@ function CampusGame() {
   useEffect(() => { if (boardPopover) setDrawer(null); }, [boardPopover]);
   const selectHall = useStore((s) => s.selectHall);
   const error = useStore((s) => s.error);
-  const dismissed = useStore(s => s.dismissedCoachTips.includes('monthly-decisions'));
   const dismissCoachTip = useStore(s => s.dismissCoachTip);
-  const [showBasics, setShowBasics] = useState(!dismissed);
+  const [showBasics, setShowBasics] = useState(false);
   const actionsLeft = Math.max(0, draft.apPerMonth - draft.apUsedThisMonth - totalApCost(plan,content));
   const step = nextStep(draft, content);
   const takeoutQueued = plan.some((a) => a.actionId === 'priceTakeout');
@@ -118,12 +118,9 @@ function CampusGame() {
         <span style={{ flex: 1 }} />
         <button data-testid="fast-forward-button" disabled={plan.length > 0 || state.phase !== 'playing'} onClick={fastForward}>{'\u23E9'} Fast forward</button>
         <button style={{ color: alerts.some((a) => a.level === 'critical') ? '#a52a21' : undefined, fontWeight: alerts.length ? 'bold' : undefined }} aria-expanded={drawer === 'status'} onClick={() => setDrawer(drawer === 'status' ? null : 'status')}>Status & guide{alerts.length ? ` (${alerts.length} alerts)` : ''}</button>
+        <button aria-expanded={deskOpen} onClick={() => setDeskOpen(!deskOpen)}>Actions</button>
         <button aria-expanded={drawer === 'actions'} onClick={() => setDrawer(drawer === 'actions' ? null : 'actions')}>Plan</button>
       </header>
-      <div data-testid="next-step-card" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 18px', fontSize: 12, background: '#e8e1cf', borderBottom: '1px solid #cdbf9f', flexShrink: 0 }}>
-        <span style={{ flex: 1 }}><strong>{plan.length ? 'After planned actions: ' : 'Next: '}{step.title}</strong> - {step.why}</span>
-        <button data-testid="next-step-show-me" onClick={showMe}>Show me</button>
-      </div>
       {showBasics && <section data-testid="monthly-decisions-help" style={{padding:'10px 18px',background:'#fff9e9',borderBottom:'1px solid #cdbf9f',fontSize:13,lineHeight:1.5,flexShrink:0}}>
         <div style={{display:'flex',justifyContent:'space-between',gap:14}}><strong>You are the developer. What do you do this month?</strong><button onClick={() => {setShowBasics(false);dismissCoachTip('monthly-decisions');}}>Start planning</button></div>
         <div>You have {draft.apPerMonth} focus points each month: a game budget for your limited time and attention, not worker capacity or a fixed number of instructions. Permit filing, insurance changes and inspection fixes cost 1; major orders, negotiations and construction starts cost 2; a recap costs 4.</div>
@@ -132,7 +129,7 @@ function CampusGame() {
         <strong>{goalSentence(draft).replace('all 1 hall', 'your hall').replace('outside date', 'tenant deadline').replace('close the takeout', 'sell/refinance the finished campus (the takeout)')}</strong>
       </section>}
       <div style={{display:'flex',flex:1,minHeight:0}}><div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minWidth:0, minHeight: 0, position: 'relative' }}>
-        <MapGrid /><EventNotices />
+        <MapGrid cue={{title: `${plan.length ? 'After planned actions: ' : 'Next: '}${step.title}`, why:step.why, objectId:step.objectId, onShow:showMe}} /><EventNotices />
         {drawer && (
           <aside data-testid={`${drawer}-drawer`} style={{ position: 'absolute', right: 12, top: 10, bottom: 10, width: drawer === 'actions' ? 400 : 600, maxWidth: '80vw', zIndex: 60, background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #d9cfb9' }}>
@@ -153,9 +150,9 @@ function CampusGame() {
           </aside>
         )}
       </div>
-      <ActionDesk /></div>
+      {deskOpen && <ActionDesk />}</div>
       <footer style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '10px 18px', flexShrink: 0, background: '#fffdf6', borderTop: '1px solid #cdbf9f', fontSize: 13 }}>
-        <span style={{ flex: 1 }}>{error ? error : plan.length ? `${plan.length} instruction${plan.length === 1 ? '' : 's'} planned. ${actionsLeft} focus point${actionsLeft===1?'':'s'} left. End month to commit; Plan to review or remove.` : 'Click a hall, office or power site to build and manage your campus.'}</span>
+        <span style={{ flex: 1 }}>{error ? error : plan.length ? `${plan.length} instruction${plan.length === 1 ? '' : 's'} planned. ${actionsLeft} focus point${actionsLeft===1?'':'s'} left. End month to commit; Plan to review or remove.` : 'Touch the campus to begin.'}</span>
         {plan.length > 0 && <button onClick={() => setDrawer('actions')}>Review plan</button>}
         {state.phase === 'takeoutAvailable' && !takeoutQueued && <button data-testid="price-takeout-banner" onClick={() => queueAction({ actionId: 'priceTakeout' })}>Price the takeout to finish the campaign</button>}
         <button style={{ padding: '10px 30px', background: '#325b48', border: '1px solid #274737', borderRadius: 6, color: 'white', fontWeight: 'bold', cursor: 'pointer' }} disabled={state.phase === 'awaitingChoice' || (state.phase === 'takeoutAvailable' && !takeoutQueued)} onClick={(e) => { if (e.detail < 2) endMonth(); }}>End month</button>

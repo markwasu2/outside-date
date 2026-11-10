@@ -1328,3 +1328,17 @@ have transparent edges; the power timeline labels stay inside the panel.
 | scope | read-only UI projection, no engine/legality/save/bot change; no new grid needed |
 | gates | done:534 unit,81 e2e bounded groups,lint,tsc,build |
 | visual | inspected:1280 hall groundbreak explains missing land instruction; direct road-to-hall switch tested |
+
+# Latest user steering - quiet campus default, detail only on demand
+
+| criterion | status |
+|---|---|
+| default scene | done: full-width land/graphics, no open action desk, no big intro, no full-width instruction paragraph |
+| next move | done: compact cue anchored to the actual campus object; Show me opens it; touch cue for why |
+| progressive disclosure | done: Actions opens/closes existing grouped desk; focus button opens rule help; objects keep their contextual choices |
+| simulation | unchanged: weighted focus, legality, saved game, clocks, bots and balance unchanged |
+| immersion | preserved: existing growth, work-progress, delivery, coin, power-flow feedback now has full canvas space |
+| first-timer | done: fresh title/setup through tutorial and Whale ending via real clicks with no intro dismissal or state injection |
+| gates | done:534 unit,81 browser in bounded groups,lint,tsc,build |
+| pixels | inspected:1280 and1440 full-width campus, readable small cue and persistent End month; details absent until requested |
+| caveat | compact top bar retains month, cash, focus and controls so the player can still act; this is not a literal interface-free screenshot |

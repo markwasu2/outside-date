@@ -4,7 +4,7 @@ test('Whale fresh setup to ending follows visible guidance using real clicks',as
  test.setTimeout(240_000);await page.setViewportSize({width:1440,height:900});await page.addInitScript(()=>{Math.random=()=>1/1_000_000_000;});
  const trace:string[]=[],errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');await page.locator('select').first().selectOption('whale');await page.getByRole('button',{name:'New game',exact:true}).click();
  for(const name of ['Next: Hall tier','Next: Cooling','Next: Contractor','Next: Lease','Next: Forecast','Next: Capital stack','Next: Power','Next: Insurance','Review closing table'])await page.getByRole('button',{name,exact:true}).click();
- await page.getByRole('button',{name:'Start campaign',exact:true}).click();await page.getByRole('button',{name:'Start planning',exact:true}).click();
+ await page.getByRole('button',{name:'Start campaign',exact:true}).click();
  for(let month=0;month<100;month++){
   if(await page.getByRole('heading',{name:/Rating the campus|Report card|You lose|You win|You scraped by/}).count())break;
   if(await page.getByTestId('event-choice').count()){
