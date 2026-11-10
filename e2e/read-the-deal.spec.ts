@@ -1,4 +1,4 @@
-import { openActions, openStatus, closePanel } from './campusNavigation';
+import { filterActions, openStatus, closePanel } from './campusNavigation';
 import { expect, test, type Page } from '@playwright/test';
 
 /**
@@ -92,47 +92,19 @@ test('Whale: the financials drawer opens with sources equal to uses at close', a
   await expect(page.getByTestId('dscr-trend')).toBeVisible();
 });
 
-test('tutorial: tabs lock until their systems come online', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Tutorial' }).click();
-  await dismissExplainerIfUp(page);
-
-  // Month 0: Land and Construction are open; the rest are locked with hints.
-  for (const id of ['power', 'money', 'regulation', 'chips']) {
-    await openActions(page);
-    await expect(page.getByTestId(`track-tab-${id}`)).toHaveAttribute('data-locked', 'true');
-  }
-  await openActions(page);
-  await expect(page.getByTestId('track-tab-land')).toHaveAttribute('data-locked', 'false');
-  await openActions(page);
-  await expect(page.getByTestId('track-tab-construction')).toHaveAttribute('data-locked', 'false');
-
-  // A locked tab shows its unlock hint instead of dead ends.
-  await openActions(page);
-  await page.getByTestId('track-tab-power').click();
-  await expect(page.getByTestId('locked-tab-hint')).toContainText('substation');
-
+test('tutorial: action index explains systems before they come online', async ({ page }) => {
+  await page.goto('/'); await page.getByRole('button', { name: 'Tutorial' }).click();
+  await filterActions(page, 'power');
+  await expect(page.getByTestId('locked-tab-hint').first()).toContainText('substation');
   await closePanel(page);
-  // Commission the study from the substation map popover (the action the hint names).
   await page.getByRole('button', { name: /Substation/ }).click();
-  await page
-    .getByTestId('map-popover')
-    .getByTestId('popover-action')
-    .filter({ hasText: 'Commission the interconnection study' })
-    .click();
-  await dismissExplainerIfUp(page);
+  await page.getByTestId('map-popover').getByTestId('popover-action').filter({ hasText: 'Commission the interconnection study' }).click();
   await page.getByRole('button', { name: 'End month' }).click();
-  await dismissExplainerIfUp(page);
   await dismissEventIfUp(page);
-
-  // Power unlocks from the committed state; the tab now shows its real rows.
-  await openActions(page);
-  await expect(page.getByTestId('track-tab-power')).toHaveAttribute('data-locked', 'false');
-  await openActions(page);
-  await page.getByTestId('track-tab-power').click();
+  await filterActions(page, 'power');
   await expect(page.getByTestId('locked-tab-hint')).toHaveCount(0);
-  await openActions(page);
-  await expect(page.getByTestId('track-tab-money')).toHaveAttribute('data-locked', 'true');
+  await filterActions(page, 'money');
+  await expect(page.getByTestId('locked-tab-hint').first()).toContainText('first construction draw');
 });
 
 test('the first eligible stat explainer auto-opens once and stays dismissed', async ({ page }) => {

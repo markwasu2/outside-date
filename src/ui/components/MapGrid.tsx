@@ -1,3 +1,4 @@
+import campusPeopleImg from '../../assets/art/campus-people.png';
 import campusGroundImg from '../../assets/art/campus-ground.jpg';
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 
@@ -250,6 +251,13 @@ export function MapGrid() {
       }}
     >
       <BoardLegend />
+      <div {...selectableCellProps(boardPopover === 'people', () => openObject('people', null))}
+        ref={(el) => { if (el) cellRefs.current.set('people', el); }} aria-label="People on site" data-testid="campus-people"
+        style={{ position: 'absolute', left: '7%', bottom: '8%', width: 110, height: 110, cursor: 'pointer', zIndex: 3 }}>
+        <img src={campusPeopleImg} alt="" aria-hidden="true" style={{width:'100%',height:'100%',objectFit:'contain',pointerEvents:'none'}} />
+        <span style={{...ART_CHIP,position:'absolute',bottom:0,left:16,fontSize:11}}>People on site</span>
+      </div>
+
       {/* Road: no popover (D1). Phase 4: the site's transmission poles queue at the road. */}
       <div {...selectableCellProps(boardPopover === 'road', () => openObject('road', null))} ref={(el) => { if (el) cellRefs.current.set('road', el); }} data-testid="map-road" style={{ cursor: 'pointer', gridColumn: '1 / 13', gridRow: '1 / 2', position: 'relative', background: TILE_ART.road.bg, ...cellStyle }}>
         <ArtLayer img={TILE_ART.road.img} />

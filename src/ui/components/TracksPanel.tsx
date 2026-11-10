@@ -392,7 +392,8 @@ function describeAction(action: PlannedAction, content: Content): string {
 }
 
 export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }) {
-  const [tab, setTab] = useState<TrackTab>('land');
+  const [search, setSearch] = useState('');
+  const [showIndex, setShowIndex] = useState(false);
   // Phase 1 (D8): a warning-fix button can ask this panel to switch tabs (e.g. "Cure the draw
   // freeze (Money tab)"). The request lives in the store because the banner renders far away
   // from this component; adopt it once and clear it.
@@ -406,7 +407,8 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
     // A warning fix button can ask for a tab; ignore the request when that tab is still locked
     // (the fix action lives behind a system that has not come online yet).
     if (requestedTab) {
-      if (unlocks[requestedTab].unlocked) setTab(requestedTab);
+      setSearch(requestedTab);
+      setShowIndex(true);
       requestTab(null);
     }
   }, [requestedTab, requestTab, unlocks]);
@@ -419,7 +421,8 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
   const error = useStore((s) => s.error);
   const clearError = useStore((s) => s.clearError);
 
-  const rows = buildRows(tab, state, content, selectedHallId);
+  const rows = TABS.flatMap((t) => buildRows(t.id, state, content, selectedHallId).map((r) => ({ ...r, category: t.id })))
+    .filter((r) => TABS.some((t) => t.id === search.toLowerCase()) ? r.category === search.toLowerCase() : `${r.category} ${r.label} ${r.help}`.toLowerCase().includes(search.toLowerCase()));
   const visitCastDef = findDef(content, 'visitCast');
   const hallIds = state.halls.map((h) => h.id);
   const filterLabel = hallFilterLabel(selectedHallId, hallIds);
@@ -455,52 +458,17 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
           </button>
         </div>
       )}
-      <div style={{ display: 'flex', borderBottom: '1px solid #ccc' }}>
-        {TABS.map((t) => {
-          const locked = !unlocks[t.id].unlocked;
-          return (
-            <button
-              key={t.id}
-              data-testid={`track-tab-${t.id}`}
-              data-locked={locked}
-              onClick={() => setTab(t.id)}
-              title={locked ? (unlocks[t.id].hint ?? 'Locked') : undefined}
-              style={{
-                flex: 1,
-                padding: '0.4rem',
-                background: tab === t.id ? '#eee' : 'transparent',
-                border: 'none',
-                borderBottom: tab === t.id ? '2px solid #333' : '2px solid transparent',
-                cursor: 'pointer',
-                opacity: locked ? 0.45 : 1,
-              }}
-            >
-              {t.label}
-              {/* aria-hidden so the tab's accessible name stays exactly the label (e2e and
-               * screen readers match "Regulation", not "Regulation <lock>"). */}
-              {locked ? <span aria-hidden="true">{' \u{1F512}'}</span> : ''}
-            </button>
-          );
-        })}
+      <div style={{ padding: '8px 10px', borderBottom: '1px solid #d9cfb9', fontSize: 12 }}>
+        <p style={{ margin: '0 0 6px' }}>Decisions live on the campus. Click land, halls, the office, people or equipment.</p>
+        <button onClick={() => setShowIndex((v) => !v)} aria-expanded={showIndex}>{showIndex ? 'Hide action index' : 'Find an action'}</button>
+        {showIndex && <input data-testid="action-search" aria-label="Find an action" placeholder="Search actions or systems" value={search} onChange={(e) => setSearch(e.target.value)} style={{ marginTop: 8, width: '95%', padding: 8 }} />}
       </div>
 
       {/* minHeight: 0 lets this flex child actually shrink and scroll; without it a long row
        * list (e.g. regulation with all three intervenors) overflows and paints rows 8+ under
        * the "Planned this month" section instead of scrolling. */}
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '0.5rem' }}>
-        {!unlocks[tab].unlocked && (
-          <div
-            data-testid="locked-tab-hint"
-            style={{ padding: '0.5rem', marginBottom: '0.5rem', background: '#f5f5f0', border: '1px dashed #bbb', borderRadius: 4, fontSize: '0.78rem', color: '#555' }}
-          >
-            {unlocks[tab].hint}
-          </div>
-        )}
-        {/* Locked tabs still render their rows under the hint: the lock flags a system that
-         * isn't online yet (with the unlock path spelled out), it doesn't wall off the panel -
-         * several existing flows (tutorial permit filing, event setup) drive these tabs before
-         * their unlock condition is met. */}
-        {tab === 'capital' && (
+        {showIndex && search.toLowerCase().includes('capital') && (
           <div data-testid="capital-summary" style={{ marginBottom: '0.5rem', fontSize: '0.78rem', color: '#444' }}>
             <div>
               Your call: {formatDollars(state.forecast.cost)} plus {(state.forecast.contingency * 100).toFixed(0)}% contingency. Spent so far{' '}
@@ -532,10 +500,11 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
             )}
           </div>
         )}
-        {rows.map((row) => {
+        {showIndex && TABS.filter((t) => t.id === search.toLowerCase() && !unlocks[t.id].unlocked).map((t) => <p data-testid="locked-tab-hint" key={t.id} style={{fontSize:12,color:'#746a55'}}>{unlocks[t.id].hint}</p>)}
+        {showIndex && rows.map((row) => {
           const check = checkAction(state, content, plan, row.action);
           return (
-            <div key={row.key} style={{ marginBottom: '0.5rem', opacity: check.ok ? (unlocks[tab].unlocked ? 1 : 0.75) : 0.5 }}>
+            <div key={row.key} style={{ marginBottom: '0.5rem', opacity: check.ok ? (unlocks[row.category].unlocked ? 1 : 0.75) : 0.5 }}>
               <button
                 disabled={!check.ok}
                 onClick={() => queueAction(row.action)}
@@ -557,8 +526,8 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
           );
         })}
 
-        <div style={{ marginTop: '1rem', borderTop: '1px solid #ccc', paddingTop: '0.5rem' }}>
-          <strong>Cast</strong>
+        {showIndex && <div style={{ marginTop: '1rem', borderTop: '1px solid #ccc', paddingTop: '0.5rem' }}>
+          <strong>People</strong>
           {GOODWILL_GROUPS.map((group) => {
             const action: PlannedAction = { actionId: 'visitCast', params: { group } };
             const check = checkAction(state, content, plan, action);
@@ -581,7 +550,7 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
               </CastHover>
             );
           })}
-        </div>
+        </div>}
       </div>
 
       {error && (

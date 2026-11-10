@@ -268,6 +268,8 @@ export function boardObjectTagline(objectId: string, state: GameState): { before
     };
   }
   switch (objectId) {
+    case 'people':
+      return { before: 'The people behind town approvals, the commission, utility power and the tenant. A visit improves that relationship; meetings settle intervenors before the docket vote.', termId: null, term: '', after: '' };
     case 'substation':
       return {
         before: 'Where grid power becomes campus power. Starts with an ',

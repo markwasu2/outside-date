@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { openActions, openStatus, closePanel } from './campusNavigation';
+import { filterActions, openStatus, closePanel } from './campusNavigation';
 
 test('desktop opens on one campus canvas with details on demand and End month persistent', async ({ page }) => {
   await page.goto('/'); await page.getByTestId('quick-start').click();
@@ -14,9 +14,12 @@ test('desktop opens on one campus canvas with details on demand and End month pe
   await expect(page.getByTestId('map-popover')).toBeVisible();
   await expect(page.getByTestId('popover-action').filter({hasText:'Commission the interconnection study'})).toBeVisible();
   await page.keyboard.press('Escape');
-  await openActions(page); await expect(page.getByRole('button', {name:'Capital',exact:true})).toBeVisible();
+  await filterActions(page, 'capital'); await expect(page.getByTestId('action-search')).toBeVisible();
+  await expect(page.getByTestId('action-row-button').first()).toBeVisible();
   await closePanel(page); await openStatus(page); await expect(page.getByTestId('goal-strip')).toBeVisible();
   await closePanel(page); await page.getByRole('button',{name:'End month',exact:true}).click();
+  // A month-0 random event can pause the commit; answer it before checking advancement.
+  while (await page.getByTestId('event-choice').count()) await page.getByTestId('event-choice').first().click();
   await expect(page.getByTestId('campus-status')).toContainText('Y1 M2');
 });
 
@@ -35,6 +38,9 @@ test('land, finance, crews and chips are reachable directly from campus objects'
   await page.keyboard.press('Escape');
   await page.getByRole('button',{name:/Laydown yard/}).click();
   await expect(page.getByTestId('popover-action').filter({hasText:/Import/})).toBeVisible();
+  await page.keyboard.press('Escape'); await page.getByTestId('campus-people').click();
+  await expect(page.getByTestId('popover-action').filter({hasText:'Visit utility'})).toBeVisible();
+  await page.screenshot({path:'docs/screenshots/cold2/scene-people.png'});
   await page.keyboard.press('Escape'); await page.getByRole('button',{name:'Power plants',exact:true}).click();
   await expect(page.getByTestId('map-popover')).toContainText('waiting for the power docket');
 });

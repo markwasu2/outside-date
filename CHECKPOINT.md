@@ -979,3 +979,21 @@ now have visible chrome. Existing hall placement routes remain intact.
 | full gates | done: 512 vitest, 58 e2e (29+28 shards + long tutorial), lint, tsc, build |
 | balance grid | skipped: art/UI routes only, engine unchanged |
 | staged remainder | legacy fallback tabs, cast figures, stronger hall growth and in-scene events |
+
+# Campus-first stage 3 - plan index and people on site
+
+Removed the seven-tab action strip. The Plan drawer shows the month's queue,
+with an on-demand searchable action index as a safety net. Warning routes still
+open the correct action search. People standing in the scene open visits and
+intervenor meetings. The campus remains the default interface.
+
+| criterion | status |
+|---|---|
+| no competing tabs | done: no seven-tab strip; searchable fallback only when requested |
+| cast on campus | done: clickable people art opens visits and meetings |
+| reachability | done: all existing rows retained; e2e helpers use explicit search |
+| full gates | done: 512 unit, 58 e2e (57 + isolated tutorial), lint, tsc, build |
+| visual | done: 1280x720 and 1440x900 campus and people popover inspected |
+| End month | done: regression was test assuming no pending event; test answers real event before expecting next month |
+| balance grid | skipped: UI composition and tests only, engine untouched |
+| staged remainder | stronger hall growth/blocked states and object-anchored events |
