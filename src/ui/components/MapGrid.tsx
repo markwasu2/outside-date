@@ -18,6 +18,7 @@ import { monthDeltas } from '../board/deltas';
 import { hallVisual, stageMinMonths } from '../board/hallVisual';
 import { HallSprite } from '../board/HallSprite';
 import { laydownSummary } from '../board/actions';
+import { plantWaitingWords } from '../board/powerWords';
 import { MapPopover, POPOVER_MAX_HEIGHT, POPOVER_WIDTH } from '../board/MapPopover';
 
 /** GFX 1: the generated isometric tile art sits under the tile's content as a
@@ -664,13 +665,13 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;o
           return (
             <div key={p.id} data-testid={`plant-buildout-${p.id}`} data-build-state={status}
               className={flash ? 'board-arrival-flash' : undefined}
-              title={online ? `Plant ${p.id}: online (${p.mwGrid} MW)` : planned ? `Plant ${p.id}: ${p.slipped ? 'delayed' : 'building'}, online ${formatMonth(targetMonth ?? 0)}` : `Plant ${p.id}: waiting for approved docket`}
+              title={online ? `Plant ${p.id}: online (${p.mwGrid} MW)` : planned ? `Plant ${p.id}: ${p.slipped ? 'delayed' : 'building'}, online ${formatMonth(targetMonth ?? 0)}` : `Plant ${p.id}: ${plantWaitingWords(draft)}`}
               style={{ flex: 1, minWidth: 0, position: 'relative', borderRadius: 3, overflow: 'hidden', background: online ? '#e4efd9' : '#ede3d0', border: '1px solid #8d6e63', display: 'flex', flexDirection: 'column' }}>
               {planned ? <img src={online ? PLANT_ART.online : PLANT_ART.building} alt="" aria-hidden="true" draggable={false} style={{ width: '100%', flex: 1, minHeight: 0, objectFit: 'cover', pointerEvents: 'none' }} />
-                : <div style={{ flex: 1, display: 'grid', placeItems: 'center', border: '1px dashed #ae9a77', color: '#776a53', fontSize: 11 }}>Permitting</div>}
+                : <div style={{ flex: 1, display: 'grid', placeItems: 'center', border: '1px dashed #ae9a77', color: '#776a53', fontSize: 11 }}>{draft.docket.status === 'approved' ? 'Approved' : 'Permitting'}</div>}
               <div style={{ fontSize: '0.6rem', padding: 2, textAlign: 'center', background: online ? '#d6e9c9' : '#fff8e9' }}>
                 <strong>{p.id} {online ? 'online' : planned ? p.slipped ? 'delayed' : 'building' : 'waiting'}</strong><br />
-                {online ? `${p.mwGrid} MW` : planned ? formatMonth(targetMonth ?? 0) : 'needs docket'}
+                {online ? `${p.mwGrid} MW` : planned ? formatMonth(targetMonth ?? 0) : draft.docket.status === 'approved' ? 'starts next month' : 'needs docket'}
               </div>
             </div>
           );

@@ -21,3 +21,16 @@ it('folds completed or irrelevant instructions but keeps missing prerequisites a
  s.flags['inspectionFail:H1']=true;expect(isContextOnlyAction({actionId:'fixInspection',params:{hallId:'H1'}},s)).toBe(false);
  expect(isContextOnlyAction({actionId:'cureDraw'},s)).toBe(true);s.flags.drawFreeze=true;expect(isContextOnlyAction({actionId:'cureDraw'},s)).toBe(false);
 });
+
+it('folds completed docket upkeep without hiding a request or an unsettled meeting',()=>{
+ const s=createGame(loadContent(),'whale',DEFAULT_SETUP,DEFAULT_NEGOTIATION,1);
+ expect(isContextOnlyAction({actionId:'fileDocket'},s)).toBe(false);
+ s.docket.status='open';expect(isContextOnlyAction({actionId:'fileDocket'},s)).toBe(true);
+ expect(isContextOnlyAction({actionId:'answerDiscovery'},s)).toBe(true);
+ s.docket.discoveryOutstanding=true;expect(isContextOnlyAction({actionId:'answerDiscovery'},s)).toBe(false);
+ s.docket.intervenors=[{id:'test',meetingsNeeded:2,meetingsDone:1,settled:false}];
+ const action={actionId:'meetIntervenor',params:{intervenorId:'test'}};
+ expect(isContextOnlyAction(action,s)).toBe(false);s.docket.intervenors[0]!.settled=true;expect(isContextOnlyAction(action,s)).toBe(true);
+ s.docket.status='failedOnce';expect(isContextOnlyAction({actionId:'prepTestimony'},s)).toBe(false);
+ s.docket.status='approved';expect(isContextOnlyAction({actionId:'prepTestimony'},s)).toBe(true);
+});

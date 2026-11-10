@@ -4,6 +4,7 @@ import { formatMonth } from '../../engine/format';
 import { checkAction, useStore } from '../store';
 import { buildRows } from '../components/TracksPanel';
 import { actionCostWords, decisionResult, isContextOnlyAction } from './decisionWords';
+import { plantWords, plantWaitingWords, substationWords } from './powerWords';
 import { DocketBrief } from './DocketBrief';
 import { Term } from '../Term';
 import { boardActionsForObject, boardObjectTagline, laydownSummary } from './actions';
@@ -178,9 +179,10 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
             <button aria-pressed={officeView === 'capital'} onClick={() => setOfficeView('capital')}>Raise capital</button>
           </div>
         )}
+        {objectId === 'substation' && <p data-testid="substation-progress" style={{lineHeight:1.4}}>{substationWords(state)}</p>}
         {objectId === 'powerPlants' && (
           <div style={{ marginBottom: 8 }}>
-            {state.power.plants.map((p) => <p key={p.id} style={{ margin: '4px 0' }}>Plant {p.id}: {p.onlineMonth !== null && p.onlineMonth <= state.month ? `online, ${p.mwGrid} MW` : p.plannedOnlineMonth !== null ? `${p.slipped ? 'delayed' : 'building'}, online ${formatMonth(p.onlineMonth ?? p.plannedOnlineMonth)}, ${p.mwGrid} MW` : 'waiting for the power docket to pass'}</p>)}
+            {!state.docketEnabled ? <p>{plantWaitingWords(state)}</p> : state.power.plants.map((p) => <p key={p.id} style={{ margin: '4px 0' }}>Plant {p.id}: {plantWords(p,state)}</p>)}
           </div>
         )}
         {objectId === 'laydownYard' ? (
