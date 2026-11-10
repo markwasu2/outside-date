@@ -120,8 +120,8 @@ describe('EventModal: bespoke choice stakes (UX 9)', () => {
   it('union_pla names the budget cost and the odds shift', () => {
     const card = content.events.find((e) => e.id === 'union_pla');
     expect(describeChoiceEffects('sign', card ?? null)).toContain('+2%');
-    expect(describeChoiceEffects('sign', card ?? null)).toContain('0.22 to 0.05');
-    expect(describeChoiceEffects('decline', card ?? null)).toContain('0.22');
+    expect(describeChoiceEffects('sign', card ?? null)).toContain('22% to 5% each month');
+    expect(describeChoiceEffects('decline', card ?? null)).toContain('22% each month');
   });
 
   it('tenant_slide_offer names the slip and the rent cut', () => {
