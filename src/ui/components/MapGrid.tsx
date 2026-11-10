@@ -252,14 +252,14 @@ export function MapGrid() {
     >
       <BoardLegend />
       <div {...selectableCellProps(boardPopover === 'people', () => openObject('people', null))}
-        ref={(el) => { if (el) cellRefs.current.set('people', el); }} aria-label="People on site" data-testid="campus-people"
+        ref={(el) => { if (el) { el.dataset.campusObject = 'people'; cellRefs.current.set('people', el); } }} aria-label="People on site" data-testid="campus-people"
         style={{ position: 'absolute', left: '7%', bottom: '8%', width: 110, height: 110, cursor: 'pointer', zIndex: 3 }}>
         <img src={campusPeopleImg} alt="" aria-hidden="true" style={{width:'100%',height:'100%',objectFit:'contain',pointerEvents:'none'}} />
         <span style={{...ART_CHIP,position:'absolute',bottom:0,left:16,fontSize:11}}>People on site</span>
       </div>
 
       {/* Road: no popover (D1). Phase 4: the site's transmission poles queue at the road. */}
-      <div {...selectableCellProps(boardPopover === 'road', () => openObject('road', null))} ref={(el) => { if (el) cellRefs.current.set('road', el); }} data-testid="map-road" style={{ cursor: 'pointer', gridColumn: '1 / 13', gridRow: '1 / 2', position: 'relative', background: TILE_ART.road.bg, ...cellStyle }}>
+      <div {...selectableCellProps(boardPopover === 'road', () => openObject('road', null))} ref={(el) => { if (el) { el.dataset.campusObject = 'road'; cellRefs.current.set('road', el); } }} data-testid="map-road" style={{ cursor: 'pointer', gridColumn: '1 / 13', gridRow: '1 / 2', position: 'relative', background: TILE_ART.road.bg, ...cellStyle }}>
         <ArtLayer img={TILE_ART.road.img} />
         <span style={ART_CHIP}>
           {TILE_ART.road.icon} {TILE_ART.road.label}
@@ -277,7 +277,7 @@ export function MapGrid() {
       <div
         {...selectableCellProps(boardPopover === 'siteOffice', () => openObject('siteOffice', null))}
         ref={(el) => {
-          if (el) cellRefs.current.set('siteOffice', el);
+          if (el) { el.dataset.campusObject = 'siteOffice'; cellRefs.current.set('siteOffice', el); }
         }}
         style={{
           gridColumn: '1 / 2',
@@ -303,7 +303,7 @@ export function MapGrid() {
       <div
         {...selectableCellProps(boardPopover === 'pond', () => openObject('pond', null))}
         ref={(el) => {
-          if (el) cellRefs.current.set('pond', el);
+          if (el) { el.dataset.campusObject = 'pond'; cellRefs.current.set('pond', el); }
         }}
         data-scene-object="field"
         data-testid="map-pond-slot"
@@ -369,6 +369,7 @@ export function MapGrid() {
               }}
               data-scene-object="hall"
               data-hall-id={hall.id}
+              data-campus-object={hall.id}
               data-blocked={blocked}
               className={arrivalFlash ? 'board-arrival-flash' : undefined}
               style={{
@@ -465,7 +466,7 @@ export function MapGrid() {
       <div
         {...selectableCellProps(boardPopover === 'laydownYard', () => openObject('laydownYard', null))}
         ref={(el) => {
-          if (el) cellRefs.current.set('laydownYard', el);
+          if (el) { el.dataset.campusObject = 'laydownYard'; cellRefs.current.set('laydownYard', el); }
         }}
         style={{
           gridColumn: '9 / 11',
@@ -547,7 +548,7 @@ export function MapGrid() {
           openObject('substation', selectedHallId === 'substation' ? null : 'substation'),
         )}
         ref={(el) => {
-          if (el) cellRefs.current.set('substation', el);
+          if (el) { el.dataset.campusObject = 'substation'; cellRefs.current.set('substation', el); }
         }}
         className={substationEnergized && !reducedMotion ? 'board-anim' : undefined}
         style={{
@@ -602,7 +603,7 @@ export function MapGrid() {
       {/* D3: plant A/B as generator icons, planned -> online. */}
       <div
         {...selectableCellProps(boardPopover === 'powerPlants', () => openObject('powerPlants', null))}
-        ref={(el) => { if (el) cellRefs.current.set('powerPlants', el); }}
+        ref={(el) => { if (el) { el.dataset.campusObject = 'powerPlants'; cellRefs.current.set('powerPlants', el); } }}
         style={{ cursor: 'pointer', gridColumn: '11 / 13', gridRow: '4 / 8', background: '#bcaaa4', ...cellStyle, justifyContent: 'flex-start', padding: 4 }}
         data-scene-object="plants"
         aria-label="Power plants"

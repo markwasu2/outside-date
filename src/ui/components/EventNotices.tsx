@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { Content } from '../../content/schemas';
 import type { LogEntry } from '../../engine/types';
 import { describeEffect } from './EventModal';
+import { eventCampusTarget, type CampusTarget } from '../board/eventCampus';
+import { useCampusAnchor } from '../board/useCampusAnchor';
 import { useStore } from '../store';
 import { warnings } from '../board/warnings';
 
@@ -19,6 +21,7 @@ export interface Notice {
   body?: string;
   stakes?: string;
   warning: boolean;
+  target?: CampusTarget;
   expiresAt: number;
 }
 
@@ -67,6 +70,7 @@ export function EventNotices() {
   const draft = useStore((s) => s.draft);
   const content = useStore((s) => s.content);
   const state = useStore((s) => s.state);
+  const prevState = useStore((s) => s.prevState);
   const [notices, setNotices] = useState<Notice[]>([]);
   const seenCount = useRef<number | null>(null);
 
@@ -105,12 +109,13 @@ export function EventNotices() {
         body: e.detail,
         stakes: noticeStakes(e, content),
         warning: e.kind === 'warning',
+        target: eventCampusTarget(draft, content.events.find((c) => c.title === e.text)?.id ?? '', e.month, prevState),
         expiresAt: Date.now() + NOTICE_TTL_MS,
       }));
     if (cards.length > 0) {
       setNotices((prev) => dedupeNotices([...prev, ...cards]).slice(-MAX_VISIBLE));
     }
-  }, [log, pendingTitle, content]);
+  }, [log, pendingTitle, content, draft, prevState]);
 
   // Threshold crossings remain in the log, but the banner already owns their live display
   // and fix buttons. Never repeat that same warning in a transient card.
@@ -118,55 +123,28 @@ export function EventNotices() {
   const visible = notices.filter((n) => !isBannerDuplicate(n, bannerTitles));
   if (!draft || draft.phase === 'awaitingChoice' || visible.length === 0) return null;
 
+  const latest = visible[visible.length - 1]!;
+  return <CampusNotice notice={latest} remaining={visible.length - 1} onDismiss={() => setNotices((prev) => prev.filter((n) => n.key !== latest.key))} />;
+}
+
+function CampusNotice({notice:n,remaining,onDismiss}:{notice:Notice;remaining:number;onDismiss:()=>void}) {
+  const target = n.target ?? {id:'siteOffice',label:'Site office'};
+  const {cardRef,position} = useCampusAnchor(target.id, n.key);
   return (
-    <div
-      data-testid="event-notices"
-      style={{
-        position: 'relative',
-        flexShrink: 0,
-        maxHeight: 120,
-        overflowY: 'auto',
-        padding: '4px 12px',
-        display: 'flex',
-        flexDirection: 'row',
-        gap: 8,
-        alignItems: 'flex-start',
-        pointerEvents: 'none',
-      }}
-    >
-      {visible.map((n) => (
-        <div
-          key={n.key}
-          data-testid="event-notice"
-          style={{
-            pointerEvents: 'auto',
-            flex: '1 1 0',
-            minWidth: 0,
-            background: n.warning ? '#fdf3e7' : '#f4f7f0',
-            border: `1px solid ${n.warning ? '#d98e2b' : '#7fb069'}`,
-            borderLeft: `4px solid ${n.warning ? '#d98e2b' : '#7fb069'}`,
-            borderRadius: 6,
-            padding: '0.5rem 0.6rem',
-            fontSize: '0.78rem',
-            fontFamily: 'sans-serif',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-            <strong>{n.warning ? '\u{26A0}\u{FE0F} ' : '\u{1F4C7} '}{n.title}</strong>
-            <button
-              data-testid="event-notice-dismiss"
-              aria-label="Dismiss"
-              onClick={() => setNotices((prev) => prev.filter((p) => p.key !== n.key))}
-              style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.8rem', padding: 0 }}
-            >
-              {'\u{2715}'}
-            </button>
-          </div>
-          {n.body && <div style={{ marginTop: 4, color: '#444' }}>{n.body}</div>}
-          {n.stakes && <div style={{ marginTop: 4, color: '#555' }}>Stakes: {n.stakes}</div>}
+    <div data-testid="event-notices" style={{position:'fixed',inset:0,zIndex:80,pointerEvents:'none'}}>
+      <div ref={cardRef} key={n.key} data-testid="event-notice" data-campus-target={target.id}
+        style={{position:'fixed',left:position?.left ?? 24,top:position?.top ?? 120,width:320,maxHeight:'calc(100vh - 200px)',overflowY:'auto',
+          pointerEvents:'auto',background:n.warning ? '#fdf3e7' : '#f4f7f0',border:`1px solid ${n.warning ? '#d98e2b' : '#7fb069'}`,
+          borderLeft:`4px solid ${n.warning ? '#d98e2b' : '#7fb069'}`,borderRadius:6,padding:'0.5rem 0.6rem',fontSize:'0.78rem',fontFamily:'sans-serif',boxShadow:'0 2px 8px #0003'}}>
+        <div style={{fontSize:11,color:'#72572b',marginBottom:4}}>At {target.label}</div>
+        <div style={{display:'flex',justifyContent:'space-between',gap:8}}>
+          <strong>{n.title}</strong>
+          <button data-testid="event-notice-dismiss" aria-label="Dismiss" onClick={onDismiss} style={{cursor:'pointer'}}>Close</button>
         </div>
-      ))}
+        {n.body && <div style={{marginTop:4,color:'#444'}}>{n.body}</div>}
+        {n.stakes && <div style={{marginTop:4,color:'#555'}}>Stakes: {n.stakes}</div>}
+        {remaining > 0 && <div style={{marginTop:4,color:'#777'}}>{remaining} earlier update{remaining === 1 ? '' : 's'} in Status &amp; guide.</div>}
+      </div>
     </div>
   );
 }

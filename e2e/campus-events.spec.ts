@@ -1,0 +1,28 @@
+import { expect, test } from '@playwright/test';
+test('choice cards appear by their object and remain clear of the commit footer',async({page})=>{
+  await page.goto('/');await page.getByTestId('quick-start').click();
+  await page.evaluate(async()=>{
+    // @ts-expect-error dev browser source import
+    const {useStore}=await import('/src/ui/store.ts');const s=useStore.getState();const card=s.content.events.find((c:{id:string})=>c.id==='governor_visit');
+    const next={...s.state,phase:'awaitingChoice',pending:{cardId:card.id,choices:card.choices}};useStore.setState({state:next,draft:next});
+  });
+  const card=page.getByTestId('campus-event-card');await expect(card).toHaveAttribute('data-campus-target','people');
+  const box=await card.boundingBox(),footer=await page.getByRole('button',{name:'End month',exact:true}).boundingBox();
+  expect(box!.y+box!.height).toBeLessThan(footer!.y);expect(box!.x).toBeGreaterThan(100);
+  await page.screenshot({path:'docs/screenshots/cold2/campus-event-people.png'});
+  await page.setViewportSize({width:1440,height:900});
+  await page.screenshot({path:'docs/screenshots/cold2/campus-event-1440.png'});
+  await card.getByTestId('event-choice').first().click();await expect(card).toHaveCount(0);
+});
+test('a no-choice event appears at the matching object without blocking End month',async({page})=>{
+  await page.goto('/');await page.getByTestId('quick-start').click();
+  await page.evaluate(async()=>{
+    // @ts-expect-error dev browser source import
+    const {useStore}=await import('/src/ui/store.ts');const s=useStore.getState();const card=s.content.events.find((c:{id:string})=>c.id==='restudy');
+    const next={...s.state,log:[...s.state.log,{month:s.state.month,kind:'event',text:card.title,detail:card.body}]};useStore.setState({state:next,draft:next});
+  });
+  const notice=page.getByTestId('event-notice');await expect(notice).toHaveAttribute('data-campus-target','substation');
+  await page.screenshot({path:'docs/screenshots/cold2/campus-event-study.png'});
+  const end=page.getByRole('button',{name:'End month',exact:true});expect(await end.evaluate(el=>{const r=el.getBoundingClientRect();return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})).toBe(true);
+  await notice.getByRole('button',{name:'Dismiss'}).click();await expect(notice).toHaveCount(0);
+});

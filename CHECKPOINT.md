@@ -1015,3 +1015,22 @@ and extra-fitout months rather than reaching a misleading 100% early.
 | full gates | done: 512 unit, 59 e2e, lint, tsc, build |
 | balance grid | skipped: rendering/read-only projections only, engine and saves unchanged |
 | remaining stage 4 | object-anchored event choice cards |
+
+# Campus-first stage 4b - events belong to the scene
+
+Choice cards open beside the relevant campus object with a temporary target ring,
+leaving the scene visible. Visitors appear by people, rack decisions at the yard,
+and office decisions at the office. No-choice notices now appear in the scene
+again (the campus-first composition had dropped them), one at a time, dismissible
+and auto-expiring. A hall-specific target is used only with claim evidence or a
+unique newly failed inspection. Unknown targets use the office, never a random hall.
+
+| criterion | status |
+|---|---|
+| object choice cards | done: resize-aware anchors, readable body/choices above map, footer clear |
+| non-choice moments | done: latest update beside its object, older updates in guide log; never blocks End month |
+| occurrence evidence | done: tests pin claim hall and unique new inspection; no random target inference |
+| visual | done: 1280x720 visitor/study cards and 1440x900 visitor card inspected |
+| full gates | done: 515 unit, 61 e2e (60 + isolated tutorial), lint, tsc, build |
+| balance grid | skipped: presentation only, no engine/state-shape change |
+| next stage | fresh desktop real-click playthrough and remaining observed confusion |
