@@ -1,3 +1,4 @@
+import { applyAction } from '../../engine/actions';
 import type { Content } from '../../content/schemas';
 import { formatDollars, formatMonth, formatMonths } from '../../engine/format';
 import { allLeverQuotes } from '../../engine/systems/capital';
@@ -192,16 +193,25 @@ export function warnings(state: GameState, content: Content): BoardWarning[] {
     const hall = state.halls[firstHallNeedingPower];
     if (hall) {
       const fitoutMonth = projectedFitoutMonth(state, content, firstHallNeedingPower);
-      for (const order of state.power.orders) {
-        if (order.arrived) continue;
+      for (const kind of ['transformer', 'switchgear'] as const) {
+        const orders = state.power.orders.filter((o) => o.kind === kind);
+        if (orders.some((o) => o.arrived)) continue;
+        const order = [...orders].sort((a, b) => a.arrivalMonth - b.arrivalMonth)[0];
+        if (!order) continue;
         if (order.arrivalMonth > fitoutMonth) {
+          let alternative = 'No faster second-supplier quote is available with the current cash, yard space and orders.';
+          try {
+            const quoted = applyAction(state, { actionId: 'secondSource', params: { kind } }, content);
+            const alt = quoted.power.orders.find((o) => o.kind === kind && o.supplier === 'alt');
+            if (alt && alt.arrivalMonth < order.arrivalMonth) alternative = `A second supplier quotes ${formatMonth(alt.arrivalMonth)}, with ${formatDollars(state.cash - quoted.cash)} deposit now and ${formatDollars(alt.price)} total. This adds another order, not a free speed-up; review it at the substation.`;
+          } catch { /* Only describe a quote the current engine can actually offer. */ }
           out.push({
             id: `late-order-${order.kind}`,
             level: 'warning',
             title: `${order.kind} arrives ${formatMonth(order.arrivalMonth)}, after ${hall.id} needs it`,
             detail: `${hall.id} is projected to reach fitout around ${formatMonth(
               fitoutMonth,
-            )}. No lever speeds an order already placed - you can cancel it for a partial refund, or stand the hall down to slow the approach.`,
+            )}. This is the earliest pending supplier arrival, not a new delay since your order. ${alternative} The yard shows this same booked date.`,
             fixes: [
               { label: 'Open the substation', objectId: 'substation' },
               { label: `Stand down ${hall.id}`, objectId: hall.id },

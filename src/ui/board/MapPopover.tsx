@@ -155,8 +155,8 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
               <div style={{ color: '#777' }}>No equipment on order yet. Order the transformer and switchgear from the substation.</div>
             ) : (
             orders.map((o) => (
-              <div key={`${o.kind}-${o.arrivalMonth}`} style={{ padding: '3px 0', borderBottom: '1px solid #eee' }}>
-                {'\u{1F4E6}'} {o.kind} -{' '}
+              <div key={`${o.kind}-${o.supplier}-${o.arrivalMonth}`} style={{ padding: '3px 0', borderBottom: '1px solid #eee' }}>
+                {'\u{1F4E6}'} {o.kind} ({o.supplier === 'alt' ? 'second supplier' : o.supplier === 'spot' ? 'spot' : 'standard'}) -{' '}
                 {o.arrived
                   ? 'arrived, on site'
                   : `arrives ${formatMonth(o.arrivalMonth)} (${Math.max(0, o.arrivalMonth - state.month)}mo left)`}
