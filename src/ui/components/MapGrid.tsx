@@ -603,7 +603,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;o
         <div style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{substationStateWords(draft)}</div>
         {power.studyStatus === 'pending' && (
           <div style={ART_CHIP}>
-            Study{studyMonthsLeft !== null ? `: ${Math.max(0, studyMonthsLeft)}mo left` : ''}
+            Study{studyMonthsLeft !== null ? studyMonthsLeft <= 0 ? ': decision this month' : `: ${studyMonthsLeft}mo left` : ''}
           </div>
         )}
         {power.substationStatus === 'building' && (
@@ -654,7 +654,8 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;o
           )}
         </div>
         <div style={{ display: 'flex', gap: 3, flex: 1, minHeight: 0, width: '100%', marginTop: 3 }}>
-        {power.plants.map((p) => {
+        {!draft.docketEnabled && <div data-testid="local-grid-supply" style={{...ART_CHIP,alignSelf:'flex-start'}}>Local grid supply<br />No power docket needed</div>}
+        {draft.docketEnabled && power.plants.map((p) => {
           const online = p.onlineMonth !== null && p.onlineMonth <= draft.month;
           const planned = p.plannedOnlineMonth !== null;
           const status = online ? 'online' : planned ? 'building' : 'waiting';

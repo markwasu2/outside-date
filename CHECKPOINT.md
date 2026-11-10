@@ -1421,3 +1421,12 @@ have transparent edges; the power timeline labels stay inside the panel.
 | budget | uses reserved plan costs,not just committed state; original priority preserved for next month's reset |
 | gates |541unit,88browser bounded groups,lint,tsc,build;1280pixels inspected |
 | scope | guidance only,no engine/save/bot/rule change |
+
+# Personal replay - scenario-truthful power map
+
+| criterion | status |
+|---|---|
+| observed | Tutorial displayed two empty plants demanding a docket it does not require |
+| fixed | scenarios without docket show local-grid supply instead of false waiting plant badges; study due this month no longer says zero months left |
+| gates |541unit,88browser,lint,tsc,build;1280pixel local-grid map inspected |
+| scope | map presentation only,Whale plant display retained,no engine/save/bot change |
