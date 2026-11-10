@@ -1377,3 +1377,16 @@ have transparent edges; the power timeline labels stay inside the panel.
 | gates | done:535 unit,84 browser bounded groups,lint,tsc,build |
 | visual | inspected:1280 matching pending2/3 and installed0/3 with explicit explanation |
 | scope | UI projection only, no engine/save/bot change; no new grid |
+
+# Playtest 5 - useful fast-forward during empty waits
+
+| criterion | status |
+|---|---|
+| root causes | fixed: resolved ledger entries/false takeout estimate and pre-eligibility pre-rent DSCR no longer block empty waits |
+| safety | kept: current milestones,low cash,live covenant trouble,pending choice,freeze,inspection and discovery stops |
+| handoffs | done: stop on events,newly-ready construction stage or newly energized hall |
+| exact steps | done: every month still uses ordinary step; unit compares full state to manual stepping |
+| grid | done: before/after1000 seeds both scenarios/all bots/all difficulties are byte-identical; Whale normal careful73.4%,competent69.7% |
+| saves | no shape change or migration needed |
+| gates | done:539 unit,85 browser bounded groups/focused rerun,lint,tsc,build |
+| visual | inspected:1280 plant wait advancesY3M1 toY3M6,stops ahead ofPlantA online with explicit reason |

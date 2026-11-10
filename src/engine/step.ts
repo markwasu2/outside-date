@@ -3,7 +3,7 @@ import type { Effect } from '../content/schemas';
 import type { GameState, LogEntry, PlannedAction } from './types';
 import { applyAction } from './actions';
 import { applyEffect } from './effects';
-import { ledger, dscr, runway } from './selectors';
+import { fastForwardMilestones, dscr, runway } from './selectors';
 import { drawEvent, resolveChoice } from './systems/events';
 import { resolveContent } from './resolve';
 import { tick as marketsTick } from './systems/markets';
@@ -189,29 +189,38 @@ function runWorldTick(state: GameState, content: Content): { state: GameState; l
   return { state: next, log: [] };
 }
 
-/**
- * UI-only (4.2): repeatedly steps with no actions until a dated milestone (ledger) is within
- * 1 month, a warning fires (runway < 3 months, DSCR headroom < 0.1, outside date < 3 months),
- * the run ends, or an event needs a choice. Bots don't call this.
- */
+export function fastForwardPause(state: GameState, content: Content): string | null {
+  const resolved=resolveContent(state,content);
+  const due=fastForwardMilestones(state,resolved).find(e=>e.month>=state.month&&e.month-state.month<=1);
+  if(due)return `"${due.label}" is due soon - use End month to step past it.`;
+  if(runway(state,resolved)<3)return 'runway is under 3 months - use End month to continue one at a time.';
+  const live=state.halls.filter(h=>!h.terminated);
+  const testActive=state.debt.converted||state.debt.conversionFailedCount>0||state.month>=resolved.tuning.covenant.forcedTestMonth||(live.length>0&&live.every(h=>h.delivered));
+  const coverage=dscr(state,resolved);
+  if(testActive&&Number.isFinite(coverage)&&coverage-resolved.tuning.covenant.dscrTrigger<0.1)return 'DSCR headroom is critically thin - use End month to continue one at a time.';
+  if(state.flags.drawFreeze)return 'the lender draw freeze needs your attention.';
+  if(state.halls.some(h=>!h.delivered&&!h.terminated&&state.flags[`inspectionFail:${h.id}`]))return 'a failed inspection needs your attention.';
+  if(state.docket.discoveryOutstanding)return 'a discovery response needs your attention.';
+  return null;
+}
+
+/** Skip empty months, never a current obligation, live financing risk or newly-ready stage.
+ * Uses ordinary step(), including every event; bots do not call this helper. */
 export function fastForward(state: GameState, content: Content): { state: GameState; log: LogEntry[] } {
   let current = state;
   const log: LogEntry[] = [];
   let guard = 0;
   while (current.phase === 'playing' && guard < current.maxMonths + 1) {
     guard += 1;
-    const dueSoon = ledger(current, content).some(
-      (entry) => entry.month - current.month <= 1 && entry.month >= current.month,
-    );
-    if (dueSoon) break;
-    if (runway(current, content) < 3) break;
-    const coverage = dscr(current, content);
-    if (Number.isFinite(coverage) && coverage - content.tuning.covenant.dscrTrigger < 0.1) break;
-
+    if(fastForwardPause(current,content))break;
+    const before=current;
     const result = step(current, [], content);
     current = result.state;
     log.push(...result.log);
     if (current.phase !== 'playing') break;
+    if(current.log.slice(before.log.length).some(e=>e.kind==='event'))break;
+    // Do not silently skip past a construction handoff that needs the next instruction.
+    if(current.halls.some(h=>{const old=before.halls.find(o=>o.id===h.id);return !!old&&!h.delivered&&!h.terminated&&((old.stageActive&&!h.stageActive)||(!old.energized&&h.energized));}))break;
   }
   return { state: current, log };
 }
