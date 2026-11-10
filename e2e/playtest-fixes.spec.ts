@@ -13,6 +13,7 @@ import { expect, test, type Page } from '@playwright/test';
 async function startWhaleCampaign(page: Page) {
   await page.goto('/');
   await page.getByRole('button', { name: 'New game' }).click();
+  for (const name of ['Next: Hall tier','Next: Cooling','Next: Contractor']) await page.getByRole('button',{name,exact:true}).click();
   await page.getByRole('button', { name: 'Next: Lease' }).click();
   await page.getByRole('button', { name: 'Next: Forecast' }).click();
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();

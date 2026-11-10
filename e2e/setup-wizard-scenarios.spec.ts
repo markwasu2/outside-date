@@ -4,6 +4,7 @@ async function openScenario(page: import('@playwright/test').Page, scenarioId: s
   await page.goto('/');
   await page.locator('select').first().selectOption(scenarioId);
   await page.getByRole('button', { name: 'New game' }).click();
+  for (const name of ['Next: Hall tier','Next: Cooling','Next: Contractor']) await page.getByRole('button',{name,exact:true}).click();
   await page.getByRole('button', { name: 'Next: Lease' }).click();
 }
 

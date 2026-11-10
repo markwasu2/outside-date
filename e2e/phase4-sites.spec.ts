@@ -14,6 +14,7 @@ async function openSetup(page: Page, scenarioId: string) {
 async function forecastEstimate(page: Page, siteId: string) {
   await openSetup(page, 'whale');
   await page.getByTestId(`site-card-${siteId}`).click();
+  for (const name of ['Next: Hall tier','Next: Cooling','Next: Contractor']) await page.getByRole('button',{name,exact:true}).click();
   await page.getByRole('button', { name: 'Next: Lease' }).click();
   await page.getByRole('button', { name: 'Next: Forecast' }).click();
   const text = await page.getByText(/Our estimate is /).textContent();
@@ -51,6 +52,7 @@ test('the forecast estimate moves with the picked site', async ({ page }) => {
 test('the in-game map reads the picked site theme', async ({ page }) => {
   await openSetup(page, 'whale');
   await page.getByTestId('site-card-farmland').click();
+  for (const name of ['Next: Hall tier','Next: Cooling','Next: Contractor']) await page.getByRole('button',{name,exact:true}).click();
   await page.getByRole('button', { name: 'Next: Lease' }).click();
   await page.getByRole('button', { name: 'Next: Forecast' }).click();
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();
@@ -101,6 +103,7 @@ test('a full tutorial-scenario run on a non-default site completes to an outcome
   // wetlands meadow instead so the whole run - pond theme, extra pad months, grant - is
   // exercised end to end, not just the card.
   await page.getByTestId('site-card-edge5-meadow').click();
+  for (const name of ['Next: Hall tier','Next: Cooling','Next: Contractor']) await page.getByRole('button',{name,exact:true}).click();
   await page.getByRole('button', { name: 'Next: Lease' }).click();
   await page.getByRole('button', { name: 'Next: Forecast' }).click();
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();

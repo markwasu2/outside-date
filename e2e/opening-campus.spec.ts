@@ -8,6 +8,7 @@ test('opening choices stay on the land and only close starts the campaign',async
   await expect(page.getByTestId('opening-land')).toHaveAttribute('data-pond','true');
   await expect(page.getByTestId('opening-campus')).toHaveAttribute('data-site','farmland');
   await page.screenshot({path:'docs/screenshots/cold2/opening-land.png'});
+  for (const name of ['Next: Hall tier','Next: Cooling','Next: Contractor']) await page.getByRole('button',{name,exact:true}).click();
   await page.getByRole('button',{name:'Next: Lease',exact:true}).click();
   await expect(page.getByTestId('opening-campus')).toHaveAttribute('data-opening-step','lease');
   await page.getByRole('button',{name:'Next: Forecast',exact:true}).click();
@@ -19,4 +20,23 @@ test('opening choices stay on the land and only close starts the campaign',async
   await expect(page.getByRole('button',{name:'End month',exact:true})).toHaveCount(0);
   await page.getByRole('button',{name:'Start campaign',exact:true}).click();
   await expect(page.getByTestId('campus-status')).toContainText('Y1 M1');
+});
+
+test('opening objects edit one focused choice without losing the selected terms',async({page})=>{
+  await page.goto('/');await page.getByRole('button',{name:'New game',exact:true}).click();
+  await page.getByRole('button',{name:'Next: Hall tier',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Choose the hall tier'})).toBeVisible();
+  await expect(page.getByTestId('site-card-farmland')).toHaveCount(0);
+  await page.getByRole('radio').nth(1).check();
+  await page.getByRole('button',{name:'Next: Cooling',exact:true}).click();
+  await page.getByRole('radio').nth(1).check();
+  await page.locator('[aria-label="Edit dry cooling planned"] img').evaluate((el:HTMLImageElement)=>el.decode());
+  await page.screenshot({path:'docs/screenshots/cold2/opening-cooling.png'});
+  await page.getByRole('button',{name:'Edit H1 planned',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Choose the hall tier'})).toBeVisible();
+  await expect(page.getByRole('radio').nth(1)).toBeChecked();
+  await page.getByRole('button',{name:'Edit dry cooling planned',exact:true}).click();
+  await expect(page.getByRole('radio').nth(1)).toBeChecked();
+  await page.getByRole('button',{name:'Next: Contractor',exact:true}).click();
+  await page.screenshot({path:'docs/screenshots/cold2/opening-contractor.png'});
 });
