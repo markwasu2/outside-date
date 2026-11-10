@@ -1596,3 +1596,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | implementation | explicit read-only waiting marker; no simulation, bot, tuning or save changes |
 | gates | 563 unit, 104 browser (102 bounded + 2 complete journeys), lint, tsc, build; 1280px rent and lender-clock pixels inspected |
 | caveat | existing bundle-size warning remains |
+
+# Personal custom Whale replay - explain the power hookup clock
+
+| criterion | status |
+|---|---|
+| personal run | Whale normal custom Quarry Ridge, hybrid halls/cooling, GMP, no mezz, high utility charge; closed Y4 M12, 4/4 on time, $2.36B campus, $415.2M equity, 1.55x; actual live clicks |
+| observed | power-hookup wait opened supplier/cancel actions instead of explaining the waiting equipment or automatic substation clock |
+| fixed | Why wait shows the actual arrival/build clock directly on the campus; touching the substation still opens its actions |
+| gates | 563 unit, 104 browser (102 bounded plus 2 complete journeys), lint, tsc, build; 1280px equipment and construction clocks inspected |
+| scope | one read-only waiting marker plus tests; no engine, bot, tuning or save changes, no migration needed; existing bundle-size warning remains |

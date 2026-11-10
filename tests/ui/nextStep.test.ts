@@ -125,6 +125,7 @@ function powerWaitingState() {
 it('never tells a power-blocked RFS hall to advance construction', () => {
   const step = nextStep(powerWaitingState(), content);
   expect(step.title).toBe('H1: waiting on power hookup');
+  expect(step.waiting).toBe(true);
   expect(step.why).toContain('transformer arrives');
   expect(step.why).toContain('substation builds itself');
   expect(step.actionId).toBeUndefined();
@@ -134,6 +135,7 @@ it('names automatic substation construction and completion date', () => {
   state.power.substationStatus = 'building'; state.power.substationDoneMonth = 42;
   const step = nextStep(state, content);
   expect(step.why).toContain('Substation construction is underway until');
+  expect(step.waiting).toBe(true);
   expect(step.why).not.toContain('Everything critical');
 });
 it('skips a blocked hall when another hall can really advance', () => {

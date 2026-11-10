@@ -256,7 +256,7 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
           : power.substationStatus === 'none'
             ? `Study ${power.studyStatus === 'pending' ? `finishes ${formatMonth(power.studyDoneMonth ?? state.month)}` : 'complete'}; gear installs automatically on the next monthly tick when both orders have arrived.`
             : 'Substation is complete; the next source of capacity is the power plants. Check their online dates at the power plants.';
-      return { title: `${blocked.id}: waiting on power hookup`, why: `${wait} ${chain} End the month to advance these clocks.`, objectId: 'substation' };
+      return { title: `${blocked.id}: waiting on power hookup`, waiting:true, why: `${wait} ${chain} End the month to advance these clocks.`, objectId: 'substation' };
     }
     return { title: `${blocked.id}: ${blocker}`, why: 'This prerequisite blocks its next stage. Resolve it before advancing construction.', objectId: blocker.includes('permit') ? 'siteOffice' : blocked.id };
   }
