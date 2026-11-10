@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
 import type { Setup } from '../../src/engine/types';
-import { hallAdvanceLabel, hallCaption, pondStateWords, substationStateWords } from '../../src/ui/board/legibility';
+import { hallAdvanceLabel, hallAdvanceReason, hallCaption, pondStateWords, substationStateWords } from '../../src/ui/board/legibility';
 
 // UX legibility: hall tiles name their stage in words plus what they are waiting on; fixed
 // tiles name their state. These pin the caption/blocker projection against the engine's own
@@ -105,4 +105,33 @@ describe('fixed tile state words', () => {
     const state = freshState();
     expect(pondStateWords(state)).toBe('open');
   });
+});
+
+describe('commissioning power blocker direction', () => {
+ function blocked() {
+  const state=freshState(); const hall=state.halls[0]!;
+  hall.stageIndex=4;hall.stageActive=false;hall.energized=false;
+  state.permits.air.status='granted';
+  return {state,hall};
+ }
+ it('points to substation prerequisites while the connection is unfinished',()=>{
+  const {state,hall}=blocked();
+  expect(hallAdvanceReason(state,content,hall)).toContain('Open the substation');
+  expect(hallAdvanceReason(state,content,hall)).toContain('before commissioning');
+ });
+ it('points to plant capacity, not completed substation work',()=>{
+  const {state,hall}=blocked();state.power.substationStatus='done';state.power.interimGridMW=0;
+  const before=JSON.stringify(state);const reason=hallAdvanceReason(state,content,hall);
+  expect(reason).toContain('waiting for plant capacity');expect(reason).toContain('Open Power plants');
+  expect(reason).not.toContain('check the study');expect(JSON.stringify(state)).toBe(before);
+ });
+ it('tells the player to end month when capacity already fits',()=>{
+  const {state,hall}=blocked();state.power.substationStatus='done';state.power.interimGridMW=200;
+  expect(hallAdvanceReason(state,content,hall)).toContain('End month runs the automatic power hookup');
+ });
+ it('does not promise capacity when no more is scheduled',()=>{
+  const {state,hall}=blocked();state.power.substationStatus='done';state.power.interimGridMW=0;
+  state.power.plants.forEach(p=>{p.mwGrid=0;p.onlineMonth=0;});
+  expect(hallAdvanceReason(state,content,hall)).toContain('Waiting will not close this gap');
+ });
 });
