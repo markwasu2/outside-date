@@ -1,0 +1,128 @@
+Outside Date Y1 M1 Cash $9.0M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide Plan
+PLAN Commission the interconnection study (1 AP, $500K) Starts the study clock that gates the docket filing.
+PLAN Order the switchgear (1 AP, $500K) Long lead time. Order it early.
+PLAN Option the site (1 AP, $20.0M total, from $18.8M equity + $1.2M mezz) Locks land (cost set by the site choice at setup). Required before the pad stage. One time only.
+PLAN Confirm the rack schedule (0 AP, $0) Reveals rack arrival windows on the ledger and raises Tenant goodwill +3. One time only.
+Outside Date Y1 M2 Cash $7.8M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+PLAN File water permit (1 AP, $0) Starts that permit's decision clock.
+PLAN Break ground on a near pad: H1 (2 of 2 left, no feeder cost) (1 AP, $0) Starts the next construction stage on a hall. Cost flows through draws.
+PLAN File air permit (1 AP, $0) Starts that permit's decision clock.
+Outside Date Y1 M3 Cash $7.5M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+PLAN File building permit (1 AP, $0) Starts that permit's decision clock.
+Outside Date Y1 M4 Cash $7.3M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+EVENT Host the visit
+Costs 1 AP next month, unlocks the $20.0M equipment rebate
+Outside Date Y1 M5 Cash $7.0M AP 1/3 0/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Outside Date Y1 M6 Cash $6.8M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Outside Date Y1 M7 Cash $6.5M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+PLAN Advance construction: H1 (1 AP, $0) Starts the next construction stage on a hall. Cost flows through draws.
+Outside Date Y1 M8 Cash $6.3M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Outside Date Y1 M9 Cash $5.5M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+PLAN Cure a draw freeze (1 AP, $0)
+Ends an active draw freeze so construction draws resume.
+Outside Date Y1 M10 Cash $5.3M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Outside Date Y1 M11 Cash $5.0M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Outside Date Y1 M12 Cash $4.8M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide Plan
+PLAN Advance construction: H1 (1 AP, $0) Starts the next construction stage on a hall. Cost flows through draws.
+EVENT Sponsor a booth
+Cash -$1.0M, Town goodwill +6, Has consequences
+Outside Date Y2 M1 Cash $3.5M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+EVENT Sponsor a booth
+Cash -$1.0M, Town goodwill +6, Has consequences
+Outside Date Y2 M2 Cash $2.3M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Outside Date Y2 M3 Cash $2.0M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+PLAN Advance construction: H1 (1 AP, $0) Starts the next construction stage on a hall. Cost flows through draws.
+Outside Date Y2 M4 Cash $1.8M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Outside Date Y2 M5 Cash $1.1M AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Outside Date Y2 M6 Cash $350K AP 0/3 0/1 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+PLAN Advance construction: H1 (1 AP, $0) Starts the next construction stage on a hall. Cost flows through draws.
+Outside Date Y2 M7 Cash $20.8M AP 0/3 1/1 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Outside Date Y2 M8 Cash $20.7M AP 0/3 1/1 halls delivered ⏩ Fast forward Status & guide Plan
+EVENT Sign the agreement
+Hall budgets +2%, labor-shortfall odds drop from 0.22 to 0.05 a month
+Outside Date Y2 M9 Cash $20.7M AP 0/3 1/1 halls delivered ⏩ Fast forward Status & guide Plan
+PRICE TAKEOUT
+END Outside Date
+Y2 M9 · Campaign closed
+1/1 halls delivered
+Look around campus
+Legend
+People on site
+Road
+2 poles
+Site office
+Low field
+Water permit
+H1
+Delivered
+near pad
++$663K/mo
+🪙
+🪙
+🪙
+Laydown yard 0/3
+empty
+Substation
+energized
+Power plants
+Permitting
+A waiting
+needs docket
+Permitting
+B waiting
+needs docket
+Your campus, at close
+What you built, what it cost, and the result of the decisions you made.
+You win: a good outcome
+
+Campus value $115.9M, equity multiple 1.51x, your equity $12.1M.
+
+Power timing
+Setup estimate assumed a first-try docket approval. A later docket moves the plant schedule even without a construction slip.
+Plant A: setup estimate Y4 M1; after docket approval not scheduled; actual not online.
+Plant B: setup estimate Y4 M1; after docket approval not scheduled; actual not online.
+Report card
+F
+Time
+1 of 1 delivered late (graded against the lease date).
+C
+Cost
+Total cost ran 5% over your call of $85.3M.
+B
+Risk allocation
+1 risk you held and could have mitigated materialized anyway.
+B
+Community
+Town and commission goodwill averaged 65.
+A
+Value
+The campus priced above the market band per MW of IT load.
+Risk allocation
+Risk	Held by	Materialized	Cost to you	Mitigation you had
+Delivery delay	Who holds this: You (the developer)	Yes	$900K	Delay in start-up (DSU) insurance moves the storm-caused part of this to the insurer.
+Cost overruns	Who holds this: You (the developer)	No	$0	A guaranteed maximum price (GMP) contract moves overruns to the general contractor.
+Storm delay	Who holds this: You (the developer)	No	$0	DSU moves storm delay cost to the insurer while it is active.
+Plant construction slip after docket approval	Who holds this: You (the developer)	No construction slip	$0	A higher minimum power charge lowers slip odds and shifts more of this to the utility.
+Stranded plant capacity	Who holds this: The ratepayers	No	$0	Informational. See the codex; ratepayers carry this cost in the real world.
+Refinancing risk	Who holds this: You (the developer)	No	$0	Lower leverage at close reduces the odds of a failed conversion test.
+Tenant exit	Who holds this: You (the developer)	No	$0	Cut from v1 as a mechanic (residual value guarantee); informational only.
+Interest rate movement	Who holds this: You (the developer)	No	$0	No in-game mitigation. Rate moves are market events.
+Labor shortage	Who holds this: You (the developer)	No	$0	A project labor agreement or importing crews reduces or prevents this.
+Water availability gap	Who holds this: The town and county	No	$0	Hybrid or dry cooling keeps more of this with the town instead of you.
+Chip generation obsolescence	Who holds this: The tenant	No	$0	Hybrid tier keeps this with the tenant; air tier shifts some of it to you.
+Who you worked with
+Priya Natarajan
+CEO, Arcadia Public Power - Utility goodwill 50
+Marcus Teale
+Independent engineer, senior lender - Utility goodwill 50
+Foreman Ruth Calder
+General contractor's site foreman - Town goodwill 79
+Jordan Ashe
+VP of site delivery, the Whale - Tenant goodwill 53
+Play again
+Try another difficulty
+
+Same rules, bigger numbers: the Whale campaign has more halls, a bigger budget, and a real docket fight.
+
+Start the Whale campaign
+No more months advance. Campus value $115.9M · Your equity $12.1M

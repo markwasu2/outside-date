@@ -144,3 +144,10 @@ it('names the funding check when gear is due but its balance is unpaid', () => {
   const state = powerWaitingState(); state.month = 40;
   expect(nextStep(state, content).why).toContain('check the site office for funding');
 });
+
+it('prioritizes frozen draws and failed inspections over waiting or other prerequisites',()=>{
+ const state = powerWaitingState();state.flags.drawFreeze=true;
+ expect(nextStep(state,content).actionId).toBe('cureDraw');
+ state.flags.drawFreeze=false;state.flags['inspectionFail:H1']=true;
+ expect(nextStep(state,content).params).toEqual({hallId:'H1'});
+});
