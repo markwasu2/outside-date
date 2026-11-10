@@ -23,3 +23,17 @@ export function decisionResult(action:PlannedAction,state:GameState,content:Cont
  default:return fallback;
  }
 }
+
+/** These choices cannot help right now because they are already underway/done or
+ * there is no fault to cure. Missing prerequisites and budget remain in the main list. */
+export function isContextOnlyAction(action:PlannedAction,state:GameState):boolean {
+ switch(action.actionId){
+ case 'commissionStudy':return state.power.studyStatus!=='none';
+ case 'orderTransformer':case 'orderSwitchgear':return state.power.substationStatus!=='none'||state.power.orders.some(o=>o.kind===(action.actionId==='orderTransformer'?'transformer':'switchgear'));
+ case 'filePermit':return ['pending','granted'].includes(state.permits[String(action.params?.permitId) as keyof GameState['permits']]?.status??'');
+ case 'fixInspection':return !state.flags[`inspectionFail:${String(action.params?.hallId)}`];
+ case 'cureDraw':return !state.flags.drawFreeze;
+ case 'confirmRackSchedule':return !!state.flags.rackScheduleConfirmed;
+ default:return false;
+ }
+}
