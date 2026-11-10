@@ -1731,3 +1731,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | setup shows the actual fixed site's card selected and explains the difficulty rule and Normal route; normal retains all three real choices |
 | gates | 570 unit, 115 browser (113 bounded plus both full journeys), lint, tsc, build; actual 1280px easy and hard setup pixels inspected; back/forward and normal-selection regression tests |
 | scope | setup presentation only, no engine/save/bot/tuning changes, no migration required; existing bundle-size warning remains |
+
+# Event decision scales - dials instead of yes/no cards
+
+| criterion | status |
+|---|---|
+| ask | Mark: event decisions should be bar scales, not yes/no or pick-a-card ("should decide with a bar scale"), keep going after posture bars |
+| built | all 8 two-choice events (governor_visit, town_hall, subpoena, the_ask, tenant_slide_offer, union_pla, partner_dispute, hiring_fair) carry a `scale` block: pole labels plus 3-5 hand-authored levels; EventModal renders a slider with pole labels, the level's state-resolved stakes, and one commit button; the_ask's expansion preview follows the dial |
+| balance | pole levels reproduce the old choices' effects exactly (unit-tested pole equivalence for both poles of all 8 cards); bots still answer old choice ids through the unchanged choice path; 1000-seed grids: Whale normal careful 73.4%, competent 69.7% (matches the recorded main band exactly), Millbrook careful normal 85.6 |
+| engine | `EventScaleSchema`; resolveChoice accepts `level:N` through the generic effect path; tenant_slide_offer's bespoke handler interpolates slide months and rent cut by level; addAskHalls takes an optional hall count (the ask's middle level adds one hall) |
+| gates | 644 unit, affected browser specs rewritten to drive the slider (stakes at both poles, keyboard-set levels, commit) and passing, lint, tsc, build |
+| scope | event decisions only; bots, saves, tuning and unscaled cards (docket vote, chip generation, notices) unchanged |

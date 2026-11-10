@@ -12,12 +12,16 @@ import { expect, test, type Page } from '@playwright/test';
 
 /** Dismisses a scripted event dialog if one is up; returns whether one was. */
 async function dismissEventIfUp(page: Page) {
-  const dialog = page.getByRole('dialog');
-  if ((await dialog.count()) > 0) {
-    await page.getByTestId('event-choice').first().click();
+  // Resolves the pending card via its first (old-style) choice id, whether the card renders
+  // choice buttons or a decision scale.
+  return page.evaluate(async () => {
+    // @ts-expect-error dev browser import
+    const {useStore} = await import('/src/ui/store.ts');
+    const s = useStore.getState(); const p = s.state.pending;
+    if (!p) return false;
+    s.resolveEventChoice(p.choices[0].id);
     return true;
-  }
-  return false;
+  });
 }
 
 test('tutorial: substation popover commissions the study from the map, and the month advances it', async ({ page }) => {

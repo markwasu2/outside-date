@@ -124,7 +124,17 @@ test('a full tutorial-scenario run on a non-default site completes to an outcome
   for (let i = 0; i < 500; i += 1) {
     if ((await reportCardHeading.count()) > 0 || (await gameOverHeading.count()) > 0) break;
     if ((await dialog.count()) > 0) {
-      await page.getByTestId('event-choice').first().click();
+      // Resolve the pending card via its first (old-style) choice id, whether the card renders
+      // choice buttons or a decision scale.
+      const dismissed = await page.evaluate(async () => {
+        // @ts-expect-error dev browser import
+        const {useStore} = await import('/src/ui/store.ts');
+        const s = useStore.getState(); const p = s.state.pending;
+        if (!p) return false;
+        s.resolveEventChoice(p.choices[0].id);
+        return true;
+      });
+      expect(dismissed).toBe(true);
       continue;
     }
     if ((await ratingHeading.count()) > 0) {

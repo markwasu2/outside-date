@@ -46,9 +46,11 @@ test('finding #2: a scripted event choice shows a cost preview before it is comm
   }
   await expect(dialog).toBeVisible();
 
-  const hostChoice = page.getByTestId('event-choice').filter({ hasText: 'Host the visit' });
-  await expect(hostChoice).toContainText("Uses 2 focus points next month");
-  // UX 9: the bespoke stakes name the rebate, not a generic fallback.
-  await expect(hostChoice).toContainText('$20.0M equipment rebate');
-  await expect(page.getByTestId('event-choice').filter({ hasText: 'Decline' })).toContainText('No visit, no rebate');
+  // The visit is a scale now: the decline pole reads like the old decline choice, and sliding
+  // to full hosting shows the focus cost and the rebate unlock (UX 9's bespoke stakes).
+  const stakes = page.getByTestId('event-scale-stakes');
+  await expect(stakes).toContainText('No visit, no rebate');
+  await page.getByTestId('event-scale').press('End');
+  await expect(stakes).toContainText('Uses 2 focus points next month');
+  await expect(stakes).toContainText('$20.0M equipment rebate');
 });

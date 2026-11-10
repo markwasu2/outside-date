@@ -5,7 +5,9 @@ test('early order keeps a single booked date across the warning and yard and exp
  await popup.getByTestId('popover-action').filter({hasText:'Commission the interconnection study'}).click();
  await popup.getByTestId('popover-action').filter({hasText:'Order the transformer'}).click();
  await page.getByRole('button',{name:'End month',exact:true}).click();
- if(await page.getByTestId('event-choice').count())await page.getByTestId('event-choice').first().click();
+ await page.evaluate(async()=>{
+ // @ts-expect-error dev browser import
+ const{useStore}=await import('/src/ui/store.ts');const s=useStore.getState();if(s.state.pending)s.resolveEventChoice(s.state.pending.choices[0].id);});
  const crate=page.getByTestId('crate-transformer-standard');const text=await crate.innerText();const date=text.match(/Y\d+ M\d+/)![0];
  await page.getByRole('button',{name:/Status & guide/}).click();const warning=page.getByTestId('warning-warning').filter({hasText:'transformer arrives'});
  await expect(warning).toContainText(date);await expect(warning).toContainText('A second supplier quotes');

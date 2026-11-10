@@ -41,7 +41,7 @@ test('fix 12: End month and Fast forward are disabled while an event modal is pe
 
   // Resolving the event re-enables both, confirming the guard is tied to the pending state,
   // not a one-way lockout.
-  await page.getByTestId('event-choice').first().click();
+  await page.getByTestId('event-choice-commit').click();
   await expect(dialog).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'End month' })).toBeEnabled();
   await expect(page.getByTestId('fast-forward-button')).toBeEnabled();
@@ -75,7 +75,17 @@ test('fix 14: fast-forwarding a whale campaign through Y3 never freezes silently
     if ((await gameOverHeading.count()) > 0 || (await reportCardHeading.count()) > 0) break;
 
     if ((await dialog.count()) > 0) {
-      await page.getByTestId('event-choice').first().click();
+      // Resolve whatever card is up through the store with its first (old-style) choice id, so
+      // the journey is indifferent to whether the card renders buttons or a decision scale.
+      const dismissed = await page.evaluate(async () => {
+        // @ts-expect-error dev browser import
+        const {useStore} = await import('/src/ui/store.ts');
+        const s = useStore.getState(); const p = s.state.pending;
+        if (!p) return false;
+        s.resolveEventChoice(p.choices[0].id);
+        return true;
+      });
+      expect(dismissed).toBe(true);
       continue;
     }
 

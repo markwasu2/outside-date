@@ -314,7 +314,10 @@ export const effectHandlers: Record<EffectType, EffectHandler> = {
     return { ...state, halls: state.halls.map((h) => ({ ...h, costBudget: Math.round(h.costBudget * (1 + pct)) })) };
   },
 
-  addAskHalls: (state, _args, content) => {
+  addAskHalls: (state, args, content) => {
+    // Optional count (default 2) backs the_ask's event scale: its middle level takes one hall
+    // instead of both. The old choice effects carry no args, so their behavior is unchanged.
+    const count = typeof args[0] === 'number' ? args[0] : 2;
     const template = state.halls[0];
     if (!template) return state;
     const tierMult = content.tuning.tiers[state.setup.hallTier].costMult;
@@ -326,7 +329,7 @@ export const effectHandlers: Record<EffectType, EffectHandler> = {
       // lastDelivery+9/+12 landed at months 59/62, past any realistic completion inside a
       // 60-month campaign, which made saying yes an automatic loss.
       buildAskHall(state, content, state.halls.length + 1, state.month + 26, costBudget),
-      buildAskHall(state, content, state.halls.length + 2, state.month + 30, costBudget),
+      ...(count > 1 ? [buildAskHall(state, content, state.halls.length + 2, state.month + 30, costBudget)] : []),
     ];
     const addedBudget = newHalls.reduce((sum, h) => sum + h.costBudget, 0);
     const budgetAtClose = state.budgetAtClose;
@@ -337,7 +340,7 @@ export const effectHandlers: Record<EffectType, EffectHandler> = {
     const sizedAdded = Math.round(addedBudget * sizedRatio);
     const prev = latestClosing(state);
     const amended = prev
-      ? amendClosing(prev, state.month, 'The ask: two more halls', [
+      ? amendClosing(prev, state.month, count === 1 ? 'The ask: one more hall' : 'The ask: two more halls', [
           { label: 'Expansion halls', amount: addedBudget },
           { label: 'Expansion cushion', amount: sizedAdded - addedBudget },
         ])

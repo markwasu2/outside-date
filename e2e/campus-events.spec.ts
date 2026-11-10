@@ -12,7 +12,7 @@ test('choice cards appear by their object and remain clear of the commit footer'
   await page.screenshot({path:'docs/screenshots/cold2/campus-event-people.png'});
   await page.setViewportSize({width:1440,height:900});
   await page.screenshot({path:'docs/screenshots/cold2/campus-event-1440.png'});
-  await card.getByTestId('event-choice').first().click();await expect(card).toHaveCount(0);
+  await card.getByTestId('event-choice-commit').click();await expect(card).toHaveCount(0);
 });
 test('a no-choice event appears at the matching object without blocking End month',async({page})=>{
   await page.goto('/');await page.getByTestId('quick-start').click();
@@ -36,6 +36,8 @@ test('expansion choice states the real campaign cutoff before either answer',asy
   });
   await expect(page.getByTestId('expansion-cutoff')).toContainText('Y6 M1');
   await expect(page.getByTestId('expansion-cutoff')).toContainText('Expansion does not extend this deadline');
+  // The commitments preview follows the ask's scale: it appears once the dial leaves Decline.
+  await page.getByTestId('event-scale').press('End');
   await expect(page.getByTestId('expansion-funding')).toContainText('equity +');
   await expect(page.getByTestId('expansion-funding')).toContainText('extra pad months');
   await expect(page.getByTestId('expansion-funding')).toContainText('line losses once delivered');

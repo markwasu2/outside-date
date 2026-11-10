@@ -12,9 +12,9 @@ test('repeat sponsorship shows the current expiry and skip leaves it intact',asy
  const note=page.getByTestId('hiring-fair-renewal');
  await expect(note).toContainText('start of Y4 M7');await expect(note).toContainText('Y4 M8, not 6 extra months');
  await expect(note).toContainText('Skipping keeps your current benefit');
- await expect(page.getByTestId('campus-event-card').getByRole('button',{name:/Sponsor a booth/})).toBeVisible();
+ await expect(page.getByTestId('event-scale')).toBeVisible();
  await page.screenshot({path:'docs/screenshots/cold2/hiring-fair-renewal.png'});
- await page.getByRole('button',{name:'Skip it',exact:true}).click();await expect(note).toHaveCount(0);
+ await page.getByTestId('event-choice-commit').click();await expect(note).toHaveCount(0);
  expect(await page.evaluate(async()=>{
  // @ts-expect-error dev browser source import
  const {useStore}=await import('/src/ui/store.ts');return useStore.getState().state.flags.hiringFairUntil;

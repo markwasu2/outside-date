@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { retrofitCashWords } from '../board/retrofitWords';
 import { expansionPowerWords } from '../board/powerWords';
@@ -36,7 +36,8 @@ export function describeEffect(effect: Effect): string {
   // mirror events.json's own documented note for this card (2 halls / -20 tenant goodwill), not
   // tuning, since they're fixed scripted-event outcomes rather than a tunable.
   if (effect.type === 'addAskHalls') {
-    return 'Adds 2 more halls (same terms), new delivery dates, scales debt/equity commitments';
+    const count = typeof effect.args[0] === 'number' ? effect.args[0] : 2;
+    return `Adds ${count} more hall${count === 1 ? '' : 's'} (same terms), new delivery dates, scales debt/equity commitments`;
   }
   if (effect.type === 'declineAsk') {
     return 'Tenant goodwill -20';
@@ -217,6 +218,22 @@ const BESPOKE_CHOICE_STAKES: Record<string, (tier: string) => Record<string, str
         },
 };
 
+/** Scale-level stakes text for cards whose level effects the generic preview can't describe
+ * truthfully (flag gates, the bespoke tenant-slide handler), keyed `${cardId}:${choiceId}`.
+ * Numbers mirror the same sources as BESPOKE_CHOICE_STAKES above; the pole levels repeat the old
+ * choice text verbatim since their effects are identical. */
+const BESPOKE_SCALE_STAKES: Record<string, string> = {
+  'governor_visit:level:0': 'No visit, no rebate',
+  'governor_visit:level:1': 'Uses 1 focus point next month, unlocks the $20.0M equipment rebate',
+  'governor_visit:level:2': 'Uses 2 focus points next month, unlocks the $20.0M equipment rebate',
+  'union_pla:level:0': 'Base labor-shortfall chance stays at 22% each month',
+  'union_pla:level:1': 'Hall budgets +1%, base labor-shortfall chance drops from 22% to 5% each month',
+  'union_pla:level:2': 'Hall budgets +2%, base labor-shortfall chance drops from 22% to 5% each month',
+  'tenant_slide_offer:level:0': 'Dates and rent unchanged',
+  'tenant_slide_offer:level:1': 'The next undelivered hall slips 1 month (delivery and outside date), its rent -1%',
+  'tenant_slide_offer:level:2': 'The next undelivered hall slips 2 months (delivery and outside date), its rent -2%',
+};
+
 export function describeChoiceEffects(
   choiceId: string,
   eventCard: EventCard | null | undefined,
@@ -224,6 +241,17 @@ export function describeChoiceEffects(
   state?: GameState,
 ): string {
   if (!eventCard) return '';
+  // Scale cards: the UI commits 'level:N' instead of a choice id. Bespoke level text first, then
+  // the level's effects through the same generic/state-resolved preview the choice buttons use.
+  if (/^level:\d+$/.test(choiceId)) {
+    const bespokeLevel = BESPOKE_SCALE_STAKES[`${eventCard.id}:${choiceId}`];
+    if (bespokeLevel) return bespokeLevel;
+    const level = eventCard.scale?.levels[Number(choiceId.slice(6))];
+    if (!level) return '';
+    if (level.effects.length === 0) return 'No change';
+    const parts = level.effects.map((e) => (state ? describeEffectWithState(e, state) : describeEffect(e)));
+    return Array.from(new Set(parts)).join(', ');
+  }
   const bespoke = BESPOKE_CHOICE_STAKES[eventCard.id]?.(hallTier ?? 'liquid')[choiceId];
   if (bespoke) return bespoke;
   const def = eventCard.choices?.find((c) => c.id === choiceId);
@@ -260,6 +288,12 @@ export function EventModal() {
   // P10.3: 'event' sound fires once per newly-pending card, not on every re-render - tracked by
   // cardId so re-opening the same pending event (e.g. after a parent re-render) doesn't re-beep.
   const lastSoundedCardId = useRef<string | null>(null);
+  // Scale cards: the slider position lives here (not in ScalePicker) so the_ask's expansion
+  // preview can recompute its commitments from the level currently under the player's thumb.
+  const [scaleLevel, setScaleLevel] = useState(0);
+  useEffect(() => {
+    setScaleLevel(0);
+  }, [draft.pending?.cardId]);
   useEffect(() => {
     const cardId = draft.pending?.cardId ?? null;
     if (cardId && cardId !== lastSoundedCardId.current) {
@@ -285,9 +319,13 @@ export function EventModal() {
   const codexId = isSynthetic ? undefined : eventCard?.codexId;
   const expansion = pending.cardId === 'the_ask' ? (() => {
     const resolved = resolveContent(draft,content);
-    const yes = eventCard?.choices?.find(c=>c.id==='yes');
-    if (!yes) return null;
-    const after = yes.effects.reduce((s,e)=>applyEffect(s,e,resolved),draft);
+    // With the ask's scale, preview the level under the player's thumb; the decline level adds
+    // no halls, so it gets no commitments preview. Without a scale, preview the old yes choice.
+    const askEffects = eventCard?.scale
+      ? (scaleLevel > 0 ? eventCard.scale.levels[scaleLevel]?.effects : null)
+      : eventCard?.choices?.find(c=>c.id==='yes')?.effects;
+    if (!askEffects) return null;
+    const after = askEffects.reduce((s,e)=>applyEffect(s,e,resolved),draft);
     const spatial = resolved.tuning.spatial;
     const nearTaken = draft.halls.filter(h=>!h.terminated && h.stageIndex>=0 && (h.pad??'near')==='near').length;
     const nearLeft = Math.max(0,spatial.nearPads-nearTaken);
@@ -360,6 +398,37 @@ export function EventModal() {
             </div>
           );
         })()}
+        {eventCard?.scale ? (
+          <div data-testid="event-scale-wrap" style={{ marginTop: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#72572b' }}>
+              <span>{eventCard.scale.minLabel}</span>
+              <span>{eventCard.scale.maxLabel}</span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={eventCard.scale.levels.length - 1}
+              step={1}
+              value={scaleLevel}
+              data-testid="event-scale"
+              aria-label={`${title} scale`}
+              onChange={(e) => setScaleLevel(Number(e.target.value))}
+              style={{ width: '100%' }}
+            />
+            <div style={{ fontWeight: 600 }}>{eventCard.scale.levels[scaleLevel]?.label}</div>
+            {(() => {
+              const stakes = describeChoiceEffects(`level:${scaleLevel}`, eventCard, draft.setup.hallTier, draft);
+              return stakes ? <div data-testid="event-scale-stakes" style={{ fontSize: '0.75rem', color: '#555' }}>{stakes}</div> : null;
+            })()}
+            <button
+              data-testid="event-choice-commit"
+              onClick={() => resolveEventChoice(`level:${scaleLevel}`)}
+              style={{ marginTop: 8, width: '100%', padding: '0.5rem' }}
+            >
+              Set it
+            </button>
+          </div>
+        ) : (
         <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
           {pending.choices.map((choice) => {
             const costText = isSynthetic ? describeVoteChoice(choice.id, resolveContent(draft, content).tuning.docket) : describeChoiceEffects(choice.id, eventCard, draft.setup.hallTier, draft);
@@ -376,6 +445,7 @@ export function EventModal() {
             );
           })}
         </div>
+        )}
       </div>
     </div>
   );

@@ -14,15 +14,18 @@ import { expect, test, type Page } from '@playwright/test';
  *     chip that opens the stakeholders view focused on the GC.
  */
 
-/** Dismisses a scripted event dialog if one is up; returns whether one was. Explainer
- * popovers also use role="dialog", so match on the event-choice buttons, not the role. */
+/** Dismisses a scripted event dialog if one is up; returns whether one was. Resolves through
+ * the store with the first (old-style) choice id, so it works whether the card renders choice
+ * buttons or a decision scale. */
 async function dismissEventIfUp(page: Page) {
-  const choice = page.getByTestId('event-choice');
-  if ((await choice.count()) > 0) {
-    await choice.first().click();
+  return page.evaluate(async () => {
+    // @ts-expect-error dev browser import
+    const {useStore} = await import('/src/ui/store.ts');
+    const s = useStore.getState(); const p = s.state.pending;
+    if (!p) return false;
+    s.resolveEventChoice(p.choices[0].id);
     return true;
-  }
-  return false;
+  });
 }
 
 /** Exact-match locator for open explainer popovers (never the -target- wrapper buttons). */
@@ -167,7 +170,7 @@ test("tutorial storm card carries a who-holds chip that opens the GC's stakehold
     await dismissExplainerIfUp(page);
     await page.getByRole('button', { name: 'End month' }).click();
     await dismissExplainerIfUp(page);
-    const dialog = page.getByRole('dialog').filter({ has: page.getByTestId('event-choice') });
+    const dialog = page.getByRole('dialog').filter({ has: page.getByTestId('campus-event-card') });
     if ((await dialog.count()) > 0) {
       const chip = dialog.getByTestId('who-holds-chip');
       if ((await chip.count()) > 0) {
@@ -178,7 +181,7 @@ test("tutorial storm card carries a who-holds chip that opens the GC's stakehold
         await expect(page.getByTestId('stakeholders-view')).toBeVisible();
         break;
       }
-      await page.getByTestId('event-choice').first().click();
+      await dismissEventIfUp(page);
     }
   }
   expect(stormSeen).toBe(true);

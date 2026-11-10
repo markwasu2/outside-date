@@ -47,8 +47,8 @@ test('event body and buttons paint above every map label', async ({ page }) => {
     const next = { ...s.state, phase: 'awaitingChoice', pending: { cardId: card.id, choices: card.choices } };
     useStore.setState({ state: next, draft: next });
   });
-  const dialog = page.getByRole('dialog').filter({ has: page.getByTestId('event-choice') });
-  const button = dialog.getByTestId('event-choice').first();
+  const dialog = page.getByRole('dialog').filter({ has: page.getByTestId('event-choice-commit') });
+  const button = dialog.getByTestId('event-choice-commit');
   await expect(button).toBeVisible();
   const onTop = await button.evaluate((el) => {
     const r = el.getBoundingClientRect();

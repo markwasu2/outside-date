@@ -20,8 +20,13 @@ test('desktop opens on one campus canvas with details on demand and End month pe
   await expect(page.getByTestId('action-row-button').first()).toBeVisible();
   await closePanel(page); await openStatus(page); await expect(page.getByTestId('goal-strip')).toBeVisible();
   await closePanel(page); await page.getByRole('button',{name:'End month',exact:true}).click();
-  // A month-0 random event can pause the commit; answer it before checking advancement.
-  while (await page.getByTestId('event-choice').count()) await page.getByTestId('event-choice').first().click();
+  // A month-0 random event can pause the commit; answer it before checking advancement. Resolved
+  // via the store's first (old-style) choice id, whether the card renders buttons or a scale.
+  await page.evaluate(async () => {
+    // @ts-expect-error dev browser import
+    const {useStore} = await import('/src/ui/store.ts');
+    const s = useStore.getState(); while (s.state.pending) s.resolveEventChoice(s.state.pending.choices[0].id);
+  });
   await expect(page.getByTestId('campus-status')).toContainText('Y1 M2');
 });
 

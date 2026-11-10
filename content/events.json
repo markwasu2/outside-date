@@ -154,7 +154,42 @@
         ]
       }
     ],
-    "note": "Fires at month 24 if the docket is already approved; otherwise fires the month the docket is approved. Yes: addAskHalls adds 2 halls of 25 MW IT, delivery = last hall's delivery + 9 and +12 months, opens a docket amendment vote in 9 months, and scales senior/equity commitments pro rata. No: declineAsk sets tenant goodwill -20. Failing the amendment vote later cancels the ask halls without a lose."
+    "note": "Fires at month 24 if the docket is already approved; otherwise fires the month the docket is approved. Yes: addAskHalls adds 2 halls of 25 MW IT, delivery = last hall's delivery + 9 and +12 months, opens a docket amendment vote in 9 months, and scales senior/equity commitments pro rata. No: declineAsk sets tenant goodwill -20. Failing the amendment vote later cancels the ask halls without a lose.",
+    "scale": {
+      "minLabel": "Decline",
+      "maxLabel": "Take both halls",
+      "levels": [
+        {
+          "label": "Decline",
+          "effects": [
+            {
+              "type": "declineAsk",
+              "args": []
+            }
+          ]
+        },
+        {
+          "label": "Take one hall",
+          "effects": [
+            {
+              "type": "addAskHalls",
+              "args": [
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Take both halls",
+          "effects": [
+            {
+              "type": "addAskHalls",
+              "args": []
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "chip_generation",
@@ -282,7 +317,141 @@
         ]
       }
     ],
-    "note": "The trailing \"p:0.5\" arg means the effect handler applies that goodwill delta with 50% probability in addition to the guaranteed -5."
+    "note": "The trailing \"p:0.5\" arg means the effect handler applies that goodwill delta with 50% probability in addition to the guaranteed -5.",
+    "scale": {
+      "minLabel": "Comply quietly",
+      "maxLabel": "Fight everything",
+      "levels": [
+        {
+          "label": "Comply quietly",
+          "effects": [
+            {
+              "type": "cash",
+              "args": [
+                -1000000
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "commission",
+                5
+              ]
+            },
+            {
+              "type": "owedAp",
+              "args": [
+                2
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Cooperate narrowly",
+          "effects": [
+            {
+              "type": "cash",
+              "args": [
+                -600000
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "commission",
+                3
+              ]
+            },
+            {
+              "type": "owedAp",
+              "args": [
+                1
+              ]
+            },
+            {
+              "type": "voteSlip",
+              "args": [
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Contest the scope",
+          "effects": [
+            {
+              "type": "cash",
+              "args": [
+                -300000
+              ]
+            },
+            {
+              "type": "owedAp",
+              "args": [
+                1
+              ]
+            },
+            {
+              "type": "voteSlip",
+              "args": [
+                1
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                -2
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Fight most of it",
+          "effects": [
+            {
+              "type": "voteSlip",
+              "args": [
+                2
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                -4
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Fight everything",
+          "effects": [
+            {
+              "type": "voteSlip",
+              "args": [
+                3
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                -5
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                -10,
+                "p:0.5"
+              ]
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "tax_check",
@@ -507,7 +676,97 @@
           }
         ]
       }
-    ]
+    ],
+    "scale": {
+      "minLabel": "Skip it",
+      "maxLabel": "Stay all night",
+      "levels": [
+        {
+          "label": "Skip it",
+          "effects": [
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                -5
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Send a statement",
+          "effects": [
+            {
+              "type": "owedAp",
+              "args": [
+                1
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                1
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Stay for an hour",
+          "effects": [
+            {
+              "type": "owedAp",
+              "args": [
+                1
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                3
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Take every question",
+          "effects": [
+            {
+              "type": "owedAp",
+              "args": [
+                2
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                5
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Stay all night",
+          "effects": [
+            {
+              "type": "owedAp",
+              "args": [
+                2
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                8
+              ]
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "newspaper_profile",
@@ -555,7 +814,25 @@
         "effects": []
       }
     ],
-    "note": "Accept: the next undelivered hall's delivery and outside months +2, rent on that hall -2%. Decline: no change. Implemented directly in the choice handler (same mechanics as the delaySwap action), since hall-date shifts have no generic closed-set effect."
+    "note": "Accept: the next undelivered hall's delivery and outside months +2, rent on that hall -2%. Decline: no change. Implemented directly in the choice handler (same mechanics as the delaySwap action), since hall-date shifts have no generic closed-set effect.",
+    "scale": {
+      "minLabel": "Hold the dates",
+      "maxLabel": "Take the offer",
+      "levels": [
+        {
+          "label": "Hold the dates",
+          "effects": []
+        },
+        {
+          "label": "Slide one month",
+          "effects": []
+        },
+        {
+          "label": "Take the offer",
+          "effects": []
+        }
+      ]
+    }
   },
   {
     "id": "governor_visit",
@@ -596,7 +873,53 @@
         "label": "Decline, politely",
         "effects": []
       }
-    ]
+    ],
+    "scale": {
+      "minLabel": "Decline politely",
+      "maxLabel": "Full hosting",
+      "levels": [
+        {
+          "label": "Decline politely",
+          "effects": []
+        },
+        {
+          "label": "A quick tour",
+          "effects": [
+            {
+              "type": "owedAp",
+              "args": [
+                1
+              ]
+            },
+            {
+              "type": "setFlag",
+              "args": [
+                "rebateUnlocked",
+                true
+              ]
+            }
+          ]
+        },
+        {
+          "label": "The full hosting",
+          "effects": [
+            {
+              "type": "owedAp",
+              "args": [
+                2
+              ]
+            },
+            {
+              "type": "setFlag",
+              "args": [
+                "rebateUnlocked",
+                true
+              ]
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "union_pla",
@@ -642,7 +965,53 @@
         "effects": []
       }
     ],
-    "note": "Signing also drops labor_shortfall's draw odds to 0.05 for the rest of the run via flags.plaSigned (see labor_shortfall)."
+    "note": "Signing also drops labor_shortfall's draw odds to 0.05 for the rest of the run via flags.plaSigned (see labor_shortfall).",
+    "scale": {
+      "minLabel": "Decline",
+      "maxLabel": "Full PLA",
+      "levels": [
+        {
+          "label": "Decline",
+          "effects": []
+        },
+        {
+          "label": "A limited PLA",
+          "effects": [
+            {
+              "type": "budgetPct",
+              "args": [
+                0.01
+              ]
+            },
+            {
+              "type": "setFlag",
+              "args": [
+                "plaSigned",
+                true
+              ]
+            }
+          ]
+        },
+        {
+          "label": "The full PLA",
+          "effects": [
+            {
+              "type": "budgetPct",
+              "args": [
+                0.02
+              ]
+            },
+            {
+              "type": "setFlag",
+              "args": [
+                "plaSigned",
+                true
+              ]
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "transformer_factory_fire",
@@ -746,7 +1115,99 @@
           }
         ]
       }
-    ]
+    ],
+    "scale": {
+      "minLabel": "Wait them out",
+      "maxLabel": "Full concession",
+      "levels": [
+        {
+          "label": "Wait them out",
+          "effects": [
+            {
+              "type": "hallPause",
+              "args": [
+                "all",
+                1
+              ]
+            },
+            {
+              "type": "cash",
+              "args": [
+                -10000000
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Offer a token",
+          "effects": [
+            {
+              "type": "playerShare",
+              "args": [
+                -0.02
+              ]
+            },
+            {
+              "type": "cash",
+              "args": [
+                -5000000
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Meet in the middle",
+          "effects": [
+            {
+              "type": "playerShare",
+              "args": [
+                -0.04
+              ]
+            },
+            {
+              "type": "cash",
+              "args": [
+                -10000000
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Give ground",
+          "effects": [
+            {
+              "type": "playerShare",
+              "args": [
+                -0.06
+              ]
+            },
+            {
+              "type": "cash",
+              "args": [
+                -15000000
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Full concession",
+          "effects": [
+            {
+              "type": "playerShare",
+              "args": [
+                -0.08
+              ]
+            },
+            {
+              "type": "cash",
+              "args": [
+                -20000000
+              ]
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "neighbor_wells",
@@ -898,7 +1359,110 @@
         "effects": []
       }
     ],
-    "note": "While flags.hiringFairUntil is in the future, labor_shortfall's draw odds are reduced by 0.05."
+    "note": "While flags.hiringFairUntil is in the future, labor_shortfall's draw odds are reduced by 0.05.",
+    "scale": {
+      "minLabel": "Skip it",
+      "maxLabel": "Host the fair",
+      "levels": [
+        {
+          "label": "Skip it",
+          "effects": []
+        },
+        {
+          "label": "Put up a booth",
+          "effects": [
+            {
+              "type": "cash",
+              "args": [
+                -250000
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                2
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Sponsor the fair",
+          "effects": [
+            {
+              "type": "cash",
+              "args": [
+                -500000
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                3
+              ]
+            },
+            {
+              "type": "setFlag",
+              "args": [
+                "hiringFairUntil",
+                "monthPlus:6"
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Sponsor big",
+          "effects": [
+            {
+              "type": "cash",
+              "args": [
+                -750000
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                5
+              ]
+            },
+            {
+              "type": "setFlag",
+              "args": [
+                "hiringFairUntil",
+                "monthPlus:6"
+              ]
+            }
+          ]
+        },
+        {
+          "label": "Host the fair",
+          "effects": [
+            {
+              "type": "cash",
+              "args": [
+                -1000000
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                6
+              ]
+            },
+            {
+              "type": "setFlag",
+              "args": [
+                "hiringFairUntil",
+                "monthPlus:6"
+              ]
+            }
+          ]
+        }
+      ]
+    }
   },
   {
     "id": "commissioner_turnover",

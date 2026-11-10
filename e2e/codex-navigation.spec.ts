@@ -63,6 +63,6 @@ test('event help returns to the unresolved choice without deciding it', async ({
   await dialog.getByRole('button', {name: 'Close', exact: true}).click();
   await expect(dialog).toHaveCount(0);
   await expect(event).toBeVisible();
-  await event.getByTestId('event-choice').first().click();
+  await event.getByTestId('event-choice-commit').click();
   await expect(event).toHaveCount(0);
 });

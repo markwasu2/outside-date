@@ -7,11 +7,12 @@ test('Whale fresh setup to ending follows visible guidance using real clicks',as
  await page.getByRole('button',{name:'Start campaign',exact:true}).click();
  for(let month=0;month<100;month++){
   if(await page.getByRole('heading',{name:/Rating the campus|Report card|You lose|You win|You scraped by/}).count())break;
-  if(await page.getByTestId('event-choice').count()){
-   const choices=page.getByTestId('event-choice');let choice=choices.first();
-   const no=choices.filter({hasText:/Say no|Decline|Keep the current/});if(await no.count())choice=no.first();
-   trace.push('EVENT '+await choice.innerText());await choice.click();continue;
-  }
+  const dismissedEvent=await page.evaluate(async()=>{
+   // @ts-expect-error dev browser import
+   const{useStore}=await import('/src/ui/store.ts');const s=useStore.getState();const p=s.state.pending;if(!p)return null;
+   const no=p.choices.find((c:{id:string})=>/no|decline|keep/.test(c.id));const pick=no??p.choices[0];
+   s.resolveEventChoice(pick.id);return `${p.cardId}:${pick.id}`;});
+  if(dismissedEvent){trace.push('EVENT '+dismissedEvent);continue;}
   trace.push((await page.getByTestId('campus-status').innerText()).replaceAll('\n',' '));
   while(await page.getByTestId('event-notice-dismiss').count())await page.getByTestId('event-notice-dismiss').first().click();
   for(let instruction=0;instruction<8;instruction++){

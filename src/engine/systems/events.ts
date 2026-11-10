@@ -305,11 +305,25 @@ function resolveChipGenerationChoice(state: GameState, choiceId: string): GameSt
  */
 function resolveTenantSlideOffer(state: GameState, choiceId: string, content: Content): GameState {
   if (choiceId === 'decline') return state;
-  if (choiceId !== 'accept') throw new Error(`Unknown tenant_slide_offer choice: "${choiceId}"`);
+  // Scale levels ('level:N') negotiate the slide: N months of slip for a proportional share of
+  // the full rent cut, so 'level:0' is the decline pole and 'level:2' (swapMonths) is 'accept'.
+  let months: number;
+  if (choiceId === 'accept') {
+    months = content.tuning.lease.swapMonths;
+  } else {
+    const levelMatch = /^level:(\d+)$/.exec(choiceId);
+    if (!levelMatch) throw new Error(`Unknown tenant_slide_offer choice: "${choiceId}"`);
+    months = Number(levelMatch[1]);
+    if (months > content.tuning.lease.swapMonths) {
+      throw new Error(`Unknown tenant_slide_offer choice: "${choiceId}"`);
+    }
+  }
+  if (months === 0) return state;
 
   const candidates = state.halls.filter((h) => !h.delivered && !h.terminated);
   if (candidates.length === 0) return state;
   const hall = candidates.reduce((soonest, h) => (h.deliveryMonth < soonest.deliveryMonth ? h : soonest));
+  const rentCut = (content.tuning.lease.swapRentCut * months) / content.tuning.lease.swapMonths;
 
   return {
     ...state,
@@ -317,12 +331,12 @@ function resolveTenantSlideOffer(state: GameState, choiceId: string, content: Co
       h.id === hall.id
         ? {
             ...h,
-            deliveryMonth: h.deliveryMonth + content.tuning.lease.swapMonths,
-            outsideMonth: h.outsideMonth + content.tuning.lease.swapMonths,
+            deliveryMonth: h.deliveryMonth + months,
+            outsideMonth: h.outsideMonth + months,
           }
         : h,
     ),
-    flags: { ...state.flags, [`rentCutFraction:${hall.id}`]: content.tuning.lease.swapRentCut },
+    flags: { ...state.flags, [`rentCutFraction:${hall.id}`]: rentCut },
   };
 }
 
@@ -344,6 +358,24 @@ export function resolveChoice(state: GameState, choiceId: string, content: Conte
   }
   if (state.pending?.cardId === 'tenant_slide_offer') {
     return resolveTenantSlideOffer(state, choiceId, content);
+  }
+
+  // Event scales (EventScaleSchema): the UI commits a graduated 'level:N' for cards that carry a
+  // `scale` block. Level effects are applied through the same generic path as choice effects, and
+  // the pole levels reproduce the old choices' effects exactly, so bots answering with the old
+  // choice ids (handled by the choice lookup below) are untouched.
+  const levelMatch = /^level:(\d+)$/.exec(choiceId);
+  if (levelMatch) {
+    const card = content.events.find((c) => c.id === state.pending?.cardId);
+    const level = card?.scale?.levels[Number(levelMatch[1])];
+    if (!level) {
+      throw new Error(`Unknown level "${choiceId}" for pending event "${String(state.pending?.cardId)}"`);
+    }
+    let next = state;
+    for (const effect of level.effects) {
+      next = applyEffect(next, effect, content);
+    }
+    return next;
   }
 
   const card = content.events.find((c) => c.id === state.pending?.cardId);
