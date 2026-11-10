@@ -308,6 +308,7 @@ function PowerTiming() {
   const state = useStore(s=>s.draft);
   const content = useStore(s=>s.content);
   const resolved = resolveContent(state,content);
+  if (!state.docketEnabled) return null;
   const initial = resolved.tuning.docket.monthsToVote + resolved.tuning.power.plantBuildMonths;
   return <section data-testid="power-timing-closeout" style={{padding:10,background:'#f3e8ce',fontSize:13}}>
     <strong>Power timing</strong>
