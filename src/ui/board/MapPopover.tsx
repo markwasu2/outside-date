@@ -5,6 +5,7 @@ import { checkAction, useStore } from '../store';
 import { buildRows } from '../components/TracksPanel';
 import { actionCostWords, decisionResult, isContextOnlyAction } from './decisionWords';
 import { plantWords, plantWaitingWords, substationWords, powerCapacityWords } from './powerWords';
+import { pondProgressWords } from './pondWords';
 import { permitReviewWords } from './permitWords';
 import { DocketBrief } from './DocketBrief';
 import { Term } from '../Term';
@@ -181,6 +182,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
           </div>
         )}
         {objectId === 'siteOffice' && officeView === 'permits' && <div data-testid="permit-review" style={{marginBottom:8,lineHeight:1.4}}>{permitReviewWords(state).map(words=><p key={words} style={{margin:'4px 0'}}>{words}</p>)}</div>}
+        {objectId === 'pond' && <p data-testid="pond-progress" style={{lineHeight:1.4}}>{pondProgressWords(state)}</p>}
         {objectId === 'substation' && <p data-testid="substation-progress" style={{lineHeight:1.4}}>{substationWords(state)}</p>}
         {objectId === 'powerPlants' && (
           <div style={{ marginBottom: 8 }}>
