@@ -44,7 +44,13 @@
         }
       }
     },
-    "normal": {},
+    "normal": {
+      "tuningOverrides": {
+        "takeout": {
+          "baseCapRate": 0.0775
+        }
+      }
+    },
     "hard": {
       "forcedSetup": {
         "site": "farmland"
@@ -59,6 +65,9 @@
       "tuningOverrides": {
         "campaign": {
           "startingCash": 215000000
+        },
+        "takeout": {
+          "baseCapRate": 0.0825
         }
       }
     }

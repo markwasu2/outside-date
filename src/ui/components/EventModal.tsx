@@ -218,7 +218,7 @@ export function EventModal() {
         <h2 style={{ marginTop: 0 }}>{title}</h2>
         <p>{body}</p>
         {pending.cardId === 'the_ask' && <p data-testid="expansion-cutoff" style={{background:'#f3e8ce',padding:8,fontSize:13}}>
-          Campaign cutoff: {formatMonth(draft.maxMonths)}. You must price the takeout then, even if added halls are unfinished or still inside their outside dates. Expansion does not extend this deadline. Permanent-loan conversion can open takeout earlier.
+          Campaign cutoff: {formatMonth(draft.maxMonths)}. You must price the takeout then, even if added halls are unfinished or still inside their outside dates. Expansion does not extend this deadline. Before the cutoff, takeout waits for unfinished halls that are still inside their outside dates.
         </p>}
         {claim && (
           <div data-testid="claim-breakdown" style={{ margin: '0.5rem 0', padding: '0.5rem', background: '#f5f5f0', border: '1px solid #ddd', borderRadius: 4, fontSize: '0.8rem' }}>

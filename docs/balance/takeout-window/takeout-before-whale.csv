@@ -1,0 +1,14 @@
+grid: whale, 1000 seeds from 1
+bot,difficulty,winRate,medianMultiple,medianFirstDelivery
+random,easy,0.0,0.00,null
+random,normal,0.0,0.00,null
+random,hard,0.0,0.00,null
+greedy,easy,73.0,1.46,37
+greedy,normal,34.9,1.85,44
+greedy,hard,40.2,1.68,45
+careful,easy,99.3,1.76,35
+careful,normal,74.5,1.38,32
+careful,hard,32.1,1.03,42
+competent,easy,96.1,1.97,37
+competent,normal,70.3,1.54,35
+competent,hard,38.6,1.13,43
