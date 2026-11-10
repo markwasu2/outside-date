@@ -1276,3 +1276,16 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 528 unit, 77 e2e bounded groups, lint, tsc, build |
 | visual | inspected: actual1280 H3 inspection notice names H3 and fix, next instruction matches |
 | grid | skipped: read-only occurrence UI, no engine/save changes |
+
+# Whale fresh visible-guidance journey and corrected land route
+
+| criterion | status |
+|---|---|
+| failure reproduced | done: Option the site Show me incorrectly opened office with no land action, player could wait forever until default |
+| route | done: Next names Land & access road and opens actual site-option action there |
+| real clicks | done: full Whale setup, visible Next/Show me instructions, events, all4 halls, takeout, report; seed1 fixed at title, no bot or game-state injection |
+| outcome | done: all4 delivered, Y5 M1 takeout,0.79x scraped outcome honestly says investors got back less |
+| full gates | done:529 unit,78 e2e bounded groups,lint,tsc,build |
+| visual | inspected:1440 construction midway and final4-hall report; trace/screenshots retained |
+| grid | skipped:UI route/test only,engine/bot/save unchanged |
+| superseding priority | next: always-visible located action list; rethink unequal decision budget with balance/save checks, per user's later feedback |

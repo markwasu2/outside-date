@@ -1,0 +1,289 @@
+Outside Date Y1 M1 Cash $197.0M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide Plan
+Next: Commission the interconnection study - It takes 12 to 24 months and gates the power docket and the substation. Start the clock now. Show me
+PLAN Commission the interconnection study (Uses 1 action; $2.0M) Starts the power-connection study. It takes 12 to 24 months; it does not give you power immediately.
+After planned actions: File the air permit - It takes about 9 months, the longest of your unfiled permits - file the long one first so it does not gate construction. Show me
+PLAN File air permit (Uses 1 action; $0) Asks for the air permit. Starts its review clock, not an immediate approval. Work that needs this permit must wait.
+After planned actions: File the water permit - It takes about 6 months, the longest of your unfiled permits - file the long one first so it does not gate construction. Show me
+PLAN File water permit (Uses 1 action; $0) Asks for the water permit. Starts its review clock, not an immediate approval. Work that needs this permit must wait.
+After planned actions: File the building permit - It takes about 3 months, the longest of your unfiled permits - file the long one first so it does not gate construction. Show me
+Outside Date Y1 M2 Cash $192.4M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide Plan
+Next: File the building permit - It takes about 3 months, the longest of your unfiled permits - file the long one first so it does not gate construction. Show me
+PLAN File building permit (Uses 1 action; $0) Asks for the building permit. Starts its review clock, not an immediate approval. Work that needs this permit must wait.
+After planned actions: Order the transformer - The lead time is 24 months - longer than the path to your first pad. Every month you wait pushes energization a month. Ordered today it arrives around Y3 M2, after H1 reaches fitout (Y2 M5) - order it anyway, and plan to slow H1 or take the slip. Show me
+PLAN Order the transformer (Uses 1 action; $8.0M) Books a transformer order and pays the deposit. Delivery takes months; the laydown yard shows the booked date. It does not switch the power on today.
+After planned actions: Order the switchgear - Lead time runs 11 to 20 months and halls cannot energize without it. Ordered today it arrives around Y2 M10, after H1 reaches fitout (Y2 M5) - order it anyway, and plan to slow H1 or take the slip. Show me
+PLAN Order the switchgear (Uses 1 action; $3.0M) Books the electrical switchgear and pays the deposit. When the study and equipment are ready, substation construction starts automatically.
+After planned actions: File the power docket - The vote lands about 12 months after filing, and intervenors will want meetings before it. File early, then work the room. Show me
+Outside Date Y1 M3 Cash $178.8M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: File the power docket - The vote lands about 12 months after filing, and intervenors will want meetings before it. File early, then work the room. Show me
+PLAN File the power docket (Uses 1 action; $0) Starts the regulator's power-approval case. You must prepare testimony and meet opposing groups before the vote. Filing is not approval.
+After planned actions: Prepare testimony - Testimony raises the vote odds, up to a cap. You have room for more. Show me
+PLAN Prepare testimony (Uses 1 action; $0) Raises the vote odds, up to a cap. Two months in a row costs commission -1.
+After planned actions: Prepare testimony - Testimony raises the vote odds, up to a cap. You have room for more. Show me
+PLAN Prepare testimony (Uses 1 action; $0) Raises the vote odds, up to a cap. Two months in a row costs commission -1.
+After planned actions: Prepare testimony - Testimony raises the vote odds, up to a cap. You have room for more. Show me
+Outside Date Y1 M4 Cash $176.2M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: Prepare testimony - Testimony raises the vote odds, up to a cap. You have room for more. Show me
+PLAN Prepare testimony (Uses 1 action; $0) Raises the vote odds, up to a cap. Two months in a row costs commission -1.
+After planned actions: Option the site - Secure the land before starting any hall. Open Land & access road to review the site price and funding, then option it. One time only. Show me
+PLAN Option the site (Uses 1 action; $50.0M total, from $50.0M equity) Secures this land using your funding commitments. Required before you can break ground; it does not build a hall yet.
+After planned actions: Advance construction on H1 - H1 is idle. Its delivery date is Y4 M3 and its outside date is Y5 M3 - keep the crew moving. Show me
+PLAN Break ground on a near pad: H1 (2 of 2 left, no feeder cost) (Uses 1 action; $0) Starts the next construction stage on H1. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M3.
+After planned actions: Advance construction on H2 - H2 is idle. Its delivery date is Y4 M7 and its outside date is Y5 M7 - keep the crew moving. Show me
+EVENT Decline, politely
+No visit, no rebate
+Outside Date Y1 M5 Cash $173.6M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: Advance construction on H2 - H2 is idle. Its delivery date is Y4 M7 and its outside date is Y5 M7 - keep the crew moving. Show me
+PLAN Break ground on a near pad: H2 (1 of 2 left, no feeder cost) (Uses 1 action; $0) Starts the next construction stage on H2. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M7.
+After planned actions: Advance construction on H3 - H3 is idle. Its delivery date is Y4 M11 and its outside date is Y5 M11 - keep the crew moving. Show me
+PLAN Break ground on the far pad: H3 (+2mo pad, $250K feeder + $40K/mo line losses) (Uses 1 action; $0) Starts the next construction stage on H3. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M11.
+After planned actions: Advance construction on H4 - H4 is idle. Its delivery date is Y5 M3 and its outside date is Y6 M3 - keep the crew moving. Show me
+PLAN Break ground on the far pad: H4 (+2mo pad, $250K feeder + $40K/mo line losses) (Uses 1 action; $0) Starts the next construction stage on H4. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y6 M3.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y1 M6 Cash $171.0M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: Meet Millbrook Ratepayers Alliance - Settling intervenors before the vote raises its odds. 0 of 2 meetings done with this group. Show me
+PLAN Meet Millbrook Ratepayers Alliance (Uses 1 action; $0) Progress toward settling with one intervenor.
+After planned actions: Meet Millbrook Ratepayers Alliance - Settling intervenors before the vote raises its odds. 1 of 2 meetings done with this group. Show me
+PLAN Meet Millbrook Ratepayers Alliance (Uses 1 action; $0) Progress toward settling with one intervenor.
+After planned actions: Meet Riverkeepers of Arcadia - Settling intervenors before the vote raises its odds. 0 of 2 meetings done with this group. Show me
+PLAN Meet Riverkeepers of Arcadia (Uses 1 action; $0) Progress toward settling with one intervenor.
+After planned actions: Meet Riverkeepers of Arcadia - Settling intervenors before the vote raises its odds. 1 of 2 meetings done with this group. Show me
+Outside Date Y1 M7 Cash $168.4M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: Meet Riverkeepers of Arcadia - Settling intervenors before the vote raises its odds. 1 of 2 meetings done with this group. Show me
+PLAN Meet Riverkeepers of Arcadia (Uses 1 action; $0) Progress toward settling with one intervenor.
+After planned actions: Meet Commission Staff - Settling intervenors before the vote raises its odds. 0 of 2 meetings done with this group. Show me
+PLAN Meet Commission Staff (Uses 1 action; $0) Progress toward settling with one intervenor.
+After planned actions: Meet Commission Staff - Settling intervenors before the vote raises its odds. 1 of 2 meetings done with this group. Show me
+PLAN Meet Commission Staff (Uses 1 action; $0) Progress toward settling with one intervenor.
+After planned actions: Advance construction on H1 - H1 is idle. Its delivery date is Y4 M3 and its outside date is Y5 M3 - keep the crew moving. Show me
+Outside Date Y1 M8 Cash $165.8M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: Advance construction on H1 - H1 is idle. Its delivery date is Y4 M3 and its outside date is Y5 M3 - keep the crew moving. Show me
+PLAN Advance construction: H1 (Uses 1 action; $0) Starts the next construction stage on H1. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M3.
+After planned actions: Advance construction on H2 - H2 is idle. Its delivery date is Y4 M7 and its outside date is Y5 M7 - keep the crew moving. Show me
+PLAN Advance construction: H2 (Uses 1 action; $0) Starts the next construction stage on H2. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M7.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y1 M9 Cash $163.2M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: Answer the discovery request - An unanswered discovery request slips the docket vote. Clear it before anything else regulatory. Show me
+PLAN Answer discovery (Uses 1 action; $0) Clears an outstanding discovery request before it slips the vote.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y1 M10 Cash $160.6M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: Advance construction on H3 - H3 is idle. Its delivery date is Y4 M11 and its outside date is Y5 M11 - keep the crew moving. Show me
+PLAN Advance construction: H3 (Uses 1 action; $0) Starts the next construction stage on H3. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M11.
+After planned actions: Advance construction on H4 - H4 is idle. Its delivery date is Y5 M3 and its outside date is Y6 M3 - keep the crew moving. Show me
+PLAN Advance construction: H4 (Uses 1 action; $0) Starts the next construction stage on H4. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y6 M3.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y1 M11 Cash $158.0M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y1 M12 Cash $155.4M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: Answer the discovery request - An unanswered discovery request slips the docket vote. Clear it before anything else regulatory. Show me
+PLAN Answer discovery (Uses 1 action; $0) Clears an outstanding discovery request before it slips the vote.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M1 Cash $152.8M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M2 Cash $150.2M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: Advance construction on H1 - H1 is idle. Its delivery date is Y4 M3 and its outside date is Y5 M3 - keep the crew moving. Show me
+PLAN Advance construction: H1 (Uses 1 action; $0) Starts the next construction stage on H1. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M3.
+After planned actions: Advance construction on H2 - H2 is idle. Its delivery date is Y4 M7 and its outside date is Y5 M7 - keep the crew moving. Show me
+PLAN Advance construction: H2 (Uses 1 action; $0) Starts the next construction stage on H2. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M7.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M3 Cash $147.6M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M4 Cash $143.8M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: Advance construction on H3 - H3 is idle. Its delivery date is Y4 M11 and its outside date is Y5 M11 - keep the crew moving. Show me
+PLAN Advance construction: H3 (Uses 1 action; $0) Starts the next construction stage on H3. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M11.
+After planned actions: Advance construction on H4 - H4 is idle. Its delivery date is Y5 M3 and its outside date is Y6 M3 - keep the crew moving. Show me
+PLAN Advance construction: H4 (Uses 1 action; $0) Starts the next construction stage on H4. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y6 M3.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M5 Cash $141.2M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M6 Cash $138.6M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M7 Cash $136.0M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: Fix the failed inspection on H2 - This hall cannot progress until its failed inspection is fixed. Open the hall to arrange the fix. Show me
+PLAN Fix inspection: H2 (Uses 1 action; $500K) Fixes the failed inspection on this hall so work can resume. Does not finish the building immediately.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M8 Cash $132.9M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (3 alerts) Plan
+Next: Advance construction on H1 - H1 is idle. Its delivery date is Y4 M3 and its outside date is Y5 M3 - keep the crew moving. Show me
+PLAN Advance construction: H1 (Uses 1 action; $0) Starts the next construction stage on H1. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M3.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M9 Cash $130.3M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: Advance construction on H2 - H2 is idle. Its delivery date is Y4 M7 and its outside date is Y5 M7 - keep the crew moving. Show me
+PLAN Advance construction: H2 (Uses 1 action; $0) Starts the next construction stage on H2. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M7.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M10 Cash $127.7M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: Advance construction on H3 - H3 is idle. Its delivery date is Y4 M11 and its outside date is Y5 M11 - keep the crew moving. Show me
+PLAN Advance construction: H3 (Uses 1 action; $0) Starts the next construction stage on H3. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M11.
+After planned actions: Advance construction on H4 - H4 is idle. Its delivery date is Y5 M3 and its outside date is Y6 M3 - keep the crew moving. Show me
+PLAN Advance construction: H4 (Uses 1 action; $0) Starts the next construction stage on H4. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y6 M3.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M11 Cash $125.1M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y2 M12 Cash $122.5M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y3 M1 Cash $119.9M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: Fix the failed inspection on H2 - This hall cannot progress until its failed inspection is fixed. Open the hall to arrange the fix. Show me
+PLAN Fix inspection: H2 (Uses 1 action; $500K) Fixes the failed inspection on this hall so work can resume. Does not finish the building immediately.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+EVENT Say no
+Tenant goodwill -20
+Outside Date Y3 M2 Cash $116.8M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y3 M3 Cash $114.2M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: End the month - Everything critical is already in motion. Next milestone: H1 delivery Y4 M3. Show me
+Outside Date Y3 M4 Cash $111.6M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: H1: waiting on power hookup - transformer arrives Y3 M10. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y3 M5 Cash $109.0M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: H1: waiting on power hookup - transformer arrives Y3 M10. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y3 M6 Cash $106.4M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: H1: waiting on power hookup - transformer arrives Y3 M10. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y3 M7 Cash $103.8M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: H1: waiting on power hookup - transformer arrives Y3 M10. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+EVENT Decline the upgrade
+Tenant goodwill -15, asset score -3
+Outside Date Y3 M8 Cash $101.2M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: H1: waiting on power hookup - transformer arrives Y3 M10. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y3 M9 Cash $98.6M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: H1: waiting on power hookup - transformer arrives Y3 M10. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y3 M10 Cash $96.0M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: H1: waiting on power hookup - transformer is due now; check the site office for funding if its balance cannot be paid. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y3 M11 Cash $93.4M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide Plan
+Next: H1: waiting on power hookup - Substation construction is underway until Y4 M1. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y3 M12 Cash $90.8M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide Plan
+Next: H1: waiting on power hookup - Substation construction is underway until Y4 M1. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y4 M1 Cash $88.2M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: H1: waiting on power hookup - Substation construction is underway until Y4 M1. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y4 M2 Cash $85.6M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: Advance construction on H1 - H1 is idle. Its delivery date is Y4 M3 and its outside date is Y5 M3 - keep the crew moving. Show me
+PLAN Advance construction: H1 (Uses 1 action; $0) Starts the next construction stage on H1. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M3.
+After planned actions: H2: waiting on power hookup - Substation is complete; the next source of capacity is the power plants. Check their online dates at the power plants. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y4 M3 Cash $83.0M Actions this month: 3 of 3 left 0/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: H2: waiting on power hookup - Substation is complete; the next source of capacity is the power plants. Check their online dates at the power plants. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y4 M4 Cash $83.1M Actions this month: 3 of 3 left 1/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: H2: waiting on power hookup - Substation is complete; the next source of capacity is the power plants. Check their online dates at the power plants. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y4 M5 Cash $83.3M Actions this month: 3 of 3 left 1/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: H2: waiting on power hookup - Substation is complete; the next source of capacity is the power plants. Check their online dates at the power plants. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y4 M6 Cash $83.5M Actions this month: 3 of 3 left 1/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: H2: waiting on power hookup - Substation is complete; the next source of capacity is the power plants. Check their online dates at the power plants. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y4 M7 Cash $83.7M Actions this month: 3 of 3 left 1/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: H2: waiting on power hookup - Substation is complete; the next source of capacity is the power plants. Check their online dates at the power plants. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y4 M8 Cash $83.9M Actions this month: 3 of 3 left 1/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: H2: waiting on power hookup - Substation is complete; the next source of capacity is the power plants. Check their online dates at the power plants. The substation builds itself once the study is complete and the gear is installed. End the month to advance these clocks. Show me
+Outside Date Y4 M9 Cash $80.5M Actions this month: 3 of 3 left 1/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: Advance construction on H2 - H2 is idle. Its delivery date is Y4 M7 and its outside date is Y5 M7 - keep the crew moving. Show me
+PLAN Advance construction: H2 (Uses 1 action; $0) Starts the next construction stage on H2. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M7.
+After planned actions: Advance construction on H3 - H3 is idle. Its delivery date is Y4 M11 and its outside date is Y5 M11 - keep the crew moving. Show me
+PLAN Advance construction: H3 (Uses 1 action; $0) Starts the next construction stage on H3. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y5 M11.
+After planned actions: Advance construction on H4 - H4 is idle. Its delivery date is Y5 M3 and its outside date is Y6 M3 - keep the crew moving. Show me
+PLAN Advance construction: H4 (Uses 1 action; $0) Starts the next construction stage on H4. Once started, crews keep working each month without another action. You act again when the next stage is ready. Tenant deadline: Y6 M3.
+After planned actions: End the month - Everything critical is already in motion. Next milestone: H2 delivery Y4 M7. Show me
+EVENT Sponsor a booth
+Cash -$1.0M, Town goodwill +6, Has consequences
+Outside Date Y4 M10 Cash $76.1M Actions this month: 3 of 3 left 1/4 halls delivered ⏩ Fast forward Status & guide (2 alerts) Plan
+Next: End the month - Everything critical is already in motion. Next milestone: H2 delivery Y4 M7. Show me
+Outside Date Y4 M11 Cash $83.3M Actions this month: 3 of 3 left 4/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: End the month - Everything critical is already in motion. Show me
+Outside Date Y4 M12 Cash $84.3M Actions this month: 3 of 3 left 4/4 halls delivered ⏩ Fast forward Status & guide Plan
+Next: End the month - Everything critical is already in motion. Show me
+Outside Date Y5 M1 Cash $85.3M Actions this month: 3 of 3 left 4/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: End the month - Everything critical is already in motion. Show me
+Outside Date Y5 M1 Cash $86.3M Actions this month: 3 of 3 left 4/4 halls delivered ⏩ Fast forward Status & guide (1 alerts) Plan
+Next: End the month - Everything critical is already in motion. Show me
+PRICE TAKEOUT
+END Outside Date
+Y5 M1 · Campaign closed
+4/4 halls delivered
+Look around campus
+Legend
+People on site
+Road
+Site office
+Low field
+Water permit
+H1
+Delivered
+near pad
++$2.8M/mo
+H2
+Delivered
+near pad
++$2.8M/mo
+H3
+Delivered
+far pad
++$2.8M/mo
+H4
+Delivered
+far pad
++$2.8M/mo
+Laydown yard 0/3
+empty
+Substation
+energized
+Power plants
+A online
+62 MW
+B online
+100 MW
+Your campus, at close
+What you built, what it cost, and the result of the decisions you made.
+You scraped by
+
+Campus value $1.62B, equity multiple 0.79x, your equity $123.3M. The takeout closed, but at 0.79x investors got back less than they put in.
+
+Power timing
+Setup estimate assumed a first-try docket approval. A later docket moves the plant schedule even without a construction slip.
+Plant A: setup estimate Y4 M1; after docket approval Y4 M3; actual Y4 M8.
+Plant B: setup estimate Y4 M1; after docket approval Y4 M3; actual Y4 M8.
+Report card
+B
+Time
+1 of 4 delivered late (graded against the lease date).
+A
+Cost
+Total cost came in at or under your call of $1.37B.
+B
+Risk allocation
+1 risk you held and could have mitigated materialized anyway.
+B
+Community
+Town and commission goodwill averaged 61.
+A
+Value
+The campus priced above the market band per MW of IT load.
+Risk allocation
+Risk	Held by	Materialized	Cost to you	Mitigation you had
+Delivery delay	Who holds this: You (the developer)	Yes	$4.5M	Delay in start-up (DSU) insurance moves the storm-caused part of this to the insurer.
+Cost overruns	Who holds this: You (the developer)	No	$0	A guaranteed maximum price (GMP) contract moves overruns to the general contractor.
+Storm delay	Who holds this: You (the developer)	No	$0	DSU moves storm delay cost to the insurer while it is active.
+Plant construction slip after docket approval	Who holds this: You (the developer)	Yes	$0	A higher minimum power charge lowers slip odds and shifts more of this to the utility.
+Stranded plant capacity	Who holds this: The ratepayers	No	$0	Informational. See the codex; ratepayers carry this cost in the real world.
+Refinancing risk	Who holds this: You (the developer)	No	$0	Lower leverage at close reduces the odds of a failed conversion test.
+Tenant exit	Who holds this: You (the developer)	No	$0	Cut from v1 as a mechanic (residual value guarantee); informational only.
+Interest rate movement	Who holds this: You (the developer)	No	$0	No in-game mitigation. Rate moves are market events.
+Labor shortage	Who holds this: You (the developer)	No	$0	A project labor agreement or importing crews reduces or prevents this.
+Water availability gap	Who holds this: The town and county	No	$0	Hybrid or dry cooling keeps more of this with the town instead of you.
+Chip generation obsolescence	Who holds this: The tenant	No	$0	Hybrid tier keeps this with the tenant; air tier shifts some of it to you.
+Who you worked with
+Governor Eleanor Voss
+Governor of Arcadia - Town goodwill 73
+Priya Natarajan
+CEO, Arcadia Public Power - Utility goodwill 55
+Commissioner Hank Odell
+Arcadia Utility Commission - PUC/Commission goodwill 49
+Commissioner Dana Kwambai
+Arcadia Utility Commission - PUC/Commission goodwill 49
+Lucia Byrne
+Counsel, Millbrook Ratepayers Alliance - PUC/Commission goodwill 49
+Marcus Teale
+Independent engineer, senior lender - Utility goodwill 55
+Foreman Ruth Calder
+General contractor's site foreman - Town goodwill 73
+Business Manager Ovidio Reyes
+Richfield County trades council - Town goodwill 73
+Sam Okafor
+Reporter, the Millbrook Clarion - Town goodwill 73
+Jordan Ashe
+VP of site delivery, the Whale - Tenant goodwill 15
+Play again
+Try another difficulty
+No more months advance. Campus value $1.62B · Your equity $123.3M

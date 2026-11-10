@@ -171,8 +171,8 @@ export function nextStep(state: GameState, content: Content): NextStep {
   if (!siteOptioned) {
     return {
       title: 'Option the site',
-      why: 'Required before the pad stage of any hall. One time only.',
-      objectId: 'siteOffice',
+      why: 'Secure the land before starting any hall. Open Land & access road to review the site price and funding, then option it. One time only.',
+      objectId: 'road',
       actionId: 'optionSite',
     };
   }
