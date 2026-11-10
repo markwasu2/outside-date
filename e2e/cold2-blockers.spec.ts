@@ -1,3 +1,4 @@
+import { adviceElement } from './campusNavigation';
 import { expect, test } from '@playwright/test';
 
 test('RFS nudge names the power blocker and automatic substation chain', async ({ page }) => {
@@ -16,12 +17,12 @@ test('RFS nudge names the power blocker and automatic substation chain', async (
     for (const h of next.halls) { h.stageIndex = 4; h.stageActive = false; h.energized = false; }
     useStore.setState({ state: next, draft: next, seenExplainers: ['cash','runway','ap','nextOutsideDate','dscrHeadroom','goodwill'] });
   });
-  await expect(page.getByTestId('next-step-card').getByText('Next: H1: waiting on power hookup', { exact: true })).toBeVisible();
-  await page.getByTestId('next-step-card').getByRole('button',{name:'Next: H1: waiting on power hookup',exact:true}).click();
+  await expect((await adviceElement(page, 'next-step-card')).getByText('Advice: H1: waiting on power hookup', { exact: true })).toBeVisible();
+  await (await adviceElement(page, 'next-step-card')).getByRole('button',{name:'Advice: H1: waiting on power hookup',exact:true}).click();
   await expect(page.getByText(/The substation builds itself once/)).toBeVisible();
   await expect(page.getByTestId('map-popover')).toHaveCount(0);
-  await expect(page.getByTestId('next-step-card')).toContainText('transformer arrives Y4 M5');
-  await expect(page.getByTestId('next-step-show-me')).toHaveText('Why wait?');
+  await expect((await adviceElement(page, 'next-step-card'))).toContainText('transformer arrives Y4 M5');
+  await expect((await adviceElement(page, 'next-step-show-me'))).toHaveText('Why wait?');
   await page.screenshot({ path: 'docs/screenshots/cold2/power-equipment-clock.png' });
   // The real object still exposes supplier options when the player chooses to inspect them.
   await page.locator('[data-campus-object="substation"]').click();
@@ -31,9 +32,9 @@ test('RFS nudge names the power blocker and automatic substation chain', async (
     const {useStore}=await import('/src/ui/store.ts');const s=structuredClone(useStore.getState().state);
     s.power.substationStatus='building';s.power.substationDoneMonth=42;useStore.setState({state:s,draft:s});
   });
-  await page.getByTestId('next-step-show-me').click();
-  if(!await page.getByTestId('next-step-card').getByText(/Substation construction is underway/).count())await page.getByTestId('next-step-show-me').click();
-  await expect(page.getByTestId('next-step-card')).toContainText('Substation construction is underway until Y4 M7');
+  await (await adviceElement(page, 'next-step-show-me')).click();
+  if(!await (await adviceElement(page, 'next-step-card')).getByText(/Substation construction is underway/).count())await (await adviceElement(page, 'next-step-show-me')).click();
+  await expect((await adviceElement(page, 'next-step-card'))).toContainText('Substation construction is underway until Y4 M7');
   await expect(page.getByTestId('map-popover')).toHaveCount(0);
   await page.screenshot({ path: 'docs/screenshots/cold2/power-construction-clock.png' });
 });

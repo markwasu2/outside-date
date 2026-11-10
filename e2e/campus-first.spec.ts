@@ -12,7 +12,7 @@ test('desktop opens on one campus canvas with details on demand and End month pe
   await page.screenshot({ path: 'docs/screenshots/cold2/scene-1280.png' });
   await page.setViewportSize({width:1440,height:900});
   await page.screenshot({ path: 'docs/screenshots/cold2/scene-1440.png' });
-  await page.getByRole('button', { name: 'Show me', exact: true }).click();
+  await page.getByTestId('review-option').first().click();
   await expect(page.getByTestId('map-popover')).toBeVisible();
   await expect(page.getByTestId('popover-action').filter({hasText:'Commission the interconnection study'})).toBeVisible();
   await page.keyboard.press('Escape');

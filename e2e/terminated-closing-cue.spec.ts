@@ -1,3 +1,4 @@
+import { adviceElement } from './campusNavigation';
 import {test,expect} from '@playwright/test';
 
 test('closing wait tells the same delivered and terminated story as the campus',async({page})=>{
@@ -11,8 +12,8 @@ test('closing wait tells the same delivered and terminated story as the campus',
  s.power.plants.forEach((p:{onlineMonth:number})=>p.onlineMonth=40);
  useStore.setState({state:s,draft:s});
  });
- const cue=page.getByTestId('next-step-card');
- await expect(cue).toContainText('Wait for the lender retest');await page.getByTestId('next-step-show-me').click();
+ const cue=(await adviceElement(page, 'next-step-card'));
+ await expect(cue).toContainText('Wait for the lender retest');await (await adviceElement(page, 'next-step-show-me')).click();
  await expect(cue).toContainText('3 of 4 halls are delivered. 1 hall was terminated.');
  await expect(cue).not.toContainText('Every hall is delivered');
  await expect(page.getByRole('button',{name:/H4 Terminated/})).toBeVisible();
@@ -22,6 +23,6 @@ test('closing wait tells the same delivered and terminated story as the campus',
  const {useStore}=await import('/src/ui/store.ts');const s=structuredClone(useStore.getState().state);s.debt.converted=true;s.flags.conversionMonth=46;useStore.setState({state:s,draft:s});
  });
  await expect(cue).toContainText('Let the rent season before closing');
- await page.getByTestId('next-step-show-me').click();
+ await (await adviceElement(page, 'next-step-show-me')).click();
  await expect(cue).toContainText('3 of 4 halls are delivered. 1 hall was terminated.');
 });

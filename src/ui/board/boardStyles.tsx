@@ -11,6 +11,24 @@ import { useEffect, useState } from 'react';
 export function BoardStyles() {
   return (
     <style>{`
+      [data-testid="campus-workspace"] > header,
+      [data-testid="campus-workspace"] > footer { box-shadow: 0 2px 8px #3e372012; }
+      [data-testid="campus-status"] { flex-wrap: wrap; row-gap: 6px !important; }
+      [data-testid="campus-status"] > button,
+      [data-testid="campus-workspace"] > footer > button {
+        border: 1px solid #c4b999; border-radius: 6px; background: #f5f0e4;
+        padding: 6px 9px; color: #443d2d; font: inherit; cursor: pointer;
+      }
+      [data-testid="campus-status"] > button:hover,
+      [data-testid="campus-workspace"] > footer > button:hover { filter: brightness(.96); }
+      [data-testid="campus-status"] > button[aria-expanded="true"] { background: #e0e9de; border-color: #7f9a80; color:#244632; }
+      [data-testid="month-review"] { background: linear-gradient(110deg,#f9f5e9,#fffdf6) !important; box-shadow: -5px 0 16px #49371d0d; }
+      [data-testid="review-options"] > div { border: 1px solid #d9cfb7 !important; border-radius: 8px; padding: 10px !important; background: #fffcf4; }
+      [data-testid="review-option"] { text-decoration: none !important; font-size: 13px; }
+      [data-testid="review-option"]:after { content: '  ↗'; color:#8a967c; }
+      [data-testid="review-option"]:hover { text-decoration: underline !important; }
+      [data-testid="map-popover"] { border-radius: 10px !important; box-shadow: 0 10px 30px #30291830 !important; }
+      [data-testid="map-popover"] button { border-radius: 5px; }
       [data-campus-scene] [data-scene-object] {
         background: transparent !important;
         border: none !important;

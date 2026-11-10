@@ -1,3 +1,4 @@
+import type { MonthReview } from './board/monthReview';
 import { milestoneWords } from './board/milestoneWords';
 import { create } from 'zustand';
 
@@ -229,6 +230,7 @@ interface UIStore {
    * (construction-spend floats, rent coin animation, arrival highlights) without any engine
    * change. null before the first committed month of a run. */
   prevState: GameState | null;
+  monthReview: MonthReview | null;
   /** Phase 1 (D6): map objects whose "what this is" teaching line has been seen this run - same
    * pattern as dismissedCoachTips (UI-only, cleared by newGame/loadGame). */
   seenBoardObjects: string[];
@@ -364,6 +366,7 @@ export const useStore = create<UIStore>((set, get) => ({
   error: null,
   boardPopover: null,
   prevState: null,
+  monthReview: null,
   seenBoardObjects: [],
   requestedTab: null,
   screen: 'start',
@@ -535,6 +538,7 @@ export const useStore = create<UIStore>((set, get) => ({
       set((s) => ({
         state: next,
         prevState: state,
+        monthReview: { before: s.snapshots[0] ?? state, after: next, actions: s.plan },
         plan: [],
         snapshots: [],
         draft: next,
@@ -575,6 +579,7 @@ export const useStore = create<UIStore>((set, get) => ({
     set((s) => ({
       state: next,
       prevState: state,
+      monthReview: { before: s.snapshots[0] ?? state, after: next, actions: s.plan },
       draft: next,
       plan: [],
       snapshots: [],
@@ -596,6 +601,7 @@ export const useStore = create<UIStore>((set, get) => ({
       set((s) => ({
         state: result.state,
         draft: result.state,
+        monthReview: { before: s.monthReview?.before ?? state, after: result.state, actions: s.monthReview?.actions ?? [] },
         plan: [],
         snapshots: [],
         error: null,
@@ -622,6 +628,7 @@ export const useStore = create<UIStore>((set, get) => ({
       error: null,
       boardPopover: null,
       prevState: null,
+  monthReview: null,
       seenBoardObjects: [],
       requestedTab: null,
       screen: 'game',
@@ -649,6 +656,7 @@ export const useStore = create<UIStore>((set, get) => ({
       error: null,
       boardPopover: null,
       prevState: null,
+  monthReview: null,
       seenBoardObjects: [],
       requestedTab: null,
       screen: 'game',

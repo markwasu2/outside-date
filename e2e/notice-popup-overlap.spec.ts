@@ -1,3 +1,4 @@
+import { adviceElement } from './campusNavigation';
 import {test,expect} from '@playwright/test';
 test('a lender notice never covers the office popup when the player follows its cure',async({page})=>{
  await page.goto('/');await page.getByRole('button',{name:'Tutorial',exact:true}).click();
@@ -7,7 +8,7 @@ test('a lender notice never covers the office popup when the player follows its 
   useStore.setState({state:s,draft:s});
  });
  await expect(page.getByTestId('event-notice')).toContainText('site office: Insurance & lender');
- await page.getByTestId('next-step-show-me').click();await expect(page.getByTestId('event-notice')).toHaveCount(0);
+ await (await adviceElement(page, 'next-step-show-me')).click();await expect(page.getByTestId('event-notice')).toHaveCount(0);
  const popup=page.getByTestId('map-popover');await expect(popup.getByRole('button',{name:'Close',exact:true})).toBeInViewport();
  await expect(popup.getByTestId('popover-action').filter({hasText:'Cure a draw freeze'})).toBeEnabled();
  await page.screenshot({path:'docs/screenshots/cold2/live-replay-notice-clear.png'});

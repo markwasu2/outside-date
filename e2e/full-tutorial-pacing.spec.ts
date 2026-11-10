@@ -1,3 +1,4 @@
+import { adviceElement } from './campusNavigation';
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 
@@ -37,7 +38,7 @@ test('cold full tutorial run via the Next card', async ({ page }) => {
     }
 
     const status = (await page.getByTestId('campus-status').innerText()).replaceAll('\n', ' ');
-    const card = await page.getByTestId('next-step-card').innerText().catch(() => '(no card)');
+    const card = await (await adviceElement(page, 'next-step-card')).innerText().catch(() => '(no card)');
     trace.push(`MONTH ${status} | NEXT ${card.replaceAll('\n', ' / ')}`);
 
     const notice = page.getByTestId('event-notice-dismiss');
@@ -54,15 +55,15 @@ test('cold full tutorial run via the Next card', async ({ page }) => {
       break;
     }
 
-    const prep = page.getByTestId('wait-prep-action');
+    const prep = (await adviceElement(page, 'wait-prep-action'));
     if (await prep.count()) {
       trace.push('PREP ' + await prep.innerText()); await prep.click();
       await expect(prep).toHaveCount(0); continue;
     }
     // Follow the Next card's own do-it-now when offered; else end the month.
-    const doit = page.getByTestId('next-step-do-it');
+    const doit = (await adviceElement(page, 'next-step-do-it'));
     if (await doit.count()) {
-      trace.push('DO ' + (await page.getByTestId('next-step-card').innerText()).split('\n')[0]);
+      trace.push('DO ' + (await (await adviceElement(page, 'next-step-card')).innerText()).split('\n')[0]);
       await doit.click();
       await page.waitForTimeout(150);
       continue; // re-read the new card before ending the month
@@ -71,7 +72,7 @@ test('cold full tutorial run via the Next card', async ({ page }) => {
     const skip = page.getByTestId('skip-quiet-months');
     if (await skip.count()) {
       trace.push('SKIP quiet months'); await skip.click();
-      const after = await page.getByTestId('next-step-card').innerText();
+      const after = await (await adviceElement(page, 'next-step-card')).innerText();
       trace.push('AFTER SKIP ' + after.replaceAll('\n', ' / '));
     } else await page.getByRole('button', { name: 'End month', exact: true }).click();
     await page.waitForTimeout(200);
@@ -86,7 +87,7 @@ test('cold full tutorial run via the Next card', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Report card', exact: true })).toBeVisible();
   expect(errors).toEqual([]);
   expect(trace.some(t => t.startsWith('PREP '))).toBe(true);
-  expect(trace).toContain('AFTER SKIP Next: Option the site / Show me / Do it now / ▼');
+  expect(trace).toContain('AFTER SKIP Advice: Option the site / Show me / Do it now / ▼');
   expect(trace.some(t => t.startsWith('SKIP '))).toBe(true);
   await shot('99-report');
   trace.push('END ' + (await page.locator('body').innerText()).replaceAll('\n', ' ').slice(0, 1200));
