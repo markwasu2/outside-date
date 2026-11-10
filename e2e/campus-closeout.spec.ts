@@ -37,3 +37,25 @@ test('takeout and final report stay with the actual campus',async({page})=>{
   await expect(page.getByTestId('campus-workspace')).toBeVisible();
   await expect(page.getByTestId('campus-status')).toContainText('Y1 M1');
 });
+
+
+test('takeout preview stays on campus until committed and survives reload',async({page})=>{
+ await page.goto('/');await page.getByTestId('quick-start').click();
+ await page.evaluate(async()=>{
+ // @ts-expect-error dev browser source import
+ const {useStore}=await import('/src/ui/store.ts');
+ (window as unknown as {__debugRunBot:(bot:string,scenario:string,difficulty:string,seed:number)=>void}).__debugRunBot('competent','whale','normal',3);
+ const store=useStore.getState(),s=structuredClone(store.state);s.phase='takeoutAvailable';s.takeout=null;s.outcome=null;useStore.setState({state:s,draft:s});useStore.getState().autosave();
+ });
+ await page.getByRole('button',{name:'Price the takeout to finish the campaign',exact:true}).click();
+ await expect(page.getByTestId('campus-workspace')).toBeVisible();
+ await expect(page.getByTestId('closeout-campus')).toHaveCount(0);
+ await expect(page.getByTestId('next-step-card')).toContainText('End month to close the campus');
+ await expect(page.getByRole('button',{name:'End month',exact:true})).toBeEnabled();
+ await page.screenshot({path:'docs/screenshots/cold2/takeout-commit-preview.png'});
+ await page.getByRole('button',{name:'End month',exact:true}).click();
+ await expect(page.getByTestId('closeout-campus')).toBeVisible();
+ await page.reload();await page.getByRole('button',{name:'Continue',exact:true}).click();
+ await expect(page.getByTestId('closeout-campus')).toBeVisible();
+ await expect(page.getByTestId('campus-workspace')).toHaveCount(0);
+});
