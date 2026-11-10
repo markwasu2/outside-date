@@ -122,6 +122,19 @@ export function findDef(content: Content, id: string): ActionDef {
 // ---------------------------------------------------------------------------
 
 /** Ids of clickable map objects that are not halls. Hall object ids are the hall ids ('H1'..). */
+/** Quote lead bounds, never consume the random order draw to preview it. */
+export function secondSupplierLabel(kind: 'transformer' | 'switchgear', state: GameState, content: Content): string {
+  const {power, markets} = resolveContent(state, content).tuning;
+  const index = state.markets.equipmentIndex;
+  const alt = markets.altSupplier[kind];
+  const book = kind === 'transformer' ? power.transformerDeposit + power.transformerBalance : power.switchgearDeposit + power.switchgearBalance;
+  const price = priceWithIndex(Math.round(book * alt.priceMult), index);
+  const lead = 'leadMonths' in alt
+    ? `~${leadWithIndex(alt.leadMonths, index, markets.leadElasticity)}mo`
+    : `${leadWithIndex(alt.leadMin, index, markets.leadElasticity)}-${leadWithIndex(alt.leadMax, index, markets.leadElasticity)}mo`;
+  return `Second supplier for the ${kind} (${formatDollars(price)}, ${lead} lead)`;
+}
+
 export type BoardObjectId = 'substation' | 'pond' | 'siteOffice' | 'laydownYard' | 'powerPlants' | string;
 
 export const GOODWILL_GROUPS: GoodwillGroup[] = ['town', 'commission', 'utility', 'tenant'];
@@ -232,18 +245,12 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
       const standardPending = state.power.orders.some((o) => o.kind === kind && o.supplier === 'standard' && !o.arrived);
       const altPending = state.power.orders.some((o) => o.kind === kind && o.supplier === 'alt');
       if (standardPending && !altPending) {
-        const alt = markets.altSupplier[kind];
-        const altPrice = priceWithIndex(Math.round(book * alt.priceMult), index);
-        const altLead =
-          'leadMonths' in alt
-            ? leadWithIndex(alt.leadMonths, index, markets.leadElasticity)
-            : null;
         rows.push(
           row(
             content,
             state,
             'secondSource',
-            `Second supplier for the ${kind} (${formatDollars(altPrice)}${altLead !== null ? `, ~${altLead}mo` : ''})`,
+            secondSupplierLabel(kind, state, content),
             { kind },
           ),
         );
