@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import type { Content } from '../../content/schemas';
 import type { GameState, GoodwillGroup, PlannedAction } from '../../engine/types';
+import { actionCostWords, decisionResult } from '../board/decisionWords';
 import { cashLabel, findDef } from '../board/actions';
 import { checkAction, useStore } from '../store';
 import type { TrackTab } from '../store';
@@ -508,7 +509,7 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
               <button
                 disabled={!check.ok}
                 onClick={() => queueAction(row.action)}
-                title={check.ok ? row.help : check.reason}
+                title={check.ok ? decisionResult(row.action,state,content,row.help) : check.reason}
                 data-testid="action-row-button"
                 style={{ width: '100%', textAlign: 'left', padding: '0.4rem', cursor: check.ok ? 'pointer' : 'not-allowed' }}
               >
@@ -516,9 +517,9 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
                   {row.portrait && <CastPortrait portrait={row.portrait} name={row.portraitName} size={22} />}
                   <div>
                     <div>
-                      <strong>{row.label}</strong> ({row.ap} AP, {row.cashLabel})
+                      <strong>{row.label}</strong> ({actionCostWords(row.ap)}; {row.cashLabel})
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#555' }}>{check.ok ? row.help : check.reason}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#555' }}>{check.ok ? decisionResult(row.action,state,content,row.help) : check.reason}</div>
                   </div>
                 </div>
               </button>
@@ -544,7 +545,7 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
                     data-testid="action-row-button"
                     style={{ width: '100%', textAlign: 'left', padding: '0.3rem', cursor: check.ok ? 'pointer' : 'not-allowed' }}
                   >
-                    Visit {group} ({visitCastDef.ap} AP)
+                    Visit {group} ({actionCostWords(visitCastDef.ap)})
                   </button>
                 </div>
               </CastHover>

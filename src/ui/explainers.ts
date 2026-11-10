@@ -42,10 +42,10 @@ export const STAT_EXPLAINERS: StatExplainer[] = [
   },
   {
     id: 'ap',
-    title: 'Action points',
-    what: 'AP is how much you can do per month. Every queued action costs AP; filled pips are spent.',
-    why: 'You can never do everything at once - AP is the scarcity that forces sequencing.',
-    doText: 'Spend AP on the bottleneck first: the progress spine under the HUD names the current one.',
+    title: 'Actions this month',
+    what: 'This is your attention budget as the developer. An instruction reserves the number of actions shown on it; some use none.',
+    why: 'The monthly limit makes you choose what needs your attention now. Workers keep building and reviews keep running after you start them.',
+    doText: 'Use actions on the next blocker first. Plan is reversible until End month. Your budget resets each month, but unused actions do not carry over.',
     trigger: (draft) => draft.apUsedThisMonth > 0,
   },
   {
@@ -53,7 +53,7 @@ export const STAT_EXPLAINERS: StatExplainer[] = [
     title: 'Next outside date',
     what: "The soonest lease deadline among your undelivered halls. Miss a hall's outside date and the tenant can terminate it.",
     why: "A termination kills the hall's rent, its takeout value, and usually the campaign.",
-    doText: 'If a date looks tight, spend AP on that hall, fix its blockers, or ask the tenant for a delay swap (Chips tab).',
+    doText: 'If a date looks tight, use actions on that hall, fix its blockers, or ask the tenant for a delay swap (Chips tab).',
     trigger: (draft) => draft.halls.some((h) => !h.delivered && !h.terminated),
   },
   {

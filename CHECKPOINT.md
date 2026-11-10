@@ -1248,3 +1248,18 @@ have transparent edges; the power timeline labels stay inside the panel.
 | scope | engine ledger/fast-forward unchanged; display-only projection |
 | full gates | done: 526 unit, 75 e2e bounded groups, lint, tsc, build; final seasoning-copy condition focused ledger test rechecked |
 | visual | inspected: 1280 future obligations omit completed rows and old opening date |
+
+# User priority - explain actions, monthly attention and decisions before play
+
+| criterion | status |
+|---|---|
+| count | done: always-visible Actions this month: X of Y left, both main header and guide; live reservation/removal/reset tested |
+| why limited | done: first-time in-campus help explains game budget models developer attention, not number of workers; unused budget does not carry over |
+| what a decision means | done: concrete equipment/permit/build/meeting examples; Plan reversible until End month, recurring jobs progress automatically |
+| goal | done: complete halls before tenant deadlines then sell/refinance, without running out of money |
+| before acting | done: Uses N actions / No monthly action used, cash price and plain consequence on each object/search row; core actions distinguish starting a process from completing it |
+| later costs | done: event previews name next-month actions rather than AP; existing event test updated for words only |
+| revisit | done: clicking header count reopens help; dismissal saved through existing coach-tip state, no schema change |
+| full gates | done: 527 unit, 76 e2e in bounded groups, lint, tsc, build |
+| visual | inspected: 1280 and1440 introduction and1280 study/switchgear previews, count and End month readable |
+| grid | skipped: words/UI only; three-action rule, engine, bot and save shape unchanged |

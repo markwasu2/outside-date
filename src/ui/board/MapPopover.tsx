@@ -3,6 +3,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { formatMonth } from '../../engine/format';
 import { checkAction, useStore } from '../store';
 import { buildRows } from '../components/TracksPanel';
+import { actionCostWords, decisionResult } from './decisionWords';
 import { DocketBrief } from './DocketBrief';
 import { Term } from '../Term';
 import { boardActionsForObject, boardObjectTagline, laydownOrders } from './actions';
@@ -132,7 +133,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
         {objectId === 'laydownYard' && (() => {
           const row = buildRows('construction', state, content, null).find((r) => r.key === 'importCrews')!;
           const check = checkAction(committed, content, plan, row.action);
-          return <button data-testid="popover-action" disabled={!check.ok} title={check.ok ? row.help : check.reason} onClick={() => { queueAction(row.action); setFeedback(`${row.label} planned. Review or undo from Plan. End month to commit.`); }} style={{ width: '100%', padding: 6, marginBottom: 8 }}>{row.label} ({row.ap} AP, {row.cashLabel})</button>;
+          return <button data-testid="popover-action" disabled={!check.ok} title={check.ok ? row.help : check.reason} onClick={() => { queueAction(row.action); setFeedback(`${row.label} planned. Review or undo from Plan. End month to commit.`); }} style={{ width: '100%', padding: 6, marginBottom: 8 }}>{row.label} ({actionCostWords(row.ap)}; {row.cashLabel})</button>;
         })()}
         {objectId === 'siteOffice' && <DocketBrief state={state} content={content} />}
         {objectId === 'siteOffice' && (
@@ -174,7 +175,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
             return (
               <Fragment key={r.key}><button
                 disabled={!check.ok}
-                title={check.ok ? r.help : check.reason}
+                title={check.ok ? decisionResult(r.action,state,content,r.help) : check.reason}
                 data-testid="popover-action"
                 onClick={() => {
                   queueAction(r.action);
@@ -194,9 +195,9 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
                 }}
               >
                 <div>
-                  <strong>{r.label}</strong> ({r.ap} AP, {r.cashLabel})
+                  <strong>{r.label}</strong> ({actionCostWords(r.ap)}; {r.cashLabel})
                 </div>
-                <div style={{ fontSize: '0.7rem', color: check.ok ? '#555' : '#b71c1c' }}>{check.ok ? r.help : check.reason}</div>
+                <div style={{ fontSize: '0.7rem', color: check.ok ? '#555' : '#b71c1c' }}>{check.ok ? decisionResult(r.action,state,content,r.help) : check.reason}</div>
               </button>
               {!check.ok && <button style={{ fontSize: 11, marginBottom: 6 }} onClick={() => setFeedback(`${r.label}: ${check.reason}`)}>Why unavailable: {r.label}?</button>}
               </Fragment>

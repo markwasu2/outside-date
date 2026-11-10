@@ -41,7 +41,7 @@ export function describeEffect(effect: Effect): string {
   }
   if (effect.type === 'owedAp') {
     const n = effect.args[0];
-    return typeof n === 'number' ? `Costs ${n} AP next month` : 'Has consequences';
+    return typeof n === 'number' ? `Uses ${n} of next month's actions` : 'Has consequences';
   }
   if (effect.type === 'cash') {
     const amount = effect.args[0];
@@ -125,7 +125,7 @@ export function describeEffect(effect: Effect): string {
  * (resolveChipGenerationChoice). */
 const BESPOKE_CHOICE_STAKES: Record<string, (tier: string) => Record<string, string>> = {
   governor_visit: () => ({
-    host: 'Costs 1 AP next month, unlocks the $20.0M equipment rebate',
+    host: "Uses 1 of next month's actions, unlocks the $20.0M equipment rebate",
     decline: 'No visit, no rebate',
   }),
   union_pla: () => ({
