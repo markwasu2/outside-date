@@ -38,7 +38,7 @@ test('item 3: Codex modal closes on Escape and on a backdrop click', async ({ pa
   await expect(codexHeading).toHaveCount(0);
 });
 
-test('item 4: the HUD fast-forward button advances the month', async ({ page }) => {
+test('item 4: the HUD run-sim button runs the simulation and advances the month', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Tutorial' }).click();
 
@@ -49,8 +49,10 @@ test('item 4: the HUD fast-forward button advances the month', async ({ page }) 
   await expect(ffButton).toBeEnabled();
   await ffButton.click();
 
-  // Fast-forward is a synchronous engine call deferred one tick behind the busy label - wait for
-  // it to settle back to its idle label rather than asserting on the (possibly missed) busy frame.
-  await expect(ffButton).toHaveText('\u23E9 Fast forward', { timeout: 10_000 });
-  await expect(monthLabel).not.toHaveText(startMonth);
+  // Run sim is a toggle: the sim spends focus by the posture bars and advances months on its
+  // own (~0.8s/month). Wait for the running label, confirm a month passed, then pause.
+  await expect(ffButton).toContainText('Pause sim', { timeout: 10_000 });
+  await expect(monthLabel).not.toHaveText(startMonth, { timeout: 10_000 });
+  await ffButton.click();
+  await expect(ffButton).toContainText('Run sim');
 });

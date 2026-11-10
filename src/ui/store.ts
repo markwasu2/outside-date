@@ -11,6 +11,7 @@ import { applyImmediateAction, fastForward as engineFastForward, fastForwardPaus
 import type { GameState, PlannedAction, Setup } from '../engine/types';
 import { BotRng } from '../sim/rng';
 import { BOTS, playOneGame } from '../sim/runSim';
+import { choosePostureActions, DEFAULT_POSTURES, MAX_POSTURE, type PostureKey, type Postures } from './postures';
 import { SAVE_VERSION, saveGame, type SaveFile } from './save';
 import { appendSnapshot, buildFinancialSnapshot, type FinancialSnapshot } from './financials';
 import { playSound } from './sound';
@@ -286,6 +287,15 @@ interface UIStore {
    * immediately), records it in `plan` and pushes an undo snapshot. `priceTakeout` is the one
    * exception: it opens the priced-close preview instead, which only `commitTakeout` applies. */
   queueAction: (action: PlannedAction) => void;
+  /** Posture bars (0-6 per thrust): how hard the sim pushes each thrust with the month's focus.
+   * Bars steer which existing actions the sim takes; they change no engine rule. */
+  postures: Postures;
+  setPosture: (key: PostureKey, value: number) => void;
+  /** Simulation run mode: the sim spends each month's focus by the posture bars, advances the
+   * clock on its own (~0.8s/month), and pauses when a decision needs the player (event choice,
+   * takeout window, game end) or on any error. */
+  simRunning: boolean;
+  toggleSim: () => void;
   /** Reverts the most recent do-it-now action this month (LIFO). No-op with nothing applied. */
   undoLastAction: () => void;
   openTakeoutPreview: () => void;
@@ -316,6 +326,26 @@ interface UIStore {
   ) => void;
 }
 
+const POSTURES_KEY = 'outside-date-postures-v1';
+
+function loadPostures(): Postures {
+  try {
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(POSTURES_KEY) : null;
+    if (raw) return { ...DEFAULT_POSTURES, ...(JSON.parse(raw) as Partial<Postures>) };
+  } catch {
+    // fall through to defaults
+  }
+  return { ...DEFAULT_POSTURES };
+}
+
+function savePostures(postures: Postures): void {
+  try {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(POSTURES_KEY, JSON.stringify(postures));
+  } catch {
+    // posture persistence is best-effort
+  }
+}
+
 function initialState(): GameState {
   return createGame(content, 'whale', DEFAULT_SETUP, DEFAULT_NEGOTIATION, DEFAULT_SEED);
 }
@@ -323,6 +353,8 @@ function initialState(): GameState {
 export const useStore = create<UIStore>((set, get) => ({
   content,
   state: initialState(),
+  postures: loadPostures(),
+  simRunning: false,
   plan: [],
   snapshots: [],
   takeoutPreview: null,
@@ -434,6 +466,48 @@ export const useStore = create<UIStore>((set, get) => ({
     get().undoLastAction();
   },
 
+  setPosture: (key, value) => {
+    const clamped = Math.max(0, Math.min(MAX_POSTURE, Math.round(value)));
+    const postures = { ...get().postures, [key]: clamped };
+    savePostures(postures);
+    set({ postures });
+  },
+
+  toggleSim: () => {
+    if (get().simRunning) {
+      set({ simRunning: false });
+      return;
+    }
+    if (get().state.phase !== 'playing') {
+      set({ error: 'The sim can only run while the game is playing.' });
+      return;
+    }
+    set({ simRunning: true, error: null });
+    const tick = () => {
+      if (!get().simRunning) return;
+      const s = get();
+      // Pause for anything that needs the player: an event choice, the takeout window, the end.
+      if (s.state.phase !== 'playing') {
+        set({ simRunning: false });
+        return;
+      }
+      for (const action of choosePostureActions(s.state, s.content, s.postures)) {
+        get().queueAction(action);
+        if (get().error) {
+          set({ simRunning: false });
+          return;
+        }
+      }
+      get().endMonth();
+      if (get().error) {
+        set({ simRunning: false });
+        return;
+      }
+      setTimeout(tick, 800);
+    };
+    setTimeout(tick, 250);
+  },
+
   endMonth: () => {
     const { state, content: c, muted } = get();
     // Fix 12 (playtest-fixes): a pending event modal must be resolved before the month can end -
@@ -537,6 +611,7 @@ export const useStore = create<UIStore>((set, get) => ({
     const { content: c } = get();
     const next = createGame(c, scenarioId, setup, negotiation, seed, difficultyId);
     set({
+      simRunning: false,
       state: next,
       draft: next,
       plan: [],
@@ -563,6 +638,7 @@ export const useStore = create<UIStore>((set, get) => ({
 
   loadGame: (save) => {
     set({
+      simRunning: false,
       state: save.state,
       draft: save.state,
       plan: [],

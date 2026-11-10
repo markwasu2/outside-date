@@ -1,3 +1,15 @@
+# Redesign: posture bars steer a self-running simulation
+
+Playtest feedback after do-it-now: still click-and-fast-forward. The player's job is now setting four 0-6 posture bars (Permits & paperwork, Construction push, Community & people, Cash & risk) and running the sim: it spends each month's focus by the bars (largest-remainder split after baseline ops), advances the clock on its own, and pauses for event choices, the takeout window, or the end. Baseline critical-path ops (power study, long-lead gear orders, draw-freeze cures, rack confirmations) always run. Bars steer which existing actions the sim takes through the same applyAction path at the same AP costs; the candidate lists reuse the balance-tested careful archetype's builders. Manual do-it-now actions and Undo still work alongside the sim. The milestone fast-forward jump lives in the Postures drawer. No engine, tuning, balance or save change (postures persist in their own localStorage key, not the save file).
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | Bars split focus proportionally, zero bars spend nothing | PASS | allocateAp unit tests; posture budgets verified against content AP costs |
+| 2 | Sim runs months on its own and pauses for decisions | PASS | store.toggleSim loop; e2e/posture-sim.spec.ts (two auto-months, bar-steered actions) |
+| 3 | Baseline ops always run regardless of bars | PASS | choosePostureActions unit tests: month-0 option/study/docket, paperwork-only files permits, construction-only never files |
+| 4 | Full gates | PASS | 619 unit; 143 browser across 8 shards including both real-click journeys; lint, tsc, production build |
+| 5 | No engine, tuning or balance change | PASS | UI/store layer only; no sim-grid change needed |
+
 # Redesign: do-it-now actions replace plan-and-approve
 
 Playtest feedback: the loop read as clicking actions into a plan and then approving your own plan at End month, with no visible cause and effect. Actions now apply the moment they are chosen - the campus, cash and focus react immediately - with a one-level Undo per month ("Done this month" in the desk and Plan drawer). End month only advances the clock. The takeout close keeps an explicit confirm through a priced preview modal. Event choices state stakes resolved against the live state (cash left, goodwill before/after and what it moves, owed focus against next month's 6). Engine step semantics unchanged: applied actions still land before the event draw and tick.

@@ -7,7 +7,7 @@ test('amendment decision reads plainly in fast-forward feedback and ledger',asyn
  s.month=10;s.permits.docketAmendment.status='pending';s.permits.docketAmendment.decisionMonth=11;
  useStore.setState({state:s,draft:s});
  });
- await page.getByRole('button',{name:'⏩ Fast forward',exact:true}).click();
+ await page.getByRole('button',{name:'Postures',exact:true}).click();await page.getByTestId('fast-forward-jump').click();
  await expect(page.locator('body')).toContainText('"Docket amendment decision" is due soon');
  await page.evaluate(async()=>{
  // @ts-expect-error dev browser import

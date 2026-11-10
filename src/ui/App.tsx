@@ -8,6 +8,7 @@ import { WarningBanner } from './board/WarningBanner';
 import { CodexModal } from './components/CodexModal';
 import { EventNotices } from './components/EventNotices';
 import { EventModal } from './components/EventModal';import { TakeoutPreviewModal } from './components/TakeoutPreviewModal';
+import { PosturesPanel } from './components/PosturesPanel';
 import { FinancialsDrawer } from './components/FinancialsDrawer';
 import { Hud } from './components/Hud';
 import { LedgerDrawer } from './components/LedgerDrawer';
@@ -79,14 +80,15 @@ function useKeyboardShortcuts() {
 /** Desktop campus-first stage: the map owns the canvas; detail stays on demand. */
 function CampusGame() {
   const [deskOpen, setDeskOpen] = useState(false);
-  const [drawer, setDrawer] = useState<'status' | 'actions' | null>(null);
+  const [drawer, setDrawer] = useState<'status' | 'actions' | 'postures' | null>(null);
   const state = useStore((s) => s.state);
   const draft = useStore((s) => s.draft);
   const content = useStore((s) => s.content);
   const plan = useStore((s) => s.plan);
   const endMonth = useStore((s) => s.endMonth);
   const queueAction = useStore((s) => s.queueAction);
-  const fastForward = useStore((s) => s.fastForward);
+  const simRunning = useStore((s) => s.simRunning);
+  const toggleSim = useStore((s) => s.toggleSim);
   const setOpenPanel = useStore((s) => s.setOpenPanel);
   const requestedTab = useStore((s) => s.requestedTab);
   const setBoardPopover = useStore((s) => s.setBoardPopover);
@@ -117,9 +119,10 @@ function CampusGame() {
         <button data-testid="actions-remaining" aria-expanded={showBasics} onClick={() => setShowBasics(!showBasics)} style={{padding:'6px 9px',background:'#e6efdf',border:'1px solid #a6b69d',borderRadius:5}}>Focus this month: {actionsLeft} of {draft.apPerMonth} left</button>
         <span>{draft.halls.filter((h) => h.delivered).length}/{draft.halls.length} halls delivered</span>
         <span style={{ flex: 1 }} />
-        <button data-testid="fast-forward-button" disabled={state.phase !== 'playing'} onClick={fastForward}>{'\u23E9'} Fast forward</button>
+        <button data-testid="fast-forward-button" disabled={state.phase !== 'playing' && !simRunning} onClick={toggleSim}>{simRunning ? '\u23F8 Pause sim' : '\u25B6 Run sim'}</button>
         <button style={{ color: alerts.some((a) => a.level === 'critical') ? '#a52a21' : undefined, fontWeight: alerts.length ? 'bold' : undefined }} aria-expanded={drawer === 'status'} onClick={() => setDrawer(drawer === 'status' ? null : 'status')}>Status & guide{alerts.length ? ` (${alerts.length} alerts)` : ''}</button>
         <button aria-expanded={deskOpen} onClick={() => setDeskOpen(!deskOpen)}>Actions</button>
+        <button aria-expanded={drawer === 'postures'} onClick={() => setDrawer(drawer === 'postures' ? null : 'postures')}>Postures</button>
         <button aria-expanded={drawer === 'actions'} onClick={() => setDrawer(drawer === 'actions' ? null : 'actions')}>Plan</button>
       </header>
       {showBasics && <section data-testid="monthly-decisions-help" style={{padding:'10px 18px',background:'#fff9e9',borderBottom:'1px solid #cdbf9f',fontSize:13,lineHeight:1.5,flexShrink:0}}>
@@ -134,10 +137,12 @@ function CampusGame() {
         {drawer && (
           <aside data-testid={`${drawer}-drawer`} style={{ position: 'absolute', right: 12, top: 10, bottom: 10, width: drawer === 'actions' ? 400 : 600, maxWidth: '80vw', zIndex: 60, background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #d9cfb9' }}>
-              <strong>{drawer === 'actions' ? 'Done this month' : 'Status & guide'}</strong>
+              <strong>{drawer === 'actions' ? 'Done this month' : drawer === 'postures' ? 'Postures & sim' : 'Status & guide'}</strong>
               <button aria-label="Close panel" onClick={() => setDrawer(null)}>Close</button>
             </div>
-            {drawer === 'actions' ? <div style={{ flex: 1, minHeight: 0 }}><TracksPanel hideEndMonth /></div> : (
+            {drawer === 'actions' ? <div style={{ flex: 1, minHeight: 0 }}><TracksPanel hideEndMonth /></div> : drawer === 'postures' ? (
+              <PosturesPanel />
+            ) : (
               <div style={{ overflowY: 'auto', flex: 1 }}>
                 <Hud hideFastForward />
                 <div id="stat-explainer-dock" style={{ maxHeight: 150, overflowY: 'auto' }} />
