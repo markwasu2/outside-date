@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { loadContent } from '../../src/content/load';
 import type { Effect } from '../../src/content/schemas';
-import { describeChoiceEffects, describeEffect, describeVoteChoice } from '../../src/ui/components/EventModal';
+import { describeChoiceEffects, describeEffect, describeVoteChoice, hiringFairRenewalWords } from '../../src/ui/components/EventModal';
 
 const content = loadContent();
 
@@ -190,4 +190,20 @@ it('chip retrofit distinguishes remaining fitout from halls already waiting for 
  expect(text).toContain('+1 month of remaining fitout');
  expect(text).toContain('Finished fitout is not delayed.');
  expect(describeChoiceEffects('retrofit',card,'air')).toContain('no added fitout delay');
+});
+
+
+it('repeat hiring fair distinguishes replacement expiry from stacking and preserves skip',()=>{
+ const card=content.events.find(e=>e.id==='hiring_fair');
+ const state={month:37,flags:{hiringFairUntil:42}};
+ const before=JSON.stringify(state);
+ expect(hiringFairRenewalWords(state,card)).toBe('Your current crew benefit ends at the start of Y4 M7. Sponsoring again resets that end to Y4 M8, not 6 extra months. Skipping keeps your current benefit.');
+ expect(JSON.stringify(state)).toBe(before);
+ expect(hiringFairRenewalWords({month:42,flags:state.flags},card)).toBeNull();
+ expect(hiringFairRenewalWords({month:43,flags:state.flags},card)).toBeNull();
+ expect(hiringFairRenewalWords({month:37,flags:{}},card)).toBeNull();
+ expect(hiringFairRenewalWords(state,content.events.find(e=>e.id==='town_hall'))).toBeNull();
+ expect(hiringFairRenewalWords(state,null)).toBeNull();
+ const changed=structuredClone(card!);changed.choices!.find(c=>c.id==='host')!.effects.find(e=>e.type==='setFlag')!.args[1]='monthPlus:4';
+ expect(hiringFairRenewalWords(state,changed)).toContain('resets that end to Y4 M6, not 4 extra months');
 });
