@@ -223,3 +223,16 @@ it('does not let pending wetlands mitigation hide switchgear orders',()=>{
  s.permits.wetlands!.status='pending';s.power.orders.push({kind:'transformer',orderedMonth:0,arrivalMonth:24,deposit:0,price:0,arrived:false,supplier:'standard'});
  expect(nextStep(s,content).actionId).toBe('orderSwitchgear');
 });
+
+
+it('explains pending wetlands review after useful docket work is exhausted',()=>{
+ const s=powerWaitingState();s.halls[0]!.pondBlocked=true;s.permits.wetlands!.status='pending';s.permits.wetlands!.decisionMonth=9;
+ expect(nextStep(s,content)).toMatchObject({title:'Check the wetlands review',objectId:'siteOffice'});
+ expect(nextStep(s,content).why).toContain('Decision due Y1 M10');
+ expect(nextStep(s,content).actionId).toBeUndefined();
+});
+it('underway mitigation explains its finish clock rather than opening a disabled hall action',()=>{
+ const s=powerWaitingState();s.halls[0]!.pondBlocked=true;s.flags.pondMitigationDoneMonth=9;
+ expect(nextStep(s,content).title).toBe('End the month');expect(nextStep(s,content).why).toContain('until Y1 M10');
+ expect(nextStep(s,content).why).toContain('no further mitigation instruction');
+});
