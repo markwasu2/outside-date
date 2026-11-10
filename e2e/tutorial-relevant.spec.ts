@@ -7,4 +7,9 @@ test('tutorial never offers waived transformer/docket choices and queued study k
  await page.locator('[data-campus-object="siteOffice"]').click();
  for(const name of ['File the power docket','Prepare testimony','Answer discovery'])await expect(popup.getByTestId('popover-action').filter({hasText:name})).toHaveCount(0);
  await page.screenshot({path:'docs/screenshots/cold2/tutorial-relevant-office.png'});
+ await popup.getByRole('button',{name:'Close',exact:true}).click();
+ await expect(page.getByTestId('local-grid-supply')).toContainText('No power docket needed');
+ await expect(page.getByTestId('plant-buildout-A')).toHaveCount(0);
+ await expect(page.getByTestId('map-root')).not.toContainText('needs docket');
+ await page.screenshot({path:'docs/screenshots/cold2/tutorial-local-grid.png'});
 });
