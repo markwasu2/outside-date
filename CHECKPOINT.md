@@ -1140,3 +1140,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 521 unit, 66 e2e, lint, tsc, build |
 | visual | done: actual1440 closing review inspected, both totals/terms/Start visible |
 | grid | skipped: UI-only, engine/save shape unchanged |
+
+# Playthrough 4 expansion choice - funding and far-pad disclosure
+
+| criterion | status |
+|---|---|
+| funding before yes | done: dry-run exact yes effects show added equity/senior/mezz commitments; called-as-costs-arrive not free cash |
+| spatial cost | done: remaining near pads, per-far-hall feeder, extra months and monthly line losses visible |
+| cutoff | retained: actual maxMonths, no expansion extension, in-window takeout rule explained |
+| full gates | done: 521 unit, 66 e2e, lint, tsc, build |
+| visual | done: 1280 card inspected, full funding/pad text and both choices fit |
+| grid | skipped: precommit disclosure only, engine and saves unchanged |

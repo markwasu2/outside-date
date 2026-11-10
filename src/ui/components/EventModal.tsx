@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+import { applyEffect } from '../../engine/effects';
+import { resolveContent } from '../../engine/resolve';
 import type { Effect, EventCard } from '../../content/schemas';
 import { formatDollars, formatMonth } from '../../engine/format';
 import type { GoodwillGroup } from '../../engine/types';
@@ -193,6 +195,16 @@ export function EventModal() {
   const body = isSynthetic ? DOCKET_VOTE_FAIL_CARD.body : pending.body ?? eventCard?.body ?? '';
   const claim = [...draft.claims].reverse().find((c) => c.cardId === pending.cardId && c.month === draft.month) ?? null;
   const codexId = isSynthetic ? undefined : eventCard?.codexId;
+  const expansion = pending.cardId === 'the_ask' ? (() => {
+    const resolved = resolveContent(draft,content);
+    const yes = eventCard?.choices?.find(c=>c.id==='yes');
+    if (!yes) return null;
+    const after = yes.effects.reduce((s,e)=>applyEffect(s,e,resolved),draft);
+    const spatial = resolved.tuning.spatial;
+    const nearTaken = draft.halls.filter(h=>!h.terminated && h.stageIndex>=0 && (h.pad??'near')==='near').length;
+    const nearLeft = Math.max(0,spatial.nearPads-nearTaken);
+    return {equity:after.equity.committedTotal-draft.equity.committedTotal,senior:after.debt.seniorCommitment-draft.debt.seniorCommitment,mezz:after.debt.mezzCommitment-draft.debt.mezzCommitment,nearLeft,spatial};
+  })() : null;
 
   return (
     <div
@@ -220,6 +232,10 @@ export function EventModal() {
         {pending.cardId === 'the_ask' && <p data-testid="expansion-cutoff" style={{background:'#f3e8ce',padding:8,fontSize:13}}>
           Campaign cutoff: {formatMonth(draft.maxMonths)}. You must price the takeout then, even if added halls are unfinished or still inside their outside dates. Expansion does not extend this deadline. Before the cutoff, takeout waits for unfinished halls that are still inside their outside dates.
         </p>}
+        {expansion && <div data-testid="expansion-funding" style={{background:'#f3e8ce',padding:8,fontSize:13,marginBottom:10}}>
+          <div>Saying yes adds commitments: equity +{formatDollars(expansion.equity)}, senior +{formatDollars(expansion.senior)}, mezz +{formatDollars(expansion.mezz)}. Equity is called as costs arrive; this is not free cash.</div>
+          <div style={{marginTop:5}}>Near pads remaining: {expansion.nearLeft}, shared by all unstarted halls. Each far-pad hall adds a {formatDollars(expansion.spatial.farFeederCost)} feeder at groundbreak, {expansion.spatial.farPadExtraMonths} extra pad months, and {formatDollars(expansion.spatial.farLineLossPerMonth)}/month in line losses once delivered.</div>
+        </div>}
         {claim && (
           <div data-testid="claim-breakdown" style={{ margin: '0.5rem 0', padding: '0.5rem', background: '#f5f5f0', border: '1px solid #ddd', borderRadius: 4, fontSize: '0.8rem' }}>
             <div>Loss: {formatDollars(claim.gross)}</div>
