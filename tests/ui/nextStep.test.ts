@@ -191,3 +191,21 @@ it('explains the real monthly work rather than promising a construction mileston
  expect(nextStep(s,content).why).toContain('Use End month below');
  expect(nextStep(s,content).why).toContain('tenant deadline');
 });
+
+
+it('recommends refiling a denied required permit before a hall reaches its blocked stage', () => {
+ const s=freshState();s.power.studyStatus='pending';fileAllPermits(s);
+ s.permits.water!.status='denied';
+ expect(s.halls[0]!.stageIndex).toBe(-1);
+ expect(nextStep(s,content)).toMatchObject({title:'Refile the water permit',objectId:'pond',actionId:'filePermit',params:{permitId:'water'}});
+ expect(nextStep(s,content).why).toContain('starts a new review');
+ s.permits.water!.status='pending';expect(nextStep(s,content).actionId).toBe('orderTransformer');
+ s.permits.water!.status='granted';expect(nextStep(s,content).actionId).toBe('orderTransformer');
+});
+it('denied permits retain the longest-review-first priority and focus guard', () => {
+ const s=freshState();s.power.studyStatus='pending';fileAllPermits(s);
+ s.permits.water!.status='denied';s.permits.building!.status='none';
+ expect(nextStep(s,content).params).toEqual({permitId:'water'});
+ expect(nextStep(s,content,0).title).toBe('End the month');
+ expect(nextStep(s,content,0).why).toContain('Refile the water permit needs');
+});

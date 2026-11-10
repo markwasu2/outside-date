@@ -94,7 +94,7 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
   }
 
   // 2. File permits - the longest one first, since they run in parallel with everything else.
-  const unfiled = state.permitsRequired.filter((id) => state.permits[id]?.status === 'none');
+  const unfiled = state.permitsRequired.filter((id) => ['none', 'denied'].includes(state.permits[id]?.status ?? ''));
   if (unfiled.length > 0) {
     const longest = [...unfiled].sort(
       (a, b) =>
@@ -104,9 +104,12 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
     if (longest) {
       const months = resolved.tuning.permits[longest as keyof typeof resolved.tuning.permits]?.months ?? 0;
       const waterSide = longest === 'water' || longest === 'wetlands';
+      const denied = state.permits[longest]?.status === 'denied';
       return {
-        title: `File the ${longest} permit`,
-        why: `It takes about ${months} months, the longest of your unfiled permits - file the long one first so it does not gate construction.`,
+        title: `${denied ? 'Refile' : 'File'} the ${longest} permit`,
+        why: denied
+          ? `The ${longest} permit was denied. Refiling starts a new review of about ${months} months. Restart this clock now, before it blocks construction.`
+          : `It takes about ${months} months, the longest of your unfiled permits - file the long one first so it does not gate construction.`,
         objectId: waterSide ? 'pond' : 'siteOffice',
         actionId: 'filePermit',
         params: { permitId: longest },
