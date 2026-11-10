@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { formatMonth } from '../../engine/format';
 import { checkAction, useStore } from '../store';
+import { buildRows } from '../components/TracksPanel';
 import { Term } from '../Term';
 import { boardActionsForObject, boardObjectTagline, laydownOrders } from './actions';
 
@@ -24,6 +25,7 @@ interface MapPopoverProps {
 }
 
 const OBJECT_TITLES: Record<string, string> = {
+  road: 'Land & access road',
   substation: 'Substation',
   pond: 'Pond',
   siteOffice: 'Site office',
@@ -32,6 +34,7 @@ const OBJECT_TITLES: Record<string, string> = {
 };
 
 export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
+  const [officeView, setOfficeView] = useState<'permits' | 'money' | 'capital'>('permits');
   const state = useStore((s) => s.state);
   const content = useStore((s) => s.content);
   const plan = useStore((s) => s.plan);
@@ -76,7 +79,9 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
 
   const hall = state.halls.find((h) => h.id === objectId);
   const title = hall ? `${hall.id} (${hall.mwIT} MW)` : (OBJECT_TITLES[objectId] ?? objectId);
-  const rows = boardActionsForObject(objectId, state, content);
+  const rows = objectId === 'road' ? buildRows('land', state, content, null)
+    : objectId === 'siteOffice' && officeView !== 'permits' ? buildRows(officeView, state, content, null)
+    : boardActionsForObject(objectId, state, content);
   const tagline = boardObjectTagline(objectId, state);
   const orders = objectId === 'laydownYard' ? laydownOrders(state) : [];
 
@@ -106,8 +111,8 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
           <strong>{title}</strong>
-          <button onClick={onClose} aria-label="Close" style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '0.8rem' }}>
-            x
+          <button onClick={onClose} aria-label="Close" style={{ border: '1px solid #b9ab8e', borderRadius: 4, background: '#f4ead5', padding: '3px 8px', cursor: 'pointer', fontSize: '0.8rem' }}>
+            Close
           </button>
         </div>
         {showTeaching && (
@@ -118,6 +123,23 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
           </div>
         )}
 
+        {objectId === 'laydownYard' && (() => {
+          const row = buildRows('construction', state, content, null).find((r) => r.key === 'importCrews')!;
+          const check = checkAction(state, content, plan, row.action);
+          return <button data-testid="popover-action" disabled={!check.ok} title={check.ok ? row.help : check.reason} onClick={() => { queueAction(row.action); onClose(); }} style={{ width: '100%', padding: 6, marginBottom: 8 }}>{row.label} ({row.ap} AP, {row.cashLabel})</button>;
+        })()}
+        {objectId === 'siteOffice' && (
+          <div style={{ display: 'flex', gap: 4, marginBottom: 8, flexWrap: 'wrap' }}>
+            <button aria-pressed={officeView === 'permits'} onClick={() => setOfficeView('permits')}>Permits & people</button>
+            <button aria-pressed={officeView === 'money'} onClick={() => setOfficeView('money')}>Insurance & lender</button>
+            <button aria-pressed={officeView === 'capital'} onClick={() => setOfficeView('capital')}>Raise capital</button>
+          </div>
+        )}
+        {objectId === 'powerPlants' && (
+          <div style={{ marginBottom: 8 }}>
+            {state.power.plants.map((p) => <p key={p.id} style={{ margin: '4px 0' }}>Plant {p.id}: {p.onlineMonth !== null && p.onlineMonth <= state.month ? `online, ${p.mwGrid} MW` : p.plannedOnlineMonth !== null ? `${p.slipped ? 'delayed' : 'building'}, online ${formatMonth(p.onlineMonth ?? p.plannedOnlineMonth)}, ${p.mwGrid} MW` : 'waiting for the power docket to pass'}</p>)}
+          </div>
+        )}
         {objectId === 'laydownYard' ? (
           <>
             {/* Phase 7 (scarcity pack): the yard is a real constraint now - show the load. */}

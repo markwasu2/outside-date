@@ -4,7 +4,8 @@ test('illustrated access road keeps its label and transmission clues visible', a
   await page.goto('/');
   await page.getByTestId('quick-start').click();
   const road = page.getByTestId('map-road');
-  await expect(road.locator('img')).toBeVisible();
+  await expect(page.getByTestId('map-root')).toHaveAttribute('data-campus-scene', 'true');
+  await expect(road.locator('img')).toBeHidden(); // Access road is now part of the shared ground illustration.
   await expect(road).toContainText('Road');
   await page.screenshot({ path: 'docs/screenshots/cold2/art-road.png' });
 });

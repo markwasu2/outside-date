@@ -35,7 +35,7 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       {/* pictorial layer: the stage illustration over its warm fallback color */}
-      <div style={{ position: 'absolute', inset: 0, background: look?.bg, borderRadius: 6, overflow: 'hidden' }} aria-hidden="true">
+      <div style={{ position: 'absolute', inset: 0, background: 'transparent', borderRadius: 6, overflow: 'hidden' }} aria-hidden="true">
         {look?.img && (
           <img
             src={look.img}
@@ -43,7 +43,7 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
+              objectFit: 'contain',
               display: 'block',
               opacity: visual.flags.terminated ? 0.45 : 1,
               filter: visual.flags.terminated ? 'grayscale(0.6)' : undefined,
