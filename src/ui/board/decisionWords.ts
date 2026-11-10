@@ -13,6 +13,11 @@ export function decisionResult(action:PlannedAction,state:GameState,content:Cont
  case 'orderSwitchgear':return 'Books the electrical switchgear and pays the deposit. When the study and equipment are ready, substation construction starts automatically.';
  case 'filePermit':return `Asks for the ${String(action.params?.permitId)} permit. Starts its review clock, not an immediate approval. Work that needs this permit must wait.`;
  case 'fileDocket':return 'Starts the regulator\'s power-approval case. You must prepare testimony and meet opposing groups before the vote. Filing is not approval.';
+ case 'prepTestimony':{
+ const gain=Math.max(0,Math.min(t.docket.testimonyBonus,t.docket.testimonyCap-state.docket.testimonyBonus));
+ const consequence=state.flags.lastPrepTestimonyMonth===state.month-1?' Preparing again this month also costs commission goodwill -1.':'';
+ return gain===0?`Testimony is already at its ${Math.round(t.docket.testimonyCap*100)}% cap. More preparation spends focus but adds no vote chance.${consequence}`:`Adds ${Math.round(gain*100)} percentage points to the testimony bonus, up to ${Math.round(t.docket.testimonyCap*100)}%.${consequence}`;
+ }
  case 'optionSite':return 'Secures this land using your funding commitments. Required before you can break ground; it does not build a hall yet.';
  case 'advanceHall':{
  const h=state.halls.find(h=>h.id===action.params?.hallId);
@@ -27,7 +32,7 @@ export function decisionResult(action:PlannedAction,state:GameState,content:Cont
 
 /** These choices cannot help right now because they are already underway/done or
  * there is no fault to cure. Missing prerequisites and budget remain in the main list. */
-export function isContextOnlyAction(action:PlannedAction,state:GameState):boolean {
+export function isContextOnlyAction(action:PlannedAction,state:GameState,content?:Content):boolean {
  switch(action.actionId){
  case 'commissionStudy':return state.power.studyStatus!=='none';
  case 'orderTransformer':case 'orderSwitchgear':return state.power.substationStatus!=='none'||state.power.orders.some(o=>o.kind===(action.actionId==='orderTransformer'?'transformer':'switchgear'));
@@ -37,7 +42,7 @@ export function isContextOnlyAction(action:PlannedAction,state:GameState):boolea
  case 'confirmRackSchedule':return !!state.flags.rackScheduleConfirmed;
  case 'fileDocket':return state.docket.status!=='none';
  case 'answerDiscovery':return !hasLiveDiscovery(state);
- case 'prepTestimony':return ['approved','dead'].includes(state.docket.status);
+ case 'prepTestimony':return ['approved','dead'].includes(state.docket.status)||(!!content&&state.docket.testimonyBonus>=resolveContent(state,content).tuning.docket.testimonyCap);
  case 'meetIntervenor':return ['approved','dead'].includes(state.docket.status)||!!state.docket.intervenors.find(i=>i.id===action.params?.intervenorId)?.settled;
  default:return false;
  }
