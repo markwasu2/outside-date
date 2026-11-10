@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { expansionPowerWords } from '../board/powerWords';
 import { applyEffect } from '../../engine/effects';
 import { resolveContent } from '../../engine/resolve';
-import type { Effect, EventCard } from '../../content/schemas';
+import type { Content, Effect, EventCard } from '../../content/schemas';
 import { formatDollars, formatMonth } from '../../engine/format';
 import type { GoodwillGroup } from '../../engine/types';
 import { playSound } from '../sound';
@@ -172,6 +172,14 @@ export function describeChoiceEffects(
   return Array.from(new Set(parts)).join(', ');
 }
 
+/** The first-failed-vote card is synthetic, so it needs the same tuning the
+ * handler uses rather than looking for a missing content.events definition. */
+export function describeVoteChoice(choiceId: string, tuning: Content['tuning']['docket']): string {
+  if (choiceId === 'appeal') return `No cash cost; vote +${tuning.appealMonths} months, odds bonus +${Math.round(tuning.appealBonus * 100)} percentage points. Existing meetings stay settled.`;
+  if (choiceId === 'redesign') return `Costs ${formatDollars(tuning.redesignCost)}; vote +${tuning.redesignMonths} months, odds bonus +${Math.round(tuning.redesignBonus * 100)} percentage points. All intervenors reopen; each requires one fewer meeting (at least 1).`;
+  return '';
+}
+
 export function EventModal() {
   const draft = useStore((s) => s.draft);
   const content = useStore((s) => s.content);
@@ -239,6 +247,7 @@ export function EventModal() {
         {target && <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:1,color:'#72572b',marginBottom:6}}>At {target.label}</div>}
         <h2 style={{ marginTop: 0 }}>{title}</h2>
         <p>{body}</p>
+        {isSynthetic && <p data-testid="failed-vote-warning" style={{fontSize:13}}>Neither option guarantees approval. If the next vote fails, the docket dies and the plants cannot proceed.</p>}
         {pending.cardId === 'the_ask' && <p data-testid="expansion-cutoff" style={{background:'#f3e8ce',padding:8,fontSize:13}}>
           Campaign cutoff: {formatMonth(draft.maxMonths)}. You must price the takeout then, even if added halls are unfinished or still inside their outside dates. Expansion does not extend this deadline. Before the cutoff, takeout waits for unfinished halls that are still inside their outside dates.
         </p>}
@@ -281,7 +290,7 @@ export function EventModal() {
         })()}
         <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
           {pending.choices.map((choice) => {
-            const costText = describeChoiceEffects(choice.id, eventCard, draft.setup.hallTier);
+            const costText = isSynthetic ? describeVoteChoice(choice.id, resolveContent(draft, content).tuning.docket) : describeChoiceEffects(choice.id, eventCard, draft.setup.hallTier);
             return (
               <button
                 key={choice.id}

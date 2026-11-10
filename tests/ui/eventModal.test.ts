@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { loadContent } from '../../src/content/load';
 import type { Effect } from '../../src/content/schemas';
-import { describeChoiceEffects, describeEffect } from '../../src/ui/components/EventModal';
+import { describeChoiceEffects, describeEffect, describeVoteChoice } from '../../src/ui/components/EventModal';
 
 const content = loadContent();
 
@@ -156,4 +156,15 @@ it('partner dispute states dilution versus a temporary all-hall pause',()=>{
  expect(wait).toBe('All halls pause for 1 month, Cash -$10.0M');
  expect(describeEffect({type:'hallPause',args:['randomActive','untilFixed']})).toBe('A hall stops work until the problem is fixed');
  expect(describeEffect({type:'playerShare',args:['invalid']})).toBe('Has consequences');
+});
+
+
+it('failed vote choices expose tuning-derived time, money and meeting consequences',()=>{
+ const t=content.tuning.docket;
+ expect(describeVoteChoice('appeal',t)).toContain(`vote +${t.appealMonths} months`);
+ expect(describeVoteChoice('appeal',t)).toContain('Existing meetings stay settled');
+ const changed={...t,redesignCost:23000000,redesignMonths:3,redesignBonus:0.12};
+ expect(describeVoteChoice('redesign',changed)).toContain('Costs $23.0M; vote +3 months, odds bonus +12 percentage points');
+ expect(describeVoteChoice('redesign',changed)).toContain('All intervenors reopen');
+ expect(describeVoteChoice('unknown',t)).toBe('');
 });
