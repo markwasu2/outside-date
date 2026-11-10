@@ -25,6 +25,7 @@ interface MapPopoverProps {
 }
 
 const OBJECT_TITLES: Record<string, string> = {
+  people: 'People on site',
   road: 'Land & access road',
   substation: 'Substation',
   pond: 'Pond',
@@ -81,6 +82,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
   const title = hall ? `${hall.id} (${hall.mwIT} MW)` : (OBJECT_TITLES[objectId] ?? objectId);
   const rows = objectId === 'road' ? buildRows('land', state, content, null)
     : objectId === 'siteOffice' && officeView !== 'permits' ? buildRows(officeView, state, content, null)
+    : objectId === 'people' ? boardActionsForObject('siteOffice', state, content).filter((r) => r.action.actionId === 'visitCast' || r.action.actionId === 'meetIntervenor')
     : boardActionsForObject(objectId, state, content);
   const tagline = boardObjectTagline(objectId, state);
   const orders = objectId === 'laydownYard' ? laydownOrders(state) : [];

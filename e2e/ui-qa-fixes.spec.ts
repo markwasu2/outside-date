@@ -1,4 +1,4 @@
-import { openActions } from './campusNavigation';
+import { filterActions, openActions } from './campusNavigation';
 import { expect, test } from '@playwright/test';
 
 /**
@@ -11,7 +11,7 @@ test('finding #1: the Regulation tab never shows a docketAmendment permit row', 
   await page.goto('/');
   await page.getByRole('button', { name: 'Tutorial' }).click();
   await openActions(page);
-  await page.getByRole('button', { name: 'Regulation', exact: true }).click();
+  await filterActions(page, 'Regulation');
 
   await expect(page.getByText('File air permit')).toBeVisible();
   await expect(page.getByText('File water permit')).toBeVisible();

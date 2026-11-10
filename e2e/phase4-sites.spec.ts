@@ -1,4 +1,4 @@
-import { openActions } from './campusNavigation';
+import { filterActions, openActions } from './campusNavigation';
 import { expect, test, type Page } from '@playwright/test';
 
 /** Phase 4 (pillar A): the setup step offers three site cards per scenario, picking one
@@ -72,7 +72,7 @@ async function queueEveryLegalAction(page: Page) {
   for (const tabName of TAB_NAMES) {
     if ((await page.getByRole('heading', { name: 'Rating the campus' }).count()) > 0) return;
     await openActions(page);
-    await page.getByRole('button', { name: tabName, exact: true }).click();
+    await filterActions(page, tabName);
     const queuedNames = new Set<string>();
     for (let guard = 0; guard < 20; guard += 1) {
       const buttons = page.getByTestId('action-row-button').and(page.locator(':enabled'));

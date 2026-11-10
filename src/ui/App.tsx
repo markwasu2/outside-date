@@ -106,7 +106,7 @@ function CampusGame() {
         <span style={{ flex: 1 }} />
         <button data-testid="fast-forward-button" disabled={plan.length > 0 || state.phase !== 'playing'} onClick={fastForward}>{'\u23E9'} Fast forward</button>
         <button style={{ color: alerts.some((a) => a.level === 'critical') ? '#a52a21' : undefined, fontWeight: alerts.length ? 'bold' : undefined }} aria-expanded={drawer === 'status'} onClick={() => setDrawer(drawer === 'status' ? null : 'status')}>Status & guide{alerts.length ? ` (${alerts.length} alerts)` : ''}</button>
-        <button aria-expanded={drawer === 'actions'} onClick={() => setDrawer(drawer === 'actions' ? null : 'actions')}>All actions</button>
+        <button aria-expanded={drawer === 'actions'} onClick={() => setDrawer(drawer === 'actions' ? null : 'actions')}>Plan</button>
       </header>
       <div data-testid="next-step-card" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 18px', fontSize: 12, background: '#e8e1cf', borderBottom: '1px solid #cdbf9f', flexShrink: 0 }}>
         <span style={{ flex: 1 }}><strong>Next: {step.title}</strong> - {step.why}</span>
@@ -117,7 +117,7 @@ function CampusGame() {
         {drawer && (
           <aside data-testid={`${drawer}-drawer`} style={{ position: 'absolute', right: 12, top: 10, bottom: 10, width: drawer === 'actions' ? 400 : 600, maxWidth: '80vw', zIndex: 60, background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #d9cfb9' }}>
-              <strong>{drawer === 'actions' ? 'All actions' : 'Status & guide'}</strong>
+              <strong>{drawer === 'actions' ? "This month's plan" : 'Status & guide'}</strong>
               <button aria-label="Close panel" onClick={() => setDrawer(null)}>Close</button>
             </div>
             {drawer === 'actions' ? <div style={{ flex: 1, minHeight: 0 }}><TracksPanel hideEndMonth /></div> : (

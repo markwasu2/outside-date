@@ -1,4 +1,4 @@
-import { openActions, openStatus } from './campusNavigation';
+import { filterActions, openActions, openStatus } from './campusNavigation';
 import { expect, test, type Page } from '@playwright/test';
 
 /**
@@ -12,7 +12,7 @@ async function startTutorialOnLandTab(page: Page) {
   await page.goto('/');
   await page.getByRole('button', { name: 'Tutorial' }).click();
   await openActions(page);
-  await page.getByRole('button', { name: 'Land', exact: true }).click();
+  await filterActions(page, 'Land');
 }
 
 test('finding #1: the tutorial fundExtensions trap is disabled with a runway reason', async ({ page }) => {
@@ -41,7 +41,7 @@ test('finding #6: tutorial action rows show scenario-resolved costs, not whale p
   await expect(page.getByTestId('action-row-button').filter({ hasText: 'Option the site' })).toContainText('$0');
 
   await openActions(page);
-  await page.getByRole('button', { name: 'Power', exact: true }).click();
+  await filterActions(page, 'Power');
   // tutorial-edge5's power overrides: $500K study / $500K switchgear deposit (were $2.0M/$3.0M).
   await expect(page.getByTestId('action-row-button').filter({ hasText: 'Commission the interconnection study' })).toContainText('$500K');
   await expect(page.getByTestId('action-row-button').filter({ hasText: 'Order the switchgear' })).toContainText('$500K');
@@ -54,10 +54,10 @@ test('finding #3: the scripted storm shows a HUD draw-freeze indicator and a log
   // Month 0: option the site and file the building permit so H1 is mid-stage when the scripted
   // month-7 storm lands (stormDamage only hits a hall active in pad/steel/shell).
   await openActions(page);
-  await page.getByRole('button', { name: 'Land', exact: true }).click();
+  await filterActions(page, 'Land');
   await page.getByTestId('action-row-button').filter({ hasText: 'Option the site' }).click();
   await openActions(page);
-  await page.getByRole('button', { name: 'Regulation', exact: true }).click();
+  await filterActions(page, 'Regulation');
   await page.getByTestId('action-row-button').filter({ hasText: 'File building permit' }).click();
   await page.getByRole('button', { name: 'End month' }).click();
 
@@ -73,7 +73,7 @@ test('finding #3: the scripted storm shows a HUD draw-freeze indicator and a log
       continue;
     }
     await openActions(page);
-    await page.getByRole('button', { name: 'Construction', exact: true }).click();
+    await filterActions(page, 'Construction');
     const advance = page.getByTestId('action-row-button').filter({ hasText: 'Advance construction: H1' });
     if ((await advance.count()) > 0 && (await advance.isEnabled())) await advance.click();
     await page.getByRole('button', { name: 'End month' }).click();
