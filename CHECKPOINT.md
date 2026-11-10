@@ -1202,3 +1202,15 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 523 unit, 72 e2e, lint, tsc, build |
 | visual | inspected: six-hall 1440 campus, no detached strips or large rings, progress/Planned labels readable |
 | grid | skipped: visual/copy only, engine and saves unchanged |
+
+# Playthrough 4 - transparent docket chance and discovery loop
+
+| criterion | status |
+|---|---|
+| odds | done: live draft chance, base/testimony/settled/goodwill/appeal components and clamp limits in site office and guide |
+| meetings | done: named groups with completed/required meetings and settlement status |
+| discovery | done: received count, per-check chance, response deadline, explicit answers do not end discovery or raise vote chance |
+| scope | repetition rule unchanged; changing frequency is an engine/balance follow-up, not silently retuned |
+| full gates | done: 524 unit, 73 e2e, lint, tsc, build |
+| visual | inspected: actual1280 site-office popup, 45% current chance and 30% recurring request chance readable |
+| grid | skipped: read-only UI projections, engine/save unchanged |

@@ -5,6 +5,7 @@ import type { GameState } from '../../engine/types';
 import { Gloss } from '../Gloss';
 import { useStore } from '../store';
 import { Term } from '../Term';
+import { DocketBrief } from './DocketBrief';
 import { nextStep } from './nextStep';
 
 /**
@@ -64,7 +65,7 @@ function Dot({ state, label, title }: { state: 'done' | 'pending' | 'todo'; labe
 }
 
 export function ProgressSpine({ hideNextStep = false }: { hideNextStep?: boolean }) {
-  const state = useStore((s) => s.state);
+  const state = useStore((s) => s.draft);
   const content = useStore((s) => s.content);
   const selectHall = useStore((s) => s.selectHall);
   const setBoardPopover = useStore((s) => s.setBoardPopover);
@@ -139,6 +140,7 @@ export function ProgressSpine({ hideNextStep = false }: { hideNextStep?: boolean
         Permits: {permitsGranted}/{permitsTotal}
       </span>
 
+      <DocketBrief state={state} content={content} />
       <span style={SECTION} title="Power docket status and intervenor meetings done over needed">
         <Gloss id="docket" gloss="the regulator's case file for your power request">Docket</Gloss>: {docketSummary(state)}
         {state.docketEnabled && meetingsNeeded > 0 && ` (meetings ${meetingsDone}/${meetingsNeeded})`}

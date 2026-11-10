@@ -3,6 +3,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { formatMonth } from '../../engine/format';
 import { checkAction, useStore } from '../store';
 import { buildRows } from '../components/TracksPanel';
+import { DocketBrief } from './DocketBrief';
 import { Term } from '../Term';
 import { boardActionsForObject, boardObjectTagline, laydownOrders } from './actions';
 
@@ -133,6 +134,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
           const check = checkAction(committed, content, plan, row.action);
           return <button data-testid="popover-action" disabled={!check.ok} title={check.ok ? row.help : check.reason} onClick={() => { queueAction(row.action); setFeedback(`${row.label} planned. Review or undo from Plan. End month to commit.`); }} style={{ width: '100%', padding: 6, marginBottom: 8 }}>{row.label} ({row.ap} AP, {row.cashLabel})</button>;
         })()}
+        {objectId === 'siteOffice' && <DocketBrief state={state} content={content} />}
         {objectId === 'siteOffice' && (
           <div style={{ display: 'flex', gap: 4, marginBottom: 8, flexWrap: 'wrap' }}>
             <button aria-pressed={officeView === 'permits'} onClick={() => setOfficeView('permits')}>Permits & people</button>
