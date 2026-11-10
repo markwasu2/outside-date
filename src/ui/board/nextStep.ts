@@ -68,7 +68,7 @@ function whileYouWait(state: GameState, remainingFocus: number): string | undefi
   const unfiled = state.permitsRequired.filter((id) => ['none', 'denied'].includes(state.permits[id]?.status ?? ''));
   if (unfiled.length > 0 && remainingFocus >= 1) prep.push(`file the ${unfiled.join(' and ')} permit${unfiled.length > 1 ? 's' : ''} (1 focus each)`);
   if (prep.length === 0) return undefined;
-  return `While you wait, you can ${prep.join('; ')} - find them in Actions.`;
+  return `While you wait, you can ${prep.join('; ')} - find ${prep.length > 1 ? 'them' : 'it'} in Actions.`;
 }
 
 function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
