@@ -1390,3 +1390,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | saves | no shape change or migration needed |
 | gates | done:539 unit,85 browser bounded groups/focused rerun,lint,tsc,build |
 | visual | inspected:1280 plant wait advancesY3M1 toY3M6,stops ahead ofPlantA online with explicit reason |
+
+# Personal live replay - notice covers the office title and Close
+
+| criterion | status |
+|---|---|
+| reproduced | live TutorialY1M3 via personal real browser clicks: lender notice covered office title/Close |
+| fix | transient no-choice notice is quiet while an object popup is open; history remains in Status & guide |
+| copy | Money-tab direction becomes site office: Insurance & lender |
+| regression | browser creates lender notice, follows Show me and confirms clear Close/cure action |
+| gates |539unit,86browser in bounded groups,lint,tsc,build;1280pixels inspected |
+| scope | presentation only,no rule/save/bot change or new grid |
