@@ -181,3 +181,13 @@ describe('subpoena choice disclosure', () => {
     expect(describeEffect({ type: 'goodwill', args: ['town', -10, 'p:bogus'] })).toBe('Town goodwill -10');
   });
 });
+
+
+it('chip retrofit distinguishes remaining fitout from halls already waiting for power', () => {
+ const card=content.events.find(e=>e.id==='chip_generation');
+ const text=describeChoiceEffects('retrofit',card,'liquid');
+ expect(text).toContain('Costs $4.0M per undelivered hall');
+ expect(text).toContain('+1 month of remaining fitout');
+ expect(text).toContain('Finished fitout is not delayed.');
+ expect(describeChoiceEffects('retrofit',card,'air')).toContain('no added fitout delay');
+});

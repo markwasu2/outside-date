@@ -76,5 +76,5 @@ test('racks modal shows the real retrofit price and delay before either choice',
     const next = {...s.state,setup:{...s.state.setup,hallTier:'liquid'}};
     useStore.setState({state:next,draft:next});
   });
-  await expect(dialog).toContainText('Costs $4.0M per undelivered hall, +1 fitout month on each');
+  await expect(dialog).toContainText('Costs $4.0M per undelivered hall; +1 month of remaining fitout. Finished fitout is not delayed.');
 });
