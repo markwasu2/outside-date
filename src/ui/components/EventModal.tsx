@@ -95,7 +95,12 @@ export function describeEffect(effect: Effect): string {
     return typeof pct === 'number' ? `A hall's budget grows ${Math.round(pct * 100)}%` : 'Has consequences';
   }
   if (effect.type === 'hallPause') {
+    if (effect.args[0] === 'all' && effect.args[1] === 1) return 'All halls pause for 1 month';
     return 'A hall stops work until the problem is fixed';
+  }
+  if (effect.type === 'playerShare') {
+    const delta = effect.args[0];
+    if (typeof delta === 'number' && delta !== 0) return `Your equity share ${delta > 0 ? '+' : '-'}${Math.round(Math.abs(delta) * 100)} percentage points`;
   }
   if (effect.type === 'hallProgress') {
     const n = effect.args[1];

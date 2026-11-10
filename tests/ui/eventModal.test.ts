@@ -148,3 +148,12 @@ it('hiring fair names the crew benefit, duration, cash and goodwill before choos
  expect(describeEffect({type:'setFlag',args:['hiringFairUntil','monthPlus:4']})).toBe('Fewer labor shortages for 4 months');
  expect(describeEffect({type:'setFlag',args:['hiringFairUntil','unexpected']})).toBe('Has consequences');
 });
+
+it('partner dispute states dilution versus a temporary all-hall pause',()=>{
+ const card=content.events.find(e=>e.id==='partner_dispute');
+ const concede=describeChoiceEffects('concede',card),wait=describeChoiceEffects('wait',card);
+ expect(concede).toBe('Your equity share -8 percentage points, Cash -$20.0M');
+ expect(wait).toBe('All halls pause for 1 month, Cash -$10.0M');
+ expect(describeEffect({type:'hallPause',args:['randomActive','untilFixed']})).toBe('A hall stops work until the problem is fixed');
+ expect(describeEffect({type:'playerShare',args:['invalid']})).toBe('Has consequences');
+});
