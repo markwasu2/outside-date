@@ -15,6 +15,7 @@ import { appendSnapshot, buildFinancialSnapshot, type FinancialSnapshot } from '
 import { playSound } from './sound';
 import { applyFireDamage, applySmallLoss, applyStormDamage } from '../engine/systems/insurance';
 import { newCrossings, warnings } from './board/warnings';
+import { hallAdvanceReason } from './board/legibility';
 
 /** P10.3: months-of-runway threshold below which `playWarningIfNeeded` beeps on a fresh crossing
  * into the danger zone - matches `Hud.tsx`'s own "< 3 = red" runway color threshold. */
@@ -204,7 +205,14 @@ export function checkAction(
     }
     return { ok: true };
   } catch (e) {
-    return { ok: false, reason: humanizeActionError(e instanceof Error ? e.message : String(e)) };
+    const message = e instanceof Error ? e.message : String(e);
+    // Explain an engine-confirmed stage rejection without changing engine legality.
+    if (action.actionId === 'advanceHall' && message.includes('prerequisites not met')) {
+      const hall = folded.halls.find(h => h.id === action.params?.hallId);
+      const reason = hall ? hallAdvanceReason(folded, planContent, hall) : null;
+      if (reason) return { ok: false, reason };
+    }
+    return { ok: false, reason: humanizeActionError(message) };
   }
 }
 

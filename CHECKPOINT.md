@@ -1317,3 +1317,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done:531 unit;80 e2e in bounded groups (Millbrook fixed exact seed result repinned to simulator1.8106279793x);lint,tsc,build |
 | visual | inspected:1280 intro and four-instruction plan/shortfall;1440 desk; clear count/cost/End month |
 | caveat | attention is a deliberate game abstraction, not a literal estimate of workdays; existing bundle-size warning remains |
+
+# Playtest 5 - exact missing prerequisite instead of a generic rejection
+
+| criterion | status |
+|---|---|
+| site option | done: rejected groundbreak names Option the site and the road across the top of campus |
+| other stages | done: current permit/status and office location, power/substation chain or liquid readiness named |
+| correctness | done: explanation only after engine-confirmed rejection, reads folded plan; queued option clears it |
+| scope | read-only UI projection, no engine/legality/save/bot change; no new grid needed |
+| gates | done:534 unit,81 e2e bounded groups,lint,tsc,build |
+| visual | inspected:1280 hall groundbreak explains missing land instruction; direct road-to-hall switch tested |

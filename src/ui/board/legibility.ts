@@ -63,6 +63,25 @@ export function hallBlocker(state: GameState, content: Content, hall: Hall): str
   }
 }
 
+/** Specific instruction for an engine-confirmed stage prerequisite rejection. */
+export function hallAdvanceReason(state: GameState, content: Content, hall: Hall): string | null {
+  const blocker = hallBlocker(state, content, hall);
+  if (blocker === 'site not optioned yet') {
+    return `Option the site before starting ${hall.id}. Choose Land & access at the road across the top of campus.`;
+  }
+  const permit = blocker?.match(/^waiting on (\w+) permit$/)?.[1] as PermitId | undefined;
+  if (permit) {
+    return `${hall.id} needs the ${permit} permit granted (currently ${state.permits[permit].status}). Open Permits & approvals at the site office on the left to file it or check its review.`;
+  }
+  if (blocker === 'waiting on power hookup') {
+    return `${hall.id} needs a power hookup before ready-for-service work. Open Power connection at the substation in the upper right to check the study, equipment and automatic substation build.`;
+  }
+  if (blocker === 'waiting on liquid cooling') {
+    return `Ready liquid cooling for ${hall.id} from this hall's actions before starting ready-for-service work.`;
+  }
+  return blocker ? `${hall.id}: ${blocker}.` : null;
+}
+
 /** One short line for the hall tile: the stage in words plus its state or blocker. */
 export function hallCaption(state: GameState, content: Content, hall: Hall): string {
   if (hall.terminated) return 'Terminated';

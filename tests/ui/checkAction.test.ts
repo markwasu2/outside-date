@@ -82,3 +82,29 @@ describe('checkAction: cash-runway guard (qa-fixes-2 finding #1)', () => {
     expect(checkAction(broke, content, [], { actionId: 'confirmRackSchedule' }).ok).toBe(true);
   });
 });
+
+
+describe('checkAction: specific construction prerequisite explanations', () => {
+  it('names the site option and its campus location instead of a generic prerequisite', () => {
+    const state = freshState();
+    const result = checkAction(state, content, [], { actionId: 'advanceHall', params: { hallId: 'H1' } });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.reason).toContain('Option the site');
+      expect(result.reason).toContain('road across the top');
+      expect(result.reason).not.toContain('prerequisites not met');
+    }
+  });
+  it('reads the folded plan, so a queued site option clears the same blocker', () => {
+    const state = freshState();
+    expect(checkAction(state, content, [{ actionId: 'optionSite' }], { actionId: 'advanceHall', params: { hallId: 'H1' } }).ok).toBe(true);
+  });
+  it('names a pending permit and points to its actual office', () => {
+    const state = freshState();
+    state.halls[0]!.stageIndex = 1;
+    state.permits.building.status = 'pending';
+    const result = checkAction(state, content, [], { actionId: 'advanceHall', params: { hallId: 'H1' } });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toContain('building permit granted (currently pending)');
+  });
+});
