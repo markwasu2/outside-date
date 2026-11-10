@@ -1627,3 +1627,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | rules | covenant trigger and forced date resolved by scenario/site/difficulty; explains earlier test when all active halls deliver and monthly retest after failure |
 | gates | 565 unit, 107 browser (105 bounded in two shards plus 2 complete journeys), lint, tsc, build; final 1280px Financials pixels inspected and 600px overflow tested |
 | scope | read-only UI only, no simulation, save, bot or tuning changes; no migration required; existing bundle-size warning remains |
+
+# Personal Oxbow replay - don't round a small loss to break-even
+
+| criterion | status |
+|---|---|
+| personal run | Whale normal Oxbow, air/evaporative/cost-plus; closed Y4 M12, 4/4 delivered, one late, $1.65B campus, $154.1M equity; actual live clicks |
+| observed | final report rounded a below-1 equity multiple to 1.00x while saying investors received less than they put in |
+| fixed | borderline losses read just under 1.00x in both report sentences; exact break-even, larger losses and gains keep ordinary formatting |
+| gates | 567 unit, 108 browser (106 bounded plus both complete journeys), lint, tsc, build; actual 1280px final report pixels inspected |
+| scope | report-only; no simulation, save, bot or tuning changes; no migration needed; existing bundle-size warning remains |
