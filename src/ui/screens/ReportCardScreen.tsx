@@ -1,3 +1,4 @@
+import { resolveContent } from '../../engine/resolve';
 import { formatDollars, formatMonth } from '../../engine/format';
 import { totalDebt } from '../../engine/selectors';
 import type { GameState, GoodwillGroup, LogEntry } from '../../engine/types';
@@ -244,6 +245,7 @@ export function ReportCardScreen() {
         )}
       </p>
 
+      <PowerTiming />
       <h2>Report card</h2>
       {grades.map((g) => (
         <div key={g.label} style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '0.5rem' }}>
@@ -271,12 +273,12 @@ export function ReportCardScreen() {
             const def = content.risks.find((r) => r.id === row.id);
             return (
               <tr key={row.id} style={{ borderBottom: '1px solid #eee' }}>
-                <td>{def?.label ?? row.id}</td>
+                <td>{row.id === 'plantSlip' ? 'Plant construction slip after docket approval' : def?.label ?? row.id}</td>
                 {/* Phase 2 (D5): who held it, as a chip linking to the Stakeholders view. */}
                 <td>
                   <WhoHoldsChip holder={row.holder} />
                 </td>
-                <td>{row.materialized ? 'Yes' : 'No'}</td>
+                <td>{row.id === 'plantSlip' ? (draft.power.plants.some(p => p.slipped || (p.onlineMonth !== null && p.plannedOnlineMonth !== null && p.onlineMonth > p.plannedOnlineMonth)) ? 'Yes' : 'No construction slip') : row.materialized ? 'Yes' : 'No'}</td>
                 <td>{formatDollars(row.costToYou)}</td>
                 <td>{def?.mitigation ?? ''}</td>
               </tr>
@@ -299,4 +301,20 @@ export function ReportCardScreen() {
       {draft.scenarioId === 'tutorial-edge5' && <TutorialEndBanner />}
     </div>
   );
+}
+
+/** Keep the original setup estimate separate from the post-approval plant schedule. */
+function PowerTiming() {
+  const state = useStore(s=>s.draft);
+  const content = useStore(s=>s.content);
+  const resolved = resolveContent(state,content);
+  const initial = resolved.tuning.docket.monthsToVote + resolved.tuning.power.plantBuildMonths;
+  return <section data-testid="power-timing-closeout" style={{padding:10,background:'#f3e8ce',fontSize:13}}>
+    <strong>Power timing</strong>
+    <div>Setup estimate assumed a first-try docket approval. A later docket moves the plant schedule even without a construction slip.</div>
+    {state.power.plants.map(p=>{
+      const offset = p.id === 'B' && typeof state.flags.plantBOffsetMonths === 'number' ? state.flags.plantBOffsetMonths : 0;
+      return <div key={p.id} style={{marginTop:5}}>Plant {p.id}: setup estimate {formatMonth(initial+offset)}; after docket approval {p.plannedOnlineMonth === null ? 'not scheduled' : formatMonth(p.plannedOnlineMonth)}; actual {p.onlineMonth === null ? 'not online' : formatMonth(p.onlineMonth)}.</div>;
+    })}
+  </section>;
 }

@@ -1102,3 +1102,16 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 519 unit, 64 e2e, lint, tsc, build |
 | visual | done: actual 1280 road popover inspected, $50.0M total/from equity visible |
 | grid | skipped: label only, engine and saves unchanged |
+
+# Playthrough 4 truth fix - distinguish power schedule baselines
+
+| criterion | status |
+|---|---|
+| reproduction | done: first-try estimate Y4 M1, approval month21 -> post-approval plan/actual Y4 M10 with no construction slip |
+| rating truth | done: Power at close names delayed docket and explains what the score measures, no blanket on-time claim |
+| report data | done: setup estimate/post-approval plan/actual per plant; plant risk label explicitly construction slip after approval |
+| actual slip | done: displayed risk is Yes for actual later than plan even if saved boolean is false |
+| scoring | unchanged: existing capacity/plant-slip score, not silently redefined as initial-program punctuality |
+| full gates | done: 521 unit, 65 e2e, lint, tsc, build |
+| visual | done: actual1280 report timing panel inspected |
+| grid | skipped: UI-only read projections, no engine or save changes |

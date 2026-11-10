@@ -35,7 +35,7 @@ function prefersReducedMotion(): boolean {
 
 export function RatingScene({ state, content, takeout, onContinue }: Props) {
   const rows: ScoreRow[] = [
-    { key: 'power', label: 'Power', explain: powerExplain(state, content) },
+    { key: 'power', label: 'Power at close', explain: powerExplain(state, content) },
     { key: 'tenant', label: 'Tenant', explain: tenantExplain(state) },
     { key: 'coverage', label: 'Coverage', explain: coverageExplain(state, content) },
     { key: 'asset', label: 'Asset', explain: assetExplain(state) },
