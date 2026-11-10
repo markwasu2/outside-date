@@ -960,3 +960,22 @@ clickable too. No new game rules or saved-state fields.
 | visual | done: docs/screenshots/cold2/campus-1280.png and campus-1440.png inspected |
 | balance grid | skipped: UI composition/navigation only |
 | remaining staged work | remove legacy tabs from fallback and finish object-specific finance/cast routes; do not claim the fallback is already gone |
+
+# Campus-first stage 2 - one continuous scene and object routes
+
+Removed the separate tile-card frames and backgrounds. The whole campus now sits
+on one illustrated ground plane; edge-connected pale margins were removed from
+the existing object artwork so each object sits directly in that landscape.
+Road opens land actions, office opens permits/people, insurance/lender or capital,
+yard offers crews, office offers rack confirmation, and plants expose their dates
+and MW. All actions remains a temporary safety net until stage 3. Close buttons
+now have visible chrome. Existing hall placement routes remain intact.
+
+| criterion | status |
+|---|---|
+| continuous scene | done: no card backgrounds/borders, one shared ground plane |
+| direct routes | done: real click e2e for land, money/capital, crews, racks and plant status |
+| visual | done: 1280x720 and 1440x900 scene plus finance popover inspected |
+| full gates | done: 512 vitest, 58 e2e (29+28 shards + long tutorial), lint, tsc, build |
+| balance grid | skipped: art/UI routes only, engine unchanged |
+| staged remainder | legacy fallback tabs, cast figures, stronger hall growth and in-scene events |

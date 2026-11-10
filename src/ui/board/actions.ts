@@ -226,6 +226,7 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
 
   if (objectId === 'siteOffice') {
     const rows: ActionRow[] = [
+      row(content, state, 'confirmRackSchedule', findDef(content, 'confirmRackSchedule').label),
       row(content, state, 'filePermit', 'File air permit', { permitId: 'air' }),
       row(content, state, 'filePermit', 'File building permit', { permitId: 'building' }),
       row(content, state, 'filePermit', 'File water permit', { permitId: 'water' }),

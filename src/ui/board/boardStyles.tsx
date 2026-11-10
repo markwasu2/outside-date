@@ -11,6 +11,22 @@ import { useEffect, useState } from 'react';
 export function BoardStyles() {
   return (
     <style>{`
+      [data-campus-scene] [data-scene-object] {
+        background: transparent !important;
+        border: none !important;
+        overflow: visible !important;
+      }
+      [data-campus-scene] [data-scene-object][aria-pressed="true"] {
+        outline: 2px dashed #345e49;
+        outline-offset: -5px;
+        border-radius: 18px;
+      }
+      [data-campus-scene] [data-scene-object] > img { filter: drop-shadow(0 8px 4px #4a3b252a); }
+      [data-campus-scene] [data-testid="map-road"] { background: transparent !important; }
+      [data-campus-scene] [data-testid="map-road"] > img { display: none; }
+      [data-campus-scene] [data-testid^="plant-buildout-"] { background: transparent !important; border: none !important; }
+      [data-campus-scene] [data-testid^="plant-buildout-"] > div:first-child { border: none !important; }
+
       @keyframes boardGlowPulse {
         0%, 100% { box-shadow: 0 0 4px 1px rgba(255, 200, 60, 0.55); }
         50% { box-shadow: 0 0 12px 4px rgba(255, 200, 60, 0.95); }

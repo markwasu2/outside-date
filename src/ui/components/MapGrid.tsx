@@ -1,3 +1,4 @@
+import campusGroundImg from '../../assets/art/campus-ground.jpg';
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 
 import { formatMonth } from '../../engine/format';
@@ -32,7 +33,7 @@ function ArtLayer({ img, dimmed }: { img?: string; dimmed?: boolean }) {
         inset: 0,
         width: '100%',
         height: '100%',
-        objectFit: 'cover',
+        objectFit: 'contain',
         borderRadius: 4,
         pointerEvents: 'none',
         opacity: dimmed ? 0.4 : 1,
@@ -231,6 +232,7 @@ export function MapGrid() {
     <div
       ref={containerRef}
       data-testid="map-root"
+      data-campus-scene="true"
       data-ground={siteTheme.ground}
       style={{
         position: 'relative',
@@ -244,12 +246,12 @@ export function MapGrid() {
         boxSizing: 'border-box',
         fontFamily: 'sans-serif',
         fontSize: '0.75rem',
-        background: siteTheme.ground,
+        background: `url(${campusGroundImg}) center / cover, ${siteTheme.ground}`,
       }}
     >
       <BoardLegend />
       {/* Road: no popover (D1). Phase 4: the site's transmission poles queue at the road. */}
-      <div data-testid="map-road" style={{ gridColumn: '1 / 13', gridRow: '1 / 2', position: 'relative', background: TILE_ART.road.bg, ...cellStyle }}>
+      <div {...selectableCellProps(boardPopover === 'road', () => openObject('road', null))} ref={(el) => { if (el) cellRefs.current.set('road', el); }} data-testid="map-road" style={{ cursor: 'pointer', gridColumn: '1 / 13', gridRow: '1 / 2', position: 'relative', background: TILE_ART.road.bg, ...cellStyle }}>
         <ArtLayer img={TILE_ART.road.img} />
         <span style={ART_CHIP}>
           {TILE_ART.road.icon} {TILE_ART.road.label}
@@ -278,6 +280,7 @@ export function MapGrid() {
           position: 'relative',
           ...cellStyle,
         }}
+        data-scene-object="office"
         title="Site office"
       >
         <ArtLayer img={TILE_ART.siteOffice.img} />
@@ -294,6 +297,7 @@ export function MapGrid() {
         ref={(el) => {
           if (el) cellRefs.current.set('pond', el);
         }}
+        data-scene-object="field"
         data-testid="map-pond-slot"
         data-pond={siteTheme.pond ? 'true' : 'false'}
         style={{
@@ -349,6 +353,7 @@ export function MapGrid() {
               ref={(el) => {
                 if (el) cellRefs.current.set(hall.id, el);
               }}
+              data-scene-object="hall"
               className={arrivalFlash ? 'board-arrival-flash' : undefined}
               style={{
                 background: look.bg,
@@ -456,6 +461,7 @@ export function MapGrid() {
           justifyContent: 'flex-start',
           padding: 4,
         }}
+        data-scene-object="yard"
         title="Laydown yard"
       >
         <ArtLayer img={TILE_ART.laydownYard.img} />
@@ -543,6 +549,7 @@ export function MapGrid() {
           ...(substationEnergized && !reducedMotion ? { animation: 'boardGlowPulse 2.4s ease-in-out infinite' } : {}),
           ...cellStyle,
         }}
+        data-scene-object="substation"
         data-testid="map-substation"
         data-build-state={power.substationStatus}
         title="Substation"
@@ -580,6 +587,8 @@ export function MapGrid() {
         {...selectableCellProps(boardPopover === 'powerPlants', () => openObject('powerPlants', null))}
         ref={(el) => { if (el) cellRefs.current.set('powerPlants', el); }}
         style={{ cursor: 'pointer', gridColumn: '11 / 13', gridRow: '4 / 8', background: '#bcaaa4', ...cellStyle, justifyContent: 'flex-start', padding: 4 }}
+        data-scene-object="plants"
+        aria-label="Power plants"
         title="Power plants"
       >
         <div>{'\u{1F50C}'} Plants</div>
