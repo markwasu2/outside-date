@@ -1523,3 +1523,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | permits office view shows actual review status/date and what End month does; denied refiling and granted status named; stale tab route corrected |
 | gates | 553 unit, 97 browser including both complete journeys, lint, tsc, build; actual 1280x720 permit popup inspected |
 | scope | read-only UI guidance, no engine/save/bot/rule change; existing bundle warning unchanged |
+
+# Personal expanded-Whale replay - truthful wait and partial closing cues
+
+| criterion | status |
+|---|---|
+| personal run | Whale normal quick start, expansion accepted, $75M retrofit, closed Y6 M1; 4/6 delivered, two unfinished, $2.05B campus, $104.8M equity, 0.51x; actual live clicks |
+| observed | End-month Show me opened a disabled Advance action; cutoff called a two-unfinished-hall campus finished |
+| fixed | Why wait opens the short monthly-clock explanation, not a disabled hall action; partial closing names the campus as it stands, counts undelivered halls and warns construction ends |
+| visual fix | opening a real object closes the cue explanation so it cannot sit behind the popup |
+| gates | 555 unit, 98 browser (96 bounded + 2 complete journeys), lint, tsc, build; 1280px wait/partial explanation/closing popup inspected |
+| scope | UI guidance only; no engine/save/bot/odds change; one player's expansion loss is not a balance verdict |

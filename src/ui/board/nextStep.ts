@@ -53,11 +53,14 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
   const resolved = resolveContent(state, content);
   const power = state.power;
 
-  if (state.phase === 'takeoutAvailable') return {
-    title:'Price the finished campus',
-    why:'The closing window is open. At the site office, Insurance & lender, choose Price the takeout to value the campus, repay debt and see your equity and report card. This finishes the campaign.',
-    objectId:'siteOffice',actionId:'priceTakeout',
-  };
+  if (state.phase === 'takeoutAvailable') {
+    const undelivered=state.halls.filter(h=>!h.delivered).length;
+    return {
+      title:undelivered ? 'Close the campus as it stands' : 'Price the finished campus',
+      why:`${undelivered ? `${undelivered} of ${state.halls.length} halls remain undelivered. Closing values the campus as it stands and ends construction. ` : ''}The closing window is open. At the site office, Insurance & lender, choose Price the takeout to value the campus, repay debt and see your equity and report card. This finishes the campaign.`,
+      objectId:'siteOffice',actionId:'priceTakeout',
+    };
+  }
   const active = state.halls.filter(h=>!h.terminated);
   if(active.length && active.every(h=>h.delivered)) {
     const conversionMonth = state.flags.conversionMonth;
@@ -249,8 +252,8 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
   return {
     title: 'End the month',
     why: nextHall
-      ? `Everything critical is already in motion. Next milestone: ${nextHall.id} delivery ${formatMonth(nextHall.deliveryMonth)}.`
-      : 'Everything critical is already in motion.',
+      ? `Crews keep working without another instruction. Use End month below to run construction, reviews and monthly costs. Next tenant deadline: ${nextHall.id} delivery ${formatMonth(nextHall.deliveryMonth)}.`
+      : 'Use End month below to run reviews and monthly costs.',
     objectId: nextHall?.id ?? 'substation',
   };
 }
