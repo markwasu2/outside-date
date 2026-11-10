@@ -53,10 +53,22 @@ export function cashLabel(
   params?: Record<string, string | number>,
 ): string {
   const resolved = resolveContent(state, content);
-  if (def.id === 'optionSite') {
-    const cost = resolveSite(resolved, state.scenarioId, state.setup.site, resolved.tuning).landCost;
+  // These hard costs draw equity/mezz/senior before cash. A zero bank debit does not
+  // make the work free: show the full cost and its funding, including disabled quotes.
+  let fundedCost: number | null = null;
+  if (def.id === 'optionSite') fundedCost = resolveSite(resolved, state.scenarioId, state.setup.site, resolved.tuning).landCost;
+  if (def.id === 'mitigateWetlands') fundedCost = resolved.tuning.wetlands.mitigationCost;
+  if (def.id === 'readyLiquid' && state.setup.hallTier !== 'air') fundedCost = state.setup.hallTier === 'liquid' ? resolved.tuning.chips.liquidReadyCost : resolved.tuning.chips.hybridLiquidReadyCost;
+  if (def.id === 'advanceHall') {
+    const hall = state.halls.find(h => h.id === params?.hallId);
+    const nearTaken = state.halls.filter(h => h.id !== hall?.id && h.stageIndex >= 0 && (h.pad ?? 'near') === 'near').length;
+    const far = params?.pad === 'far' || (params?.pad !== 'near' && nearTaken >= resolved.tuning.spatial.nearPads);
+    if (hall?.stageIndex === -1 && far) fundedCost = resolved.tuning.spatial.farFeederCost;
+  }
+  if (fundedCost !== null) {
+    const cost = fundedCost;
     try {
-      const after = applyAction(state, {actionId:def.id}, resolved);
+      const after = applyAction(state, {actionId:def.id, ...(params ? {params} : {})}, resolved);
       const sources = [
         [after.equity.calledTotal - state.equity.calledTotal, 'equity'],
         [after.debt.mezzDrawn - state.debt.mezzDrawn, 'mezz'],

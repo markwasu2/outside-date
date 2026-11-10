@@ -118,3 +118,21 @@ it('tutorial object choices omit waived transformer and disabled docket systems'
  s.power.studyStatus='pending';
  expect(cashLabel(findDef(content,'commissionStudy'),s,content)).toBe('$500K');
 });
+
+
+it('funded wetlands and far feeders show total cost, not a zero bank debit',()=>{
+ const s=freshState({site:'farmland'});s.flags.siteOptioned=true;
+ Object.values(s.permits).forEach(p=>p.status='granted');
+ expect(cashLabel(findDef(content,'mitigateWetlands'),s,content)).toBe('$6.0M total, from $6.0M equity');
+ expect(cashLabel(findDef(content,'advanceHall'),s,content,{hallId:'H2',pad:'far'})).toBe('$250K total, from $250K equity');
+ expect(cashLabel(findDef(content,'advanceHall'),s,content,{hallId:'H2',pad:'near'})).toBe('$0');
+ s.permits.wetlands!.status='pending';
+ expect(cashLabel(findDef(content,'mitigateWetlands'),s,content)).toBe('$6.0M total, funded from your capital stack');
+});
+
+it('liquid readiness names the funded total at each hall tier',()=>{
+ for(const [hallTier,price] of [['hybrid','$9.0M'],['liquid','$6.0M']] as const){
+ const s=freshState({hallTier});s.halls[0]!.stageIndex=3;
+ expect(cashLabel(findDef(content,'readyLiquid'),s,content,{hallId:'H1'})).toBe(`${price} total, from ${price} equity`);
+ }
+});
