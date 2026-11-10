@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
 import type { LogEntry, Setup } from '../../src/engine/types';
-import { equityMultipleLabel, finalStats, fiveMostConsequentialDecisions, outcomeHeadline, proximateCauseOfDeath } from '../../src/ui/screens/ReportCardScreen';
+import { docketFailureTrail, equityMultipleLabel, finalStats, recentCampaignActivity, outcomeHeadline, proximateCauseOfDeath } from '../../src/ui/screens/ReportCardScreen';
 
 const content = loadContent();
 const negotiation: NegotiationChoices = {
@@ -49,21 +49,21 @@ describe('ReportCardScreen: finalStats (fix 16)', () => {
   });
 });
 
-describe('ReportCardScreen: fiveMostConsequentialDecisions (fix 16)', () => {
+describe('ReportCardScreen: recentCampaignActivity (fix 16)', () => {
   it('drops routine tick/warning/milestone entries', () => {
     const log: LogEntry[] = [entry(1, 'tick', 'A month passed.'), entry(2, 'warning', 'Something is overdue.'), entry(3, 'milestone', 'A stage finished.')];
-    expect(fiveMostConsequentialDecisions(log)).toEqual([]);
+    expect(recentCampaignActivity(log)).toEqual([]);
   });
 
   it('keeps action and event entries, in chronological order', () => {
     const log: LogEntry[] = [entry(1, 'action', 'Optioned the site.'), entry(2, 'tick', 'A month passed.'), entry(3, 'event', 'The Governor wants a tour.')];
-    const result = fiveMostConsequentialDecisions(log);
+    const result = recentCampaignActivity(log);
     expect(result.map((e) => e.text)).toEqual(['Optioned the site.', 'The Governor wants a tour.']);
   });
 
   it('caps at the last 5 when there are more', () => {
     const log: LogEntry[] = Array.from({ length: 8 }, (_, i) => entry(i + 1, 'action', `Decision ${i + 1}`));
-    const result = fiveMostConsequentialDecisions(log);
+    const result = recentCampaignActivity(log);
     expect(result).toHaveLength(5);
     expect(result.map((e) => e.text)).toEqual(['Decision 4', 'Decision 5', 'Decision 6', 'Decision 7', 'Decision 8']);
   });
@@ -118,4 +118,12 @@ describe('equityMultipleLabel', () => {
     expect(equityMultipleLabel(0.99)).toBe('0.99x');
     expect(equityMultipleLabel(1.26)).toBe('1.26x');
   });
+});
+
+
+it('docket failure trail preserves both vote failures despite later unrelated activity',()=>{
+ const first=entry(14,'warning','The power docket failed its vote.'),second=entry(20,'warning','The power docket failed its vote.');
+ const log=[first,entry(19,'action','Visited the town.'),second,entry(20,'event','The lender flags a draw.'),entry(20,'warning','Construction draws frozen.')];
+ expect(docketFailureTrail(log)).toEqual([first,second]);
+ expect(recentCampaignActivity(log).map(e=>e.text)).toEqual(['Visited the town.','The lender flags a draw.']);
 });
