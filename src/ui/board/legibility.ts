@@ -1,6 +1,7 @@
 import type { Content } from '../../content/schemas';
 import { resolveContent } from '../../engine/resolve';
 import { resolveSite } from '../../content/sites';
+import { hallPowerHookupWords } from './powerWords';
 import { pondMitigated } from '../../engine/systems/construction';
 import { STAGES, type GameState, type Hall, type PermitId } from '../../engine/types';
 
@@ -74,10 +75,10 @@ export function hallAdvanceReason(state: GameState, content: Content, hall: Hall
     return `${hall.id} needs the ${permit} permit granted (currently ${state.permits[permit].status}). Open Permits & people at the site office on the left to file it or check its review.`;
   }
   if (blocker === 'waiting on power hookup') {
-    return `${hall.id} needs a power hookup before ready-for-service work. Open Power connection at the substation in the upper right to check the study, equipment and automatic substation build.`;
+    return hallPowerHookupWords(state, content, hall);
   }
   if (blocker === 'waiting on liquid cooling') {
-    return `Ready liquid cooling for ${hall.id} from this hall's actions before starting ready-for-service work.`;
+    return `Ready liquid cooling for ${hall.id} from this hall's actions before starting commissioning.`;
   }
   return blocker ? `${hall.id}: ${blocker}.` : null;
 }

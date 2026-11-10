@@ -1,7 +1,7 @@
 import type { Content } from '../../content/schemas';
 import { availableGridMW, requiredGridMW } from '../../engine/selectors';
 import { resolveContent } from '../../engine/resolve';
-import type { GameState, PowerPlant } from '../../engine/types';
+import type { GameState, Hall, PowerPlant } from '../../engine/types';
 import { formatMonth } from '../../engine/format';
 
 export function plantWaitingWords(state: GameState): string {
@@ -59,4 +59,21 @@ export function noMorePowerScheduled(state: GameState): boolean {
 export function expansionPowerWords(state: GameState, content: Content): string {
  const resolved=resolveContent(state,content),need=requiredGridMW(state,resolved),supply=plannedPowerMW(state,content);
  return `With ${state.setup.cooling} cooling, ${state.halls.length} halls need ${need.toFixed(1)} MW. Grid and both plants supply at most ${supply.toFixed(1)} MW. Expansion adds halls, not power.${need>supply ? ` Full delivery does not fit this power plan: ${(need-supply).toFixed(1)} MW short.` : ' Full delivery fits once the substation and plants are online.'}`;
+}
+
+/** Match the hall's blocked commissioning action to the current power-chain step. */
+export function hallPowerHookupWords(state: GameState, content: Content, hall: Hall): string {
+ if (canConnectOnNextTick(state, content, hall.id)) {
+  return `Capacity is ready for ${hall.id}. End month runs the automatic power hookup; then start commissioning at this hall.`;
+ }
+ if (state.power.substationStatus !== 'done') {
+  return `${hall.id} needs a power hookup before commissioning. Open the substation in the upper right to check the study, equipment and automatic substation build.`;
+ }
+ const resolved = resolveContent(state, content);
+ const need = hall.mwIT * resolved.tuning.cooling[state.setup.cooling].pue;
+ const capacity = `${hall.id} needs ${need.toFixed(1)} MW; the campus has ${availableGridMW(state, resolved).toFixed(1)} MW total, shared by all halls.`;
+ if (noMorePowerScheduled(state)) {
+  return `${capacity} No further power capacity is scheduled. Waiting will not close this gap. Open Power plants to review the capacity limit.`;
+ }
+ return `${capacity} The substation is energized, but this hall is waiting for plant capacity. Open Power plants to check ${state.docketEnabled && state.docket.status !== 'approved' ? 'the docket approval needed before plant construction' : 'the next scheduled capacity'}. Hookup is automatic when enough capacity is available.`;
 }
