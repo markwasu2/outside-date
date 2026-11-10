@@ -163,7 +163,7 @@ const BESPOKE_CHOICE_STAKES: Record<string, (tier: string) => Record<string, str
           decline: 'Tenant goodwill -15, asset score -3',
         }
       : {
-          retrofit: 'Costs $4.0M per undelivered hall, +1 fitout month on each',
+          retrofit: 'Costs $4.0M per undelivered hall; +1 month of remaining fitout. Finished fitout is not delayed.',
           decline: 'Tenant goodwill -15',
         },
 };
