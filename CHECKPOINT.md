@@ -1752,3 +1752,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | fresh tutorial games get a short non-blocking welcome card (plain goal, monthly loop, pointer at the Next card; auto-clears after first action, Got it persisted in the save); wait-month Next cards add a While-you-wait line naming free/prep actions (rack-schedule confirm, unfiled permits); drawer cash reads committed state; the Touch-the-campus hint clears after the first action; the storm draw-freeze notice names its cause (storm damage, no delay-in-start-up cover) |
 | gates | 644 unit, 143 browser across 8 shards, lint, tsc, build; deployed bundle byte-identical to the tested build; fixes re-verified live in a cold cloud-browser playthrough with screenshots |
 | scope | UI copy/components and one log line in insurance.ts; no engine behavior, tuning, save, bot or migration changes; existing bundle-size warning remains |
+
+# Full tutorial replay - make waiting readable and optional
+
+| criterion | status |
+|---|---|
+| replay | full tutorial through pricing and final report, then replayed entirely through UI controls, including middle event-slider settings; one hall delivered, campus closed Y2 M9 with 1.85x equity |
+| found | repeated bare End month cards hid active construction progress; the free rack-schedule reminder repeated without a direct action; first-minute goal named the outside date but the time grade used the earlier delivery call |
+| changed | next card names active stage and actual progress, including paused work; direct free rack-schedule button removes the reminder after use and never nags after delivery; Skip quiet months advances ordinary monthly ticks without choosing actions, rechecks the guide after every tick, and stops for new instructions, events, obligations and financing warnings; intro distinguishes lease target from last-chance outside date; priced close explains the time grade before committing |
+| regression | added full UI tutorial journey from first screen to final report, verifying prep, skip stopping at the newly available site option, event sliders and close explanation; added stage-progress and post-delivery prep tests; guide-card background no longer blocks clicks on campus objects beneath it |
+| gates | 646 unit, 144 browser across eight shards, lint, typecheck, build; actual welcome, progress/skip and priced-close screenshots inspected |
+| scope | UI guidance and access to ordinary monthly advancement only; no engine, balance, save or bot changes |

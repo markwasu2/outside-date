@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
 import type { Setup } from '../../src/engine/types';
-import { nextStep } from '../../src/ui/board/nextStep';
+import { nextStep, workInFlight } from '../../src/ui/board/nextStep';
 
 // Phase 1 (D7): the progress spine's Next step card. The rules are ordered by what blocks the
 // critical path first; these tests walk a whale run down that order.
@@ -269,4 +269,25 @@ it('distinguishes delivered and terminated halls while waiting to close',()=>{
  expect(nextStep(s,content).why).toContain('rent must season until');
  s.halls[2]!.delivered=false;s.halls[2]!.terminated=true;
  expect(nextStep(s,content).why).toContain('2 of 4 halls are delivered. 2 halls were terminated.');
+});
+
+
+it('shows actual stage progress without promising a finish date', () => {
+ const s = freshState(); const h = s.halls[0]!;
+ h.stageIndex = 2; h.stageActive = true; h.stageMonthsDone = 1.5;
+ expect(workInFlight(s, content)).toContain('H1 building shell:');
+ expect(workInFlight(s, content)).toContain('advances at End month');
+ s.flags.drawFreeze = true;
+ expect(workInFlight(s, content)).toContain('(paused)');
+ h.delivered = true;
+ expect(workInFlight(s, content)).toBeUndefined();
+});
+it('offers the free confirmation directly on a wait card, but never after delivery', () => {
+ const s = freshState();
+ expect(nextStep(s, content, 0).prepAction?.actionId).toBe('confirmRackSchedule');
+ s.flags.rackScheduleConfirmed = true;
+ expect(nextStep(s, content, 0).prepAction).toBeUndefined();
+ s.flags.rackScheduleConfirmed = false; s.halls.forEach(h => h.delivered = true);
+ expect(nextStep(s, content).prepAction).toBeUndefined();
+ expect(nextStep(s, content).whileYouWait).toBeUndefined();
 });

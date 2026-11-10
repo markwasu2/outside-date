@@ -2,7 +2,8 @@ import type { Content } from '../../content/schemas';
 import { formatDollars, formatMonth } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
 import { leadWithIndex } from '../../engine/systems/markets';
-import type { GameState } from '../../engine/types';
+import { STAGES, type GameState } from '../../engine/types';
+import { stageMinMonths } from './hallVisual';
 import { projectedFitoutMonth } from './warnings';
 import { canConnectOnNextTick, noMorePowerScheduled, powerCapacityWords } from './powerWords';
 import { hallBlocker } from './legibility';
@@ -22,6 +23,8 @@ export interface NextStep {
    * sat one click away in the Actions panel while the card only said 'End the month' - dead
    * months that taught players waiting is normal. Names what can be done while the clock runs. */
   whileYouWait?: string;
+  progress?: string;
+  prepAction?: { label: string; actionId: string };
   /** Map object the "Show me" button should select and open. */
   objectId: string;
   /** The next step is a clock, not an instruction. Explain it without opening an action list. */
@@ -46,16 +49,19 @@ function lateArrivalNote(state: GameState, content: Content, leadMonths: number)
 }
 
 export function nextStep(state: GameState, content: Content, remainingFocus = state.apPerMonth-state.apUsedThisMonth): NextStep {
-  const next = nextStepUnbudgeted(state,content);
+  const raw = nextStepUnbudgeted(state,content);
+  const next = { ...raw, progress: workInFlight(state, content) };
+  const prepAction = !state.flags.rackScheduleConfirmed && state.halls.some(h => !h.delivered && !h.terminated)
+    ? { label: 'Confirm rack schedule (free)', actionId: 'confirmRackSchedule' } : undefined;
   const cost = content.actions.find(a=>a.id===next.actionId)?.ap ?? 0;
   if(cost>remainingFocus)return {
     title:'End the month',
     why:`${next.title} needs ${cost} focus points; you have ${remainingFocus} left. End the month to refresh focus, or undo your last action from the desk.`,
     objectId:next.objectId,
-    whileYouWait: whileYouWait(state, remainingFocus),
+    whileYouWait: whileYouWait(state, remainingFocus), progress: next.progress, prepAction,
   };
   if (next.waiting || next.title === 'End the month') {
-    return { ...next, whileYouWait: whileYouWait(state, remainingFocus) };
+    return { ...next, whileYouWait: whileYouWait(state, remainingFocus), prepAction };
   }
   return next;
 }
@@ -63,12 +69,27 @@ export function nextStep(state: GameState, content: Content, remainingFocus = st
 /** Prep worth doing on a wait month: free confirmations and unfiled permits the player can
  * afford right now. Kept short; the Actions panel has the full list. */
 function whileYouWait(state: GameState, remainingFocus: number): string | undefined {
+  if (!state.halls.some(h => !h.delivered && !h.terminated)) return undefined;
   const prep: string[] = [];
-  if (!state.flags.rackScheduleConfirmed) prep.push('confirm the rack schedule (free, +tenant goodwill)');
+  if (!state.flags.rackScheduleConfirmed && state.halls.some(h => !h.delivered && !h.terminated)) prep.push('confirm the rack schedule (free, +tenant goodwill)');
   const unfiled = state.permitsRequired.filter((id) => ['none', 'denied'].includes(state.permits[id]?.status ?? ''));
   if (unfiled.length > 0 && remainingFocus >= 1) prep.push(`file the ${unfiled.join(' and ')} permit${unfiled.length > 1 ? 's' : ''} (1 focus each)`);
   if (prep.length === 0) return undefined;
   return `While you wait, you can ${prep.join('; ')} - find ${prep.length > 1 ? 'them' : 'it'} in Actions.`;
+}
+
+/** Show work advancing, not a promise of a completion date: labor and events can change pace. */
+export function workInFlight(state: GameState, content: Content): string | undefined {
+  const active = state.halls.filter(h => h.stageActive && !h.delivered && !h.terminated);
+  if (!active.length) return undefined;
+  const lengths = stageMinMonths(state, content);
+  const names = { pad: 'groundwork', steel: 'steel frame', shell: 'building shell', fitout: 'interior fitout', rfs: 'commissioning' };
+  return active.slice(0, 2).map(h => {
+    const stage = STAGES[h.stageIndex];
+    if (!stage) return '';
+    const pct = Math.min(100, Math.max(0, Math.round(h.stageMonthsDone / (lengths[h.stageIndex] || 1) * 100)));
+    return `${h.id} ${names[stage]}: ${pct}%${h.pausedThisMonth || state.flags.drawFreeze ? ' (paused)' : ' - advances at End month'}`;
+  }).filter(Boolean).join('. ') || undefined;
 }
 
 function nextStepUnbudgeted(state: GameState, content: Content): NextStep {

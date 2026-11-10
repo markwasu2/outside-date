@@ -25,6 +25,7 @@ import { nextStep } from './board/nextStep';
 import { warnings } from './board/warnings';
 
 import { formatDollars, formatMonth } from '../engine/format';
+import { fastForwardPause } from '../engine/step';
 
 /** P9.1/P9.2: once a run ends, show the animated rating scene first, then hand off to the real
  * report card screen (which absorbed Phase 8's `TutorialEndBanner` and Phase 6's placeholder
@@ -103,6 +104,20 @@ function CampusGame() {
   // a plain read - `plan` only lists what was done (the undo scope).
   const actionsLeft = Math.max(0, draft.apPerMonth - draft.apUsedThisMonth);
   const step = nextStep(draft, content, actionsLeft);
+  // Advance ordinary months, never choose actions. Re-check the visible guide after EVERY
+  // month so a newly available permit/site/stage instruction cannot be skipped over.
+  const skipQuietMonths = () => {
+    for (let i = 0; i < 12; i++) {
+      const before = useStore.getState();
+      const guide = nextStep(before.state, before.content);
+      if (before.state.phase !== 'playing' || fastForwardPause(before.state, before.content) ||
+          guide.actionId || (!guide.waiting && guide.title !== 'End the month')) break;
+      before.endMonth();
+      const after = useStore.getState();
+      if (after.state.month === before.state.month || after.error ||
+          after.state.log.slice(before.state.log.length).some(entry => entry.kind === 'event')) break;
+    }
+  };
   const alerts = warnings(state, content);
   // Cold-playthrough fix (2026-11-10): the old 'Touch the campus to begin.' footer hint never
   // cleared - it still showed at month 7 after a dozen actions. It only belongs before the
@@ -138,7 +153,7 @@ function CampusGame() {
         <strong>{goalSentence(draft).replace('all 1 hall', 'your hall').replace('outside date', 'tenant deadline').replace('close the takeout', 'sell/refinance the finished campus (the takeout)')}</strong>
       </section>}
       <div style={{display:'flex',flex:1,minHeight:0}}><div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minWidth:0, minHeight: 0, position: 'relative' }}>
-        <MapGrid cue={{title: `Next: ${step.title}`, why: step.why, objectId: step.objectId, waiting: step.waiting || step.title==='End the month', whileYouWait: step.whileYouWait, onShow: showMe, actionId: step.actionId, params: step.params}} /><EventNotices />
+        <MapGrid cue={{title: `Next: ${step.title}`, why: step.why, objectId: step.objectId, waiting: step.waiting || step.title==='End the month', whileYouWait: step.whileYouWait, progress: step.progress, prepAction: step.prepAction, onShow: showMe, actionId: step.actionId, params: step.params}} /><EventNotices />
         {drawer && (
           <aside data-testid={`${drawer}-drawer`} style={{ position: 'absolute', right: 12, top: 10, bottom: 10, width: drawer === 'actions' ? 400 : 600, maxWidth: '80vw', zIndex: 60, background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #d9cfb9' }}>
@@ -169,6 +184,7 @@ function CampusGame() {
             <button data-testid="cold-intro-dismiss" style={{ pointerEvents: 'auto' }} onClick={() => dismissCoachTip('cold-intro')}>Got it</button>
           </div>
           <div>{goalSentence(draft).replace('all 1 hall', 'your hall').replace('outside date', 'tenant deadline').replace('close the takeout', 'sell or refinance the finished campus (the takeout)')}</div>
+          <div data-testid="tutorial-deadlines">Aim for delivery by <strong>{formatMonth(Math.min(...draft.halls.filter(h => !h.delivered && !h.terminated).map(h => h.deliveryMonth)))}</strong>. That is the lease target; the later outside date is the last chance before the tenant can walk. The time grade uses your delivery call, not the outside date.</div>
           <div>Each month, spend focus points on actions - permits, orders, fixes - then <strong>End month</strong> to advance the clock. Crews and review clocks keep running on their own; unused focus does not carry over.</div>
           <div>The <strong>Next</strong> card on the campus always points at the most useful move. You can also click anything on the campus to see what you can do there.</div>
         </div>
@@ -177,6 +193,7 @@ function CampusGame() {
         <span style={{ flex: 1 }}>{error ? error : plan.length ? `${plan.length} action${plan.length === 1 ? '' : 's'} done this month. ${actionsLeft} focus point${actionsLeft===1?'':'s'} left. End month advances the clock.` : isFreshStart ? 'Touch the campus to begin.' : ''}</span>
         {plan.length > 0 && <button onClick={() => setDrawer('actions')}>This month</button>}
         {state.phase === 'takeoutAvailable' && <button data-testid="price-takeout-banner" onClick={() => queueAction({ actionId: 'priceTakeout' })}>Price the takeout to finish the campaign</button>}
+        {(step.waiting || step.title === 'End the month') && state.phase === 'playing' && !simRunning && !fastForwardPause(state, content) && <button data-testid="skip-quiet-months" title="Monthly costs and events still apply. Stops for events, construction handoffs or financial warnings. Does not choose actions for you." onClick={skipQuietMonths}>Skip quiet months</button>}
         <button style={{ padding: '10px 30px', background: '#325b48', border: '1px solid #274737', borderRadius: 6, color: 'white', fontWeight: 'bold', cursor: 'pointer' }} disabled={state.phase === 'awaitingChoice' || state.phase === 'takeoutAvailable'} onClick={(e) => { if (e.detail < 2) endMonth(); }}>End month</button>
       </footer>
       <LedgerDrawer hideTrigger /><FinancialsDrawer hideTrigger /><EventModal /><TakeoutPreviewModal />
