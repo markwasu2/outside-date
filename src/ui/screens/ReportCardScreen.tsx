@@ -5,6 +5,7 @@ import type { GameState, GoodwillGroup, LogEntry } from '../../engine/types';
 import { GOODWILL_LABELS } from '../components/Hud';
 import { WhoHoldsChip } from '../components/WhoHoldsChip';
 import { CastPortrait } from '../portraits';
+import { riskRecordWords } from '../riskRecordWords';
 import { communityExplain, costExplain, riskAllocationExplain, timeExplain, valueExplain } from '../reportCardExplain';
 import { useStore } from '../store';
 import { DEFAULT_NEGOTIATION, DEFAULT_SETUP } from './SetupWizard';
@@ -258,19 +259,21 @@ export function ReportCardScreen() {
       ))}
 
       <h2>Risk allocation</h2>
+      <p data-testid="risk-ledger-scope" style={{fontSize:13,color:'#665b4c'}}>These are recorded risk losses, not every expense. Prevention costs such as rack retrofits are paid from cash and are not included in the loss totals below.</p>
       <table style={{ width: '100%', fontSize: '0.85rem', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ textAlign: 'left', borderBottom: '1px solid #ccc' }}>
             <th>Risk</th>
             <th>Held by</th>
-            <th>Materialized</th>
-            <th>Cost to you</th>
+            <th>Risk record</th>
+            <th>Recorded loss cost</th>
             <th>Mitigation you had</th>
           </tr>
         </thead>
         <tbody>
           {draft.risks.map((row) => {
             const def = content.risks.find((r) => r.id === row.id);
+            const words = riskRecordWords(row,draft);
             return (
               <tr key={row.id} style={{ borderBottom: '1px solid #eee' }}>
                 <td>{row.id === 'plantSlip' ? 'Plant construction slip after docket approval' : def?.label ?? row.id}</td>
@@ -278,8 +281,8 @@ export function ReportCardScreen() {
                 <td>
                   <WhoHoldsChip holder={row.holder} />
                 </td>
-                <td>{row.id === 'plantSlip' ? (draft.power.plants.some(p => p.slipped || (p.onlineMonth !== null && p.plannedOnlineMonth !== null && p.onlineMonth > p.plannedOnlineMonth)) ? 'Yes' : 'No construction slip') : row.materialized ? 'Yes' : 'No'}</td>
-                <td>{formatDollars(row.costToYou)}</td>
+                <td>{words.record}</td>
+                <td>{words.cost}</td>
                 <td>{def?.mitigation ?? ''}</td>
               </tr>
             );
