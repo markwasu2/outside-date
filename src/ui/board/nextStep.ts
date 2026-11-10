@@ -41,6 +41,14 @@ export function nextStep(state: GameState, content: Content): NextStep {
   const resolved = resolveContent(state, content);
   const power = state.power;
 
+  if (state.flags.drawFreeze) return {
+    title: 'Cure the lender draw freeze',
+    why: 'Construction cannot draw funding or progress while the freeze remains. Open the site office, choose Insurance & lender and cure the paperwork before waiting another month.',
+    objectId: 'siteOffice', actionId: 'cureDraw',
+  };
+  const inspection = state.halls.find(h => !h.delivered && !h.terminated && state.flags[`inspectionFail:${h.id}`]);
+  if (inspection) return { title: `Fix the failed inspection on ${inspection.id}`, why: 'This hall cannot progress until its failed inspection is fixed. Open the hall to arrange the fix.', objectId: inspection.id, actionId: 'fixInspection', params: {hallId: inspection.id} };
+
   // 1. The interconnection study gates the docket and the substation, and takes the longest of
   // anything you can start on month 0.
   if (power.studyStatus === 'none') {

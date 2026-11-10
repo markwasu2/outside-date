@@ -1214,3 +1214,16 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 524 unit, 73 e2e, lint, tsc, build |
 | visual | inspected: actual1280 site-office popup, 45% current chance and 30% recurring request chance readable |
 | grid | skipped: read-only UI projections, engine/save unchanged |
+
+# Fresh full journey - unblock the real lender freeze before waiting
+
+| criterion | status |
+|---|---|
+| fresh journey | done: New game, every setup choice, closing table, real object clicks, events, storm cure, delivery, takeout and report; no bot or state injection |
+| finding fixed | done: Next prioritizes frozen draws and failed inspections over waiting; office defaults to lender view during freeze |
+| regression | done: journey asserts at least 5 actions, cure guidance and takeout/report, not merely any ending |
+| full gates | done: 525 unit, 74 e2e in bounded groups (73 existing plus 1 journey), lint, tsc, build; monolithic e2e exceeded command's 120s ceiling, not a test failure |
+| visual | inspected: 1440 closing table, freeze/cure panel and final report with delivered campus |
+| scope | tutorial-edge5 through full setup, random campaign seed; Whale full cold real-click journey remains outstanding |
+| remaining | tutorial report shows irrelevant plant/docket timing despite no docket; ledger stale rows; event target naming and discovery frequency review |
+| grid | skipped: next-step/UI routing only, engine/save unchanged |

@@ -36,7 +36,7 @@ const OBJECT_TITLES: Record<string, string> = {
 };
 
 export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
-  const [officeView, setOfficeView] = useState<'permits' | 'money' | 'capital'>('permits');
+  const [officeView, setOfficeView] = useState<'permits' | 'money' | 'capital'>(() => useStore.getState().draft.flags.drawFreeze ? 'money' : 'permits');
   const committed = useStore((s) => s.state);
   const state = useStore((s) => s.draft);
   const [feedback, setFeedback] = useState('');
