@@ -174,7 +174,7 @@ export function runwayBarColor(months: number): string {
   return '#c62828';
 }
 
-export function Hud() {
+export function Hud({ hideFastForward = false }: { hideFastForward?: boolean }) {
   const draft = useStore((s) => s.draft);
   const plan = useStore((s) => s.plan);
   const content = useStore((s) => s.content);
@@ -415,7 +415,7 @@ export function Hud() {
         })}
       </div>
 
-      <button
+      {!hideFastForward && <button
         data-testid="fast-forward-button"
         title={
           canFastForward
@@ -430,7 +430,7 @@ export function Hud() {
         onClick={handleFastForward}
       >
         {ffBusy ? 'Fast forwarding...' : '\u{23E9} Fast forward'}
-      </button>
+      </button>}
 
       <button
         title={muted ? 'Sound is off (P10.3 hooks: end turn, event card, milestone, warning)' : 'Sound is on'}

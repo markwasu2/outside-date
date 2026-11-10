@@ -1,3 +1,4 @@
+import { openStatus } from './campusNavigation';
 import { expect, test } from '@playwright/test';
 
 /**
@@ -10,9 +11,13 @@ test('item 2: all four goodwill labels are visible and distinct in the HUD', asy
   await page.goto('/');
   await page.getByRole('button', { name: 'Tutorial' }).click();
 
+  await openStatus(page);
   await expect(page.getByText(/Town: \d+/)).toBeVisible();
+  await openStatus(page);
   await expect(page.getByText(/PUC\/Commission: \d+/)).toBeVisible();
+  await openStatus(page);
   await expect(page.getByText(/Utility: \d+/)).toBeVisible();
+  await openStatus(page);
   await expect(page.getByText(/Tenant: \d+/)).toBeVisible();
 });
 
@@ -37,7 +42,7 @@ test('item 4: the HUD fast-forward button advances the month', async ({ page }) 
   await page.goto('/');
   await page.getByRole('button', { name: 'Tutorial' }).click();
 
-  const monthLabel = page.locator('strong').first();
+  const monthLabel = page.getByTestId('campus-status').locator('strong').first();
   const startMonth = await monthLabel.innerText();
 
   const ffButton = page.getByTestId('fast-forward-button');

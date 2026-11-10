@@ -4,10 +4,8 @@ import { BoardStyles } from './board/boardStyles';
 import { GoalStrip } from './board/GoalStrip';
 import { ProgressSpine } from './board/ProgressSpine';
 import { WarningBanner } from './board/WarningBanner';
-import { CoachTip } from './components/CoachTip';
 import { CodexModal } from './components/CodexModal';
 import { EventModal } from './components/EventModal';
-import { EventNotices } from './components/EventNotices';
 import { FinancialsDrawer } from './components/FinancialsDrawer';
 import { Hud } from './components/Hud';
 import { LedgerDrawer } from './components/LedgerDrawer';
@@ -18,6 +16,10 @@ import { RatingScene } from './screens/RatingScene';
 import { ReportCardScreen } from './screens/ReportCardScreen';
 import { SetupWizard } from './screens/SetupWizard';
 import { useStore } from './store';
+import { nextStep } from './board/nextStep';
+import { warnings } from './board/warnings';
+import { totalApCost } from '../engine/step';
+import { formatDollars, formatMonth } from '../engine/format';
 
 /** P9.1/P9.2: once a run ends, show the animated rating scene first, then hand off to the real
  * report card screen (which absorbed Phase 8's `TutorialEndBanner` and Phase 6's placeholder
@@ -68,6 +70,81 @@ function useKeyboardShortcuts() {
   }, [screen, phase, endMonth, fastForward, setOpenPanel]);
 }
 
+/** Desktop campus-first stage: the map owns the canvas; detail stays on demand. */
+function CampusGame() {
+  const [drawer, setDrawer] = useState<'status' | 'actions' | null>(null);
+  const state = useStore((s) => s.state);
+  const draft = useStore((s) => s.draft);
+  const content = useStore((s) => s.content);
+  const plan = useStore((s) => s.plan);
+  const endMonth = useStore((s) => s.endMonth);
+  const queueAction = useStore((s) => s.queueAction);
+  const fastForward = useStore((s) => s.fastForward);
+  const setOpenPanel = useStore((s) => s.setOpenPanel);
+  const requestedTab = useStore((s) => s.requestedTab);
+  const setBoardPopover = useStore((s) => s.setBoardPopover);
+  const selectHall = useStore((s) => s.selectHall);
+  const error = useStore((s) => s.error);
+  const step = nextStep(state, content);
+  const takeoutQueued = plan.some((a) => a.actionId === 'priceTakeout');
+  const alerts = warnings(state, content);
+  useEffect(() => { if (requestedTab) setDrawer('actions'); }, [requestedTab]);
+  const showMe = () => {
+    setDrawer(null);
+    selectHall(state.halls.some((h) => h.id === step.objectId) ? step.objectId : step.objectId === 'substation' ? 'substation' : null);
+    setBoardPopover(step.objectId);
+  };
+  return (
+    <div data-testid="campus-workspace" style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#f1eadc', color: '#302d25', fontFamily: 'Arial, sans-serif' }}>
+      <BoardStyles />
+      <header data-testid="campus-status" style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '10px 18px', background: '#fffdf6', borderBottom: '1px solid #cdbf9f', fontSize: 13, flexShrink: 0 }}>
+        <span style={{ fontFamily: 'Georgia, serif', fontSize: 18 }}>Outside Date</span>
+        <strong>{formatMonth(draft.month)}</strong>
+        <span>Cash {formatDollars(draft.cash)}</span>
+        <span>AP {draft.apUsedThisMonth + totalApCost(plan, content)}/{draft.apPerMonth}</span>
+        <span>{draft.halls.filter((h) => h.delivered).length}/{draft.halls.length} halls delivered</span>
+        <span style={{ flex: 1 }} />
+        <button data-testid="fast-forward-button" disabled={plan.length > 0 || state.phase !== 'playing'} onClick={fastForward}>{'\u23E9'} Fast forward</button>
+        <button style={{ color: alerts.some((a) => a.level === 'critical') ? '#a52a21' : undefined, fontWeight: alerts.length ? 'bold' : undefined }} aria-expanded={drawer === 'status'} onClick={() => setDrawer(drawer === 'status' ? null : 'status')}>Status & guide{alerts.length ? ` (${alerts.length} alerts)` : ''}</button>
+        <button aria-expanded={drawer === 'actions'} onClick={() => setDrawer(drawer === 'actions' ? null : 'actions')}>All actions</button>
+      </header>
+      <div data-testid="next-step-card" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 18px', fontSize: 12, background: '#e8e1cf', borderBottom: '1px solid #cdbf9f', flexShrink: 0 }}>
+        <span style={{ flex: 1 }}><strong>Next: {step.title}</strong> - {step.why}</span>
+        <button data-testid="next-step-show-me" onClick={showMe}>Show me</button>
+      </div>
+      <div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minHeight: 0, position: 'relative' }}>
+        <MapGrid />
+        {drawer && (
+          <aside data-testid={`${drawer}-drawer`} style={{ position: 'absolute', right: 12, top: 10, bottom: 10, width: drawer === 'actions' ? 400 : 600, maxWidth: '80vw', zIndex: 60, background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #d9cfb9' }}>
+              <strong>{drawer === 'actions' ? 'All actions' : 'Status & guide'}</strong>
+              <button aria-label="Close panel" onClick={() => setDrawer(null)}>Close</button>
+            </div>
+            {drawer === 'actions' ? <div style={{ flex: 1, minHeight: 0 }}><TracksPanel hideEndMonth /></div> : (
+              <div style={{ overflowY: 'auto', flex: 1 }}>
+                <Hud hideFastForward />
+                <div id="stat-explainer-dock" style={{ maxHeight: 150, overflowY: 'auto' }} />
+                <GoalStrip />
+                <ProgressSpine hideNextStep />
+                <WarningBanner />
+                <LogStrip />
+                <div style={{ display: 'flex', gap: 8, padding: 12 }}><button onClick={() => setOpenPanel('ledger')}>Ledger</button><button data-testid="open-financials" onClick={() => setOpenPanel('financials')}>Financials</button></div>
+              </div>
+            )}
+          </aside>
+        )}
+      </div>
+      <footer style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '10px 18px', flexShrink: 0, background: '#fffdf6', borderTop: '1px solid #cdbf9f', fontSize: 13 }}>
+        <span style={{ flex: 1 }}>{error ? error : plan.length ? `${plan.length} action${plan.length === 1 ? '' : 's'} planned. Cash above previews the plan.` : 'Click a hall, office or power site to build and manage your campus.'}</span>
+        {plan.length > 0 && <button onClick={() => setDrawer('actions')}>Review plan</button>}
+        {state.phase === 'takeoutAvailable' && !takeoutQueued && <button data-testid="price-takeout-banner" onClick={() => queueAction({ actionId: 'priceTakeout' })}>Price the takeout to finish the campaign</button>}
+        <button style={{ padding: '10px 30px', background: '#325b48', border: '1px solid #274737', borderRadius: 6, color: 'white', fontWeight: 'bold', cursor: 'pointer' }} disabled={state.phase === 'awaitingChoice' || (state.phase === 'takeoutAvailable' && !takeoutQueued)} onClick={endMonth}>End month</button>
+      </footer>
+      <LedgerDrawer hideTrigger /><FinancialsDrawer hideTrigger /><EventModal />
+    </div>
+  );
+}
+
 export function App() {
   const screen = useStore((s) => s.screen);
   const phase = useStore((s) => s.draft.phase);
@@ -80,33 +157,7 @@ export function App() {
       ) : phase === 'ended' ? (
         <EndedFlow />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-          <BoardStyles />
-          <Hud />
-          <div id="stat-explainer-dock" style={{ flexShrink: 0, maxHeight: 150, overflowY: 'auto' }} />
-          <GoalStrip />
-          <ProgressSpine />
-          <WarningBanner />
-          <EventNotices />
-          <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-            {/* Phase 1: minHeight: 0 on both wrappers. The progress spine + warning banner took
-             * vertical space the layout used to give the main area; without letting these flex
-             * items shrink below their content height, the TracksPanel's bottom section (End
-             * month) painted past the main area and under the LogStrip, which then intercepted
-             * clicks (found via the tutorial smoke test timing out on the End-month click). */}
-            <div style={{ flex: 2, minWidth: 0, minHeight: 0 }}>
-              <MapGrid />
-            </div>
-            <div style={{ flex: 1, minWidth: 280, minHeight: 0, borderLeft: '1px solid #ccc' }}>
-              <TracksPanel />
-            </div>
-          </div>
-          <LogStrip />
-          <LedgerDrawer />
-          <FinancialsDrawer />
-          <EventModal />
-          <CoachTip />
-        </div>
+        <CampusGame />
       )}
       {/* P9.3: mounted regardless of screen, so the Title screen's Codex button and any
        * <Term>'s "more" link mid-game (or mid-wizard) can open it. */}

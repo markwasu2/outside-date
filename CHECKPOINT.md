@@ -938,3 +938,25 @@ verifies the visible air price/zero delay and liquid price/one-month delay.
 | visual | done: desktop racks modal inspected, choices readable |
 | full gates | done: 512 vitest, 56 e2e (55 + isolated long tutorial), lint, tsc, build |
 | balance grid | skipped: copy/tests only |
+
+# Campus-first stage 1 - one big graphic
+
+The desktop default is now a full-width campus canvas. A slim status header,
+next-step line and persistent End month footer replace the competing HUD/help,
+goal/progress, warning, log and right-hand action strips. Detailed status, scoring,
+alerts, log, help, Ledger and Financials remain in Status & guide. The full legacy
+action list is temporarily available through All actions as a reachability safety
+net while the next stage finishes object-specific action routes. Existing hall,
+office, water, laydown and substation popovers still work; the plant tile is now
+clickable too. No new game rules or saved-state fields.
+
+| criterion | status |
+|---|---|
+| canvas-first | done: no action/status drawer or auto-help on initial board; map >1200px wide and >500px high at 1280x720 |
+| persistent commit | done: End month stays on footer; takeout and pending-plan review retained |
+| existing actions | done: on-demand full list remains reachable, warning tab links open it automatically |
+| status on demand | done: scoring, financial tables, log, unlock hints and help tested through explicit new navigation |
+| full gates | done: 512 vitest, 57 e2e (28+28 shards + isolated long tutorial), lint, tsc, build |
+| visual | done: docs/screenshots/cold2/campus-1280.png and campus-1440.png inspected |
+| balance grid | skipped: UI composition/navigation only |
+| remaining staged work | remove legacy tabs from fallback and finish object-specific finance/cast routes; do not claim the fallback is already gone |

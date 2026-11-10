@@ -63,7 +63,7 @@ function Dot({ state, label, title }: { state: 'done' | 'pending' | 'todo'; labe
   );
 }
 
-export function ProgressSpine() {
+export function ProgressSpine({ hideNextStep = false }: { hideNextStep?: boolean }) {
   const state = useStore((s) => s.state);
   const content = useStore((s) => s.content);
   const selectHall = useStore((s) => s.selectHall);
@@ -191,7 +191,7 @@ export function ProgressSpine() {
         </span>
       )}
 
-      <span
+      {!hideNextStep && (<span
         data-testid="next-step-card"
         style={{
           ...SECTION,
@@ -218,7 +218,7 @@ export function ProgressSpine() {
         >
           Show me
         </button>
-      </span>
+      </span>)}
 
       {narrow && (
         <button onClick={() => setCollapsed(true)} style={{ fontSize: '0.75rem', cursor: 'pointer' }}>
