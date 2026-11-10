@@ -149,8 +149,8 @@ const BESPOKE_CHOICE_STAKES: Record<string, (tier: string) => Record<string, str
     decline: 'No visit, no rebate',
   }),
   union_pla: () => ({
-    sign: 'Hall budgets +2%, labor-shortfall odds drop from 0.22 to 0.05 a month',
-    decline: 'Labor-shortfall odds stay at 0.22 a month',
+    sign: 'Hall budgets +2%, base labor-shortfall chance drops from 22% to 5% each month',
+    decline: 'Base labor-shortfall chance stays at 22% each month',
   }),
   tenant_slide_offer: () => ({
     accept: 'The next undelivered hall slips 2 months (delivery and outside date), its rent -2%',
