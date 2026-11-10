@@ -1058,3 +1058,22 @@ unique newly failed inspection. Unknown targets use the office, never a random h
 | full gates | done: 518 unit, 62 e2e, lint, tsc, build after final tuning |
 | visual | done: updated cutoff wording inspected, all choices visible |
 | migration | skipped: no saved-state shape change |
+
+# Immersive opening stage 1 - setup stays on the land
+
+The title and all six pre-close steps now sit over a read-only campus preview.
+Selected site changes the land/pond, hall count follows the scenario, and cooling
+art follows the choice. A short location/why line introduces each decision in
+order. No game state is started and no month passes until signing. Existing
+inputs, scenario overrides and save loading remain intact. Cooling sprites now
+have transparent edges; the power timeline labels stay inside the panel.
+
+| criterion | status |
+|---|---|
+| scene continuity | done: land visible on title and every setup step |
+| honest pre-close state | done: planned labels, no time until sign, budget and not-signed footer |
+| site/choices | done: e2e farmland repaints pond, all steps reach Start campaign at Y1 M1 |
+| full gates | done: 518 unit, 63 e2e, lint, tsc, build |
+| visual | done: 1280 title/land and 1440 power inspected; timeline clipping fixed |
+| grid | skipped: presentation only, no rules or save shape change |
+| staged remainder | split initial setup into land/hall/cooling/contractor interactions; final closing review; in-scene takeout/report |

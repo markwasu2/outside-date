@@ -21,9 +21,9 @@ describe('describeDifficulty (item 6)', () => {
     expect(text).toContain('+10 tenant goodwill');
   });
 
-  it('describes normal as having no overrides', () => {
+  it('describes normal exit valuation tuning', () => {
     const text = describeDifficulty(whaleDifficulties?.normal);
-    expect(text).toBe('No overrides - the scenario\u2019s defaults apply.');
+    expect(text).toBe('base exit cap rate 7.75%.');
   });
 
   it('describes hard: forced farmland, harsher goodwill, doubled supply_shock odds', () => {
