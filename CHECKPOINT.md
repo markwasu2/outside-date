@@ -1263,3 +1263,16 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 527 unit, 76 e2e in bounded groups, lint, tsc, build |
 | visual | inspected: 1280 and1440 introduction and1280 study/switchgear previews, count and End month readable |
 | grid | skipped: words/UI only; three-action rule, engine, bot and save shape unchanged |
+
+# Event occurrence names use evidence, not a rerolled target
+
+| criterion | status |
+|---|---|
+| inspections | done: new failure notice names the hall and pins there, ignoring old failures |
+| losses | done: claim-backed notices name affected hall and insured/uninsured status |
+| equipment | done: named supplier/order booked-date changes shown from matching before/after order evidence |
+| choice targets | done: tenant slide names next undelivered hall, chip generation explicitly labels all undelivered halls/rack program |
+| scope | no fresh RNG draw or invented random target; unsupported occurrences retain general object |
+| full gates | done: 528 unit, 77 e2e bounded groups, lint, tsc, build |
+| visual | inspected: actual1280 H3 inspection notice names H3 and fix, next instruction matches |
+| grid | skipped: read-only occurrence UI, no engine/save changes |
