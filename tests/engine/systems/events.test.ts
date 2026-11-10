@@ -6,6 +6,7 @@ import { createGame, type NegotiationChoices } from '../../../src/engine/init';
 import { drawEvent, resolveChoice } from '../../../src/engine/systems/events';
 import type { GameState, Setup, StageId } from '../../../src/engine/types';
 import { STAGES } from '../../../src/engine/types';
+import { createRng } from '../../../src/engine/rng';
 
 const baseContent = loadContent();
 const negotiation: NegotiationChoices = {
@@ -510,5 +511,32 @@ describe('events: per-card effects', () => {
 
     const lowUtility = { ...state, goodwill: { ...state.goodwill, utility: 60 } };
     expect(drawEvent(lowUtility, withCards([forced('interconnect_queue_jump')])).pending).toBeNull();
+  });
+});
+
+
+describe('construction events ignore terminal halls with retained stage history', () => {
+  it.each(['inspection_fail', 'overrun', 'fitout_fire', 'water_damage', 'labor_shortfall'])('%s cannot draw for a terminated hall', (id) => {
+    const state = setHallStage(freshState({}, 24), 'H1', 'fitout', { terminated: true });
+    const {state: next} = drawEvent(state, withCards([forced(id)]));
+    expect(next.log).toEqual(state.log);
+    expect(next.cash).toBe(state.cash);
+    expect(next.flags['inspectionFail:H1']).toBeFalsy();
+  });
+  it('stage-targeted inspection selects the live hall, never retained terminal history', () => {
+    for (let seed = 1; seed <= 30; seed++) {
+      let state = {...freshState(), seed, rng: createRng(seed)};
+      state = setHallStage(state, 'H1', 'shell', { terminated: true });
+      state = setHallStage(state, 'H2', 'fitout', { delivered: true });
+      state = setHallStage(state, 'H3', 'fitout');
+      const {state: next} = drawEvent(state, withCards([forced('inspection_fail')]));
+      expect(next.flags['inspectionFail:H1']).toBeFalsy();
+      expect(next.flags['inspectionFail:H2']).toBeFalsy();
+      expect(next.flags['inspectionFail:H3']).toBe(true);
+    }
+  });
+  it('delivered halls do not keep construction events eligible', () => {
+    const state = setHallStage(freshState({}, 24), 'H1', 'fitout', { delivered: true });
+    expect(drawEvent(state, withCards([forced('inspection_fail')])).state.log).toEqual(state.log);
   });
 });

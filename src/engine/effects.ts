@@ -43,7 +43,7 @@ function replaceHall(state: GameState, hallId: string, next: Hall): GameState {
 }
 
 function hallCurrentStage(hall: Hall): StageId | null {
-  return hall.stageActive ? STAGES[hall.stageIndex] ?? null : null;
+  return hall.stageActive && !hall.terminated && !hall.delivered ? STAGES[hall.stageIndex] ?? null : null;
 }
 
 function hallsInStage(state: GameState, stage: string): Hall[] {
