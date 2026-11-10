@@ -1469,3 +1469,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | journey catch | initial filter also folded denied permits; full journey caught it before merge; narrowed filter to pending/granted and added unit guard |
 | gates |545unit,92browser,lint,tsc,build;1280pixel simplified substation inspected |
 | scope | popup presentation only,no engine/save/bot change |
+
+# Personal Whale replay - explain the automatic power chain
+
+| criterion | status |
+|---|---|
+| personal run | Whale normal closed Y4 M7, 4/4 on time, $1.74B campus, $162.2M equity, 1.03x; real live clicks, not a scripted journey |
+| observed | approved plants still asked for a docket for one tick; substation popup lacked progress explanation; completed docket upkeep remained primary |
+| fixed | approved plant transition names automatic start; substation popup explains prerequisites, automatic build and due date; completed docket and settled meetings fold away |
+| safety | outstanding discovery, unsettled meetings and failed-docket recovery remain available; no discovery rule change from one seed |
+| gates | 547 unit, 93 browser (91 bounded nonjourney plus 2 complete journeys), lint, tsc, build; 1280px power popup inspected |
+| scope | UI presentation only, no engine, bot, rule or save change; no migration or seed grids required |
