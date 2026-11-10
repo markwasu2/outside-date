@@ -181,7 +181,7 @@ export function checkAction(
   const used = totalApCost(plan, planContent);
   const remaining = state.apPerMonth - state.apUsedThisMonth - used;
   if (def.ap > 0 && def.ap > remaining) {
-    return { ok: false, reason: `Needs ${def.ap} AP; only ${remaining} left this month` };
+    return { ok: false, reason: `Uses ${def.ap} action${def.ap === 1 ? '' : 's'}; only ${remaining} left this month` };
   }
   if (isDuplicateZeroApAction(def, plan, action)) {
     return { ok: false, reason: 'Already queued this month' };

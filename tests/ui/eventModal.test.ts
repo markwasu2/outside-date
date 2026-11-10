@@ -11,7 +11,7 @@ const content = loadContent();
 describe('EventModal: describeEffect (finding #2)', () => {
   it('describes an owedAp effect as an AP cost next month', () => {
     const effect: Effect = { type: 'owedAp', args: [1] };
-    expect(describeEffect(effect)).toBe('Costs 1 AP next month');
+    expect(describeEffect(effect)).toBe("Uses 1 of next month's actions");
   });
 
   it('describes a negative cash effect with the dollar amount', () => {

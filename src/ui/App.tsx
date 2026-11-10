@@ -18,6 +18,7 @@ import { RatingScene } from './screens/RatingScene';
 import { ReportCardScreen } from './screens/ReportCardScreen';
 import { SetupWizard } from './screens/SetupWizard';
 import { useStore } from './store';
+import { goalSentence } from './board/GoalStrip';
 import { nextStep } from './board/nextStep';
 import { warnings } from './board/warnings';
 import { totalApCost } from '../engine/step';
@@ -91,6 +92,10 @@ function CampusGame() {
   useEffect(() => { if (boardPopover) setDrawer(null); }, [boardPopover]);
   const selectHall = useStore((s) => s.selectHall);
   const error = useStore((s) => s.error);
+  const dismissed = useStore(s => s.dismissedCoachTips.includes('monthly-decisions'));
+  const dismissCoachTip = useStore(s => s.dismissCoachTip);
+  const [showBasics, setShowBasics] = useState(!dismissed);
+  const actionsLeft = Math.max(0, draft.apPerMonth - draft.apUsedThisMonth - totalApCost(plan,content));
   const step = nextStep(draft, content);
   const takeoutQueued = plan.some((a) => a.actionId === 'priceTakeout');
   const alerts = warnings(state, content);
@@ -107,7 +112,7 @@ function CampusGame() {
         <span style={{ fontFamily: 'Georgia, serif', fontSize: 18 }}>Outside Date</span>
         <strong>{formatMonth(draft.month)}</strong>
         <span>Cash {formatDollars(draft.cash)}</span>
-        <span>AP {draft.apUsedThisMonth + totalApCost(plan, content)}/{draft.apPerMonth}</span>
+        <button data-testid="actions-remaining" aria-expanded={showBasics} onClick={() => setShowBasics(!showBasics)} style={{padding:'6px 9px',background:'#e6efdf',border:'1px solid #a6b69d',borderRadius:5}}>Actions this month: {actionsLeft} of {draft.apPerMonth} left</button>
         <span>{draft.halls.filter((h) => h.delivered).length}/{draft.halls.length} halls delivered</span>
         <span style={{ flex: 1 }} />
         <button data-testid="fast-forward-button" disabled={plan.length > 0 || state.phase !== 'playing'} onClick={fastForward}>{'\u23E9'} Fast forward</button>
@@ -118,6 +123,13 @@ function CampusGame() {
         <span style={{ flex: 1 }}><strong>{plan.length ? 'After planned actions: ' : 'Next: '}{step.title}</strong> - {step.why}</span>
         <button data-testid="next-step-show-me" onClick={showMe}>Show me</button>
       </div>
+      {showBasics && <section data-testid="monthly-decisions-help" style={{padding:'10px 18px',background:'#fff9e9',borderBottom:'1px solid #cdbf9f',fontSize:13,lineHeight:1.5,flexShrink:0}}>
+        <div style={{display:'flex',justifyContent:'space-between',gap:14}}><strong>You are the developer. What do you do this month?</strong><button onClick={() => {setShowBasics(false);dismissCoachTip('monthly-decisions');}}>Start planning</button></div>
+        <div>The game gives you {draft.apPerMonth} actions each month to represent your limited time and attention, not the number of workers on site. A decision is an instruction you give: order equipment, file a permit, start a building stage or meet someone.</div>
+        <div>Click an object to see what an action will do and what it costs. Adding it to Plan reserves an action; you can remove it before committing. <strong>End month</strong> commits your plan, pays the monthly costs and lets jobs progress. Your budget resets next month; unused actions do not carry over. You do not have to spend them all.</div>
+        <div>Crews and review clocks keep running without another action. Some choices use no monthly action; some events use one from next month.</div>
+        <strong>{goalSentence(draft).replace('all 1 hall', 'your hall').replace('outside date', 'tenant deadline').replace('close the takeout', 'sell/refinance the finished campus (the takeout)')}</strong>
+      </section>}
       <div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minHeight: 0, position: 'relative' }}>
         <MapGrid /><EventNotices />
         {drawer && (
@@ -141,7 +153,7 @@ function CampusGame() {
         )}
       </div>
       <footer style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '10px 18px', flexShrink: 0, background: '#fffdf6', borderTop: '1px solid #cdbf9f', fontSize: 13 }}>
-        <span style={{ flex: 1 }}>{error ? error : plan.length ? `${plan.length} action${plan.length === 1 ? '' : 's'} planned. Cash above previews the plan.` : 'Click a hall, office or power site to build and manage your campus.'}</span>
+        <span style={{ flex: 1 }}>{error ? error : plan.length ? `${plan.length} instruction${plan.length === 1 ? '' : 's'} planned. ${actionsLeft} monthly actions left. End month to commit; Plan to review or remove.` : 'Click a hall, office or power site to build and manage your campus.'}</span>
         {plan.length > 0 && <button onClick={() => setDrawer('actions')}>Review plan</button>}
         {state.phase === 'takeoutAvailable' && !takeoutQueued && <button data-testid="price-takeout-banner" onClick={() => queueAction({ actionId: 'priceTakeout' })}>Price the takeout to finish the campaign</button>}
         <button style={{ padding: '10px 30px', background: '#325b48', border: '1px solid #274737', borderRadius: 6, color: 'white', fontWeight: 'bold', cursor: 'pointer' }} disabled={state.phase === 'awaitingChoice' || (state.phase === 'takeoutAvailable' && !takeoutQueued)} onClick={(e) => { if (e.detail < 2) endMonth(); }}>End month</button>
