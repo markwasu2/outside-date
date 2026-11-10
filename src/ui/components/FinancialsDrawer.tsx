@@ -1,4 +1,5 @@
 import { formatDollars, formatMonth } from '../../engine/format';
+import { resolveContent } from '../../engine/resolve';
 import { forwardNoi } from '../../engine/selectors';
 import {
   buildFinancialSnapshot,
@@ -34,7 +35,7 @@ function TrendChart({ points, triggerLine, testid }: { points: { month: number; 
   const H = 70;
   if (points.length === 0) {
     return (
-      <div data-testid={testid} style={{ color: '#777', fontSize: '0.75rem' }}>
+      <div data-testid={testid} style={{ color: '#777', fontSize: '0.875rem' }}>
         No readings yet - this series starts once there is something to show.
       </div>
     );
@@ -48,7 +49,7 @@ function TrendChart({ points, triggerLine, testid }: { points: { month: number; 
   const y = (v: number) => H - 6 - ((v - minV) / (maxV - minV)) * (H - 12);
   const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(p.month).toFixed(1)},${y(p.value).toFixed(1)}`).join(' ');
   return (
-    <svg data-testid={testid} width={W} height={H} style={{ display: 'block', background: '#fafafa', border: '1px solid #eee' }}>
+    <svg data-testid={testid} width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block', maxWidth: '100%', height: 'auto', background: '#fafafa', border: '1px solid #eee' }}>
       {triggerLine !== undefined && (
         <line x1={0} x2={W} y1={y(triggerLine)} y2={y(triggerLine)} stroke="#c62828" strokeDasharray="4 3" strokeWidth={1} />
       )}
@@ -65,7 +66,7 @@ function CommitmentBar({ label, termId, used, commitment }: { label: string; ter
   const pct = commitment > 0 ? Math.min(1, used / commitment) : 0;
   return (
     <div style={{ marginBottom: 4 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
         <span>
           <Term id={termId}>{label}</Term>
         </span>
@@ -83,7 +84,7 @@ function CommitmentBar({ label, termId, used, commitment }: { label: string; ter
 function SourcesUsesTable({ snap }: { snap: FinancialSnapshot | undefined }) {
   if (!snap?.sourcesUses) {
     return (
-      <div style={{ color: '#777', fontSize: '0.75rem' }}>
+      <div style={{ color: '#777', fontSize: '0.875rem' }}>
         Sources and uses are recorded from the month-0 snapshot of a run. This save predates the recorder - start a new
         campaign to see the closing table.
       </div>
@@ -92,13 +93,13 @@ function SourcesUsesTable({ snap }: { snap: FinancialSnapshot | undefined }) {
   const { sources, uses, sourcesTotal, usesTotal } = snap.sourcesUses;
   const rows = Math.max(sources.length, uses.length);
   return (
-    <table data-testid="sources-uses-table" style={{ width: '100%', fontSize: '0.75rem', borderCollapse: 'collapse' }}>
+    <table data-testid="sources-uses-table" style={{ width: '100%', fontSize: '0.875rem', borderCollapse: 'collapse' }}>
       <thead>
         <tr style={{ textAlign: 'left', borderBottom: '1px solid #ccc', color: '#555' }}>
           <th>Source of money</th>
-          <th style={{ textAlign: 'right' }}>$</th>
+          <th style={{ textAlign: 'right', whiteSpace: 'nowrap', padding: '3px 10px' }}>$</th>
           <th>Use of money</th>
-          <th style={{ textAlign: 'right' }}>$</th>
+          <th style={{ textAlign: 'right', whiteSpace: 'nowrap', padding: '3px 10px' }}>$</th>
         </tr>
       </thead>
       <tbody>
@@ -108,19 +109,19 @@ function SourcesUsesTable({ snap }: { snap: FinancialSnapshot | undefined }) {
           return (
             <tr key={i} style={{ borderBottom: '1px solid #f0f0f0' }}>
               <td>{s ? (s.termId ? <Term id={s.termId}>{s.label}</Term> : s.label) : ''}</td>
-              <td style={{ textAlign: 'right' }}>{s ? formatDollars(s.amount) : ''}</td>
+              <td style={{ textAlign: 'right', whiteSpace: 'nowrap', padding: '3px 10px' }}>{s ? formatDollars(s.amount) : ''}</td>
               <td>{u ? (u.termId ? <Term id={u.termId}>{u.label}</Term> : u.label) : ''}</td>
-              <td style={{ textAlign: 'right' }}>{u ? formatDollars(u.amount) : ''}</td>
+              <td style={{ textAlign: 'right', whiteSpace: 'nowrap', padding: '3px 10px' }}>{u ? formatDollars(u.amount) : ''}</td>
             </tr>
           );
         })}
         <tr style={{ fontWeight: 'bold', borderTop: '1px solid #999' }}>
           <td data-testid="sources-total-label">Total sources</td>
-          <td data-testid="sources-total" style={{ textAlign: 'right' }}>
+          <td data-testid="sources-total" style={{ textAlign: 'right', whiteSpace: 'nowrap', padding: '3px 10px' }}>
             {formatDollars(sourcesTotal)}
           </td>
           <td data-testid="uses-total-label">Total uses</td>
-          <td data-testid="uses-total" style={{ textAlign: 'right' }}>
+          <td data-testid="uses-total" style={{ textAlign: 'right', whiteSpace: 'nowrap', padding: '3px 10px' }}>
             {formatDollars(usesTotal)}
           </td>
         </tr>
@@ -167,30 +168,34 @@ export function FinancialsDrawer({ hideTrigger = false }: { hideTrigger?: boolea
   const waterfall = cashWaterfall(snapshots);
   const noiSeries = snapshots.map((s) => ({ month: s.month, value: s.forwardNoi }));
   const currentNoi = forwardNoi(state, content);
+  const covenant = resolveContent(state, content).tuning.covenant;
 
   return (
     <div
       data-testid="financials-drawer"
       style={{
         position: 'fixed',
-        bottom: 0,
-        right: 0,
-        width: '380px',
-        maxHeight: '75vh',
+        top: 60,
+        bottom: 64,
+        right: 12,
+        width: 'min(680px, calc(100vw - 24px))',
+        boxSizing: 'border-box',
+        borderRadius: 8,
         overflowY: 'auto',
-        background: '#fff',
+        background: '#fffdf6',
         border: '1px solid #ccc',
         boxShadow: '0 0 8px rgba(0,0,0,0.2)',
         fontFamily: 'sans-serif',
-        fontSize: '0.8rem',
+        fontSize: '0.9375rem',
+        lineHeight: 1.5,
         zIndex: 800,
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem', borderBottom: '1px solid #ccc' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.7rem 1rem', borderBottom: '1px solid #ccc', position: 'sticky', top: 0, background: '#fffdf6', zIndex: 1 }}>
         <strong>Financials</strong>
         <button onClick={() => setOpenPanel('financials')}>close</button>
       </div>
-      <div style={{ padding: '0.5rem 0.7rem' }}>
+      <div style={{ padding: '0.5rem 1rem 1rem' }}>
         <SectionTitle>
           <Term id="sources-and-uses">Sources and uses</Term> at close
         </SectionTitle>
@@ -205,7 +210,7 @@ export function FinancialsDrawer({ hideTrigger = false }: { hideTrigger?: boolea
             <CommitmentBar label="Mezzanine" termId="mezzanine" used={last.mezzDrawn} commitment={last.mezzCommitment} />
             <CommitmentBar label="Senior loan" termId="senior-loan" used={last.seniorDrawn} commitment={last.seniorCommitment} />
             {draws.length > 0 && (
-              <table style={{ width: '100%', fontSize: '0.72rem', borderCollapse: 'collapse', marginTop: 4 }}>
+              <table style={{ width: '100%', fontSize: '0.875rem', borderCollapse: 'collapse', marginTop: 4 }}>
                 <thead>
                   <tr style={{ textAlign: 'right', color: '#555' }}>
                     <th style={{ textAlign: 'left' }}>Month</th>
@@ -236,16 +241,16 @@ export function FinancialsDrawer({ hideTrigger = false }: { hideTrigger?: boolea
         <SectionTitle>
           <Term id="dscr">DSCR</Term> trend
         </SectionTitle>
-        <TrendChart points={trend} triggerLine={content.tuning.covenant.dscrTrigger} testid="dscr-trend" />
-        <div style={{ fontSize: '0.72rem', color: '#555' }}>
-          Dashed line: the {content.tuning.covenant.dscrTrigger.toFixed(2)}x covenant trigger, tested at month{' '}
-          {content.tuning.covenant.forcedTestMonth}.
+        <TrendChart points={trend} triggerLine={covenant.dscrTrigger} testid="dscr-trend" />
+        <div style={{ fontSize: '0.875rem', color: '#555' }}>
+          Dashed line: the {covenant.dscrTrigger.toFixed(2)}x covenant trigger. First tested when all active halls deliver,
+          or at {formatMonth(covenant.forcedTestMonth)}, whichever comes first. Retested monthly after a failure.
         </div>
 
         <SectionTitle>
           <Term id="interest-reserve">Interest reserve</Term> burn
         </SectionTitle>
-        <div data-testid="interest-reserve" style={{ fontSize: '0.78rem' }}>
+        <div data-testid="interest-reserve" style={{ fontSize: '0.875rem' }}>
           <div>
             Interest folded into the loan so far: <strong>{formatDollars(reserve.capitalizedToDate)}</strong> (
             <Term id="capitalized-interest">capitalized</Term> + <Term id="pik">PIK</Term>, not cash)
@@ -260,7 +265,7 @@ export function FinancialsDrawer({ hideTrigger = false }: { hideTrigger?: boolea
           <Term id="cash-waterfall">Cash waterfall</Term> - last committed month
         </SectionTitle>
         {waterfall ? (
-          <table data-testid="cash-waterfall" style={{ width: '100%', fontSize: '0.75rem', borderCollapse: 'collapse' }}>
+          <table data-testid="cash-waterfall" style={{ width: '100%', fontSize: '0.875rem', borderCollapse: 'collapse' }}>
             <tbody>
               {waterfall.rentIncome !== 0 && (
                 <tr>
@@ -271,7 +276,7 @@ export function FinancialsDrawer({ hideTrigger = false }: { hideTrigger?: boolea
               {waterfall.outflows.map((o) => (
                 <tr key={o.label}>
                   <td>{o.label}</td>
-                  <td style={{ textAlign: 'right' }}>-{formatDollars(o.amount)}</td>
+                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap', padding: '3px 10px' }}>-{formatDollars(o.amount)}</td>
                 </tr>
               ))}
               {waterfall.equityFunded !== 0 && (
@@ -306,7 +311,7 @@ export function FinancialsDrawer({ hideTrigger = false }: { hideTrigger?: boolea
               )}
               <tr style={{ fontWeight: 'bold', borderTop: '1px solid #999' }}>
                 <td>Net cash change</td>
-                <td data-testid="net-cash-change" style={{ textAlign: 'right' }}>
+                <td data-testid="net-cash-change" style={{ textAlign: 'right', whiteSpace: 'nowrap', padding: '3px 10px' }}>
                   {waterfall.netCashChange >= 0 ? '+' : ''}
                   {formatDollars(waterfall.netCashChange)}
                 </td>
@@ -314,13 +319,13 @@ export function FinancialsDrawer({ hideTrigger = false }: { hideTrigger?: boolea
             </tbody>
           </table>
         ) : (
-          <div style={{ color: '#777', fontSize: '0.75rem' }}>The waterfall appears after the first committed month.</div>
+          <div style={{ color: '#777', fontSize: '0.875rem' }}>The waterfall appears after the first committed month.</div>
         )}
 
         <SectionTitle>
           <Term id="forward-noi">Forward NOI</Term>
         </SectionTitle>
-        <div data-testid="forward-noi" style={{ fontSize: '0.78rem' }}>
+        <div data-testid="forward-noi" style={{ fontSize: '0.875rem' }}>
           <div>
             Current forward NOI: <strong>{currentNoi > 0 ? formatDollars(currentNoi) : 'none until a hall delivers'}</strong>
           </div>

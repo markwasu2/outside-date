@@ -1616,3 +1616,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | use same-tick termination detail only for allTerminated; other losses keep the explicit outcome reason, never an unrelated or old warning |
 | gates | 565 unit, 105 browser (103 bounded plus 2 complete journeys), lint, tsc, build; 1280px terminal explanation inspected |
 | scope | report-only, no simulation, save, bot or tuning changes; no migration required; existing bundle-size warning remains |
+
+# Personal Tutorial replay - readable optional Financials
+
+| criterion | status |
+|---|---|
+| personal run | Tutorial normal, explored Status, Financials, Plan and Fast forward; ended Y2 M8 after permit denial and late construction; live termination cause confirmed |
+| observed | Financials squeezed a four-column table into 380px with 12px text; covenant clock said raw month 54 and ignored scenario overrides |
+| fixed | optional 680px view, 14px table text, separated money columns, sticky close, room above End month; responsive width, no change to default land view |
+| rules | covenant trigger and forced date resolved by scenario/site/difficulty; explains earlier test when all active halls deliver and monthly retest after failure |
+| gates | 565 unit, 107 browser (105 bounded in two shards plus 2 complete journeys), lint, tsc, build; final 1280px Financials pixels inspected and 600px overflow tested |
+| scope | read-only UI only, no simulation, save, bot or tuning changes; no migration required; existing bundle-size warning remains |
