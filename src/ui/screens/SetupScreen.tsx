@@ -45,8 +45,9 @@ export function SetupScreen({ section='setup', scenarioId, difficultyId, setup, 
     onChange({ ...setup, [key]: value });
   }
 
-  const sites = sitesFor(content, scenarioId);
-  const selectedSiteId = resolveSite(content, scenarioId, setup.site).id;
+  const fixedSite = content.scenarios[scenarioId]?.difficulties?.[difficultyId]?.forcedSetup?.site;
+  const selectedSiteId = resolveSite(content, scenarioId, preview.setup.site).id;
+  const sites = sitesFor(content, scenarioId).filter(site => !fixedSite || site.id === selectedSiteId);
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 640, margin: '0 auto' }}>
@@ -55,7 +56,13 @@ export function SetupScreen({ section='setup', scenarioId, difficultyId, setup, 
         Budget at close: <strong>{formatDollars(preview.budgetAtClose)}</strong>
       </p>
 
-      {section === 'setup' && <SiteCards sites={sites} selected={selectedSiteId} onPick={(id) => pick('site', id)} />}
+      {section === 'setup' && <>
+        {fixedSite && <p data-testid="fixed-site-explanation">
+          {difficultyId === 'easy' ? 'Easy' : 'Hard'} difficulty fixes the land at {resolveSite(content, scenarioId, preview.setup.site).name}.
+          {' '}Return to the title and choose Normal to pick among all three sites.
+        </p>}
+        <SiteCards sites={sites} selected={selectedSiteId} onPick={(id) => pick('site', id)} />
+      </>}
       {section === 'tier' && <Section title="Hall tier" options={TIERS} selected={setup.hallTier} onPick={(id) => pick('hallTier', id)} />}
       {section === 'cooling' && <Section title="Cooling" options={COOLINGS} selected={setup.cooling} onPick={(id) => pick('cooling', id)} />}
       {section === 'contractor' && <Section title="General contractor" options={GCS} selected={setup.gc} onPick={(id) => pick('gc', id)} />}

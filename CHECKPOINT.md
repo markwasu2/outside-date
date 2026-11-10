@@ -1657,3 +1657,12 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | when current capacity fits the ordered allocation, explain End month runs the automatic hookup, then ready-for-service work still needs a hall instruction; real capacity shortages keep their plant explanation |
 | gates | 570 unit, 112 browser (110 bounded plus both complete journeys), lint, tsc, build; actual 1280px contextual cue pixels inspected; allocation boundary, order and resolved-cooling coverage |
 | scope | UI preview only, no power-system order, simulation, save, bot or tuning changes; no migration required; existing bundle-size warning remains |
+
+# Personal easy setup - don't offer a land choice difficulty will ignore
+
+| criterion | status |
+|---|---|
+| personal finding | selected Quarry on easy, but header, campus and budget stayed Richfield while the Quarry card highlighted; easy forces Megasite and hard forces Farmland in existing rules |
+| fixed | setup shows the actual fixed site's card selected and explains the difficulty rule and Normal route; normal retains all three real choices |
+| gates | 570 unit, 115 browser (113 bounded plus both full journeys), lint, tsc, build; actual 1280px easy and hard setup pixels inspected; back/forward and normal-selection regression tests |
+| scope | setup presentation only, no engine/save/bot/tuning changes, no migration required; existing bundle-size warning remains |
