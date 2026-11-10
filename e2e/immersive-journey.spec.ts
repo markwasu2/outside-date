@@ -31,7 +31,7 @@ test('fresh title through signing, object-only construction and final report',as
    await popup.getByRole('button',{name:'Close',exact:true}).click();await expect(popup).toHaveCount(0);
   }
   if([0,5,10,15].includes(turn))await page.screenshot({path:`docs/screenshots/cold2/journey-${turn}.png`});
-  if(await page.getByTestId('price-takeout-banner').count()){trace.push('PRICE TAKEOUT');await page.getByTestId('price-takeout-banner').click();await page.getByRole('button',{name:'End month',exact:true}).click();break;}
+  if(await page.getByTestId('price-takeout-banner').count()){trace.push('PRICE TAKEOUT');await page.getByTestId('price-takeout-banner').click();await expect(page.getByTestId('takeout-preview-card')).toBeVisible();await page.getByTestId('commit-takeout').click();break;}
   await page.getByRole('button',{name:'End month',exact:true}).click();
  }
  for(let i=0;i<6;i++){

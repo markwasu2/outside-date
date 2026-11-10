@@ -26,7 +26,7 @@ test('Whale fresh setup to ending follows visible guidance using real clicks',as
    await popup.getByRole('button',{name:'Close',exact:true}).click();if(!chosen)break;
   }
   if([0,15,30,45].includes(month))await page.screenshot({path:`docs/screenshots/cold2/whale-journey-${month}.png`});
-  if(await page.getByTestId('price-takeout-banner').count()){trace.push('PRICE TAKEOUT');await page.getByTestId('price-takeout-banner').click();await page.getByRole('button',{name:'End month',exact:true}).click();break;}
+  if(await page.getByTestId('price-takeout-banner').count()){trace.push('PRICE TAKEOUT');await page.getByTestId('price-takeout-banner').click();await page.getByTestId('commit-takeout').click();break;}
   await page.getByRole('button',{name:'End month',exact:true}).click();
  }
  for(let i=0;i<6;i++){const button=page.getByRole('button',{name:/^(Skip|Continue)$/});if(!await button.count())break;await button.first().click();}
