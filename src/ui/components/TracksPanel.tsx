@@ -1,3 +1,4 @@
+import { capitalCashLabel } from '../board/capitalWords';
 import { hallAdvanceLabel } from '../board/legibility';
 import { useEffect, useState } from 'react';
 
@@ -224,7 +225,7 @@ export function buildRows(tab: TrackTab, state: GameState, content: Content, sel
         label: q.label,
         help,
         ap: def.ap,
-        cashLabel: q.maxAmount > 0 ? `raises ${formatDollars(q.maxAmount)}` : 'raises cash',
+        cashLabel: capitalCashLabel(state, content, q.id, q.maxAmount),
         action: q.id === 'recap' ? { actionId: 'recap' } : { actionId: q.id, params: { amount: q.maxAmount } },
       });
     }
