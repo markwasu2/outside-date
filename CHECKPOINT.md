@@ -1449,3 +1449,12 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | delivered campus cue names lender retest or exact seasoning end; open window names Price the finished campus and routes Show me to office Insurance & lender |
 | gates |544unit,90browser,lint,tsc,build;1280pixel cue and exact takeout route inspected |
 | scope | guide and popup route only,no engine/save/bot change |
+
+# Personal replay - use the full desktop viewport
+
+| criterion | status |
+|---|---|
+| observed | browser default body8px margin created736pxpage inside720pxviewport with permanent page scroll |
+| fixed | reset document margins at app entry; campus remains viewport-sized,footer visible without page scrolling |
+| gates |544unit,91browser,lint,tsc,build;1280x720pixels inspected;1280x720and1440x900dimensions asserted |
+| scope | document CSS only,no engine/save/bot change |
