@@ -1,5 +1,6 @@
 import { formatDollars, formatMonth } from '../../engine/format';
 import { useStore } from '../store';
+import { timeExplain } from '../reportCardExplain';
 
 /**
  * Do-it-now model's replacement for the old "queue priceTakeout, End month to commit" flow
@@ -29,6 +30,7 @@ export function TakeoutPreviewModal() {
           <div>Your equity is worth <strong>{formatDollars(t.playerEquityValue)}</strong> - a {t.equityMultiple.toFixed(2)}x multiple.</div>
           <div style={{ marginTop: 6 }}>
             Report card: time {card.time} · cost {card.cost} · risk {card.riskAllocation} · community {card.community} · value {card.value}
+            <div data-testid="close-time-explanation" style={{fontSize:12,color:'#6b5a33'}}>{timeExplain(preview)} The outside date is the last-chance deadline, not the time-grade target.</div>
           </div>
         </div>
         <p style={{ fontSize: 13, color: '#6b5a33' }}>
