@@ -40,6 +40,10 @@ export function describeEffect(effect: Effect): string {
   if (effect.type === 'declineAsk') {
     return 'Tenant goodwill -20';
   }
+  if (effect.type === 'setFlag' && effect.args[0] === 'hiringFairUntil') {
+    const duration = typeof effect.args[1] === 'string' ? /^monthPlus:(\d+)$/.exec(effect.args[1]) : null;
+    if (duration) return `Fewer labor shortages for ${Number(duration[1])} months`;
+  }
   if (effect.type === 'owedAp') {
     const n = effect.args[0];
     return typeof n === 'number' ? `Uses ${n} focus point${n === 1 ? '' : 's'} next month` : 'Has consequences';

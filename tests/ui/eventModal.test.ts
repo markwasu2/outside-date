@@ -139,3 +139,12 @@ describe('EventModal: bespoke choice stakes (UX 9)', () => {
     expect(describeChoiceEffects('decline', card ?? null, 'liquid')).toBe('Tenant goodwill -15');
   });
 });
+
+it('hiring fair names the crew benefit, duration, cash and goodwill before choosing',()=>{
+ const card=content.events.find(e=>e.id==='hiring_fair');
+ const text=describeChoiceEffects('host',card);
+ expect(text).toContain('Cash -$1.0M');expect(text).toContain('Town goodwill +6');
+ expect(text).toContain('Fewer labor shortages for 6 months');expect(text).not.toContain('Has consequences');
+ expect(describeEffect({type:'setFlag',args:['hiringFairUntil','monthPlus:4']})).toBe('Fewer labor shortages for 4 months');
+ expect(describeEffect({type:'setFlag',args:['hiringFairUntil','unexpected']})).toBe('Has consequences');
+});
