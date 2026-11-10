@@ -236,3 +236,11 @@ it('underway mitigation explains its finish clock rather than opening a disabled
  expect(nextStep(s,content).title).toBe('End the month');expect(nextStep(s,content).why).toContain('until Y1 M10');
  expect(nextStep(s,content).why).toContain('no further mitigation instruction');
 });
+
+
+it('endgame clock cues explain waiting while the closing instruction still opens its action',()=>{
+ const s=freshState();s.halls.forEach(h=>h.delivered=true);
+ expect(nextStep(s,content)).toMatchObject({title:'Wait for the lender retest',waiting:true});
+ s.debt.converted=true;s.flags.conversionMonth=40;expect(nextStep(s,content)).toMatchObject({title:'Let the rent season before closing',waiting:true});
+ s.phase='takeoutAvailable';expect(nextStep(s,content).waiting).not.toBe(true);expect(nextStep(s,content).actionId).toBe('priceTakeout');
+});

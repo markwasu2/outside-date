@@ -129,7 +129,7 @@ function CampusGame() {
         <strong>{goalSentence(draft).replace('all 1 hall', 'your hall').replace('outside date', 'tenant deadline').replace('close the takeout', 'sell/refinance the finished campus (the takeout)')}</strong>
       </section>}
       <div style={{display:'flex',flex:1,minHeight:0}}><div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minWidth:0, minHeight: 0, position: 'relative' }}>
-        <MapGrid cue={{title: `${plan.length ? 'After planned actions: ' : 'Next: '}${step.title}`, why:step.why, objectId:step.objectId, waiting:step.title==='End the month', onShow:showMe}} /><EventNotices />
+        <MapGrid cue={{title: `${plan.length ? 'After planned actions: ' : 'Next: '}${step.title}`, why:step.why, objectId:step.objectId, waiting:step.waiting || step.title==='End the month', onShow:showMe}} /><EventNotices />
         {drawer && (
           <aside data-testid={`${drawer}-drawer`} style={{ position: 'absolute', right: 12, top: 10, bottom: 10, width: drawer === 'actions' ? 400 : 600, maxWidth: '80vw', zIndex: 60, background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #d9cfb9' }}>

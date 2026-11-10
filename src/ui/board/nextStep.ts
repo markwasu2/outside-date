@@ -20,6 +20,8 @@ export interface NextStep {
   why: string;
   /** Map object the "Show me" button should select and open. */
   objectId: string;
+  /** The next step is a clock, not an instruction. Explain it without opening an action list. */
+  waiting?: boolean;
   actionId?: string;
   params?: Record<string, string | number>;
 }
@@ -67,6 +69,7 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
     const conversionMonth = state.flags.conversionMonth;
     return {
       title:state.debt.converted ? 'Let the rent season before closing' : 'Wait for the lender retest',
+      waiting:true,
       why:state.debt.converted && typeof conversionMonth === 'number'
         ? `Every hall is delivered. The loan converted; rent must season until ${formatMonth(conversionMonth+resolved.tuning.takeout.seasoningMonths)}. End the month to advance this clock. Then Price the takeout at the site office to finish.`
         : 'Every hall is delivered. The lender retests income against debt payments each month before the closing window can open. Check financing at the site office; End month runs the next test.',
