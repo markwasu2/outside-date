@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import type { Content } from '../../content/schemas';
 import type { GameState, GoodwillGroup, PlannedAction } from '../../engine/types';
 import { actionCostWords, decisionResult } from '../board/decisionWords';
-import { cashLabel, findDef } from '../board/actions';
+import { cashLabel, findDef, cancelOrderRows } from '../board/actions';
 import { checkAction, useStore } from '../store';
 import type { TrackTab } from '../store';
 import { tabUnlocks } from '../tabUnlock';
@@ -138,7 +138,6 @@ export function buildRows(tab: TrackTab, state: GameState, content: Content, sel
     const commissionStudy = findDef(content, 'commissionStudy');
     const orderTransformer = findDef(content, 'orderTransformer');
     const orderSwitchgear = findDef(content, 'orderSwitchgear');
-    const cancelOrder = findDef(content, 'cancelOrder');
     const rows: Row[] = [
       {
         key: 'commissionStudy',
@@ -193,16 +192,7 @@ export function buildRows(tab: TrackTab, state: GameState, content: Content, sel
         });
       }
     }
-    for (const order of state.power.orders) {
-      rows.push({
-        key: `cancelOrder:${order.kind}${order.supplier !== 'standard' ? `:${order.supplier}` : ''}`,
-        label: `Cancel ${order.kind} order${order.supplier === 'alt' ? ' (second supplier)' : order.supplier === 'spot' ? ' (spot)' : ''}`,
-        help: cancelOrder.help,
-        ap: cancelOrder.ap,
-        cashLabel: cashLabel(cancelOrder, state, content),
-        action: { actionId: 'cancelOrder', params: { kind: order.kind } },
-      });
-    }
+    rows.push(...cancelOrderRows(state, content));
     return rows;
   }
 
