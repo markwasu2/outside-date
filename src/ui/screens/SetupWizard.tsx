@@ -1,3 +1,4 @@
+import { ClosingReview } from './ClosingReview';
 import { OpeningCampus } from './OpeningCampus';
 import { previewState } from './preview';
 import { useState } from 'react';
@@ -15,7 +16,7 @@ import { SetupScreen } from './SetupScreen';
 import { TitleScreen } from './TitleScreen';
 import { resolveWizardConfiguration } from './setupWizardConfig';
 
-type Step = 'title' | 'setup' | 'tier' | 'cooling' | 'contractor' | 'lease' | 'forecast' | 'capital' | 'power' | 'insurance';
+type Step = 'title' | 'setup' | 'tier' | 'cooling' | 'contractor' | 'lease' | 'forecast' | 'capital' | 'power' | 'insurance' | 'review';
 
 /** The canonical defaults now live in ../defaultGame.ts (single source shared with the
  * tutorial sim test, qa-fixes-2 finding 2); re-exported here so App.tsx and
@@ -141,9 +142,11 @@ export function SetupWizard() {
           negotiation={wizard.negotiation}
           onChange={(insurance) => setNegotiation((n) => ({ ...n, insurance }))}
           onBack={() => setStep('power')}
-          onStart={start}
+          onStart={() => setStep('review')}
         />
       );
+    case 'review':
+      return <ClosingReview preview={previewState(content,scenarioId,setup,wizard.negotiation,difficultyId)} onBack={() => setStep('insurance')} onStart={start} />;
   }
   }
   return <OpeningCampus onNavigate={step === 'title' ? undefined : (target) => setStep(target as Step)} step={step} preview={previewState(content,scenarioId,setup,wizard.negotiation,difficultyId)} content={content}>{renderStep()}</OpeningCampus>;

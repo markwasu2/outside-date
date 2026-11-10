@@ -85,7 +85,7 @@ export function InsuranceScreen({ content, scenarioId, setup, negotiation, onCha
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem' }}>
         <button onClick={onBack}>Back</button>
-        <button onClick={onStart}>Start campaign</button>
+        <button onClick={onStart}>Review closing table</button>
       </div>
     </div>
   );

@@ -58,6 +58,7 @@ test('the in-game map reads the picked site theme', async ({ page }) => {
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();
   await page.getByRole('button', { name: 'Next: Power' }).click();
   await page.getByRole('button', { name: 'Next: Insurance' }).click();
+  await page.getByRole('button',{name:'Review closing table',exact:true}).click();
   await page.getByRole('button', { name: 'Start campaign' }).click();
   await expect(page.getByTestId('map-root')).toBeVisible();
   await expect(page.getByTestId('map-pond-slot')).toHaveAttribute('data-pond', 'true');
@@ -109,6 +110,7 @@ test('a full tutorial-scenario run on a non-default site completes to an outcome
   await page.getByRole('button', { name: 'Next: Capital stack' }).click();
   await page.getByRole('button', { name: 'Next: Power' }).click();
   await page.getByRole('button', { name: 'Next: Insurance' }).click();
+  await page.getByRole('button',{name:'Review closing table',exact:true}).click();
   await page.getByRole('button', { name: 'Start campaign' }).click();
 
   await expect(page.getByTestId('map-root')).toBeVisible();

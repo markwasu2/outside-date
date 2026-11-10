@@ -7,7 +7,7 @@ import campusGround from '../../assets/art/campus-ground.jpg';
 import people from '../../assets/art/campus-people.png';
 import { STAGE_ART, TILE_ART, COOLING_ART, SUBSTATION_ART } from '../art';
 
-const STEPS = ['title','setup','tier','cooling','contractor','lease','forecast','capital','power','insurance'];
+const STEPS = ['title','setup','tier','cooling','contractor','lease','forecast','capital','power','insurance','review'];
 const OPENING: Record<string,{place:string;line:string}> = {
   title:{place:'At the site gate',line:'A piece of land, a tenant deadline, and a campus to build.'},
   setup:{place:'Walking the land',line:'Choose your ground and the kind of campus you want to build.'},
@@ -18,6 +18,7 @@ const OPENING: Record<string,{place:string;line:string}> = {
   forecast:{place:'At the planning table',line:'Make your cost and delivery call before lenders size the funding.'},
   capital:{place:'With the lender',line:'Match the construction budget with debt and equity. More debt is not free money.'},
   power:{place:'At the power connection',line:'Agree the utility terms. The long study and equipment clocks start during construction.'},
+  review:{place:'At the closing table',line:'Check the sources, uses and deadline. This is the last review before time starts.'},
   insurance:{place:'Before signing',line:'Choose your cover, check the monthly cost, then close and start the campaign.'},
 };
 
@@ -25,7 +26,7 @@ const OPENING: Record<string,{place:string;line:string}> = {
 export function OpeningCampus({step,preview,content,children,onNavigate}:{step:string;preview:GameState;content:Content;children:ReactNode;onNavigate?:(step:string)=>void}) {
   const site = resolveSite(content,preview.scenarioId,preview.setup.site);
   const guide = OPENING[step]!;
-  const at = step === 'power' ? 'power' : step === 'cooling' ? 'cooling' : step === 'contractor' ? 'people' : ['lease','forecast','capital','insurance'].includes(step) ? 'office' : 'land';
+  const at = step === 'power' ? 'power' : step === 'cooling' ? 'cooling' : step === 'contractor' ? 'people' : ['lease','forecast','capital','insurance','review'].includes(step) ? 'office' : 'land';
   const sprite = (src:string|undefined,left:string,top:string,width:string,label:string,active=false,target?:string) => (
     <div key={label} role={target && onNavigate ? 'button' : undefined} tabIndex={target && onNavigate ? 0 : undefined} aria-label={target && onNavigate ? `Edit ${label}` : undefined}
       onClick={()=>target && onNavigate?.(target)} onKeyDown={e=>{if((e.key === 'Enter' || e.key === ' ') && target){e.preventDefault();onNavigate?.(target);}}}
@@ -51,7 +52,7 @@ export function OpeningCampus({step,preview,content,children,onNavigate}:{step:s
       </div>
       <aside data-testid="opening-conversation" style={{position:'absolute',right:16,top:14,bottom:14,width:'min(720px,56vw)',display:'flex',flexDirection:'column',background:'#fffdf5f5',border:'1px solid #a18b61',borderRadius:10,boxShadow:'0 8px 28px #38240544',overflow:'hidden'}}>
         <div style={{padding:'12px 18px',background:'#eee3c9',borderBottom:'1px solid #cdbf9f'}}>
-          <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:1,color:'#765522'}}>{guide.place}{step!=='title'?` · ${STEPS.indexOf(step)} of 9`:''}</div>
+          <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:1,color:'#765522'}}>{guide.place}{step!=='title'?` · ${STEPS.indexOf(step)} of 10`:''}</div>
           <div style={{fontSize:13,marginTop:5}}>{guide.line}</div>
         </div>
         <div className="opening-content" style={{flex:1,minHeight:0,overflowY:'auto'}}>{children}</div>
