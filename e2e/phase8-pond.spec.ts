@@ -7,7 +7,7 @@ async function startCampaign(page: Page, siteId: string) {
   await page.locator('select').first().selectOption('whale');
   await page.getByRole('button', { name: 'New game' }).click();
   await page.getByTestId(`site-card-${siteId}`).click();
-  for (const n of ['Next: Lease', 'Next: Forecast', 'Next: Capital stack', 'Next: Power', 'Next: Insurance']) {
+  for (const n of ['Next: Hall tier', 'Next: Cooling', 'Next: Contractor', 'Next: Lease', 'Next: Forecast', 'Next: Capital stack', 'Next: Power', 'Next: Insurance']) {
     await page.getByRole('button', { name: n }).click();
   }
   await page.getByRole('button', { name: 'Start campaign' }).click();

@@ -11,7 +11,7 @@ async function openSetup(page: Page) {
 async function startCampaign(page: Page, siteId: string) {
   await openSetup(page);
   await page.getByTestId(`site-card-${siteId}`).click();
-  for (const n of ['Next: Lease', 'Next: Forecast', 'Next: Capital stack', 'Next: Power', 'Next: Insurance']) {
+  for (const n of ['Next: Hall tier', 'Next: Cooling', 'Next: Contractor', 'Next: Lease', 'Next: Forecast', 'Next: Capital stack', 'Next: Power', 'Next: Insurance']) {
     await page.getByRole('button', { name: n }).click();
   }
   await page.getByRole('button', { name: 'Start campaign' }).click();
@@ -44,6 +44,7 @@ test('shots', async ({ page }) => {
 
   // Forecast reflecting a non-default site (farmland).
   await page.getByTestId('site-card-farmland').click();
+  for (const name of ['Next: Hall tier','Next: Cooling','Next: Contractor']) await page.getByRole('button',{name,exact:true}).click();
   await page.getByRole('button', { name: 'Next: Lease' }).click();
   await page.getByRole('button', { name: 'Next: Forecast' }).click();
   await page.screenshot({ path: '/downloads/p4-forecast-farmland.png', fullPage: true });

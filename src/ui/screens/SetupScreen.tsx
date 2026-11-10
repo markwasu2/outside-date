@@ -9,6 +9,7 @@ import { useStore } from '../store';
 import { previewState } from './preview';
 
 interface Props {
+  section?: 'setup' | 'tier' | 'cooling' | 'contractor';
   scenarioId: string;
   difficultyId: DifficultyId;
   setup: Setup;
@@ -36,7 +37,7 @@ export const GCS: { id: GcContract; label: string; note: string }[] = [
 /** P7.2. Each option's one-liner is static text (the trade-off is fixed by design); the budget
  * total itself is live, recomputed from a full `previewState()` on every pick so it can never
  * drift from `createGame`'s real cost-basis formula. */
-export function SetupScreen({ scenarioId, difficultyId, setup, negotiation, onChange, onBack, onNext }: Props) {
+export function SetupScreen({ section='setup', scenarioId, difficultyId, setup, negotiation, onChange, onBack, onNext }: Props) {
   const content = useStore((s) => s.content);
   const preview = previewState(content, scenarioId, setup, negotiation, difficultyId);
 
@@ -49,19 +50,19 @@ export function SetupScreen({ scenarioId, difficultyId, setup, negotiation, onCh
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 640, margin: '0 auto' }}>
-      <h2>Setup</h2>
+      <h2>{section === 'setup' ? 'Choose the land' : section === 'tier' ? 'Choose the hall tier' : section === 'cooling' ? 'Choose the cooling' : 'Choose the contractor'}</h2>
       <p>
         Budget at close: <strong>{formatDollars(preview.budgetAtClose)}</strong>
       </p>
 
-      <SiteCards sites={sites} selected={selectedSiteId} onPick={(id) => pick('site', id)} />
-      <Section title="Hall tier" options={TIERS} selected={setup.hallTier} onPick={(id) => pick('hallTier', id)} />
-      <Section title="Cooling" options={COOLINGS} selected={setup.cooling} onPick={(id) => pick('cooling', id)} />
-      <Section title="General contractor" options={GCS} selected={setup.gc} onPick={(id) => pick('gc', id)} />
+      {section === 'setup' && <SiteCards sites={sites} selected={selectedSiteId} onPick={(id) => pick('site', id)} />}
+      {section === 'tier' && <Section title="Hall tier" options={TIERS} selected={setup.hallTier} onPick={(id) => pick('hallTier', id)} />}
+      {section === 'cooling' && <Section title="Cooling" options={COOLINGS} selected={setup.cooling} onPick={(id) => pick('cooling', id)} />}
+      {section === 'contractor' && <Section title="General contractor" options={GCS} selected={setup.gc} onPick={(id) => pick('gc', id)} />}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem' }}>
         <button onClick={onBack}>Back</button>
-        <button onClick={onNext}>Next: Lease</button>
+        <button onClick={onNext}>{section === 'setup' ? 'Next: Hall tier' : section === 'tier' ? 'Next: Cooling' : section === 'cooling' ? 'Next: Contractor' : 'Next: Lease'}</button>
       </div>
     </div>
   );

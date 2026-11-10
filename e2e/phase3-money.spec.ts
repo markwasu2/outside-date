@@ -5,6 +5,7 @@ async function startWhaleToForecast(page: import('@playwright/test').Page) {
   await page.goto('/');
   await page.locator('select').first().selectOption('whale');
   await page.getByRole('button', { name: 'New game' }).click();
+  for (const name of ['Next: Hall tier','Next: Cooling','Next: Contractor']) await page.getByRole('button',{name,exact:true}).click();
   await page.getByRole('button', { name: 'Next: Lease' }).click();
   await page.getByRole('button', { name: 'Next: Forecast' }).click();
 }

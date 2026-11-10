@@ -6,11 +6,7 @@ test('Millbrook Relay is selectable and starts a single-hall campaign', async ({
   await expect(page.getByText(/Millbrook Relay: one 20 MW hall/)).toBeVisible();
   await page.screenshot({ path: '/tmp/millbrook-relay-title.png', fullPage: true });
   await page.getByRole('button', { name: 'New game', exact: true }).click();
-  await page.getByRole('button', { name: /^Next:/ }).click();
-  await page.getByRole('button', { name: /^Next:/ }).click();
-  await page.getByRole('button', { name: /^Next:/ }).click();
-  await page.getByRole('button', { name: /^Next:/ }).click();
-  await page.getByRole('button', { name: /^Next:/ }).click();
+  for (let i=0;i<8;i++) await page.getByRole('button', { name: /^Next:/ }).click();
   await page.getByRole('button', { name: 'Start campaign', exact: true }).click();
   await expect(page.getByRole('button', { name: 'End month', exact: true })).toBeVisible();
   await expect(page.getByText('H1', { exact: false }).first()).toBeVisible();

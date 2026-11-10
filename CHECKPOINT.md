@@ -1115,3 +1115,16 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 521 unit, 65 e2e, lint, tsc, build |
 | visual | done: actual1280 report timing panel inspected |
 | grid | skipped: UI-only read projections, no engine or save changes |
+
+# Immersive opening stage 2 - focused choices on campus objects
+
+| criterion | status |
+|---|---|
+| one decision at a time | done: land, hall tier, cooling and contractor are separate short steps, not one long form |
+| scene interaction | done: click land/hall/cooling/crew/office/power objects to revisit their terms; keyboard Enter/Space works |
+| persistence | done: e2e changes liquid tier and dry cooling, revisits both through objects and retains selection |
+| order | done: guided land->hall->cooling->crew->lease->forecast->capital->power->insurance, location line counts progress |
+| full gates | done: 521 unit, 66 e2e, lint, tsc, build |
+| visual | done: actual1280 cooling/crew panels inspected, all options and Next visible |
+| grid | skipped: navigation/layout only, no rules/save changes |
+| next | closing-table review before signing, remaining playthrough truth fixes and full first-time journey |

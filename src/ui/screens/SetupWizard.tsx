@@ -15,7 +15,7 @@ import { SetupScreen } from './SetupScreen';
 import { TitleScreen } from './TitleScreen';
 import { resolveWizardConfiguration } from './setupWizardConfig';
 
-type Step = 'title' | 'setup' | 'lease' | 'forecast' | 'capital' | 'power' | 'insurance';
+type Step = 'title' | 'setup' | 'tier' | 'cooling' | 'contractor' | 'lease' | 'forecast' | 'capital' | 'power' | 'insurance';
 
 /** The canonical defaults now live in ../defaultGame.ts (single source shared with the
  * tutorial sim test, qa-fixes-2 finding 2); re-exported here so App.tsx and
@@ -69,15 +69,19 @@ export function SetupWizard() {
         />
       );
     case 'setup':
+    case 'tier':
+    case 'cooling':
+    case 'contractor':
       return (
         <SetupScreen
+          section={step}
           scenarioId={scenarioId}
           difficultyId={difficultyId}
           setup={setup}
           negotiation={negotiation}
           onChange={setSetup}
-          onBack={() => setStep('title')}
-          onNext={() => setStep('lease')}
+          onBack={() => setStep(step === 'setup' ? 'title' : step === 'tier' ? 'setup' : step === 'cooling' ? 'tier' : 'cooling')}
+          onNext={() => setStep(step === 'setup' ? 'tier' : step === 'tier' ? 'cooling' : step === 'cooling' ? 'contractor' : 'lease')}
         />
       );
     case 'lease':
@@ -87,7 +91,7 @@ export function SetupWizard() {
           scenario={wizard.scenario}
           negotiation={wizard.negotiation}
           onChange={(lease) => setNegotiation((n) => ({ ...n, lease }))}
-          onBack={() => setStep('setup')}
+          onBack={() => setStep('contractor')}
           onNext={() => setStep('forecast')}
         />
       );
@@ -142,5 +146,5 @@ export function SetupWizard() {
       );
   }
   }
-  return <OpeningCampus step={step} preview={previewState(content,scenarioId,setup,wizard.negotiation,difficultyId)} content={content}>{renderStep()}</OpeningCampus>;
+  return <OpeningCampus onNavigate={step === 'title' ? undefined : (target) => setStep(target as Step)} step={step} preview={previewState(content,scenarioId,setup,wizard.negotiation,difficultyId)} content={content}>{renderStep()}</OpeningCampus>;
 }
