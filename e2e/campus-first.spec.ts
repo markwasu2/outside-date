@@ -7,7 +7,7 @@ test('desktop opens on one campus canvas with details on demand and End month pe
   await expect(page.getByTestId('actions-drawer')).toHaveCount(0);
   await expect(page.getByTestId('status-drawer')).toHaveCount(0);
   const map = await page.getByTestId('map-root').boundingBox();
-  expect(map!.width).toBeGreaterThan(1200); expect(map!.height).toBeGreaterThan(500);
+  expect(map!.width).toBeGreaterThan(850); expect(map!.height).toBeGreaterThan(500);
   await page.screenshot({ path: 'docs/screenshots/cold2/scene-1280.png' });
   await page.setViewportSize({width:1440,height:900});
   await page.screenshot({ path: 'docs/screenshots/cold2/scene-1440.png' });
@@ -30,7 +30,7 @@ test('land, finance, crews and chips are reachable directly from campus objects'
   await expect(page.getByTestId('popover-action').filter({hasText:'Option the site'})).toContainText('$50.0M total, from $50.0M equity');
   await page.screenshot({path:'docs/screenshots/cold2/site-cost-truth.png'});
   await page.getByTestId('map-popover').getByRole('button',{name:'Close',exact:true}).click();
-  await page.getByRole('button',{name:/Site office/}).click();
+  await page.getByTestId('map-root').getByRole('button',{name:/Site office/}).click();
   await expect(page.getByTestId('popover-action').filter({hasText:'Confirm the rack schedule'})).toBeVisible();
   await page.getByRole('button',{name:'Insurance & lender',exact:true}).click();
   await expect(page.getByTestId('popover-action').filter({hasText:'Cure'})).toBeVisible();
@@ -38,7 +38,7 @@ test('land, finance, crews and chips are reachable directly from campus objects'
   await expect(page.getByTestId('popover-action').filter({hasText:/sponsor bridge/i})).toBeVisible();
   await page.screenshot({path:'docs/screenshots/cold2/campus-finance.png'});
   await page.keyboard.press('Escape');
-  await page.getByRole('button',{name:/Laydown yard/}).click();
+  await page.getByTestId('map-root').getByRole('button',{name:/Laydown yard/}).click();
   await expect(page.getByTestId('popover-action').filter({hasText:/Import/})).toBeVisible();
   await page.keyboard.press('Escape'); await page.getByTestId('campus-people').click();
   await expect(page.getByTestId('popover-action').filter({hasText:'Visit utility'})).toBeVisible();

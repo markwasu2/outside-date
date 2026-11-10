@@ -1,0 +1,14 @@
+import {test,expect} from '@playwright/test';
+test('action desk is visible without a tab or search and names each campus location',async({page})=>{
+ await page.goto('/');await page.getByRole('button',{name:'Tutorial',exact:true}).click();await page.getByRole('button',{name:'Start planning',exact:true}).click();
+ const desk=page.getByTestId('action-desk');await expect(desk).toBeVisible();
+ const power=desk.locator('section').filter({has:page.getByRole('heading',{name:'Power connection',exact:true})});
+ await expect(power).toContainText('Substation · upper right');await expect(power).toContainText('Uses 1 action');await expect(power).toContainText('does not give you power immediately');
+ await power.getByTestId('action-location').click();await expect(page.getByTestId('map-popover')).toContainText('Substation');
+ await page.getByTestId('map-popover').getByRole('button',{name:'Close',exact:true}).click();
+ await power.getByTestId('desk-add-action').first().click();await expect(page.getByTestId('actions-remaining')).toHaveText('Actions this month: 2 of 3 left');
+ await expect(desk).toContainText("This month's plan (1)");await desk.getByRole('button',{name:'Remove',exact:true}).click();
+ await expect(page.getByTestId('actions-remaining')).toHaveText('Actions this month: 3 of 3 left');
+ await desk.locator('section').first().scrollIntoViewIfNeeded();
+ await page.screenshot({path:'docs/screenshots/cold2/visible-actions-1280.png'});await page.setViewportSize({width:1440,height:900});await page.screenshot({path:'docs/screenshots/cold2/visible-actions-1440.png'});
+});

@@ -13,10 +13,10 @@ test('finding #1: the Regulation tab never shows a docketAmendment permit row', 
   await openActions(page);
   await filterActions(page, 'Regulation');
 
-  await expect(page.getByText('File air permit')).toBeVisible();
-  await expect(page.getByText('File water permit')).toBeVisible();
-  await expect(page.getByText('File wetlands permit')).toBeVisible();
-  await expect(page.getByText('File building permit')).toBeVisible();
+  await expect(page.getByTestId('actions-drawer').getByText('File air permit')).toBeVisible();
+  await expect(page.getByTestId('actions-drawer').getByText('File water permit')).toBeVisible();
+  await expect(page.getByTestId('actions-drawer').getByText('File wetlands permit')).toBeVisible();
+  await expect(page.getByTestId('actions-drawer').getByText('File building permit')).toBeVisible();
   await expect(page.getByText('File docketAmendment permit')).toHaveCount(0);
 });
 

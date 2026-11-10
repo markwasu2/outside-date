@@ -32,7 +32,7 @@ test('phase 5 shots', async ({ page }) => {
   await dismissExplainers(page);
   await page.screenshot({ path: '/downloads/p5-map-strip-1440.png' });
 
-  const substation = page.getByRole('button', { name: /Substation/ });
+  const substation = page.getByTestId('map-root').getByRole('button', { name: /Substation/ });
   await substation.click();
   await page
     .getByTestId('map-popover')

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { ActionDesk } from './board/ActionDesk';
 import { BoardStyles } from './board/boardStyles';
 import { GoalStrip } from './board/GoalStrip';
 import { ProgressSpine } from './board/ProgressSpine';
@@ -130,7 +131,7 @@ function CampusGame() {
         <div>Crews and review clocks keep running without another action. Some choices use no monthly action; some events use one from next month.</div>
         <strong>{goalSentence(draft).replace('all 1 hall', 'your hall').replace('outside date', 'tenant deadline').replace('close the takeout', 'sell/refinance the finished campus (the takeout)')}</strong>
       </section>}
-      <div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minHeight: 0, position: 'relative' }}>
+      <div style={{display:'flex',flex:1,minHeight:0}}><div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minWidth:0, minHeight: 0, position: 'relative' }}>
         <MapGrid /><EventNotices />
         {drawer && (
           <aside data-testid={`${drawer}-drawer`} style={{ position: 'absolute', right: 12, top: 10, bottom: 10, width: drawer === 'actions' ? 400 : 600, maxWidth: '80vw', zIndex: 60, background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -152,6 +153,7 @@ function CampusGame() {
           </aside>
         )}
       </div>
+      <ActionDesk /></div>
       <footer style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '10px 18px', flexShrink: 0, background: '#fffdf6', borderTop: '1px solid #cdbf9f', fontSize: 13 }}>
         <span style={{ flex: 1 }}>{error ? error : plan.length ? `${plan.length} instruction${plan.length === 1 ? '' : 's'} planned. ${actionsLeft} monthly actions left. End month to commit; Plan to review or remove.` : 'Click a hall, office or power site to build and manage your campus.'}</span>
         {plan.length > 0 && <button onClick={() => setDrawer('actions')}>Review plan</button>}

@@ -34,7 +34,7 @@ test('tutorial: substation popover queues the study from the map, and the month 
 
   await closePanel(page);
   // D1/D6: clicking the substation opens its popover with the first-open teaching line.
-  const substation = page.getByRole('button', { name: /Substation/ });
+  const substation = page.getByTestId('map-root').getByRole('button', { name: /Substation/ });
   await substation.click();
   const popover = page.getByTestId('map-popover');
   await expect(popover).toBeVisible();
@@ -60,7 +60,7 @@ test('tutorial: substation popover queues the study from the map, and the month 
     .getByTestId('popover-action')
     .filter({ hasText: 'Order the switchgear' })
     .click();
-  await expect(page.getByRole('button', { name: /Laydown yard/ })).toContainText('switchgear');
+  await expect(page.getByTestId('map-root').getByRole('button', { name: /Laydown yard/ })).toContainText('switchgear');
 });
 
 test('Whale month 0 shows four hall sprites on the board', async ({ page }) => {
@@ -115,7 +115,7 @@ test('water permit has a labelled route from the site office and dry field', asy
   await page.goto('/');
   await page.getByTestId('quick-start').click();
   await expect(page.getByTestId('map-pond-slot')).toContainText('Water permit');
-  await page.getByRole('button', { name: /Site office/ }).click();
+  await page.getByTestId('map-root').getByRole('button', { name: /Site office/ }).click();
   const popover = page.getByTestId('map-popover');
   await expect(popover.getByTestId('popover-action').filter({ hasText: 'File water permit' })).toBeVisible();
   await page.screenshot({ path: 'docs/screenshots/cold2/water-route.png' });
