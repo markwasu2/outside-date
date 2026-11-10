@@ -2,14 +2,8 @@ import { formatDollars } from '../../engine/format';
 import { STAGE_ART, VEHICLE_ART } from '../art';
 import type { HallVisual } from './hallVisual';
 
-/**
- * Graphics pass 1 (2026-11-09): the hall is the stage's isometric illustration (art.ts's
- * STAGE_ART `img`, generated in the user's chosen style) instead of the old SVG geometry. The
- * pure hallVisual() still decides stage/progress/flags; this component only draws. All the
- * functional overlays (ghost outline, warning pips, rent ticker, spend float, coin burst) are
- * unchanged. Since a static illustration cannot grow with progress the way the SVG did, a thin
- * stage-progress strip along the bottom keeps the month-to-month build feedback.
- */
+/** Layer the next stage over the completed structure, revealing it upwards as work
+ * advances. Pauses keep their exact progress and remove working vehicles. */
 
 interface HallSpriteProps {
   visual: HallVisual;
@@ -30,26 +24,22 @@ interface HallSpriteProps {
 export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, spendFloat, coinBurst, reducedMotion }: HallSpriteProps) {
   const { stage, progress0to1 } = visual;
   const look = STAGE_ART[stage] ?? STAGE_ART.notStarted;
+  const baseLook = STAGE_ART[visual.baseStage] ?? STAGE_ART.notStarted;
   const underConstruction = stage !== 'notStarted' && stage !== 'delivered';
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       {/* pictorial layer: the stage illustration over its warm fallback color */}
       <div style={{ position: 'absolute', inset: 0, background: 'transparent', borderRadius: 6, overflow: 'hidden' }} aria-hidden="true">
-        {look?.img && (
-          <img
-            src={look.img}
-            alt=""
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              display: 'block',
-              opacity: visual.flags.terminated ? 0.45 : 1,
-              filter: visual.flags.terminated ? 'grayscale(0.6)' : undefined,
-            }}
-            draggable={false}
-          />
+        {baseLook?.img && <img src={baseLook.img} alt="" draggable={false}
+          style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'contain',opacity:visual.flags.terminated ? 0.45 : 1}} />}
+        {underConstruction && look?.img && (
+          <img src={look.img} alt="" draggable={false} data-testid="hall-growth"
+            data-progress={progress0to1.toFixed(3)}
+            style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'contain',
+              clipPath:`inset(${progress0to1 === 0 ? 100 : (1 - progress0to1) * 65}% 0 0 0)`,
+              transition: reducedMotion ? undefined : 'clip-path 0.6s ease',
+              opacity: visual.flags.terminated ? 0.45 : 1}} />
         )}
       </div>
 
@@ -57,7 +47,7 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
       {underConstruction && (
         <div
           data-testid="stage-progress"
-          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 4, background: 'rgba(0,0,0,0.25)', borderRadius: '0 0 6px 6px', pointerEvents: 'none' }}
+          style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 6, background: 'rgba(0,0,0,0.25)', borderRadius: '0 0 6px 6px', pointerEvents: 'none' }}
           aria-hidden="true"
         >
           <div
@@ -163,7 +153,7 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
       )}
 
       {/* GFX 2: the stage's construction vehicle while crews are actively working it */}
-      {underConstruction && visual.flags.active && VEHICLE_ART[stage] && (
+      {underConstruction && visual.flags.active && !visual.flags.paused && !failedInspection && VEHICLE_ART[stage] && (
         <img
           src={VEHICLE_ART[stage]!.img}
           alt=""
@@ -177,8 +167,6 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
             right: 2,
             width: '30%',
             borderRadius: 4,
-            border: '1px solid rgba(141,110,99,0.7)',
-            background: '#fffdf8',
             pointerEvents: 'none',
           }}
         />

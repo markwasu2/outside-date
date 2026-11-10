@@ -10,7 +10,7 @@ import { resolveSite } from '../../content/sites';
 import { STAGES } from '../../engine/types';
 import type { PlannedAction } from '../../engine/types';
 import { STAGE_ART, TILE_ART, SUBSTATION_ART, PLANT_ART, type TileArt } from '../art';
-import { LEGEND_ENTRIES, hallCaption, pondStateWords, substationStateWords } from '../board/legibility';
+import { LEGEND_ENTRIES, hallBlocker, hallCaption, pondStateWords, substationStateWords } from '../board/legibility';
 import { COOLING_ART, DELIVERY_TRUCK, EQUIP_ART } from '../art';
 import { useStore } from '../store';
 import { usePrefersReducedMotion } from '../board/boardStyles';
@@ -343,7 +343,13 @@ export function MapGrid() {
         {draft.halls.map((hall) => {
           const look = hallLook(hall.stageIndex, hall.delivered);
           const selected = selectedHallId === hall.id;
-          const visual = hallVisual(hall, stageMin);
+          const hallMins = [...stageMin];
+          if (hall.pad === 'far') hallMins[0] = (hallMins[0] ?? 1) + resolvedContent.tuning.spatial.farPadExtraMonths;
+          const extraFitout = draft.flags[`extraFitoutMonths:${hall.id}`];
+          if (typeof extraFitout === 'number') hallMins[3] = (hallMins[3] ?? 1) + extraFitout;
+          const visual = hallVisual(hall, hallMins);
+          if (hall.stageActive && draft.flags.drawFreeze) visual.flags.paused = true;
+          const blocked = !hall.delivered && !hall.terminated && (!!hallBlocker(draft, content, hall) || visual.flags.paused || !!draft.flags[`inspectionFail:${hall.id}`]);
           const late = !hall.delivered && !hall.terminated && draft.month > hall.outsideMonth;
           const failedInspection = !!draft.flags[`inspectionFail:${hall.id}`];
           // D4: the rent ticker reads the committed state every render (not just month deltas).
@@ -362,6 +368,8 @@ export function MapGrid() {
                 if (el) cellRefs.current.set(hall.id, el);
               }}
               data-scene-object="hall"
+              data-hall-id={hall.id}
+              data-blocked={blocked}
               className={arrivalFlash ? 'board-arrival-flash' : undefined}
               style={{
                 background: look.bg,
@@ -387,7 +395,8 @@ export function MapGrid() {
                   pointerEvents: 'none',
                   padding: '0 3px',
                   borderRadius: 3,
-                  background: 'rgba(255,253,248,0.85)',
+                  background: blocked ? '#fff1cc' : 'rgba(255,253,248,0.85)',
+                  borderLeft: blocked ? '3px solid #a66517' : undefined,
                   color: '#3a3026',
                   maxWidth: '90%',
                 }}

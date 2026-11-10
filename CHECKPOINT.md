@@ -997,3 +997,21 @@ intervenor meetings. The campus remains the default interface.
 | End month | done: regression was test assuming no pending event; test answers real event before expecting next month |
 | balance grid | skipped: UI composition and tests only, engine untouched |
 | staged remainder | stronger hall growth/blocked states and object-anchored events |
+
+# Campus-first stage 4a - hall growth and stopped work
+
+Halls retain their completed structure while the next stage rises from it with
+monthly progress. Previously an idle next stage appeared fully built before any
+work started. Transparent-edge vehicles now sit in the landscape instead of pale
+squares. Failed inspection and lender draw freeze are named on the affected hall,
+and working vehicles disappear while work is stopped. Progress includes far-pad
+and extra-fitout months rather than reaching a misleading 100% early.
+
+| criterion | status |
+|---|---|
+| monthly growth | done: completed-stage base plus upward progress reveal; e2e partial/completed hall fixture |
+| blocked state | done: hall-level inspection/freeze captions, amber chip and stopped vehicles |
+| visuals | done: 1280x720 mixed-stage campus inspected, no vehicle square backgrounds |
+| full gates | done: 512 unit, 59 e2e, lint, tsc, build |
+| balance grid | skipped: rendering/read-only projections only, engine and saves unchanged |
+| remaining stage 4 | object-anchored event choice cards |
