@@ -4,6 +4,7 @@ import { resolveContent } from '../../engine/resolve';
 import { leadWithIndex } from '../../engine/systems/markets';
 import type { GameState } from '../../engine/types';
 import { projectedFitoutMonth } from './warnings';
+import { powerCapacityWords } from './powerWords';
 import { hallBlocker } from './legibility';
 
 /**
@@ -228,6 +229,7 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
   if (blocked) {
     const blocker = hallBlocker(state, content, blocked)!;
     if (blocker === 'waiting on power hookup') {
+      if(power.substationStatus==='done')return {title:`${blocked.id}: waiting for plant capacity`,why:powerCapacityWords(state,content),objectId:'powerPlants'};
       const pending = power.orders.filter((o) => !o.arrived);
       const chain = 'The substation builds itself once the study is complete and the gear is installed.';
       const wait = power.substationStatus === 'building'
