@@ -531,7 +531,8 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
           const flash = (deltas.arrivedOrders.includes(o.kind) || deltas.newOrders.includes(o.kind)) && !reducedMotion;
           // Phase 5 (pillar K): a booked slot is a crate you can lose - past its arrival month
           // with the balance unpaid, the crate turns red and counts down the grace window.
-          const overdue = !o.arrived && draft.month >= o.arrivalMonth;
+          const dueNow = !o.arrived && draft.month === o.arrivalMonth;
+          const overdue = !o.arrived && draft.month > o.arrivalMonth;
           const graceLeft = overdue ? Math.max(0, o.arrivalMonth + content.tuning.markets.slotGraceMonths - draft.month) : 0;
           return (
             <div
@@ -543,7 +544,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
                   ? `${o.kind}: on site`
                   : overdue
                     ? `${o.kind}: balance unpaid - the slot is lost in ${graceLeft}mo`
-                    : `${o.kind} (${o.supplier === 'alt' ? 'second supplier' : o.supplier === 'spot' ? 'spot' : 'standard'}): arrives ${formatMonth(o.arrivalMonth)}`
+                    : dueNow ? `${o.kind}: due this month. End month attempts delivery and pays the balance from available funding.` : `${o.kind} (${o.supplier === 'alt' ? 'second supplier' : o.supplier === 'spot' ? 'spot' : 'standard'}): arrives ${formatMonth(o.arrivalMonth)}`
               }
               style={{
                 position: 'relative',
@@ -557,7 +558,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
             >
               {'\u{1F4E6}'} {o.kind}
               {o.supplier !== 'standard' && !o.arrived ? ` (${o.supplier === 'alt' ? '2nd' : 'spot'})` : ''}
-              {o.arrived ? ' on site' : overdue ? ` - slot lost in ${graceLeft}mo` : `: ${formatMonth(o.arrivalMonth)} (${Math.max(0, o.arrivalMonth - draft.month)}mo)`}
+              {o.arrived ? ' on site' : overdue ? ` - slot lost in ${graceLeft}mo` : dueNow ? ' - due this month' : `: ${formatMonth(o.arrivalMonth)} (${Math.max(0, o.arrivalMonth - draft.month)}mo)`}
             </div>
           );
         })}

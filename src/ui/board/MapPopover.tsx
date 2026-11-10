@@ -203,7 +203,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
                 {'\u{1F4E6}'} {o.kind} ({o.supplier === 'alt' ? 'second supplier' : o.supplier === 'spot' ? 'spot' : 'standard'}) -{' '}
                 {o.arrived
                   ? 'arrived, on site'
-                  : `arrives ${formatMonth(o.arrivalMonth)} (${Math.max(0, o.arrivalMonth - state.month)}mo left)`}
+                  : state.month === o.arrivalMonth ? 'due this month; End month attempts delivery and pays the balance from available funding' : state.month > o.arrivalMonth ? 'balance unpaid; check funding at the site office before the supplier slot expires' : `arrives ${formatMonth(o.arrivalMonth)} (${Math.max(0, o.arrivalMonth - state.month)}mo left)`}
               </div>
               ))
             )}
