@@ -168,3 +168,16 @@ it('failed vote choices expose tuning-derived time, money and meeting consequenc
  expect(describeVoteChoice('redesign',changed)).toContain('All intervenors reopen');
  expect(describeVoteChoice('unknown',t)).toBe('');
 });
+
+
+describe('subpoena choice disclosure', () => {
+  it('shows the actual delay and separates guaranteed harm from the extra risk', () => {
+    const card = content.events.find((e) => e.id === 'subpoena');
+    expect(describeChoiceEffects('fight', card)).toBe('Docket vote slips 3 months, Town goodwill -5, 50% chance of Town goodwill -10');
+    expect(describeChoiceEffects('comply', card)).toBe('Cash -$1.0M, PUC/Commission goodwill +5, Uses 2 focus points next month');
+  });
+  it('keeps unconditional goodwill certain and ignores invalid probability values', () => {
+    expect(describeEffect({ type: 'goodwill', args: ['town', -5] })).toBe('Town goodwill -5');
+    expect(describeEffect({ type: 'goodwill', args: ['town', -10, 'p:bogus'] })).toBe('Town goodwill -10');
+  });
+});
