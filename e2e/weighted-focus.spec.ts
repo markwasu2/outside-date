@@ -20,6 +20,6 @@ test('four unequal instructions fit together and a major task cannot spend the f
  await expect(order).toBeDisabled();await expect(order).toContainText('Uses 2 focus points; only 1 left');
  await page.screenshot({path:'docs/screenshots/cold2/weighted-focus-mixed-plan.png'});
  await page.getByTestId('map-popover').getByRole('button',{name:'Close',exact:true}).click();
- await expect(page.getByTestId('action-desk')).toContainText("This month's plan (4)");
+ await expect(page.getByTestId('action-desk')).toContainText('Done this month (4)');
  await page.getByRole('button',{name:'End month',exact:true}).click();await expect(count).toHaveText('Focus this month: 6 of 6 left');
 });

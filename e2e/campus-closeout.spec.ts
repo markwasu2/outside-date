@@ -50,10 +50,10 @@ test('takeout preview stays on campus until committed and survives reload',async
  await page.getByRole('button',{name:'Price the takeout to finish the campaign',exact:true}).click();
  await expect(page.getByTestId('campus-workspace')).toBeVisible();
  await expect(page.getByTestId('closeout-campus')).toHaveCount(0);
- await expect(page.getByTestId('next-step-card')).toContainText('End month to close the campus');
- await expect(page.getByRole('button',{name:'End month',exact:true})).toBeEnabled();
+ await expect(page.getByTestId('takeout-preview-card')).toBeVisible();
+ await expect(page.getByRole('button',{name:'End month',exact:true})).toBeDisabled();
  await page.screenshot({path:'docs/screenshots/cold2/takeout-commit-preview.png'});
- await page.getByRole('button',{name:'End month',exact:true}).click();
+ await page.getByTestId('commit-takeout').click();
  await expect(page.getByTestId('closeout-campus')).toBeVisible();
  await page.reload();await page.getByRole('button',{name:'Continue',exact:true}).click();
  await expect(page.getByTestId('closeout-campus')).toBeVisible();

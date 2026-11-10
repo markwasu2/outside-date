@@ -37,7 +37,7 @@ test('runway warning deep-links to the Capital tab, where a lever can be queued'
   await page.getByRole('button', { name: /Raise capital/ }).first().click();
   await expect(page.getByTestId('capital-summary')).toBeVisible();
   await page.getByRole('button', { name: /sponsor bridge loan/i }).first().click();
-  await expect(page.getByTestId('queued-pending-tag')).toBeVisible();
+  await expect(page.getByTestId('undo-last-action')).toContainText(/bridge loan/i);
 });
 
 test('event card shows what the policy paid and the deductible', async ({ page }) => {

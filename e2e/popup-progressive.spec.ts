@@ -6,6 +6,6 @@ test('completed instructions and irrelevant cures fold away without hiding real 
  const ground=popup.getByTestId('popover-action').filter({hasText:'near pad'});await expect(ground).toBeVisible();await expect(ground).toBeDisabled();
  await popup.getByTestId('context-only-actions').locator('summary').click();await expect(fix).toBeVisible();
  await popup.getByRole('button',{name:'Close',exact:true}).click();await page.locator('[data-campus-object="substation"]').click();const study=popup.getByTestId('popover-action').filter({hasText:'Commission the interconnection study'});await study.click();await expect(study).not.toBeVisible();
- await expect(popup.getByRole('status')).toContainText('planned');await expect(popup.getByTestId('popover-action').filter({hasText:'Order the switchgear'})).toBeVisible();
+ await expect(popup.getByRole('status')).toContainText('done');await expect(popup.getByTestId('popover-action').filter({hasText:'Order the switchgear'})).toBeVisible();
  await page.screenshot({path:'docs/screenshots/cold2/popup-progressive.png'});
 });
