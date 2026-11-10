@@ -37,7 +37,18 @@ function lateArrivalNote(state: GameState, content: Content, leadMonths: number)
   return ` Ordered today it arrives around ${formatMonth(arrival)}, after ${hall.id} reaches fitout (${formatMonth(fitout)}) - order it anyway, and plan to slow ${hall.id} or take the slip.`;
 }
 
-export function nextStep(state: GameState, content: Content): NextStep {
+export function nextStep(state: GameState, content: Content, remainingFocus = state.apPerMonth-state.apUsedThisMonth): NextStep {
+  const next = nextStepUnbudgeted(state,content);
+  const cost = content.actions.find(a=>a.id===next.actionId)?.ap ?? 0;
+  if(cost>remainingFocus)return {
+    title:'End the month',
+    why:`${next.title} needs ${cost} focus points; you have ${remainingFocus} left. End the month to commit your plan and refresh focus, or remove an instruction from Plan.`,
+    objectId:next.objectId,
+  };
+  return next;
+}
+
+function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
   const resolved = resolveContent(state, content);
   const power = state.power;
 

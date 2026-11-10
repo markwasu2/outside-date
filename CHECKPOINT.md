@@ -1411,3 +1411,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | retained | Whale choices unchanged; unavailable but relevant prerequisites still explain their reason |
 | gates |540unit,87browser bounded groups,lint,tsc,build;1280power/office pixels inspected |
 | scope | action-row presentation only,no engine/save/bot/rule change |
+
+# Personal live replay - map cue respects remaining focus
+
+| criterion | status |
+|---|---|
+| found personally | cue recommended2-point land option with only1focus left,leading to dead-end instruction |
+| fix | when priority instruction cannot fit,the cue says End the month and on touch explains exact cost/remaining or Plan undo |
+| budget | uses reserved plan costs,not just committed state; original priority preserved for next month's reset |
+| gates |541unit,88browser bounded groups,lint,tsc,build;1280pixels inspected |
+| scope | guidance only,no engine/save/bot/rule change |
