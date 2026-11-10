@@ -109,3 +109,12 @@ it('yard summary counts pending and arrived reservations, and frees installed cr
  s.power.orders=[];s.power.substationStatus='building';
  expect(laydownSummary(s,content)).toMatchObject({reserved:0,inTransit:0,onSite:0,installed:true});
 });
+
+
+it('tutorial object choices omit waived transformer and disabled docket systems',()=>{
+ const s=createGame(content,'tutorial-edge5',setup,negotiation,1);
+ expect(ids('substation',s)).not.toContain('orderTransformer');
+ for(const id of ['fileDocket','prepTestimony','answerDiscovery','meetIntervenor'])expect(ids('siteOffice',s)).not.toContain(id);
+ s.power.studyStatus='pending';
+ expect(cashLabel(findDef(content,'commissionStudy'),s,content)).toBe('$500K');
+});

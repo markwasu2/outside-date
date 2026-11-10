@@ -76,6 +76,7 @@ export function cashLabel(
       // Not currently legal (missing prereq, insufficient cash): the static label still applies.
     }
   }
+  if (def.id === 'commissionStudy') return formatDollars(resolved.tuning.power.studyCost);
   if (def.cash !== 'dynamic') return formatDollars(def.cash);
   const amount = dynamicCash(def, state, resolved);
   return amount === null ? 'varies' : formatDollars(amount);
@@ -185,7 +186,7 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
     }
     const rows: ActionRow[] = [
       row(content, state, 'commissionStudy', findDef(content, 'commissionStudy').label),
-      row(content, state, 'orderTransformer', findDef(content, 'orderTransformer').label),
+      ...(!state.skipTransformerOrder ? [row(content, state, 'orderTransformer', findDef(content, 'orderTransformer').label)] : []),
       row(content, state, 'orderSwitchgear', findDef(content, 'orderSwitchgear').label),
     ];
     for (const kind of ['transformer', 'switchgear'] as const) {
@@ -244,11 +245,13 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
       row(content, state, 'filePermit', 'File air permit', { permitId: 'air' }),
       row(content, state, 'filePermit', 'File building permit', { permitId: 'building' }),
       row(content, state, 'filePermit', 'File water permit', { permitId: 'water' }),
-      row(content, state, 'fileDocket', findDef(content, 'fileDocket').label),
-      row(content, state, 'prepTestimony', findDef(content, 'prepTestimony').label),
-      row(content, state, 'answerDiscovery', findDef(content, 'answerDiscovery').label),
+      ...(state.docketEnabled ? [
+        row(content, state, 'fileDocket', findDef(content, 'fileDocket').label),
+        row(content, state, 'prepTestimony', findDef(content, 'prepTestimony').label),
+        row(content, state, 'answerDiscovery', findDef(content, 'answerDiscovery').label),
+      ] : []),
     ];
-    for (const intervenor of state.docket.intervenors) {
+    for (const intervenor of state.docketEnabled ? state.docket.intervenors : []) {
       const name = content.cast.intervenors.find((i) => i.id === intervenor.id)?.name ?? intervenor.id;
       rows.push(row(content, state, 'meetIntervenor', `Meet ${name}`, { intervenorId: intervenor.id }));
     }

@@ -1401,3 +1401,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | regression | browser creates lender notice, follows Show me and confirms clear Close/cure action |
 | gates |539unit,86browser in bounded groups,lint,tsc,build;1280pixels inspected |
 | scope | presentation only,no rule/save/bot change or new grid |
+
+# Personal live replay - irrelevant tutorial systems and changing study price
+
+| criterion | status |
+|---|---|
+| found personally | live Tutorial showed waived transformer,disabled docket and study price jumping500K to2M after queueing |
+| fix | tutorial object menus omit waived transformer/docket actions; completed-study fallback reads resolved500K price |
+| retained | Whale choices unchanged; unavailable but relevant prerequisites still explain their reason |
+| gates |540unit,87browser bounded groups,lint,tsc,build;1280power/office pixels inspected |
+| scope | action-row presentation only,no engine/save/bot/rule change |
