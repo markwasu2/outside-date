@@ -34,3 +34,11 @@ it('stops when available power unblocks a hall instead of wasting its new build 
  const {c,s}=waiting();s.power.interimGridMW=100;s.halls.forEach(h=>{h.energized=false;h.stageIndex=4;});
  expect(fastForward(s,c).state.month).toBe(25);
 });
+
+it('ignores historical discovery after approval but still stops for an open request',()=>{
+ const {c,s}=waiting();s.docket.discoveryOutstanding=true;s.docket.discoveryDueMonth=s.month;
+ expect(fastForwardPause(s,c)).toBeNull();expect(fastForwardMilestones(s,c).some(e=>e.kind==='discovery')).toBe(false);
+ const next=fastForward(s,c).state;expect(next.month).toBeGreaterThan(s.month);expect(next.docket.discoveryOutstanding).toBe(true);
+ s.docket.status='open';s.docket.voteMonth=40;s.docket.discoveryDueMonth=s.month+5;
+ expect(fastForwardPause(s,c)).toContain('discovery response');expect(fastForward(s,c).state.month).toBe(s.month);
+});

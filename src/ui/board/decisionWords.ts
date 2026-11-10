@@ -1,6 +1,7 @@
 import type { Content } from '../../content/schemas';
 import type { GameState, PlannedAction } from '../../engine/types';
 import { resolveContent } from '../../engine/resolve';
+import { hasLiveDiscovery } from '../../engine/selectors';
 import { formatMonth } from '../../engine/format';
 
 export const actionCostWords=(cost:number)=>cost===0?'No focus cost':`Uses ${cost} focus point${cost===1?'':'s'}`;
@@ -35,7 +36,7 @@ export function isContextOnlyAction(action:PlannedAction,state:GameState):boolea
  case 'cureDraw':return !state.flags.drawFreeze;
  case 'confirmRackSchedule':return !!state.flags.rackScheduleConfirmed;
  case 'fileDocket':return state.docket.status!=='none';
- case 'answerDiscovery':return !state.docket.discoveryOutstanding;
+ case 'answerDiscovery':return !hasLiveDiscovery(state);
  case 'prepTestimony':return ['approved','dead'].includes(state.docket.status);
  case 'meetIntervenor':return ['approved','dead'].includes(state.docket.status)||!!state.docket.intervenors.find(i=>i.id===action.params?.intervenorId)?.settled;
  default:return false;

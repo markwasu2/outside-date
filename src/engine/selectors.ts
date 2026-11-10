@@ -201,6 +201,12 @@ export function ledger(state: GameState, content: Content): LedgerEntry[] {
 }
 
 
+/** Discovery can delay only an open docket. Old saves may retain the outstanding
+ * flag after the vote; preserve that history without treating it as a live duty. */
+export function hasLiveDiscovery(state: GameState): boolean {
+  return state.docket.status === 'open' && state.docket.discoveryOutstanding;
+}
+
 /** Real current milestones for no-instruction time skipping. Historical ledger rows remain
  * available to the ledger UI, but completed work cannot stop a future wait. */
 export function fastForwardMilestones(state: GameState, content: Content): LedgerEntry[] {
@@ -208,7 +214,7 @@ export function fastForwardMilestones(state: GameState, content: Content): Ledge
     switch(e.kind){
       case 'permit': return state.permits[e.label.replace(' permit decision','') as keyof GameState['permits']]?.status==='pending';
       case 'docketVote': return state.docket.status==='open';
-      case 'discovery': return state.docket.discoveryOutstanding;
+      case 'discovery': return hasLiveDiscovery(state);
       case 'studyDone': return state.power.studyStatus==='pending';
       case 'orderArrival': return state.power.orders.some(o=>e.label===`${o.kind} arrival`&&!o.arrived);
       case 'plantOnline': return state.power.plants.some(p=>e.label===`Plant ${p.id} online`&&(p.onlineMonth===null||p.onlineMonth>state.month));
