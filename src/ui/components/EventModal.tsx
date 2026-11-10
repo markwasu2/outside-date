@@ -60,7 +60,12 @@ export function describeEffect(effect: Effect): string {
     if (typeof group !== 'string' || typeof delta !== 'number') return 'Has consequences';
     const label = GOODWILL_LABELS[group as GoodwillGroup] ?? group;
     const sign = delta > 0 ? '+' : '';
-    return `${label} goodwill ${sign}${delta}`;
+    const probabilityArg = effect.args[2];
+    const probability = typeof probabilityArg === 'string' && probabilityArg.startsWith('p:')
+      ? Number(probabilityArg.slice(2)) : null;
+    const chance = probability !== null && Number.isFinite(probability) && probability >= 0 && probability < 1
+      ? `${Math.round(probability * 100)}% chance of ` : '';
+    return `${chance}${label} goodwill ${sign}${delta}`;
   }
   // UX 6: branches for the no-choice event cards, so their notice cards can state the stakes
   // instead of falling back to "Has consequences". Same effect args the handlers read.
@@ -84,6 +89,11 @@ export function describeEffect(effect: Effect): string {
     const months = effect.args[1];
     const target = effect.args[0] === 'randomPending' ? 'A pending order' : `The ${String(effect.args[0])}`;
     return typeof months === 'number' ? `${target} slips ${months} months` : 'Has consequences';
+  }
+  if (effect.type === 'voteSlip') {
+    const months = effect.args[0];
+    if (typeof months !== 'number') return 'Has consequences';
+    return months > 0 ? `Docket vote slips ${months} months` : `Docket vote moves up ${-months} months`;
   }
   if (effect.type === 'studySlip') {
     const months = effect.args[0];
