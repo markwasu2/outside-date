@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Content } from '../../content/schemas';
 import type { LogEntry } from '../../engine/types';
 import { describeEffect } from './EventModal';
-import { eventCampusTarget, type CampusTarget } from '../board/eventCampus';
+import { eventCampusTarget, eventOccurrenceDetail, type CampusTarget } from '../board/eventCampus';
 import { useCampusAnchor } from '../board/useCampusAnchor';
 import { useStore } from '../store';
 import { warnings } from '../board/warnings';
@@ -106,7 +106,7 @@ export function EventNotices() {
       .map((e, i) => ({
         key: `${e.month}-${seenCount.current}-${i}`,
         title: e.text,
-        body: e.detail,
+        body: [e.detail, eventOccurrenceDetail(draft, content.events.find(c=>c.title===e.text)?.id??'',e.month,prevState)].filter(Boolean).join(' ') || undefined,
         stakes: noticeStakes(e, content),
         warning: e.kind === 'warning',
         target: eventCampusTarget(draft, content.events.find((c) => c.title === e.text)?.id ?? '', e.month, prevState),
