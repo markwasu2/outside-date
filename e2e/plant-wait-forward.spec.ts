@@ -10,8 +10,10 @@ test('Fast forward advances an empty pre-rent plant wait and stops before its li
   s.power.plants.forEach(p=>{p.plannedOnlineMonth=30;p.onlineMonth=null;});
   const c={...useStore.getState().content,events:[]};useStore.setState({state:s,draft:s,content:c,plan:[]});
  });
- await expect(page.getByTestId('campus-status')).toContainText('Y3 M1');await page.getByTestId('fast-forward-button').click();
+ await expect(page.getByTestId('campus-status')).toContainText('Y3 M1');
+ await page.getByRole('button',{name:'Postures',exact:true}).click();
+ await page.getByTestId('fast-forward-jump').click();
  await expect(page.getByTestId('campus-status')).toContainText('Y3 M6');
- await page.getByTestId('fast-forward-button').click();await expect(page.locator('footer')).toContainText('Plant A online');
+ await page.getByTestId('fast-forward-jump').click();await expect(page.locator('footer')).toContainText('Plant A online');
  await page.screenshot({path:'docs/screenshots/cold2/plant-wait-forward.png'});
 });
