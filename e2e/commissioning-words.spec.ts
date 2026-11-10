@@ -1,3 +1,4 @@
+import { adviceElement } from './campusNavigation';
 import {test,expect} from '@playwright/test';
 
 test('final stage is commissioning work before delivery, with a matching map action',async({page})=>{
@@ -13,7 +14,7 @@ test('final stage is commissioning work before delivery, with a matching map act
  s.power.plants.forEach((p:{status:string;onlineMonth:number})=>{p.status='online';p.onlineMonth=0;});
  useStore.setState({state:s,draft:s});
  });
- await expect(page.getByTestId('next-step-card')).toContainText('Start commissioning on H1');
+ await expect((await adviceElement(page, 'next-step-card'))).toContainText('Start commissioning on H1');
  const hall=page.getByRole('button',{name:/H1 Commissioning - ready/});await expect(hall).toBeVisible();await hall.click();
  const start=page.getByRole('button',{name:/^Start commissioning: H1 \(Uses/});await expect(start).toBeVisible();await start.click();
  await expect(page.getByRole('button',{name:/H1 Commissioning - testing/})).toBeVisible();

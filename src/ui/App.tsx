@@ -1,3 +1,4 @@
+import { MonthReviewPanel } from './board/MonthReviewPanel';
 import { useEffect, useState } from 'react';
 
 import { ActionDesk } from './board/ActionDesk';
@@ -81,6 +82,8 @@ function useKeyboardShortcuts() {
 /** Desktop campus-first stage: the map owns the canvas; detail stays on demand. */
 function CampusGame() {
   const [deskOpen, setDeskOpen] = useState(false);
+  const [showAdvice, setShowAdvice] = useState(false);
+  const [showReview, setShowReview] = useState(true);
   const [drawer, setDrawer] = useState<'status' | 'actions' | 'postures' | null>(null);
   const state = useStore((s) => s.state);
   const draft = useStore((s) => s.draft);
@@ -132,7 +135,7 @@ function CampusGame() {
   return (
     <div data-testid="campus-workspace" style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#f1eadc', color: '#302d25', fontFamily: 'Arial, sans-serif' }}>
       <BoardStyles />
-      <header data-testid="campus-status" style={{ display: 'flex', alignItems: 'center', gap: 20, padding: '10px 18px', background: '#fffdf6', borderBottom: '1px solid #cdbf9f', fontSize: 13, flexShrink: 0 }}>
+      <header data-testid="campus-status" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: '#fffdf6', borderBottom: '1px solid #cdbf9f', fontSize: 13, flexShrink: 0 }}>
         <span style={{ fontFamily: 'Georgia, serif', fontSize: 18 }}>Outside Date</span>
         <strong>{formatMonth(draft.month)}</strong>
         <span>Cash {formatDollars(draft.cash)}</span>
@@ -141,6 +144,8 @@ function CampusGame() {
         <span style={{ flex: 1 }} />
         <button data-testid="fast-forward-button" disabled={state.phase !== 'playing' && !simRunning} onClick={toggleSim}>{simRunning ? '\u23F8 Pause sim' : '\u25B6 Run sim'}</button>
         <button style={{ color: alerts.some((a) => a.level === 'critical') ? '#a52a21' : undefined, fontWeight: alerts.length ? 'bold' : undefined }} aria-expanded={drawer === 'status'} onClick={() => setDrawer(drawer === 'status' ? null : 'status')}>Status & guide{alerts.length ? ` (${alerts.length} alerts)` : ''}</button>
+        <button aria-expanded={showReview} onClick={() => setShowReview(!showReview)}>Month review</button>
+        <button aria-expanded={showAdvice} onClick={() => setShowAdvice(!showAdvice)}>{showAdvice ? 'Hide advice' : 'Show advice'}</button>
         <button aria-expanded={deskOpen} onClick={() => setDeskOpen(!deskOpen)}>Actions</button>
         <button aria-expanded={drawer === 'postures'} onClick={() => setDrawer(drawer === 'postures' ? null : 'postures')}>Postures</button>
         <button aria-expanded={drawer === 'actions'} onClick={() => setDrawer(drawer === 'actions' ? null : 'actions')}>Plan</button>
@@ -153,7 +158,7 @@ function CampusGame() {
         <strong>{goalSentence(draft).replace('all 1 hall', 'your hall').replace('outside date', 'tenant deadline').replace('close the takeout', 'sell/refinance the finished campus (the takeout)')}</strong>
       </section>}
       <div style={{display:'flex',flex:1,minHeight:0}}><div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minWidth:0, minHeight: 0, position: 'relative' }}>
-        <MapGrid cue={{title: `Next: ${step.title}`, why: step.why, objectId: step.objectId, waiting: step.waiting || step.title==='End the month', whileYouWait: step.whileYouWait, progress: step.progress, prepAction: step.prepAction, onShow: showMe, actionId: step.actionId, params: step.params}} /><EventNotices />
+        <MapGrid cue={showAdvice ? {title: `Advice: ${step.title}`, why: step.why, objectId: step.objectId, waiting: step.waiting || step.title==='End the month', whileYouWait: step.whileYouWait, progress: step.progress, prepAction: step.prepAction, onShow: showMe, actionId: step.actionId, params: step.params} : undefined} /><EventNotices />
         {drawer && (
           <aside data-testid={`${drawer}-drawer`} style={{ position: 'absolute', right: 12, top: 10, bottom: 10, width: drawer === 'actions' ? 400 : 600, maxWidth: '80vw', zIndex: 60, background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #d9cfb9' }}>
@@ -176,6 +181,7 @@ function CampusGame() {
           </aside>
         )}
       </div>
+      {showReview && <MonthReviewPanel onInspect={(target) => {setDrawer(null);setBoardPopover(target);selectHall(state.halls.some(h => h.id === target) ? target : null);}} />}
       {deskOpen && <ActionDesk />}</div>
       {isFreshStart && state.phase === 'playing' && content.scenarios[state.scenarioId]?.coachTips === true && !dismissedCoachTips.includes('cold-intro') && (
         <div data-testid="cold-intro" style={{ position: 'fixed', bottom: 64, left: '50%', transform: 'translateX(-50%)', zIndex: 70, maxWidth: 520, padding: '12px 16px', background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', fontSize: 13, lineHeight: 1.5, pointerEvents: 'none' }}>
@@ -186,7 +192,7 @@ function CampusGame() {
           <div>{goalSentence(draft).replace('all 1 hall', 'your hall').replace('outside date', 'tenant deadline').replace('close the takeout', 'sell or refinance the finished campus (the takeout)')}</div>
           <div data-testid="tutorial-deadlines">Aim for delivery by <strong>{formatMonth(Math.min(...draft.halls.filter(h => !h.delivered && !h.terminated).map(h => h.deliveryMonth)))}</strong>. That is the lease target; the later outside date is the last chance before the tenant can walk. The time grade uses your delivery call, not the outside date.</div>
           <div>Each month, spend focus points on actions - permits, orders, fixes - then <strong>End month</strong> to advance the clock. Crews and review clocks keep running on their own; unused focus does not carry over.</div>
-          <div>The <strong>Next</strong> card on the campus always points at the most useful move. You can also click anything on the campus to see what you can do there.</div>
+          <div>Your <strong>Month review</strong> explains what happened and how your choices played out. Inspect the options, then decide your priorities. Click the campus to act; Show advice is there if you want a suggestion.</div>
         </div>
       )}
       <footer style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '10px 18px', flexShrink: 0, background: '#fffdf6', borderTop: '1px solid #cdbf9f', fontSize: 13 }}>

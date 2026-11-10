@@ -1,3 +1,4 @@
+import { adviceElement } from './campusNavigation';
 import {test,expect} from '@playwright/test';
 
 test('expansion warns about a permanent dry-cooling power gap before the answer',async({page})=>{
@@ -25,7 +26,7 @@ test('a fully online but undersized supply does not tell H6 to wait for another 
  Object.values(s.permits).forEach((p:{status:string})=>p.status='granted');s.power.plants.forEach((p:{onlineMonth:number})=>p.onlineMonth=40);
  s.halls.forEach((h:{delivered:boolean;energized:boolean;stageIndex:number;stageActive:boolean},i:number)=>{h.delivered=i<5;h.energized=i<5;h.stageIndex=i<5?5:4;h.stageActive=false;});useStore.setState({state:s,draft:s});
  });
- await expect(page.getByTestId('next-step-card')).toContainText('H6: power capacity is short');await page.getByTestId('next-step-show-me').click();
+ await expect((await adviceElement(page, 'next-step-card'))).toContainText('H6: power capacity is short');await (await adviceElement(page, 'next-step-show-me')).click();
  const popup=page.getByTestId('map-popover');await expect(popup).toContainText('No further power capacity is scheduled');await expect(popup).toContainText('Waiting will not close this gap');
  await page.screenshot({path:'docs/screenshots/cold2/exhausted-power-gap.png'});
 });

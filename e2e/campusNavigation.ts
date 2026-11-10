@@ -15,3 +15,12 @@ export async function closePanel(page: Page) {
   const close = page.getByRole('button', { name: 'Close panel', exact: true });
   if (await close.isVisible()) await close.click();
 }
+
+/** Old recommendation tests opt in explicitly; the monthly review is the default surface. */
+export async function adviceElement(page: Page, testId: string) {
+  const toggle = page.getByRole('button', { name: 'Show advice', exact: true });
+  if (await toggle.count()) await toggle.click();
+  const review=page.getByRole('button',{name:'Month review',exact:true});
+  if(await page.getByTestId('month-review').count() && await review.count())await review.click();
+  return page.getByTestId(testId);
+}

@@ -1,12 +1,13 @@
+import { adviceElement } from './campusNavigation';
 import {test,expect} from '@playwright/test';
 import fs from 'node:fs';
 test('fresh title through signing, object-only construction and final report',async({page})=>{
- test.setTimeout(180_000);await page.setViewportSize({width:1440,height:900});
+ test.setTimeout(55_000);await page.setViewportSize({width:1440,height:900});
  const trace:string[]=[];const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(() => { Math.random = () => 1 / 1_000_000_000; });
  await page.goto('/');await page.locator('select').first().selectOption('tutorial-edge5');await page.getByRole('button',{name:'New game',exact:true}).click();
  for(const name of ['Next: Hall tier','Next: Cooling','Next: Contractor','Next: Lease','Next: Forecast','Next: Capital stack','Next: Power','Next: Insurance','Review closing table'])await page.getByRole('button',{name,exact:true}).click();
- await page.screenshot({path:'docs/screenshots/cold2/journey-closing.png'});await page.getByRole('button',{name:'Start campaign',exact:true}).click();
+ await page.screenshot({path:'docs/screenshots/cold2/journey-closing.png'});await page.getByRole('button',{name:'Start campaign',exact:true}).click();await page.getByRole('button',{name:'Month review',exact:true}).click();await adviceElement(page,'next-step-card');
  for(let turn=0;turn<100;turn++){
   const heading=page.getByRole('heading',{name:/Rating the campus|Report card|You lose|You win|You scraped by/});if(await heading.count())break;
   const dismissedEvent=await page.evaluate(async()=>{
@@ -19,7 +20,7 @@ test('fresh title through signing, object-only construction and final report',as
   for(const target of ['substation','road','pond','H1','laydownYard','siteOffice']){
    await page.locator(`[data-campus-object="${target}"]`).click();const popup=page.getByTestId('map-popover');await expect(popup).toBeVisible();
    if(target==='siteOffice' && await popup.getByRole('button',{name:'Insurance & lender',exact:true}).count()){
-    await popup.getByRole('button',{name:'Insurance & lender',exact:true}).click();const cure=popup.getByTestId('popover-action').filter({hasText:'Cure'});if(await cure.count() && await cure.isEnabled()){await expect(page.getByTestId('next-step-card')).toContainText('Cure the lender draw freeze');await page.screenshot({path:'docs/screenshots/cold2/journey-freeze-cure.png'});trace.push('PLAN '+await cure.innerText());await cure.click();}
+    await popup.getByRole('button',{name:'Insurance & lender',exact:true}).click();const cure=popup.getByTestId('popover-action').filter({hasText:'Cure'});if(await cure.count() && await cure.isEnabled()){await expect((await adviceElement(page, 'next-step-card'))).toContainText('Cure the lender draw freeze');await page.screenshot({path:'docs/screenshots/cold2/journey-freeze-cure.png'});trace.push('PLAN '+await cure.innerText());await cure.click();}
     await popup.getByRole('button',{name:'Permits & people',exact:true}).click();
    }
    // Only intentional build/prerequisite actions; no generic click-all, no bot or state injection.

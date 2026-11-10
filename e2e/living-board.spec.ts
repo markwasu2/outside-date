@@ -1,3 +1,4 @@
+import { adviceElement } from './campusNavigation';
 import { openStatus, closePanel } from './campusNavigation';
 import { expect, test, type Page } from '@playwright/test';
 
@@ -32,7 +33,7 @@ test('tutorial: substation popover commissions the study from the map, and the m
   // healthy state.
   await openStatus(page);
   await expect(page.getByTestId('progress-spine')).toBeVisible();
-  await expect(page.getByTestId('next-step-card')).toContainText('interconnection study');
+  await expect((await adviceElement(page, 'next-step-card'))).toContainText('interconnection study');
   await openStatus(page);
   await expect(page.getByTestId('warning-banner')).toHaveCount(0);
 
@@ -48,7 +49,7 @@ test('tutorial: substation popover commissions the study from the map, and the m
   await popover.getByTestId('popover-action').filter({ hasText: 'Commission the interconnection study' }).click();
   await expect(popover).toBeVisible();
   await expect(popover.getByRole('status')).toContainText('done.');
-  await expect(page.getByTestId('next-step-card')).not.toContainText('Commission the interconnection study');
+  await expect((await adviceElement(page, 'next-step-card'))).not.toContainText('Commission the interconnection study');
   await expect(page.getByTestId('queued-ghost').first()).toBeVisible();
 
   // End month: the plan clears and the study is visibly underway on the board.
@@ -85,7 +86,7 @@ test('Whale month 0 shows four hall sprites on the board', async ({ page }) => {
     await expect(page.locator(`[role="button"][title^="${id}: "]`)).toBeVisible();
   }
   // D7: the spine is up for a fresh Whale run too, pointing at the study first.
-  await expect(page.getByTestId('next-step-card')).toContainText('interconnection study');
+  await expect((await adviceElement(page, 'next-step-card'))).toContainText('interconnection study');
 });
 
 test('Whale: a delivered hall shows its rent ticker on the board', async ({ page }) => {

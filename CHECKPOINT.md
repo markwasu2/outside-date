@@ -1763,3 +1763,15 @@ have transparent edges; the power timeline labels stay inside the panel.
 | regression | added full UI tutorial journey from first screen to final report, verifying prep, skip stopping at the newly available site option, event sliders and close explanation; added stage-progress and post-delivery prep tests; guide-card background no longer blocks clicks on campus objects beneath it |
 | gates | 646 unit, 144 browser across eight shards, lint, typecheck, build; actual welcome, progress/skip and priced-close screenshots inspected |
 | scope | UI guidance and access to ordinary monthly advancement only; no engine, balance, save or bot changes |
+
+# Development review - player judgment before optional advice
+
+| criterion | status |
+|---|---|
+| finding | following one Next card is a chore, not a development decision; default browser-grey controls and overlapping floating instructions made the scene feel inconsistent |
+| changed | default side desk reviews actual monthly developments and consequences of earlier choices, then offers schedule, cash and people routes to inspect without spending; optional advice is hidden until requested and no longer the default play loop; review evidence remains fixed while current options update |
+| evidence | snapshot compares the position before the month's actions with the monthly outcome; reports insurance payments and retained loss, lender freezes/cures, construction, permit decisions, equipment arrivals and goodwill; unknown causes are not presented as proven; warnings are separated from payoffs; loaded games start review history at the next tick |
+| visual | removed the default floating recommendation; anchored review beside the campus; shorter option cards and consistent warm controls, active states, rounded office panels; campus stays visible and interactive, review scrolls separately |
+| replay | new full tutorial journey through campus objects and event sliders, without ever opening advice, reached the final close; opening an option spends nothing, and review history is unchanged by new actions; existing recommendation tests now explicitly opt in |
+| gates | 651 unit tests, 145 browser tests across eight shards, lint, typecheck and build; actual opening, setback and construction-payoff pixels inspected |
+| scope | UI only, no engine, balance, saved-game schema or bot changes; review snapshots are session-only and report that limitation on load |
