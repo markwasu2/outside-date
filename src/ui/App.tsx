@@ -5,6 +5,7 @@ import { GoalStrip } from './board/GoalStrip';
 import { ProgressSpine } from './board/ProgressSpine';
 import { WarningBanner } from './board/WarningBanner';
 import { CodexModal } from './components/CodexModal';
+import { EventNotices } from './components/EventNotices';
 import { EventModal } from './components/EventModal';
 import { FinancialsDrawer } from './components/FinancialsDrawer';
 import { Hud } from './components/Hud';
@@ -113,7 +114,7 @@ function CampusGame() {
         <button data-testid="next-step-show-me" onClick={showMe}>Show me</button>
       </div>
       <div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minHeight: 0, position: 'relative' }}>
-        <MapGrid />
+        <MapGrid /><EventNotices />
         {drawer && (
           <aside data-testid={`${drawer}-drawer`} style={{ position: 'absolute', right: 12, top: 10, bottom: 10, width: drawer === 'actions' ? 400 : 600, maxWidth: '80vw', zIndex: 60, background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #d9cfb9' }}>

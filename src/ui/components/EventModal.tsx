@@ -5,6 +5,8 @@ import { formatDollars } from '../../engine/format';
 import type { GoodwillGroup } from '../../engine/types';
 import { playSound } from '../sound';
 import { EVENT_STAKEHOLDER } from '../stakeholders';
+import { eventCampusTarget } from '../board/eventCampus';
+import { useCampusAnchor } from '../board/useCampusAnchor';
 import { useStore } from '../store';
 import { GOODWILL_LABELS } from './Hud';
 import { WhoHoldsChip } from './WhoHoldsChip';
@@ -176,6 +178,9 @@ export function EventModal() {
     }
   }, [draft.pending?.cardId, muted]);
 
+  const target = draft.pending ? eventCampusTarget(draft, draft.pending.cardId) : null;
+  const {cardRef,position} = useCampusAnchor(target?.id ?? null, draft.pending?.cardId);
+
   if (draft.phase !== 'awaitingChoice' || !draft.pending) return null;
   const { pending } = draft;
 
@@ -198,14 +203,18 @@ export function EventModal() {
         position: 'fixed',
         zIndex: 900,
         inset: 0,
-        background: 'rgba(0,0,0,0.5)',
+        background: 'rgba(40,35,20,0.12)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: 'sans-serif',
       }}
     >
-      <div style={{ background: '#fff', borderRadius: 8, padding: '1.5rem', maxWidth: 420 }}>
+      {position && <div aria-hidden="true" style={{position:'fixed',...position.ring,border:'3px dashed #6c4c18',borderRadius:12,boxSizing:'border-box',pointerEvents:'none'}} />}
+      <div ref={cardRef} data-testid="campus-event-card" data-campus-target={target?.id}
+        style={{ background: '#fffdf4', border:'2px solid #8e7548', boxShadow:'0 8px 24px #30240b55', borderRadius: 8, padding: '1rem', width:420, boxSizing:'border-box', maxWidth:'calc(100vw - 32px)', maxHeight:'calc(100vh - 180px)', overflowY:'auto',
+          ...(position ? {position:'fixed',left:position.left,top:position.top} : {}) }}>
+        {target && <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:1,color:'#72572b',marginBottom:6}}>At {target.label}</div>}
         <h2 style={{ marginTop: 0 }}>{title}</h2>
         <p>{body}</p>
         {claim && (
