@@ -99,7 +99,7 @@ test('tutorial: action index explains systems before they come online', async ({
   await filterActions(page, 'power');
   await expect(page.getByTestId('locked-tab-hint').first()).toContainText('substation');
   await closePanel(page);
-  await page.getByRole('button', { name: /Substation/ }).click();
+  await page.getByTestId('map-root').getByRole('button', { name: /Substation/ }).click();
   await page.getByTestId('map-popover').getByTestId('popover-action').filter({ hasText: 'Commission the interconnection study' }).click();
   await page.getByRole('button', { name: 'End month' }).click();
   await dismissEventIfUp(page);
@@ -156,7 +156,7 @@ test("tutorial storm card carries a who-holds chip that opens the GC's stakehold
   await dismissExplainerIfUp(page);
 
   // Queue everything the tutorial wants, then advance to month 7's scripted storm.
-  await page.getByRole('button', { name: /Substation/ }).click();
+  await page.getByTestId('map-root').getByRole('button', { name: /Substation/ }).click();
   await page
     .getByTestId('map-popover')
     .getByTestId('popover-action')

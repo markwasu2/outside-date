@@ -31,7 +31,7 @@ test('markets: HUD strip, order dialog supplier options, and a supplier-tagged c
   await closePanel(page);
   // Commission the study and advance one month, the same flow living-board.spec.ts proves
   // unlocks the switchgear order in the tutorial.
-  const substation = page.getByRole('button', { name: /Substation/ });
+  const substation = page.getByTestId('map-root').getByRole('button', { name: /Substation/ });
   await substation.click();
   await page
     .getByTestId('map-popover')

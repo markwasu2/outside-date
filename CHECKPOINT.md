@@ -1289,3 +1289,16 @@ have transparent edges; the power timeline labels stay inside the panel.
 | visual | inspected:1440 construction midway and final4-hall report; trace/screenshots retained |
 | grid | skipped:UI route/test only,engine/bot/save unchanged |
 | superseding priority | next: always-visible located action list; rethink unequal decision budget with balance/save checks, per user's later feedback |
+
+# User priority - always-visible actions with campus locations
+
+| criterion | status |
+|---|---|
+| visible | done: permanent What can I do desk beside campus, no tab/search needed |
+| actionable | done: grouped available choices with cost/result and Add to plan, plan remove controls always present |
+| location | done: each group names actual campus object and side, Show location opens it and pulses its campus graphic |
+| locked choices | done: opt-in unavailable list with current reasons; default shows legal choices only |
+| parity | done: shared object row builders/legality/cash previews, object clicking remains supported |
+| full gates | done:529 unit,79 e2e bounded groups,lint,tsc,build; test selectors explicitly scope map vs new location buttons |
+| visual | inspected:1280 and1440 desk with readable campus, location/result/cost and persistent month commit |
+| grid | skipped:UI discovery only, unequal budget redesign next |
