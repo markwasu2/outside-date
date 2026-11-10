@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
-import { eventCampusTarget } from '../../src/ui/board/eventCampus';
+import { eventCampusTarget, eventOccurrenceDetail } from '../../src/ui/board/eventCampus';
 const negotiation: NegotiationChoices = {lease:{firstDeliveryMonth:38,lateRemedy:'liquidatedDamages'},capital:{seniorIndex:1,mezzIndex:1,playerShareIndex:1},power:{minCharge:'medium',plantBOffset:0},insurance:{dsu:false}};
 const state = () => createGame(loadContent(),'whale',{site:'megasite',hallTier:'air',cooling:'evaporative',gc:'costPlus'},negotiation,1);
 it('pins visitors, racks and study events to the matching scene object',()=>{
@@ -18,4 +18,14 @@ it('does not invent a hall target when an occurrence has no hall evidence',()=>{
 it('pins inspection to the one newly failed hall, not an old failure',()=>{
   const prev=state(),next=structuredClone(prev);prev.flags['inspectionFail:H1']=true;next.flags['inspectionFail:H1']=true;next.flags['inspectionFail:H3']=true;
   expect(eventCampusTarget(next,'inspection_fail',next.month,prev).id).toBe('H3');
+});
+
+it('names changed equipment and inspection outcomes only from occurrence evidence',()=>{
+ const prev=state(),next=structuredClone(prev);next.flags['inspectionFail:H2']=true;
+ expect(eventOccurrenceDetail(next,'inspection_fail',next.month,prev)).toContain('H2 failed inspection');
+ expect(eventOccurrenceDetail(prev,'inspection_fail',prev.month,prev)).toBeUndefined();
+ prev.power.orders=[{kind:'transformer',supplier:'standard',orderedMonth:0,arrivalMonth:24,arrived:false,price:1,deposit:1}];
+ next.power.orders=[{...prev.power.orders[0]!,arrivalMonth:27}];
+ expect(eventOccurrenceDetail(next,'supply_shock',next.month,prev)).toContain('transformer (standard): booked arrival is now Y3 M4');
+ expect(eventCampusTarget(next,'tenant_slide_offer').label).toBe('H1 lease dates');
 });

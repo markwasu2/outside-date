@@ -41,3 +41,13 @@ test('expansion choice states the real campaign cutoff before either answer',asy
   await expect(page.getByTestId('expansion-funding')).toContainText('line losses once delivered');
   await page.screenshot({path:'docs/screenshots/cold2/expansion-funding.png'});
 });
+
+test('inspection notice names and pins the newly affected hall',async({page})=>{
+ await page.goto('/');await page.getByTestId('quick-start').click();
+ await page.evaluate(async()=>{
+ // @ts-expect-error dev source import
+ const {useStore}=await import('/src/ui/store.ts');const s=useStore.getState();const card=s.content.events.find((c:{id:string})=>c.id==='inspection_fail');
+ const next=structuredClone(s.state);next.flags['inspectionFail:H3']=true;next.log.push({month:next.month,kind:'event',text:card.title,detail:card.body});useStore.setState({prevState:s.state,state:next,draft:next});
+ });
+ const notice=page.getByTestId('event-notice');await expect(notice).toHaveAttribute('data-campus-target','H3');await expect(notice).toContainText('H3 failed inspection');await page.screenshot({path:'docs/screenshots/cold2/inspection-target.png'});
+});
