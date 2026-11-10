@@ -535,7 +535,7 @@ export function MapGrid() {
             >
               {'\u{1F4E6}'} {o.kind}
               {o.supplier !== 'standard' && !o.arrived ? ` (${o.supplier === 'alt' ? '2nd' : 'spot'})` : ''}
-              {o.arrived ? ' on site' : overdue ? ` - slot lost in ${graceLeft}mo` : ` (${Math.max(0, o.arrivalMonth - draft.month)}mo)`}
+              {o.arrived ? ' on site' : overdue ? ` - slot lost in ${graceLeft}mo` : `: ${formatMonth(o.arrivalMonth)} (${Math.max(0, o.arrivalMonth - draft.month)}mo)`}
             </div>
           );
         })}

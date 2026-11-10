@@ -1176,3 +1176,17 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 521 unit, 70 e2e, lint, tsc, build |
 | visual | inspected: 1280 substation popup with unavailable explanation and enabled switchgear visible |
 | grid | skipped: UI-only, engine/save shape unchanged |
+
+# Playthrough 4 - equipment warning and yard tell one story
+
+| criterion | status |
+|---|---|
+| real lever | done: second-source quote is probed through actual action, names deposit/total/date; no blanket no-lever claim |
+| no invented quote | done: unavailable cash/yard/order condition yields explicit no-current-quote text |
+| competing orders | done: warning uses earliest pending supplier; an arrived supplier clears the kind's warning |
+| date | done: warning, yard crate and yard popup show same booked Y/M date with supplier identity |
+| expectation | done: warns that early order can still miss projected fitout, not a newly slipped booking |
+| fix routing | done: warning's object fix closes guide so the object's actions are visible |
+| full gates | done: 523 unit, 71 e2e, lint, tsc, build |
+| visual | inspected: 1280 warning and yard both Y3 M1, real alternate Y2 M7 quote with funding |
+| grid | skipped: read-only UI projection/quote, engine and save unchanged |

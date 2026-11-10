@@ -87,6 +87,8 @@ function CampusGame() {
   const setOpenPanel = useStore((s) => s.setOpenPanel);
   const requestedTab = useStore((s) => s.requestedTab);
   const setBoardPopover = useStore((s) => s.setBoardPopover);
+  const boardPopover = useStore((s) => s.boardPopover);
+  useEffect(() => { if (boardPopover) setDrawer(null); }, [boardPopover]);
   const selectHall = useStore((s) => s.selectHall);
   const error = useStore((s) => s.error);
   const step = nextStep(draft, content);

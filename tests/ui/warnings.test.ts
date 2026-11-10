@@ -124,3 +124,24 @@ describe('newCrossings / warningKey', () => {
     expect(keyIncludesLevel).toContain('runway');
   });
 });
+
+describe('equipment warning quotes', () => {
+  it('uses the earliest supplier and offers a real second-source quote rather than claiming no lever', () => {
+    const state = freshState();
+    state.cash = 100_000_000;
+    state.power.studyStatus = 'pending';
+    state.power.orders = [{kind:'transformer',supplier:'standard',arrivalMonth:30,orderedMonth:0,arrived:false,price:40_000_000,deposit:8_000_000}];
+    const warning = byId(state,'late-order-transformer');
+    expect(warning?.detail).toContain('A second supplier quotes');
+    expect(warning?.detail).toContain('not a new delay');
+    expect(state.power.orders).toHaveLength(1);
+    state.power.orders.push({...state.power.orders[0]!,supplier:'alt',arrivalMonth:2});
+    expect(byId(state,'late-order-transformer')).toBeUndefined();
+  });
+  it('does not invent a second-source quote when the yard is full', () => {
+    const state = freshState();
+    state.cash = 100_000_000;
+    state.power.orders = Array.from({length:content.tuning.spatial.laydownCapacity},()=>({kind:'transformer' as const,supplier:'standard' as const,arrivalMonth:30,orderedMonth:0,arrived:false,price:40_000_000,deposit:8_000_000}));
+    expect(byId(state,'late-order-transformer')?.detail).toContain('No faster second-supplier quote');
+  });
+});
