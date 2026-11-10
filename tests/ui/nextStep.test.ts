@@ -209,3 +209,17 @@ it('denied permits retain the longest-review-first priority and focus guard', ()
  expect(nextStep(s,content,0).title).toBe('End the month');
  expect(nextStep(s,content,0).why).toContain('Refile the water permit needs');
 });
+
+
+it('does useful docket work while a pond mitigation permit is still under review',()=>{
+ const s=powerWaitingState();s.halls[0]!.pondBlocked=true;s.permits.wetlands!.status='pending';
+ s.docket.status='open';s.docket.discoveryOutstanding=true;
+ expect(nextStep(s,content).actionId).toBe('answerDiscovery');
+ s.permits.wetlands!.status='granted';expect(nextStep(s,content).actionId).toBe('mitigateWetlands');
+ s.flags.pondMitigationDoneMonth=10;expect(nextStep(s,content).actionId).toBe('answerDiscovery');
+});
+it('does not let pending wetlands mitigation hide switchgear orders',()=>{
+ const s=freshState();s.power.studyStatus='pending';fileAllPermits(s);s.halls[0]!.pondBlocked=true;
+ s.permits.wetlands!.status='pending';s.power.orders.push({kind:'transformer',orderedMonth:0,arrivalMonth:24,deposit:0,price:0,arrived:false,supplier:'standard'});
+ expect(nextStep(s,content).actionId).toBe('orderSwitchgear');
+});

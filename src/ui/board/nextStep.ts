@@ -138,7 +138,7 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
 
   // 3b. Phase 8: a hall position under the pond is schedule-critical once the wetlands permit
   // allows the mitigation - every month waited is a month off the pond hall's slack.
-  if (state.halls.some((h) => h.pondBlocked) && typeof state.flags.pondMitigationDoneMonth !== 'number') {
+  if (state.permits.wetlands?.status === 'granted' && state.halls.some((h) => h.pondBlocked) && typeof state.flags.pondMitigationDoneMonth !== 'number') {
     const wetlands = resolved.tuning.wetlands;
     return {
       title: 'Mitigate the wetlands pond',
