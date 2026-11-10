@@ -1,3 +1,4 @@
+import { milestoneWords } from './milestoneWords';
 import { applyAction } from '../../engine/actions';
 import type { Content } from '../../content/schemas';
 import { formatDollars, formatMonth, formatMonths } from '../../engine/format';
@@ -178,8 +179,8 @@ export function warnings(state: GameState, content: Content): BoardWarning[] {
       out.push({
         id: `ledger-due-${first.kind}-${first.month}`,
         level: 'notice',
-        title: `Due soon: ${first.label}`,
-        detail: `${first.label} lands ${formatMonth(first.month)}${
+        title: `Due soon: ${milestoneWords(first.label)}`,
+        detail: `${milestoneWords(first.label)} lands ${formatMonth(first.month)}${
           dueSoon.length > 1 ? ` (plus ${dueSoon.length - 1} more within 2 months)` : ''
         }. Check the ledger before ending the month.`,
         fixes: [{ label: 'Open the ledger', panel: 'ledger' }],

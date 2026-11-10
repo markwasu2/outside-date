@@ -1,3 +1,4 @@
+import { milestoneWords } from '../board/milestoneWords';
 import { formatMonth } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
 import type { Content } from '../../content/schemas';
@@ -158,7 +159,7 @@ export function LedgerDrawer({ hideTrigger = false }: { hideTrigger?: boolean })
                 marginBottom: '0.2rem',
               }}
             >
-              <span>{entry.label}</span>
+              <span>{milestoneWords(entry.label)}</span>
               <span>{formatMonth(entry.month)}{urgencyText(draft, entry, slipped)}</span>
             </div>
           );
