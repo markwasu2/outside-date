@@ -41,7 +41,7 @@ test('substation illustration follows physical build state, not just a completed
   });
   await expect(sub).toHaveAttribute('data-build-state','building');
   expect(await sub.locator('img').getAttribute('src')).not.toBe(planned);
-  await expect(sub.getByRole('progressbar')).toBeVisible();
+  await expect(sub).toContainText('Done Y1 M3');
   await page.screenshot({ path: 'docs/screenshots/cold2/art-substation.png' });
   await page.evaluate(async () => {
     const { useStore } = await import('/src/ui/store.ts'); const s = useStore.getState();

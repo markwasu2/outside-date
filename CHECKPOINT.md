@@ -1190,3 +1190,15 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 523 unit, 71 e2e, lint, tsc, build |
 | visual | inspected: 1280 warning and yard both Y3 M1, real alternate Y2 M7 quote with funding |
 | grid | skipped: read-only UI projection/quote, engine and save unchanged |
+
+# Playthrough 4 - remove detached campus scaffolding
+
+| criterion | status |
+|---|---|
+| rings | done: cell-sized selected/queued dashed outlines removed; small Planned label, sprite highlight and keyboard-only focus outline retained |
+| progress | done: detached bottom-of-cell bars replaced by progress percent attached to hall stage caption; substation retains dated completion caption |
+| glyphs | done: road, poles, field, office, yard and power use words rather than missing-font-looking decorative glyphs |
+| dead routes | done: player-facing Money/Capital tab directions point to site office or action search |
+| full gates | done: 523 unit, 72 e2e, lint, tsc, build |
+| visual | inspected: six-hall 1440 campus, no detached strips or large rings, progress/Planned labels readable |
+| grid | skipped: visual/copy only, engine and saves unchanged |
