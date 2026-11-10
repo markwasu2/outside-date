@@ -155,3 +155,14 @@ it('a second-source race offers one truthful cancellation, identical on map and 
  const remaining=boardActionsForObject('substation',next,content).filter(r=>r.action.actionId==='cancelOrder');
  expect(remaining).toHaveLength(1);expect(remaining[0]!.label).toBe('Cancel transformer order (standard supplier)');
 });
+
+it('the pond offers the blocked hall mitigation route until work is started',()=>{
+ const s=freshState({site:'farmland'});const h=s.halls.find(h=>h.pondBlocked)!;
+ const before=JSON.stringify(s),pond=boardActionsForObject('pond',s,content).find(r=>r.action.actionId==='mitigateWetlands')!;
+ const hall=boardActionsForObject(h.id,s,content).find(r=>r.action.actionId==='mitigateWetlands')!;
+ expect(pond).toEqual(hall);expect(pond.label).toContain(h.id);expect(JSON.stringify(s)).toBe(before);
+ s.permits.wetlands.status='granted';expect(ids('pond',s)).toContain('mitigateWetlands');
+ s.flags.pondMitigationDoneMonth=s.month+3;expect(ids('pond',s)).not.toContain('mitigateWetlands');
+ s.month+=3;expect(ids('pond',s)).not.toContain('mitigateWetlands');
+ expect(ids('pond',freshState())).not.toContain('mitigateWetlands');
+});
