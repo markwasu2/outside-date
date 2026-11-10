@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
 import type { Setup } from '../../src/engine/types';
-import { boardActionsForObject, boardObjectTagline, laydownOrders } from '../../src/ui/board/actions';
+import { boardActionsForObject, boardObjectTagline, laydownOrders, cashLabel, findDef } from '../../src/ui/board/actions';
 
 // Phase 1 (D1): the board popover's action list must match what the TracksPanel would offer for
 // the same object - boardActionsForObject is the single shared source. These tests pin the
@@ -72,6 +72,10 @@ describe('boardActionsForObject', () => {
     for (const id of ['filePermit', 'fileDocket', 'prepTestimony', 'answerDiscovery', 'visitCast']) {
       expect(list).toContain(id);
     }
+  });
+
+  it('site price names the full land cost and equity source, not a free cash debit', () => {
+    expect(cashLabel(findDef(content,'optionSite'), freshState(), content)).toBe('$50.0M total, from $50.0M equity');
   });
 
   it('unknown objects return an empty list rather than throwing', () => {
