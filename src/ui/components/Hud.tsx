@@ -6,7 +6,6 @@ import { dscr, forwardNoi, hallGrossRent, runway } from '../../engine/selectors'
 import type { GameState, GoodwillGroup } from '../../engine/types';
 import { exportSaveToFile, SAVE_VERSION } from '../save';
 import { STAT_EXPLAINERS } from '../explainers';
-import { usePrefersReducedMotion } from '../board/boardStyles';
 import { useStore } from '../store';
 import { CastHover } from './CastHover';
 import { StatExplainer } from './StatExplainer';
@@ -178,8 +177,6 @@ export function Hud({ hideFastForward = false }: { hideFastForward?: boolean }) 
   const plan = useStore((s) => s.plan);
   const content = useStore((s) => s.content);
   const state = useStore((s) => s.state);
-  const prevState = useStore((s) => s.prevState);
-  const reducedMotion = usePrefersReducedMotion();
   const lastNegotiation = useStore((s) => s.lastNegotiation);
   const lastDifficultyId = useStore((s) => s.lastDifficultyId);
   const dismissedCoachTips = useStore((s) => s.dismissedCoachTips);
@@ -232,35 +229,10 @@ export function Hud({ hideFastForward = false }: { hideFastForward?: boolean }) 
     ? Math.min(...activeHalls.map((h) => h.outsideMonth))
     : null;
 
-  // Phase 1 (D4): at End month the cash number counts up/down from the previously committed
-  // value instead of snapping - instant under prefers-reduced-motion or while a plan preview is
-  // showing (then draft.cash already reflects uncommitted actions).
-  const [displayCash, setDisplayCash] = useState(draft.cash);
-  useEffect(() => {
-    const from =
-      prevState && state.month > prevState.month && plan.length === 0 && !reducedMotion ? prevState.cash : draft.cash;
-    if (from === draft.cash) {
-      setDisplayCash(draft.cash);
-      return;
-    }
-    // Update in ~8 coarse steps rather than every animation frame: the HUD sits at the app root,
-    // so each setDisplayCash re-renders the whole board - per-frame updates made end-to-end play
-    // noticeably slower without looking any smoother.
-    let raf = 0;
-    const start = performance.now();
-    let lastStep = -1;
-    const tick = (t: number) => {
-      const p = Math.min(1, (t - start) / 600);
-      const step = Math.floor(p * 8);
-      if (step !== lastStep) {
-        lastStep = step;
-        setDisplayCash(Math.round(from + (draft.cash - from) * p));
-      }
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [draft.cash, state.month, prevState, plan.length, reducedMotion]);
+    // Cold-playthrough fix (2026-11-10): the old cash count-up animation lived here, but this
+  // Hud renders inside the Status & guide drawer - the top bar (App.tsx) shows draft.cash
+  // directly. During the 600ms tick the drawer's cash disagreed with the top bar, on the one
+  // stat players watch. The drawer now reads the committed value too.
 
   const canFastForward = plan.length === 0 && draft.phase === 'playing';
 
@@ -308,7 +280,7 @@ export function Hud({ hideFastForward = false }: { hideFastForward?: boolean }) 
       </StatExplainer>
 
       <StatExplainer id="cash" autoOpen={firstEligibleExplainer === 'cash'}>
-        <div data-testid="hud-cash">Cash: {formatDollars(displayCash)}</div>
+        <div data-testid="hud-cash">Cash: {formatDollars(draft.cash)}</div>
       </StatExplainer>
 
       {/* Phase 3 (B): your cost call against what has actually been spent, plus the delivery call. */}

@@ -77,7 +77,7 @@ function drawFreezeUnlessDsu(state: GameState): GameState {
       {
         month: state.month,
         kind: 'warning',
-        text: 'Lender draw freeze: construction draws are paused until you cure it (Money tab).',
+        text: 'Lender draw freeze: construction draws are paused until you cure it (Money tab). Cause: the storm damaged the site and no delay-in-start-up cover is in force, so the lender paused funding until the paperwork is cured.',
       },
     ],
   };
