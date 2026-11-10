@@ -1565,3 +1565,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | safety | pending/granted permits are not refiled; focus guard preserved; engine already allows denied refiling |
 | gates | 558 unit, 101 browser (99 bounded + 2 complete journeys), lint, tsc, build; 1280px expanded map cue inspected |
 | scope | UI guidance only; no engine/save/bot/tuning change, no migration required; existing bundle-size warning remains |
+
+# Personal hard-Whale replay - avoid the disabled wetlands cue
+
+| criterion | status |
+|---|---|
+| personal observation | Y1 M4 of live Whale hard: Next Mitigate opened a disabled action while wetlands review was pending, hiding actionable docket work |
+| fixed | recommend mitigation only after wetlands approval; pending review no longer preempts switchgear orders, filing the docket or discovery/meetings/testimony |
+| safety | actual granted mitigation priority retained; underway mitigation not repeated; no engine/save/bot/tuning changes |
+| gates | 560 unit, 102 browser (100 bounded + 2 complete journeys), lint, tsc, build; 1280px discovery route inspected |
+| evidence | docs/screenshots/cold2/wetlands-actionable-cue.png; personal replay remains active and will resume after deployment |
