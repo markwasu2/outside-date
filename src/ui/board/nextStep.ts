@@ -6,6 +6,7 @@ import type { GameState } from '../../engine/types';
 import { projectedFitoutMonth } from './warnings';
 import { powerCapacityWords } from './powerWords';
 import { hallBlocker } from './legibility';
+import { permitReviewWords } from './permitWords';
 
 /**
  * Phase 1 (D7): the single most useful next move, as a pure function of the committed state and
@@ -234,6 +235,13 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
   const blocked = state.halls.find((h) => !h.delivered && !h.terminated && hallBlocker(state, content, h));
   if (blocked) {
     const blocker = hallBlocker(state, content, blocked)!;
+    if (blocker === 'waiting on wetlands mitigation' && state.permits.wetlands?.status === 'pending') {
+      return {title:'Check the wetlands review',why:permitReviewWords(state).find(words=>words.startsWith('wetlands permit:'))!,objectId:'siteOffice'};
+    }
+    if (blocker === 'wetlands mitigation underway') {
+      const done = state.flags.pondMitigationDoneMonth as number;
+      return {title:'End the month',why:`Wetlands mitigation is underway until ${formatMonth(done)}. End month advances this clock; no further mitigation instruction is needed. ${blocked.id} can break ground once it finishes.`,objectId:blocked.id};
+    }
     if (blocker === 'waiting on power hookup') {
       if(power.substationStatus==='done')return {title:`${blocked.id}: waiting for plant capacity`,why:powerCapacityWords(state,content),objectId:'powerPlants'};
       const pending = power.orders.filter((o) => !o.arrived);

@@ -1575,3 +1575,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | safety | actual granted mitigation priority retained; underway mitigation not repeated; no engine/save/bot/tuning changes |
 | gates | 560 unit, 102 browser (100 bounded + 2 complete journeys), lint, tsc, build; 1280px discovery route inspected |
 | evidence | docs/screenshots/cold2/wetlands-actionable-cue.png; personal replay remains active and will resume after deployment |
+
+# Completed hard-Whale replay - explain the wetlands wait clock
+
+| criterion | status |
+|---|---|
+| personal run | Whale hard closed Y5 M4, 4/4 delivered, 2 late, $1.65B campus, $157.1M equity, 0.96x; actual live clicks |
+| observed | after docket preparation finished, pending-wetlands fallback still sent the player to disabled mitigation; underway mitigation did the same |
+| fixed | pending wetlands wait opens the actual office review date; underway mitigation opens Why wait with its finish date and no-repeat instruction |
+| priority | other buildable halls and useful docket work still precede the wait fallback |
+| gates | 562 unit, 103 browser (101 bounded + 2 complete journeys), lint, tsc, build; 1280px review and mitigation clocks inspected |
+| scope | read-only UI guidance, no engine/save/bot/tuning change; existing bundle-size warning remains |
