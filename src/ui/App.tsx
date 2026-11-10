@@ -13,6 +13,7 @@ import { LedgerDrawer } from './components/LedgerDrawer';
 import { LogStrip } from './components/LogStrip';
 import { MapGrid } from './components/MapGrid';
 import { TracksPanel } from './components/TracksPanel';
+import { CloseoutCampus } from './screens/CloseoutCampus';
 import { RatingScene } from './screens/RatingScene';
 import { ReportCardScreen } from './screens/ReportCardScreen';
 import { SetupWizard } from './screens/SetupWizard';
@@ -38,9 +39,9 @@ function EndedFlow() {
   const [step, setStep] = useState<'rating' | 'reportCard'>(takeout ? 'rating' : 'reportCard');
 
   if (step === 'rating' && takeout) {
-    return <RatingScene state={draft} content={content} takeout={takeout} onContinue={() => setStep('reportCard')} />;
+    return <CloseoutCampus rating><RatingScene state={draft} content={content} takeout={takeout} onContinue={() => setStep('reportCard')} /></CloseoutCampus>;
   }
-  return <ReportCardScreen />;
+  return <CloseoutCampus rating={false}><ReportCardScreen /></CloseoutCampus>;
 }
 
 /** PLAN.md's Phase 6 visual-direction note: space = end turn, F = fast-forward, L = ledger.
