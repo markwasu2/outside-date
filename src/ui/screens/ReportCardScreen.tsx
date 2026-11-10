@@ -79,6 +79,12 @@ export function outcomeHeadline(outcome: GameState['outcome']): string {
   return `You lose: ${outcome?.kind === 'lose' ? LOSE_REASON_TEXT[outcome.reason] ?? outcome.reason : 'unknown'}`;
 }
 
+/** Keep rounding from turning a small investor loss into apparent break-even. */
+export function equityMultipleLabel(multiple: number): string {
+  const rounded = multiple.toFixed(2);
+  return multiple < 1 && rounded === '1.00' ? 'just under 1.00x' : `${rounded}x`;
+}
+
 /** P8.2, moved here from App.tsx's old placeholder `EndedSummary`: shown instead of the plain
  * "Play again" once the tutorial scenario itself ends, per PLAN.md's "same rules, bigger
  * numbers" accept criterion. Quick-starts Whale the same way the Title screen's Tutorial button
@@ -232,12 +238,12 @@ export function ReportCardScreen() {
     <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 640, margin: '0 auto' }}>
       <h1 style={{ textAlign: 'center' }}>{outcomeHeadline(outcome)}</h1>
       <p style={{ textAlign: 'center' }}>
-        Campus value {formatDollars(takeout.campusValue)}, equity multiple {takeout.equityMultiple.toFixed(2)}x, your equity{' '}
+        Campus value {formatDollars(takeout.campusValue)}, equity multiple {equityMultipleLabel(takeout.equityMultiple)}, your equity{' '}
         {formatDollars(takeout.playerEquityValue)}.
         {outcome?.kind === 'win' && outcome.tier === 'scraped' && (
           <>
             {' '}
-            The takeout closed, but at {takeout.equityMultiple.toFixed(2)}x investors got back less than they put in.
+            The takeout closed, but at {equityMultipleLabel(takeout.equityMultiple)} investors got back less than they put in.
           </>
         )}
       </p>

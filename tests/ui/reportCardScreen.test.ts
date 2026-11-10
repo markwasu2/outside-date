@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
 import type { LogEntry, Setup } from '../../src/engine/types';
-import { finalStats, fiveMostConsequentialDecisions, outcomeHeadline, proximateCauseOfDeath } from '../../src/ui/screens/ReportCardScreen';
+import { equityMultipleLabel, finalStats, fiveMostConsequentialDecisions, outcomeHeadline, proximateCauseOfDeath } from '../../src/ui/screens/ReportCardScreen';
 
 const content = loadContent();
 const negotiation: NegotiationChoices = {
@@ -104,5 +104,18 @@ describe('outcomeHeadline (UX queue item 7)', () => {
 
   it('losses keep their reason', () => {
     expect(outcomeHeadline({ kind: 'lose', reason: 'equityWiped' })).toContain('You lose');
+  });
+});
+
+
+describe('equityMultipleLabel', () => {
+  it('does not round a small loss into apparent break-even', () => {
+    expect(equityMultipleLabel(0.996)).toBe('just under 1.00x');
+    expect(equityMultipleLabel(0.99999)).toBe('just under 1.00x');
+  });
+  it('keeps exact break-even, larger losses and gains distinct', () => {
+    expect(equityMultipleLabel(1)).toBe('1.00x');
+    expect(equityMultipleLabel(0.99)).toBe('0.99x');
+    expect(equityMultipleLabel(1.26)).toBe('1.26x');
   });
 });
