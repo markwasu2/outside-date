@@ -283,7 +283,7 @@ export function ReportCardScreen() {
                 </td>
                 <td>{words.record}</td>
                 <td>{words.cost}</td>
-                <td>{row.id === 'tenantExit' ? 'Informational only. Tenant exit is not a separate risk event in this campaign; hall termination still follows outside-date rules.' : def?.mitigation ?? ''}</td>
+                <td>{def?.mitigation ?? ''}</td>
               </tr>
             );
           })}

@@ -45,7 +45,7 @@
     "id": "tenantExit",
     "label": "Tenant exit",
     "defaultHolder": "you",
-    "mitigation": "Cut from v1 as a mechanic (residual value guarantee); informational only.",
+    "mitigation": "Informational only. Tenant exit is not a separate risk event in this campaign; hall termination still follows outside-date rules.",
     "movedBy": null
   },
   {
