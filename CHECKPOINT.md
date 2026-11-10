@@ -1077,3 +1077,16 @@ have transparent edges; the power timeline labels stay inside the panel.
 | visual | done: 1280 title/land and 1440 power inspected; timeline clipping fixed |
 | grid | skipped: presentation only, no rules or save shape change |
 | staged remainder | split initial setup into land/hall/cooling/contractor interactions; final closing review; in-scene takeout/report |
+
+# Immersive closeout - takeout and report stay at the campus
+
+| criterion | status |
+|---|---|
+| actual scene | done: the actual finished halls, plants and rent remain behind rating and report, not a substitute backdrop |
+| closing conversation | done: rating/valuation/debt/equity and report in one readable scrollable panel |
+| finished means finished | done: inert map, no End month or building actions; look-around toggle reveals full campus |
+| outcomes | done: takeout and no-takeout loss both use scene shell; replay controls retained |
+| visual | done: 1280 rating and 1440 report inspected, solid panel background and reveal transition readable |
+| full gates | done: 518 unit, 64 e2e, lint, tsc, build |
+| grid | skipped: UI-only, no engine/state shape changes |
+| remainder | spatial opening choices, closing-table review, new playthrough-4 grading/cost/timing fixes |
