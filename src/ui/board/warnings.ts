@@ -4,7 +4,7 @@ import { formatDollars, formatMonth, formatMonths } from '../../engine/format';
 import { allLeverQuotes } from '../../engine/systems/capital';
 import { resolveContent } from '../../engine/resolve';
 import { resolveSite } from '../../content/sites';
-import { dscr, forwardNoi, ledger, runway } from '../../engine/selectors';
+import { dscr, forwardNoi, fastForwardMilestones, runway } from '../../engine/selectors';
 import type { GameState } from '../../engine/types';
 import { netMonthlyBurn } from '../components/Hud';
 import type { TrackTab } from '../store';
@@ -171,7 +171,7 @@ export function warnings(state: GameState, content: Content): BoardWarning[] {
   }
 
   // --- A ledger item due within 2 months.
-  const dueSoon = ledger(state, content).filter((e) => e.month >= state.month && e.month - state.month <= 2);
+  const dueSoon = fastForwardMilestones(state, content).filter((e) => e.month >= state.month && e.month - state.month <= 2);
   if (dueSoon.length > 0) {
     const first = dueSoon[0];
     if (first) {
