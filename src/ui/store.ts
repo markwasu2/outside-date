@@ -3,10 +3,10 @@ import { create } from 'zustand';
 import type { ActionDef, Content } from '../content/schemas';
 import { loadContent } from '../content/load';
 import { applyAction } from '../engine/actions';
-import { formatDollars, formatMonth } from '../engine/format';
+import { formatDollars } from '../engine/format';
 import { createGame, type DifficultyId, type NegotiationChoices } from '../engine/init';
-import { dscr, ledger, runway } from '../engine/selectors';
-import { fastForward as engineFastForward, resolveEvent, step, totalApCost } from '../engine/step';
+import { runway } from '../engine/selectors';
+import { fastForward as engineFastForward, fastForwardPause, resolveEvent, step, totalApCost } from '../engine/step';
 import type { GameState, PlannedAction, Setup } from '../engine/types';
 import { BotRng } from '../sim/rng';
 import { BOTS, playOneGame } from '../sim/runSim';
@@ -31,21 +31,7 @@ function deliveredCount(state: GameState): number {
  * always matches the one that actually fired. Exported for tests. `state`/`content` here are the
  * already-stopped state fast-forward returned, same as what the engine's guard itself read. */
 export function fastForwardStopReason(state: GameState, content: Content): string {
-  const dueSoon = ledger(state, content)
-    .filter((entry) => entry.month - state.month <= 1 && entry.month >= state.month)
-    .sort((a, b) => a.month - b.month)[0];
-  if (dueSoon) {
-    return `Fast-forward stopped: "${dueSoon.label}" is due ${formatMonth(dueSoon.month)} - use End month to step past it.`;
-  }
-  const months = runway(state, content);
-  if (months < 3) {
-    return `Fast-forward stopped: runway is under 3 months (${Math.max(0, Math.round(months))}mo) - use End month to continue one at a time.`;
-  }
-  const coverage = dscr(state, content);
-  if (Number.isFinite(coverage) && coverage - content.tuning.covenant.dscrTrigger < 0.1) {
-    return 'Fast-forward stopped: DSCR headroom is critically thin - use End month to continue one at a time.';
-  }
-  return 'Fast-forward stopped for this month - use End month to continue.';
+  return `Fast-forward stopped: ${fastForwardPause(state,content) ?? 'a construction handoff is ready - choose its next stage.'}`;
 }
 
 /** Phase 1 (D8): fires each threshold warning once per crossing - diffs the warnings() lists

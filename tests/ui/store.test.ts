@@ -57,6 +57,7 @@ describe('store: fastForwardStopReason (fix 14)', () => {
     // using the real exported dscr()/forwardNoi() math rather than duplicating its formula here.
     const debtService = noi / (content.tuning.covenant.dscrTrigger + 0.05);
     state.debt.seniorDrawn = debtService / content.tuning.covenant.permRate;
+    state.debt.conversionFailedCount=1; // coverage is a live covenant after a conversion attempt
     const coverage = dscr(state, content);
     expect(Number.isFinite(coverage)).toBe(true);
     expect(coverage - content.tuning.covenant.dscrTrigger).toBeLessThan(0.1);

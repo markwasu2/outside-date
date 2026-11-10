@@ -199,3 +199,24 @@ export function ledger(state: GameState, content: Content): LedgerEntry[] {
 
   return entries.sort((a, b) => a.month - b.month);
 }
+
+
+/** Real current milestones for no-instruction time skipping. Historical ledger rows remain
+ * available to the ledger UI, but completed work cannot stop a future wait. */
+export function fastForwardMilestones(state: GameState, content: Content): LedgerEntry[] {
+  return ledger(state,content).filter(e=>{
+    switch(e.kind){
+      case 'permit': return state.permits[e.label.replace(' permit decision','') as keyof GameState['permits']]?.status==='pending';
+      case 'docketVote': return state.docket.status==='open';
+      case 'discovery': return state.docket.discoveryOutstanding;
+      case 'studyDone': return state.power.studyStatus==='pending';
+      case 'orderArrival': return state.power.orders.some(o=>e.label===`${o.kind} arrival`&&!o.arrived);
+      case 'plantOnline': return state.power.plants.some(p=>e.label===`Plant ${p.id} online`&&(p.onlineMonth===null||p.onlineMonth>state.month));
+      case 'hallDelivery': return state.halls.some(h=>e.label===`${h.id} delivery`&&!h.delivered&&!h.terminated);
+      case 'hallOutside': return state.halls.some(h=>e.label===`${h.id} outside date`&&!h.delivered&&!h.terminated);
+      case 'conversionTest': return !state.debt.converted;
+      case 'takeoutWindow': return false; // historical estimate, not the actual seasoning condition
+      default:return true;
+    }
+  });
+}
