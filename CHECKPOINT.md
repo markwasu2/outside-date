@@ -1586,3 +1586,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | priority | other buildable halls and useful docket work still precede the wait fallback |
 | gates | 562 unit, 103 browser (101 bounded + 2 complete journeys), lint, tsc, build; 1280px review and mitigation clocks inspected |
 | scope | read-only UI guidance, no engine/save/bot/tuning change; existing bundle-size warning remains |
+
+# Personal hard replays - keep endgame waiting on the campus
+
+| criterion | status |
+|---|---|
+| observed | both hard replays used Let the rent season before closing, but Show me opened unrelated permits rather than the endgame clock |
+| fixed | rent seasoning and lender retest use Why wait to explain the current clock directly; Price the finished campus still opens the real takeout action |
+| implementation | explicit read-only waiting marker; no simulation, bot, tuning or save changes |
+| gates | 563 unit, 104 browser (102 bounded + 2 complete journeys), lint, tsc, build; 1280px rent and lender-clock pixels inspected |
+| caveat | existing bundle-size warning remains |

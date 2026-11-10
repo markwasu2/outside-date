@@ -15,7 +15,7 @@ test('Whale fresh setup to ending follows visible guidance using real clicks',as
   trace.push((await page.getByTestId('campus-status').innerText()).replaceAll('\n',' '));
   while(await page.getByTestId('event-notice-dismiss').count())await page.getByTestId('event-notice-dismiss').first().click();
   for(let instruction=0;instruction<8;instruction++){
-   const title=await page.getByTestId('next-step-card').innerText();trace.push(title.replaceAll('\n',' '));if(title.includes('Next: End the month')||title.includes('After planned actions: End the month'))break;
+   const title=await page.getByTestId('next-step-card').innerText();trace.push(title.replaceAll('\n',' '));if(await page.getByTestId('next-step-show-me').innerText()==='Why wait?'){await page.getByTestId('next-step-show-me').click();await expect(page.getByTestId('map-popover')).toHaveCount(0);break;}
    await page.getByTestId('next-step-show-me').click();const popup=page.getByTestId('map-popover');await expect(popup).toBeVisible();
    const rows=popup.getByTestId('popover-action');let chosen=false;
    for(let i=0;i<await rows.count();i++){

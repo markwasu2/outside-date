@@ -209,7 +209,7 @@ export function ProgressSpine({ hideNextStep = false }: { hideNextStep?: boolean
         <span>
           Next step: <strong>{step.title}</strong> - {step.why}
         </span>
-        {step.title !== 'End the month' && <button
+        {!step.waiting && step.title !== 'End the month' && <button
           data-testid="next-step-show-me"
           onClick={() => {
             const isHall = state.halls.some((h) => h.id === step.objectId);
