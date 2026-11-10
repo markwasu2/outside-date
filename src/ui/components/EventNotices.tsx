@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import type { Content } from '../../content/schemas';
-import type { LogEntry } from '../../engine/types';
+import type { GameState, LogEntry } from '../../engine/types';
 import { describeEffect } from './EventModal';
 import { eventCampusTarget, eventOccurrenceDetail, type CampusTarget } from '../board/eventCampus';
 import { useCampusAnchor } from '../board/useCampusAnchor';
@@ -23,6 +23,8 @@ export interface Notice {
   warning: boolean;
   target?: CampusTarget;
   expiresAt: number;
+  observedMonth?: number;
+  bannerOwned?: boolean;
 }
 
 /** Entries worth a card: no-choice event cards and warnings. The modal-backed (choice) events
@@ -43,6 +45,14 @@ export function noticeStakes(entry: LogEntry, content: Content): string | undefi
 
 export function isBannerDuplicate(notice: Pick<Notice, 'title' | 'warning'>, bannerTitles: Set<string>): boolean {
   return notice.warning && bannerTitles.has(notice.title);
+}
+
+/** A live alert is not a historical event. Once cured it must never return as a card.
+ * Month-to-month history remains in Status & guide, not over the current campus. */
+export function noticeIsCurrent(notice: Notice, state: GameState): boolean {
+  if (notice.bannerOwned || (notice.observedMonth !== undefined && notice.observedMonth !== state.month)) return false;
+  if (/draw freeze/i.test(notice.title) && !state.flags.drawFreeze) return false;
+  return true;
 }
 
 const MAX_VISIBLE = 3;
@@ -112,6 +122,8 @@ export function EventNotices() {
         warning: e.kind === 'warning',
         target: eventCampusTarget(draft, content.events.find((c) => c.title === e.text)?.id ?? '', e.month, prevState),
         expiresAt: Date.now() + NOTICE_TTL_MS,
+        observedMonth: draft.month,
+        bannerOwned: e.kind === 'warning' && warnings(draft,content).some(w=>w.title===e.text),
       }));
     if (cards.length > 0) {
       setNotices((prev) => dedupeNotices([...prev, ...cards]).slice(-MAX_VISIBLE));
@@ -121,7 +133,7 @@ export function EventNotices() {
   // Threshold crossings remain in the log, but the banner already owns their live display
   // and fix buttons. Never repeat that same warning in a transient card.
   const bannerTitles = new Set(warnings(state, content).map((w) => w.title));
-  const visible = notices.filter((n) => !isBannerDuplicate(n, bannerTitles));
+  const visible = notices.filter((n) => noticeIsCurrent(n,draft) && !isBannerDuplicate(n, bannerTitles));
   if (!draft || boardPopover || draft.phase === 'awaitingChoice' || visible.length === 0) return null;
 
   const latest = visible[visible.length - 1]!;

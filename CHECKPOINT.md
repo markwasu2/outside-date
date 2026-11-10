@@ -1430,3 +1430,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | scenarios without docket show local-grid supply instead of false waiting plant badges; study due this month no longer says zero months left |
 | gates |541unit,88browser,lint,tsc,build;1280pixel local-grid map inspected |
 | scope | map presentation only,Whale plant display retained,no engine/save/bot change |
+
+# Personal replay - stop resurrecting resolved notices
+
+| criterion | status |
+|---|---|
+| observed | cured freeze crossing returned as transient card; delivered hall's historical deadline advertised as due soon |
+| fixed | banner-owned crossings stay with the live status surface; cured freeze cards suppressed; transient news ends with its month; history stays in log |
+| milestone truth | warning due-soon list reuses existing live-milestone selector,not historical ledger rows |
+| gates |543unit,89browser,lint,tsc,build;1280pixel cleared-notice map inspected |
+| scope | UI warning/notice derivation only,no engine/save/bot change |

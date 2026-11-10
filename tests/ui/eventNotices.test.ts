@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { createGame } from '../../src/engine/init';
 import { loadContent } from '../../src/content/load';
 import type { LogEntry } from '../../src/engine/types';
-import { dedupeNotices, isBannerDuplicate, isNoticeEntry, noticeStakes, type Notice } from '../../src/ui/components/EventNotices';
+import { dedupeNotices, noticeIsCurrent, isBannerDuplicate, isNoticeEntry, noticeStakes, type Notice } from '../../src/ui/components/EventNotices';
 
 // UX 6 (playthrough): no-choice event cards and warnings must surface as visible cards with
 // stakes, modeled on the hiring-fair modal. These pin the entry filter and the stakes line.
@@ -66,4 +67,19 @@ describe('banner/card dedupe', () => {
     expect(isBannerDuplicate({ title: 'Runway under 3 months', warning: false }, titles)).toBe(false);
     expect(isBannerDuplicate({ title: 'H1 missed delivery', warning: true }, titles)).toBe(false);
   });
+});
+
+
+describe('notice lifetime',()=>{
+ const state=createGame(content,'whale', {site:'megasite',hallTier:'air',cooling:'evaporative',gc:'costPlus'}, {lease:{firstDeliveryMonth:14,lateRemedy:'liquidatedDamages'},capital:{seniorIndex:0,mezzIndex:0,playerShareIndex:0},power:{minCharge:'medium',plantBOffset:0},insurance:{dsu:false}},1);
+ const notice:Notice={key:'freeze',title:'Draw freeze: lender is holding construction draws',warning:true,expiresAt:9000};
+ it('cannot resurrect a cured freeze or a banner-owned crossing',()=>{
+  expect(noticeIsCurrent(notice,state)).toBe(false);
+  expect(noticeIsCurrent({...notice,title:'Runway under3months',bannerOwned:true},state)).toBe(false);
+ });
+ it("keeps a current event but not last month's event",()=>{
+  const event={...notice,title:'The rebate comes through',observedMonth:state.month};
+  expect(noticeIsCurrent(event,state)).toBe(true);
+  expect(noticeIsCurrent(event,{...state,month:state.month+1})).toBe(false);
+ });
 });
