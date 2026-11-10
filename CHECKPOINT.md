@@ -1044,3 +1044,17 @@ unique newly failed inspection. Unknown targets use the office, never a random h
 | full gates | done: 515 unit, 62 e2e, lint, tsc, build |
 | visual | done: 1280x720 expansion card inspected, full choice and cutoff visible |
 | balance grid | skipped: copy only; before-engine-change 1000-seed baseline captured separately |
+
+# Takeout keeps valid construction windows
+
+| criterion | status |
+|---|---|
+| approved rule | done: seasoned conversion waits for unfinished nonterminated in-window halls, capped at maxMonths |
+| no clock extension | done: hard stop unchanged; inclusive outside-month test, delivered/terminated cases, cutoff case covered |
+| baseline + final grids | done: seeds 1-1000, all bots/difficulties, Whale + Millbrook; docs/balance/takeout-window |
+| normal band | done: careful 70.4%, competent 70.2% (before 74.5%, 70.3%) |
+| tuning | normal exit cap 7.75%, hard 8.25% (both were 7.25%); no bot changes, easy/Millbrook untouched |
+| other guards | done: competent hard 31.7%, within unchanged 28-45%; Millbrook grid identical |
+| full gates | done: 518 unit, 62 e2e, lint, tsc, build after final tuning |
+| visual | done: updated cutoff wording inspected, all choices visible |
+| migration | skipped: no saved-state shape change |
