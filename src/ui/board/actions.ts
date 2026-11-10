@@ -268,6 +268,11 @@ export function boardActionsForObject(objectId: string, state: GameState, conten
       if (permitId === 'water') continue;
       rows.push(row(content, state, 'filePermit', `File ${permitId} permit`, { permitId }));
     }
+    const blocked = state.halls.find((h) => h.pondBlocked);
+    if (blocked && typeof state.flags.pondMitigationDoneMonth !== 'number') {
+      const wetlands = resolveContent(state, content).tuning.wetlands;
+      rows.push(row(content, state, 'mitigateWetlands', `Mitigate the wetlands pond (${formatDollars(wetlands.mitigationCost)}, ${wetlands.mitigationMonths}mo, then ${blocked.id} can break ground)`, {}));
+    }
     return rows;
   }
 
