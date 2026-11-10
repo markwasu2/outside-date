@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+import { retrofitCashWords } from '../board/retrofitWords';
 import { expansionPowerWords } from '../board/powerWords';
 import { applyEffect } from '../../engine/effects';
 import { resolveContent } from '../../engine/resolve';
@@ -266,6 +267,7 @@ export function EventModal() {
           <div data-testid="expansion-power" style={{marginTop:5}}>{expansion.power}</div>
           <div style={{marginTop:5}}>Near pads remaining: {expansion.nearLeft}, shared by all unstarted halls. Each far-pad hall adds a {formatDollars(expansion.spatial.farFeederCost)} feeder at groundbreak, {expansion.spatial.farPadExtraMonths} extra pad months, and {formatDollars(expansion.spatial.farLineLossPerMonth)}/month in line losses once delivered.</div>
         </div>}
+        {pending.cardId === 'chip_generation' && <p data-testid="retrofit-cash-preview" style={{background:'#f3e8ce',padding:8,fontSize:13}}>If you retrofit: {retrofitCashWords(draft)}</p>}
         {claim && (
           <div data-testid="claim-breakdown" style={{ margin: '0.5rem 0', padding: '0.5rem', background: '#f5f5f0', border: '1px solid #ddd', borderRadius: 4, fontSize: '0.8rem' }}>
             <div>Loss: {formatDollars(claim.gross)}</div>
