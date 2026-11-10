@@ -1365,3 +1365,15 @@ have transparent edges; the power timeline labels stay inside the panel.
 | scope | rating UI only,report data/engine/save/balance unchanged |
 | gates | done:534 unit,83 browser tests bounded groups,lint,tsc,build |
 | visual | inspected:1280 ending shows all score/value numbers and Continue beside actual campus |
+
+# Playtest 5 - yard capacity is one reservation count
+
+| criterion | status |
+|---|---|
+| historical mismatch | not reproduced on current main; both already read draft orders and engine removes installed crates |
+| consistency | done: label and popup share resolved-capacity reservation summary, not separate calculations |
+| explanation | done: in-transit orders reserve slots, arrived units wait on site, installed equipment frees slots |
+| regression | done: Y3 M1 pending/arrived/installed browser states show matching2/3 or0/3; unit summary test |
+| gates | done:535 unit,84 browser bounded groups,lint,tsc,build |
+| visual | inspected:1280 matching pending2/3 and installed0/3 with explicit explanation |
+| scope | UI projection only, no engine/save/bot change; no new grid |

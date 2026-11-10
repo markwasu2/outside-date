@@ -266,6 +266,17 @@ export function laydownOrders(state: GameState): { kind: string; arrivalMonth: n
   return state.power.orders.map((o) => ({ kind: o.kind, arrivalMonth: o.arrivalMonth, arrived: o.arrived, supplier: o.supplier, price: o.price }));
 }
 
+/** Same draft-state reservation model for the campus label and the yard popup. */
+export function laydownSummary(state: GameState, content: Content) {
+  const orders = laydownOrders(state);
+  return { orders, reserved: orders.length,
+    capacity: resolveContent(state, content).tuning.spatial.laydownCapacity,
+    onSite: orders.filter(o => o.arrived).length,
+    inTransit: orders.filter(o => !o.arrived).length,
+    installed: state.power.substationStatus !== 'none',
+  };
+}
+
 /** One-line plain-English "what this is" per map object, shown in the popover header the first
  * time the object is opened in a game (D6). The glossary term inside gets the dotted-underline
  * <Term> treatment with a hover definition. termId is null when no existing glossary entry fits -
