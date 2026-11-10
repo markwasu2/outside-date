@@ -1544,3 +1544,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | due month says due this month, without red unpaid warning; tooltip and yard popup explain the delivery/balance tick; after an unsuccessful tick the existing overdue countdown remains |
 | gates | 555 unit, 99 browser (97 bounded + 2 complete journeys), lint, tsc, build; due/unpaid 1280px screenshots inspected |
 | scope | UI display boundary only; no engine/save/bot/rule changes |
+
+# Expanded-Whale deadline notice - use the player clock
+
+| criterion | status |
+|---|---|
+| observed | overdue expansion hall notice used Outside date: month 62 while the campus uses Y6 M3 |
+| fixed | notice and history render the stored index as Tenant deadline: Y6 M3; original log/save remains untouched |
+| replay verification | live #101 Tutorial closed Y2 M8, $119.8M campus, $15.1M equity, 1.89x; due-month crates/Why wait/permit dates confirmed with live pixels |
+| gates | 556 unit, 100 browser (98 bounded + 2 journeys), lint, tsc, build; 1280px deadline notice inspected |
+| scope | UI formatter only; no engine/save/bot/rule change |
