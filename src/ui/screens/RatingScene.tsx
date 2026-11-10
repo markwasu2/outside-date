@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import type { Content } from '../../content/schemas';
 import { formatDollars } from '../../engine/format';
@@ -22,13 +22,8 @@ interface ScoreRow {
   explain: string;
 }
 
-/** P9.1: four score bars animate in, then cap rate, then campus value/debt repaid/equity value
- * as the big number. Driven by a simple stage counter (no animation library, matching the
- * project's plain-inline-style convention) - each tick reveals one more row via an opacity/width
- * CSS transition. "Skip" jumps straight to the fully revealed state; "Continue" (shown once fully
- * revealed) hands off to the report card. */
-/** P10.4: true if the OS/browser-level reduced-motion preference is set. Read once at mount
- * (not subscribed to changes) since this is a one-shot scene, not a long-lived settings panel. */
+/** Final numbers are readable immediately. Only decorative bar entry may animate;
+ * no staged reveal or invented zero can be mistaken for the actual outcome. */
 function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
 }
@@ -41,33 +36,21 @@ export function RatingScene({ state, content, takeout, onContinue }: Props) {
     { key: 'asset', label: 'Asset', explain: assetExplain(state) },
   ];
 
-  const maxStage = rows.length + 2; // + cap rate, + the big numbers
   const reducedMotion = useState(prefersReducedMotion)[0];
-  // P10.4: reduced-motion players see the fully-revealed scene immediately, no tick-by-tick
-  // reveal and no CSS transitions (the `transition: 'none'` below), rather than just a faster version.
-  const [stage, setStage] = useState(reducedMotion ? maxStage : 0);
-
-  useEffect(() => {
-    if (reducedMotion || stage >= maxStage) return;
-    const t = setTimeout(() => setStage((s) => s + 1), 700);
-    return () => clearTimeout(t);
-  }, [reducedMotion, stage, maxStage]);
-
-  const transition = reducedMotion ? 'none' : undefined;
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: 560, margin: '0 auto' }}>
+      <style>{'@keyframes ratingBarEnter {from {transform:scaleX(0)} to {transform:scaleX(1)}}'}</style>
       <h1 style={{ textAlign: 'center' }}>Rating the campus</h1>
-      {rows.map((row, i) => {
-        const shown = stage > i;
+      {rows.map((row) => {
         const value = takeout.scores[row.key];
         const max = SCORE_MAX[row.key];
         return (
-          <div key={row.key} style={{ marginBottom: '1rem', opacity: shown ? 1 : 0, transition: transition ?? 'opacity 0.3s' }}>
+          <div key={row.key} data-testid={`rating-score-${row.key}`} style={{ marginBottom: '1rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
               <strong>{row.label}</strong>
               <span>
-                {shown ? value.toFixed(1) : '0.0'} / {max}
+                {value.toFixed(1)} / {max}
               </span>
             </div>
             <div style={{ background: '#eee', borderRadius: 4, height: 10 }}>
@@ -76,8 +59,9 @@ export function RatingScene({ state, content, takeout, onContinue }: Props) {
                   background: '#4a7',
                   height: '100%',
                   borderRadius: 4,
-                  width: shown ? `${(value / max) * 100}%` : '0%',
-                  transition: transition ?? 'width 0.8s ease',
+                  width: `${(value / max) * 100}%`,
+                  animation: reducedMotion ? undefined : 'ratingBarEnter 0.6s ease-out',
+                  transformOrigin: 'left',
                 }}
               />
             </div>
@@ -87,20 +71,20 @@ export function RatingScene({ state, content, takeout, onContinue }: Props) {
       })}
 
       <div
-        style={{ opacity: stage > rows.length ? 1 : 0, transition: transition ?? 'opacity 0.3s', textAlign: 'center', margin: '1.5rem 0' }}
+        data-testid="rating-cap-rate" style={{ textAlign: 'center', margin: '1.5rem 0' }}
       >
         <p>Cap rate: {(takeout.capRate * 100).toFixed(2)}%</p>
       </div>
 
-      <div style={{ opacity: stage > rows.length + 1 ? 1 : 0, transition: transition ?? 'opacity 0.5s', textAlign: 'center' }}>
+      <div data-testid="rating-values" style={{ textAlign: 'center' }}>
         <p>Campus value: {formatDollars(takeout.campusValue)}</p>
         <p>Debt repaid: {formatDollars(takeout.totalDebt)}</p>
         <h2>Your equity: {formatDollars(takeout.playerEquityValue)}</h2>
       </div>
 
       <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-        <button onClick={() => (stage < maxStage ? setStage(maxStage) : onContinue())} style={{ padding: '0.5rem 1.5rem' }}>
-          {stage < maxStage ? 'Skip' : 'Continue'}
+        <button onClick={onContinue} style={{ padding: '0.5rem 1.5rem' }}>
+          Continue
         </button>
       </div>
     </div>
