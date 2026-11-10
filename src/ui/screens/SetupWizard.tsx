@@ -1,3 +1,5 @@
+import { OpeningCampus } from './OpeningCampus';
+import { previewState } from './preview';
 import { useState } from 'react';
 
 import type { DifficultyId, NegotiationChoices } from '../../engine/init';
@@ -52,6 +54,7 @@ export function SetupWizard() {
     newGame('tutorial-edge5', DEFAULT_SETUP, DEFAULT_NEGOTIATION, 1, 'normal');
   }
 
+  function renderStep() {
   switch (step) {
     case 'title':
       return (
@@ -138,4 +141,6 @@ export function SetupWizard() {
         />
       );
   }
+  }
+  return <OpeningCampus step={step} preview={previewState(content,scenarioId,setup,wizard.negotiation,difficultyId)} content={content}>{renderStep()}</OpeningCampus>;
 }

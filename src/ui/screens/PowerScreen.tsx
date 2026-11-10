@@ -100,7 +100,8 @@ export function PowerScreen({ content, scenarioId, negotiation, onChange, onBack
         {rows.map((row, i) => (
           <div
             key={row.label}
-            style={{ position: 'absolute', left: `${(row.month / maxMonth) * 100}%`, top: i * 16, fontSize: '0.7rem', color: row.color, whiteSpace: 'nowrap' }}
+            style={{ position: 'absolute', left: `${(row.month / maxMonth) * 100}%`,
+              transform: row.month > maxMonth * 0.65 ? 'translateX(-100%)' : undefined, top: i * 16, fontSize: '0.7rem', color: row.color, whiteSpace: 'nowrap' }}
             title={`${row.label}: ${formatMonth(row.month)}`}
           >
             | {row.label} ({formatMonth(row.month)})

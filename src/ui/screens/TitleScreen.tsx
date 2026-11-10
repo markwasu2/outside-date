@@ -33,6 +33,8 @@ export function describeDifficulty(preset: NonNullable<Scenario['difficulties']>
     const bits = Object.entries(preset.eventOddsMultipliers).map(([id, m]) => `${id} odds \u00d7${m}`);
     parts.push(bits.join(', '));
   }
+  const cap = preset.tuningOverrides?.takeout?.baseCapRate;
+  if (typeof cap === 'number') parts.push(`base exit cap rate ${(cap * 100).toFixed(2)}%`);
   if (parts.length === 0) return 'No overrides - the scenario\u2019s defaults apply.';
   return `${parts.join('; ')}.`;
 }

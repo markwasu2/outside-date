@@ -171,7 +171,7 @@ function Section<T extends string>({
           <label key={opt.id} style={{ display: 'flex', gap: '0.5rem', alignItems: 'baseline' }}>
             <input type="radio" checked={selected === opt.id} onChange={() => onPick(opt.id)} />
             <span>
-              <strong>{opt.label}</strong> — {opt.note}
+              <strong>{opt.label}</strong> - {opt.note}
             </span>
           </label>
         ))}

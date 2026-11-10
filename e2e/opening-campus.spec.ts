@@ -1,0 +1,22 @@
+import { expect, test } from '@playwright/test';
+test('opening choices stay on the land and only close starts the campaign',async({page})=>{
+  await page.goto('/');await expect(page.getByTestId('opening-campus')).toHaveAttribute('data-opening-step','title');
+  await page.screenshot({path:'docs/screenshots/cold2/opening-title.png'});
+  await page.getByRole('button',{name:'New game',exact:true}).click();
+  await expect(page.getByTestId('opening-campus')).toHaveAttribute('data-opening-step','setup');
+  await page.getByTestId('site-card-farmland').click();
+  await expect(page.getByTestId('opening-land')).toHaveAttribute('data-pond','true');
+  await expect(page.getByTestId('opening-campus')).toHaveAttribute('data-site','farmland');
+  await page.screenshot({path:'docs/screenshots/cold2/opening-land.png'});
+  await page.getByRole('button',{name:'Next: Lease',exact:true}).click();
+  await expect(page.getByTestId('opening-campus')).toHaveAttribute('data-opening-step','lease');
+  await page.getByRole('button',{name:'Next: Forecast',exact:true}).click();
+  await page.getByRole('button',{name:'Next: Capital stack',exact:true}).click();
+  await page.getByRole('button',{name:'Next: Power',exact:true}).click();
+  await page.setViewportSize({width:1440,height:900});
+  await page.screenshot({path:'docs/screenshots/cold2/opening-power-1440.png'});
+  await page.getByRole('button',{name:'Next: Insurance',exact:true}).click();
+  await expect(page.getByRole('button',{name:'End month',exact:true})).toHaveCount(0);
+  await page.getByRole('button',{name:'Start campaign',exact:true}).click();
+  await expect(page.getByTestId('campus-status')).toContainText('Y1 M1');
+});
