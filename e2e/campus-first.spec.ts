@@ -34,6 +34,8 @@ test('land, finance, crews and chips are reachable directly from campus objects'
   await page.getByTestId('map-root').getByRole('button',{name:/Site office/}).click();
   await expect(page.getByTestId('popover-action').filter({hasText:'Confirm the rack schedule'})).toBeVisible();
   await page.getByRole('button',{name:'Insurance & lender',exact:true}).click();
+  await expect(page.getByTestId('popover-action').filter({hasText:'Cure'})).not.toBeVisible();
+  await page.getByTestId('context-only-actions').locator('summary').click();
   await expect(page.getByTestId('popover-action').filter({hasText:'Cure'})).toBeVisible();
   await page.getByRole('button',{name:'Raise capital',exact:true}).click();
   await expect(page.getByTestId('popover-action').filter({hasText:/sponsor bridge/i})).toBeVisible();

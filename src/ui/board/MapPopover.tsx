@@ -3,7 +3,7 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { formatMonth } from '../../engine/format';
 import { checkAction, useStore } from '../store';
 import { buildRows } from '../components/TracksPanel';
-import { actionCostWords, decisionResult } from './decisionWords';
+import { actionCostWords, decisionResult, isContextOnlyAction } from './decisionWords';
 import { DocketBrief } from './DocketBrief';
 import { Term } from '../Term';
 import { boardActionsForObject, boardObjectTagline, laydownSummary } from './actions';
@@ -92,6 +92,40 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
   const yard = laydownSummary(state,content);
   const orders = objectId === 'laydownYard' ? yard.orders : [];
 
+  const renderRow = (r: (typeof rows)[number]) => {
+            const check = checkAction(committed, content, plan, r.action);
+            return (
+              <Fragment key={r.key}><button
+                disabled={!check.ok}
+                title={check.ok ? decisionResult(r.action,state,content,r.help) : check.reason}
+                data-testid="popover-action"
+                onClick={() => {
+                  queueAction(r.action);
+                  setFeedback(`${r.label} planned. Review or undo from Plan. End month to commit.`);
+                }}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '4px 6px',
+                  marginBottom: 3,
+                  cursor: check.ok ? 'pointer' : 'not-allowed',
+                  opacity: check.ok ? 1 : 0.55,
+                  border: '1px solid #ccc',
+                  borderRadius: 4,
+                  background: '#fff',
+                }}
+              >
+                <div>
+                  <strong>{r.label}</strong> ({actionCostWords(r.ap)}; {r.cashLabel})
+                </div>
+                <div style={{ fontSize: '0.7rem', color: check.ok ? '#555' : '#b71c1c' }}>{check.ok ? decisionResult(r.action,state,content,r.help) : check.reason}</div>
+              </button>
+              {!check.ok && <button style={{ fontSize: 11, marginBottom: 6 }} onClick={() => setFeedback(`${r.label}: ${check.reason}`)}>Why unavailable: {r.label}?</button>}
+              </Fragment>
+            );
+          };
+
   return (
     <>
       <div
@@ -172,39 +206,13 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
         ) : rows.length === 0 ? (
           <div style={{ color: '#777' }}>Nothing to do here right now.</div>
         ) : (
-          rows.map((r) => {
-            const check = checkAction(committed, content, plan, r.action);
-            return (
-              <Fragment key={r.key}><button
-                disabled={!check.ok}
-                title={check.ok ? decisionResult(r.action,state,content,r.help) : check.reason}
-                data-testid="popover-action"
-                onClick={() => {
-                  queueAction(r.action);
-                  setFeedback(`${r.label} planned. Review or undo from Plan. End month to commit.`);
-                }}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '4px 6px',
-                  marginBottom: 3,
-                  cursor: check.ok ? 'pointer' : 'not-allowed',
-                  opacity: check.ok ? 1 : 0.55,
-                  border: '1px solid #ccc',
-                  borderRadius: 4,
-                  background: '#fff',
-                }}
-              >
-                <div>
-                  <strong>{r.label}</strong> ({actionCostWords(r.ap)}; {r.cashLabel})
-                </div>
-                <div style={{ fontSize: '0.7rem', color: check.ok ? '#555' : '#b71c1c' }}>{check.ok ? decisionResult(r.action,state,content,r.help) : check.reason}</div>
-              </button>
-              {!check.ok && <button style={{ fontSize: 11, marginBottom: 6 }} onClick={() => setFeedback(`${r.label}: ${check.reason}`)}>Why unavailable: {r.label}?</button>}
-              </Fragment>
-            );
-          })
+          <>
+            {rows.filter(r=>!isContextOnlyAction(r.action,state)).map(renderRow)}
+            {rows.some(r=>isContextOnlyAction(r.action,state)) && <details data-testid="context-only-actions" style={{marginTop:8,fontSize:12,color:'#665b4c'}}>
+              <summary style={{cursor:'pointer',padding:'6px 0'}}>Already underway or not needed ({rows.filter(r=>isContextOnlyAction(r.action,state)).length})</summary>
+              {rows.filter(r=>isContextOnlyAction(r.action,state)).map(renderRow)}
+            </details>}
+          </>
         )}
       </div>
     </>

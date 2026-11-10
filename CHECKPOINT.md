@@ -1458,3 +1458,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | fixed | reset document margins at app entry; campus remains viewport-sized,footer visible without page scrolling |
 | gates |544unit,91browser,lint,tsc,build;1280x720pixels inspected;1280x720and1440x900dimensions asserted |
 | scope | document CSS only,no engine/save/bot change |
+
+# Personal replay - put completed choices behind progressive detail
+
+| criterion | status |
+|---|---|
+| observed | already-commissioned study,pending permits and nonexistent inspection/freeze repairs filled popups with disabled instructions |
+| fixed | fold only already-underway/completed or currently irrelevant cures under one optional detail group; planned feedback remains visible |
+| safety | missing prerequisites,budget limits,denied-permit refiling and active faults stay in primary list; original explanations retained when expanded |
+| journey catch | initial filter also folded denied permits; full journey caught it before merge; narrowed filter to pending/granted and added unit guard |
+| gates |545unit,92browser,lint,tsc,build;1280pixel simplified substation inspected |
+| scope | popup presentation only,no engine/save/bot change |
