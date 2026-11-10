@@ -53,6 +53,20 @@ export function cashLabel(
   params?: Record<string, string | number>,
 ): string {
   const resolved = resolveContent(state, content);
+  if (def.id === 'optionSite') {
+    const cost = resolveSite(resolved, state.scenarioId, state.setup.site, resolved.tuning).landCost;
+    try {
+      const after = applyAction(state, {actionId:def.id}, resolved);
+      const sources = [
+        [after.equity.calledTotal - state.equity.calledTotal, 'equity'],
+        [after.debt.mezzDrawn - state.debt.mezzDrawn, 'mezz'],
+        [after.debt.seniorDrawn - state.debt.seniorDrawn, 'senior'],
+        [state.cash - after.cash, 'cash'],
+      ] as const;
+      const breakdown = sources.filter(([amount]) => amount > 0).map(([amount,label]) => `${formatDollars(amount)} ${label}`).join(' + ');
+      return `${formatDollars(cost)} total${breakdown ? `, from ${breakdown}` : ''}`;
+    } catch { return `${formatDollars(cost)} total, funded from your capital stack`; }
+  }
   if (def.cash === 'dynamic' || def.id === 'commissionStudy' || (typeof def.cash === 'number' && def.cash > 0)) {
     try {
       const after = applyAction(state, { actionId: def.id, ...(params ? { params } : {}) }, resolved);

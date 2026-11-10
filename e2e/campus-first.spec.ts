@@ -26,7 +26,8 @@ test('desktop opens on one campus canvas with details on demand and End month pe
 test('land, finance, crews and chips are reachable directly from campus objects', async ({ page }) => {
   await page.goto('/'); await page.getByTestId('quick-start').click();
   await page.getByTestId('map-road').click();
-  await expect(page.getByTestId('popover-action').filter({hasText:'Option the site'})).toBeVisible();
+  await expect(page.getByTestId('popover-action').filter({hasText:'Option the site'})).toContainText('$50.0M total, from $50.0M equity');
+  await page.screenshot({path:'docs/screenshots/cold2/site-cost-truth.png'});
   await page.getByTestId('map-popover').getByRole('button',{name:'Close',exact:true}).click();
   await page.getByRole('button',{name:/Site office/}).click();
   await expect(page.getByTestId('popover-action').filter({hasText:'Confirm the rack schedule'})).toBeVisible();

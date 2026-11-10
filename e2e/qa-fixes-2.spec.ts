@@ -36,9 +36,8 @@ test('finding #1: the tutorial fundExtensions trap is disabled with a runway rea
 test('finding #6: tutorial action rows show scenario-resolved costs, not whale prices', async ({ page }) => {
   await startTutorialOnLandTab(page);
 
-  // The site option is funded by the tutorial's capital stack, so its cash cost reads $0
-  // (was "$50.0M" - the whale's megasite land price against an $8.0M bankroll).
-  await expect(page.getByTestId('action-row-button').filter({ hasText: 'Option the site' })).toContainText('$0');
+  // The full scenario land price is visible even when equity funds it rather than cash.
+  await expect(page.getByTestId('action-row-button').filter({ hasText: 'Option the site' })).toContainText('total, from');
 
   await openActions(page);
   await filterActions(page, 'Power');

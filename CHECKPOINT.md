@@ -1090,3 +1090,15 @@ have transparent edges; the power timeline labels stay inside the panel.
 | full gates | done: 518 unit, 64 e2e, lint, tsc, build |
 | grid | skipped: UI-only, no engine/state shape changes |
 | remainder | spatial opening choices, closing-table review, new playthrough-4 grading/cost/timing fixes |
+
+# Playthrough 4 truth fix - site option is not free
+
+| criterion | status |
+|---|---|
+| real total | done: option label shows full selected site's land cost |
+| real funding | done: dry-run funding waterfall shows equity/mezz/senior/cash source, not just cash delta |
+| fallback | done: unavailable option retains full cost and explains capital-stack funding |
+| shared display | done: both search list and object popover use the same label |
+| full gates | done: 519 unit, 64 e2e, lint, tsc, build |
+| visual | done: actual 1280 road popover inspected, $50.0M total/from equity visible |
+| grid | skipped: label only, engine and saves unchanged |
