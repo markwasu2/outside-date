@@ -1513,3 +1513,13 @@ have transparent edges; the power timeline labels stay inside the panel.
 | truth | uses resolved scenario cooling PUE and existing capacity selector; scheduled date explicitly can slip; hookups automatic, not a new action |
 | gates | 552 unit, 96 browser (94 bounded plus 2 complete journeys), lint, tsc, build; 1280px capacity popup inspected |
 | scope | UI guidance only, no engine/save/bot/rule change |
+
+# Personal Tutorial replay - explain the permit review on touch
+
+| criterion | status |
+|---|---|
+| personal run | Tutorial replay closed Y2 M9, 1/1 delivered late, $119.7M campus, $14.9M equity, 1.87x; actual live clicks |
+| observed | waiting-on-permit cue opened visits and folded file actions without the pending decision date |
+| fixed | permits office view shows actual review status/date and what End month does; denied refiling and granted status named; stale tab route corrected |
+| gates | 553 unit, 97 browser including both complete journeys, lint, tsc, build; actual 1280x720 permit popup inspected |
+| scope | read-only UI guidance, no engine/save/bot/rule change; existing bundle warning unchanged |

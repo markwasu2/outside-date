@@ -71,7 +71,7 @@ export function hallAdvanceReason(state: GameState, content: Content, hall: Hall
   }
   const permit = blocker?.match(/^waiting on (\w+) permit$/)?.[1] as PermitId | undefined;
   if (permit) {
-    return `${hall.id} needs the ${permit} permit granted (currently ${state.permits[permit].status}). Open Permits & approvals at the site office on the left to file it or check its review.`;
+    return `${hall.id} needs the ${permit} permit granted (currently ${state.permits[permit].status}). Open Permits & people at the site office on the left to file it or check its review.`;
   }
   if (blocker === 'waiting on power hookup') {
     return `${hall.id} needs a power hookup before ready-for-service work. Open Power connection at the substation in the upper right to check the study, equipment and automatic substation build.`;
