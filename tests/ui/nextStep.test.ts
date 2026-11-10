@@ -164,3 +164,11 @@ it('does not direct the player to an instruction that cannot fit remaining focus
  expect(nextStep(s,content,1).why).toContain('needs 2 focus points; you have 1 left');
  expect(nextStep(s,content,2).actionId).toBe('commissionStudy');
 });
+
+
+it('names the closing path instead of end-month after delivery',()=>{
+ const s=freshState();s.halls.forEach(h=>h.delivered=true);s.debt.converted=true;s.flags.conversionMonth=40;
+ expect(nextStep(s,content)).toMatchObject({title:'Let the rent season before closing',objectId:'siteOffice'});
+ expect(nextStep(s,content).why).toContain('rent must season until');
+ s.phase='takeoutAvailable';expect(nextStep(s,content)).toMatchObject({title:'Price the finished campus',actionId:'priceTakeout',objectId:'siteOffice'});
+});

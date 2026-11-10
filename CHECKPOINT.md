@@ -1440,3 +1440,12 @@ have transparent edges; the power timeline labels stay inside the panel.
 | milestone truth | warning due-soon list reuses existing live-milestone selector,not historical ledger rows |
 | gates |543unit,89browser,lint,tsc,build;1280pixel cleared-notice map inspected |
 | scope | UI warning/notice derivation only,no engine/save/bot change |
+
+# Personal replay - an explicit path from delivered halls to closing
+
+| criterion | status |
+|---|---|
+| observed | after delivery,the map kept saying End month without explaining seasoning or the eventual closing action |
+| fixed | delivered campus cue names lender retest or exact seasoning end; open window names Price the finished campus and routes Show me to office Insurance & lender |
+| gates |544unit,90browser,lint,tsc,build;1280pixel cue and exact takeout route inspected |
+| scope | guide and popup route only,no engine/save/bot change |

@@ -52,6 +52,24 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
   const resolved = resolveContent(state, content);
   const power = state.power;
 
+  if (state.phase === 'takeoutAvailable') return {
+    title:'Price the finished campus',
+    why:'The closing window is open. At the site office, Insurance & lender, choose Price the takeout to value the campus, repay debt and see your equity and report card. This finishes the campaign.',
+    objectId:'siteOffice',actionId:'priceTakeout',
+  };
+  const active = state.halls.filter(h=>!h.terminated);
+  if(active.length && active.every(h=>h.delivered)) {
+    const conversionMonth = state.flags.conversionMonth;
+    return {
+      title:state.debt.converted ? 'Let the rent season before closing' : 'Wait for the lender retest',
+      why:state.debt.converted && typeof conversionMonth === 'number'
+        ? `Every hall is delivered. The loan converted; rent must season until ${formatMonth(conversionMonth+resolved.tuning.takeout.seasoningMonths)}. End the month to advance this clock. Then Price the takeout at the site office to finish.`
+        : 'Every hall is delivered. The lender retests income against debt payments each month before the closing window can open. Check financing at the site office; End month runs the next test.',
+      objectId:'siteOffice',
+    };
+  }
+
+
   if (state.flags.drawFreeze) return {
     title: 'Cure the lender draw freeze',
     why: 'Construction cannot draw funding or progress while the freeze remains. Open the site office, choose Insurance & lender and cure the paperwork before waiting another month.',
