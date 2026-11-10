@@ -26,3 +26,15 @@ test('a no-choice event appears at the matching object without blocking End mont
   const end=page.getByRole('button',{name:'End month',exact:true});expect(await end.evaluate(el=>{const r=el.getBoundingClientRect();return el.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));})).toBe(true);
   await notice.getByRole('button',{name:'Dismiss'}).click();await expect(notice).toHaveCount(0);
 });
+
+test('expansion choice states the real campaign cutoff before either answer',async({page})=>{
+  await page.goto('/');await page.getByTestId('quick-start').click();
+  await page.evaluate(async()=>{
+    // @ts-expect-error dev browser source import
+    const {useStore}=await import('/src/ui/store.ts');const s=useStore.getState();const card=s.content.events.find((c:{id:string})=>c.id==='the_ask');
+    const next={...s.state,phase:'awaitingChoice',pending:{cardId:card.id,choices:card.choices}};useStore.setState({state:next,draft:next});
+  });
+  await expect(page.getByTestId('expansion-cutoff')).toContainText('Y6 M1');
+  await expect(page.getByTestId('expansion-cutoff')).toContainText('Expansion does not extend this deadline');
+  await page.screenshot({path:'docs/screenshots/cold2/expansion-cutoff.png'});
+});

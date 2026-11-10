@@ -1034,3 +1034,13 @@ unique newly failed inspection. Unknown targets use the office, never a random h
 | full gates | done: 515 unit, 61 e2e (60 + isolated tutorial), lint, tsc, build |
 | balance grid | skipped: presentation only, no engine/state-shape change |
 | next stage | fresh desktop real-click playthrough and remaining observed confusion |
+
+# Expansion cutoff - honest choice wording before rule change
+
+| criterion | status |
+|---|---|
+| cutoff before answer | done: expansion card quotes actual run maxMonths and says outside dates do not extend it |
+| current rule caveat | done: warns conversion can open takeout earlier |
+| full gates | done: 515 unit, 62 e2e, lint, tsc, build |
+| visual | done: 1280x720 expansion card inspected, full choice and cutoff visible |
+| balance grid | skipped: copy only; before-engine-change 1000-seed baseline captured separately |
