@@ -33,6 +33,9 @@ export function cancelOrderRows(state: GameState, content: Content): ActionRow[]
     if (!target) continue;
     const supplier = target.supplier === 'alt' ? 'second supplier' : target.supplier === 'spot' ? 'spot' : 'standard supplier';
     const entry = row(content, state, 'cancelOrder', `Cancel ${kind} order (${supplier})`, { kind });
+    const refund = Math.round(target.deposit * (1 - resolveContent(state, content).tuning.power.cancelFeeShare));
+    entry.cashLabel = `${formatDollars(refund)} cash refund now`;
+    entry.help = `Refunds ${formatDollars(refund)} of the ${formatDollars(target.deposit)} already paid; ${formatDollars(target.deposit - refund)} is kept as the cancellation fee. Removes this supplier's delivery slot.`;
     if (pending.length > 1) entry.help += ' The standard supplier stays on order.';
     rows.push(entry);
   }

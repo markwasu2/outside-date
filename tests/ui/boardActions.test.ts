@@ -166,3 +166,12 @@ it('the pond offers the blocked hall mitigation route until work is started',()=
  s.month+=3;expect(ids('pond',s)).not.toContain('mitigateWetlands');
  expect(ids('pond',freshState())).not.toContain('mitigateWetlands');
 });
+
+it('cancellation quotes match the engine refund for standard, alternate and spot orders',async()=>{
+ const {applyAction}=await import('../../src/engine/actions');
+ for(const supplier of ['standard','alt','spot'] as const){
+ const s=freshState();s.power.orders=[{kind:'transformer',orderedMonth:1,arrivalMonth:24,arrived:false,deposit:8000000,price:30000000,supplier}];
+ const before=JSON.stringify(s),r=boardActionsForObject('substation',s,content).find(r=>r.action.actionId==='cancelOrder')!;
+ const next=applyAction(s,r.action,content);expect(next.cash-s.cash).toBe(6400000);expect(r.cashLabel).toBe('$6.4M cash refund now');expect(r.help).toContain('$1.6M is kept');expect(r.help).toContain('$8.0M already paid');expect(JSON.stringify(s)).toBe(before);
+ }
+});

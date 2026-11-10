@@ -15,6 +15,9 @@ test('cancelling the named second supplier preserves the standard transformer',a
  const popup=page.getByTestId('map-popover');
  await expect(popup.getByRole('button',{name:/^Cancel transformer order/})).toHaveCount(1);
  await expect(popup).toContainText('The standard supplier stays on order.');
+ const cancel=popup.getByRole('button',{name:/^Cancel transformer order \(second supplier\)/});
+ await expect(cancel).toContainText('$800K cash refund now');await expect(cancel).toContainText('$200K is kept as the cancellation fee');
+ await cancel.scrollIntoViewIfNeeded();await page.screenshot({path:'docs/screenshots/cold2/cancellation-refund-quote.png'});
  await page.screenshot({path:'docs/screenshots/cold2/cancel-second-supplier.png'});
  await popup.getByRole('button',{name:/^Cancel transformer order \(second supplier\)/}).click();
  await expect(popup.getByRole('button',{name:/^Cancel transformer order \(standard supplier\)/})).toBeVisible();
