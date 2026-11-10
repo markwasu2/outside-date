@@ -6,7 +6,7 @@ import { applyEffect } from '../../engine/effects';
 import { resolveContent } from '../../engine/resolve';
 import type { Content, Effect, EventCard } from '../../content/schemas';
 import { formatDollars, formatMonth } from '../../engine/format';
-import type { GoodwillGroup } from '../../engine/types';
+import type { GameState, GoodwillGroup } from '../../engine/types';
 import { playSound } from '../sound';
 import { EVENT_STAKEHOLDER } from '../stakeholders';
 import { eventCampusTarget } from '../board/eventCampus';
@@ -191,6 +191,16 @@ export function describeVoteChoice(choiceId: string, tuning: Content['tuning']['
   return '';
 }
 
+/** A repeat sponsorship replaces its expiry; it does not stack six new months. */
+export function hiringFairRenewalWords(state: Pick<GameState, 'month' | 'flags'>, card: EventCard | null | undefined): string | null {
+  const until = state.flags.hiringFairUntil;
+  if (card?.id !== 'hiring_fair' || typeof until !== 'number' || until <= state.month) return null;
+  const effect = card.choices?.find(c => c.id === 'host')?.effects.find(e => e.type === 'setFlag' && e.args[0] === 'hiringFairUntil');
+  const duration = typeof effect?.args[1] === 'string' ? /^monthPlus:(\d+)$/.exec(effect.args[1]) : null;
+  if (!duration) return null;
+  return `Your current crew benefit ends at the start of ${formatMonth(until)}. Sponsoring again resets that end to ${formatMonth(state.month + Number(duration[1]))}, not ${Number(duration[1])} extra months. Skipping keeps your current benefit.`;
+}
+
 export function EventModal() {
   const draft = useStore((s) => s.draft);
   const content = useStore((s) => s.content);
@@ -258,6 +268,7 @@ export function EventModal() {
         {target && <div style={{fontSize:11,textTransform:'uppercase',letterSpacing:1,color:'#72572b',marginBottom:6}}>At {target.label}</div>}
         <h2 style={{ marginTop: 0 }}>{title}</h2>
         <p>{body}</p>
+        {hiringFairRenewalWords(draft, eventCard) && <p data-testid="hiring-fair-renewal" style={{background:'#f3e8ce',padding:8,fontSize:13}}>{hiringFairRenewalWords(draft, eventCard)}</p>}
         {isSynthetic && <p data-testid="failed-vote-warning" style={{fontSize:13}}>Neither option guarantees approval. If the next vote fails, the docket dies and the plants cannot proceed.</p>}
         {pending.cardId === 'the_ask' && <p data-testid="expansion-cutoff" style={{background:'#f3e8ce',padding:8,fontSize:13}}>
           Campaign cutoff: {formatMonth(draft.maxMonths)}. You must price the takeout then, even if added halls are unfinished or still inside their outside dates. Expansion does not extend this deadline. Before the cutoff, takeout waits for unfinished halls that are still inside their outside dates.
