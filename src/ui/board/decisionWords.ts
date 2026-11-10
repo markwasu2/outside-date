@@ -39,6 +39,7 @@ export function isContextOnlyAction(action:PlannedAction,state:GameState,content
  case 'filePermit':return ['pending','granted'].includes(state.permits[String(action.params?.permitId) as keyof GameState['permits']]?.status??'');
  case 'fixInspection':return !state.flags[`inspectionFail:${String(action.params?.hallId)}`];
  case 'cureDraw':return !state.flags.drawFreeze;
+ case 'readyLiquid':return !!state.halls.find(h=>h.id===action.params?.hallId)?.liquidReady;
  case 'confirmRackSchedule':return !!state.flags.rackScheduleConfirmed;
  case 'fileDocket':return state.docket.status!=='none';
  case 'answerDiscovery':return !hasLiveDiscovery(state);

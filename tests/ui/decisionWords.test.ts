@@ -52,3 +52,12 @@ it('names the previous-month trigger without suggesting a same-month repeat pena
  s.flags.lastPrepTestimonyMonth=4;expect(decisionResult(a,s,c,'')).not.toContain('goodwill -1');
  s.flags.lastPrepTestimonyMonth=2;expect(decisionResult(a,s,c,'')).not.toContain('goodwill -1');
 });
+
+it('folds only the completed liquid-ready hall and keeps unready prerequisites visible',()=>{
+ const s=createGame(loadContent(),'whale',{...DEFAULT_SETUP,hallTier:'liquid'},DEFAULT_NEGOTIATION,1);
+ const a={actionId:'readyLiquid',params:{hallId:'H1'}};
+ expect(isContextOnlyAction(a,s)).toBe(false);s.halls[0]!.liquidReady=true;
+ const before=JSON.stringify(s);expect(isContextOnlyAction(a,s)).toBe(true);expect(JSON.stringify(s)).toBe(before);
+ expect(isContextOnlyAction({actionId:'readyLiquid',params:{hallId:'H2'}},s)).toBe(false);
+ expect(isContextOnlyAction({actionId:'readyLiquid',params:{hallId:'missing'}},s)).toBe(false);
+});
