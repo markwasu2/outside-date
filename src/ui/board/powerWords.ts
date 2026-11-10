@@ -1,5 +1,5 @@
 import type { Content } from '../../content/schemas';
-import { availableGridMW } from '../../engine/selectors';
+import { availableGridMW, requiredGridMW } from '../../engine/selectors';
 import { resolveContent } from '../../engine/resolve';
 import type { GameState, PowerPlant } from '../../engine/types';
 import { formatMonth } from '../../engine/format';
@@ -42,5 +42,21 @@ export function powerCapacityWords(state: GameState,content: Content): string {
  const waiting=state.halls.find(h=>!h.energized&&!h.delivered&&!h.terminated);
  const free=Math.max(0,available-reserved);
  const source=state.power.plants.filter(p=>p.onlineMonth===null||p.onlineMonth>state.month).map(p=>({id:p.id,month:p.onlineMonth??p.plannedOnlineMonth})).filter(p=>p.month!==null).sort((a,b)=>a.month!-b.month!)[0];
- return `${available.toFixed(1)} MW available; ${reserved.toFixed(1)} MW committed to energized halls.${waiting?` ${waiting.id} needs ${(waiting.mwIT*pue).toFixed(1)} MW; ${free.toFixed(1)} MW is uncommitted.`:''}${source?` Next scheduled capacity: Plant ${source.id}, ${formatMonth(source.month!)}. Plant dates can slip.`:state.docketEnabled&&state.docket.status!=='approved'?' Plants wait for docket approval.':''}${waiting && canConnectOnNextTick(state,content,waiting.id) ? ` Capacity is ready for ${waiting.id}. End month runs the automatic hookup; then start ready-for-service work at the hall.` : ' Power hookups happen automatically as capacity becomes available.'}`;
+ return `${available.toFixed(1)} MW available; ${reserved.toFixed(1)} MW committed to energized halls.${waiting?` ${waiting.id} needs ${(waiting.mwIT*pue).toFixed(1)} MW; ${free.toFixed(1)} MW is uncommitted.`:''}${source?` Next scheduled capacity: Plant ${source.id}, ${formatMonth(source.month!)}. Plant dates can slip.`:state.docketEnabled&&state.docket.status!=='approved'?' Plants wait for docket approval.':''}${waiting && canConnectOnNextTick(state,content,waiting.id) ? ` Capacity is ready for ${waiting.id}. End month runs the automatic hookup; then start ready-for-service work at the hall.` : waiting && noMorePowerScheduled(state) ? ` No further power capacity is scheduled. Waiting will not close this gap; ${waiting.id} cannot start ready-for-service work with this cooling and power plan. At the campaign cutoff, price the campus as it stands.` : ' Power hookups happen automatically as capacity becomes available.'}`;
+}
+
+/** Final supply from the existing grid connection and all booked campus plants. */
+export function plannedPowerMW(state: GameState, content: Content): number {
+ const resolved=resolveContent(state,content);
+ return Math.min(resolved.tuning.power.substationCapacityMW,state.power.interimGridMW+state.power.plants.reduce((sum,p)=>sum+p.mwGrid,0));
+}
+
+export function noMorePowerScheduled(state: GameState): boolean {
+ return state.power.substationStatus==='done' && state.power.plants.every(p=>p.onlineMonth!==null && p.onlineMonth<=state.month);
+}
+
+/** Called with the expansion preview, not the current four-hall campus. */
+export function expansionPowerWords(state: GameState, content: Content): string {
+ const resolved=resolveContent(state,content),need=requiredGridMW(state,resolved),supply=plannedPowerMW(state,content);
+ return `With ${state.setup.cooling} cooling, ${state.halls.length} halls need ${need.toFixed(1)} MW. Grid and both plants supply at most ${supply.toFixed(1)} MW. Expansion adds halls, not power.${need>supply ? ` Full delivery does not fit this power plan: ${(need-supply).toFixed(1)} MW short.` : ' Full delivery fits once the substation and plants are online.'}`;
 }

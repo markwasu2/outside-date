@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 
+import { expansionPowerWords } from '../board/powerWords';
 import { applyEffect } from '../../engine/effects';
 import { resolveContent } from '../../engine/resolve';
 import type { Effect, EventCard } from '../../content/schemas';
@@ -203,7 +204,7 @@ export function EventModal() {
     const spatial = resolved.tuning.spatial;
     const nearTaken = draft.halls.filter(h=>!h.terminated && h.stageIndex>=0 && (h.pad??'near')==='near').length;
     const nearLeft = Math.max(0,spatial.nearPads-nearTaken);
-    return {equity:after.equity.committedTotal-draft.equity.committedTotal,senior:after.debt.seniorCommitment-draft.debt.seniorCommitment,mezz:after.debt.mezzCommitment-draft.debt.mezzCommitment,nearLeft,spatial};
+    return {power:expansionPowerWords(after,content),equity:after.equity.committedTotal-draft.equity.committedTotal,senior:after.debt.seniorCommitment-draft.debt.seniorCommitment,mezz:after.debt.mezzCommitment-draft.debt.mezzCommitment,nearLeft,spatial};
   })() : null;
 
   return (
@@ -234,6 +235,7 @@ export function EventModal() {
         </p>}
         {expansion && <div data-testid="expansion-funding" style={{background:'#f3e8ce',padding:8,fontSize:13,marginBottom:10}}>
           <div>Saying yes adds commitments: equity +{formatDollars(expansion.equity)}, senior +{formatDollars(expansion.senior)}, mezz +{formatDollars(expansion.mezz)}. Equity is called as costs arrive; this is not free cash.</div>
+          <div data-testid="expansion-power" style={{marginTop:5}}>{expansion.power}</div>
           <div style={{marginTop:5}}>Near pads remaining: {expansion.nearLeft}, shared by all unstarted halls. Each far-pad hall adds a {formatDollars(expansion.spatial.farFeederCost)} feeder at groundbreak, {expansion.spatial.farPadExtraMonths} extra pad months, and {formatDollars(expansion.spatial.farLineLossPerMonth)}/month in line losses once delivered.</div>
         </div>}
         {claim && (
