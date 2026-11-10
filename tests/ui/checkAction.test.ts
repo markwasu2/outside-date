@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
+import { applyImmediateAction } from '../../src/engine/step';
 import type { PlannedAction, Setup } from '../../src/engine/types';
 import { checkAction } from '../../src/ui/store';
 
@@ -31,7 +32,7 @@ describe('checkAction: zero-AP action dedup (item 1)', () => {
 
     const second = checkAction(state, content, [standDownH1], standDownH1);
     expect(second.ok).toBe(false);
-    if (!second.ok) expect(second.reason).toBe('Already queued this month');
+    if (!second.ok) expect(second.reason).toBe('Already done this month');
   });
 
   it('does not treat standDown on a different hall as a duplicate', () => {
@@ -45,15 +46,16 @@ describe('checkAction: zero-AP action dedup (item 1)', () => {
 
   it('does not apply the zero-AP dedup check to AP-costing actions', () => {
     const state = freshState();
-    // optionSite costs AP and is only legal once per game (site already optioned after queueing
-    // it); re-queueing it should still be rejected, but via the normal dry-run failure, not via
-    // the zero-AP path (def.ap !== 0 for this action, so isDuplicateZeroApAction is a no-op here).
+    // optionSite costs AP and is only legal once per game (the site is optioned once applied);
+    // under do-it-now, `doneThisMonth` is only the zero-AP duplicate scope, so a repeat is
+    // rejected by the handler's own precondition against the post-action state, not the dedup.
     const optionSite: PlannedAction = { actionId: 'optionSite' };
     const first = checkAction(state, content, [], optionSite);
     expect(first.ok).toBe(true);
-    const second = checkAction(state, content, [optionSite], optionSite);
+    const applied = applyImmediateAction(state, optionSite, content);
+    const second = checkAction(applied, content, [optionSite], optionSite);
     expect(second.ok).toBe(false);
-    if (!second.ok) expect(second.reason).not.toBe('Already queued this month');
+    if (!second.ok) expect(second.reason).not.toBe('Already done this month');
   });
 });
 
@@ -95,9 +97,11 @@ describe('checkAction: specific construction prerequisite explanations', () => {
       expect(result.reason).not.toContain('prerequisites not met');
     }
   });
-  it('reads the folded plan, so a queued site option clears the same blocker', () => {
+  it('reads the applied state, so a done site option clears the same blocker', () => {
     const state = freshState();
-    expect(checkAction(state, content, [{ actionId: 'optionSite' }], { actionId: 'advanceHall', params: { hallId: 'H1' } }).ok).toBe(true);
+    // Do-it-now: actions apply at click time, so the check sees the post-option state directly.
+    const applied = applyImmediateAction(state, { actionId: 'optionSite' }, content);
+    expect(checkAction(applied, content, [{ actionId: 'optionSite' }], { actionId: 'advanceHall', params: { hallId: 'H1' } }).ok).toBe(true);
   });
   it('names a pending permit and points to its actual office', () => {
     const state = freshState();

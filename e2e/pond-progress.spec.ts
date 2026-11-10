@@ -39,5 +39,5 @@ test('pond touch offers mitigation itself and changes to the work clock after qu
  await page.locator('[data-campus-object="pond"]').click();await expect(mitigate).toBeEnabled();await expect(popup.getByTestId('pond-progress')).toContainText('Mitigate the pond below');
  await page.screenshot({path:'docs/screenshots/cold2/pond-mitigation-action.png'});
  await mitigate.click();await expect(mitigate).toHaveCount(0);await expect(popup.getByTestId('pond-progress')).toContainText('mitigation is underway until');
- await expect(popup.getByRole('status')).toContainText('planned');await expect(page.getByRole('button',{name:'End month',exact:true})).toBeEnabled();
+ await expect(popup.getByRole('status')).toContainText('done');await expect(page.getByRole('button',{name:'End month',exact:true})).toBeEnabled();
 });

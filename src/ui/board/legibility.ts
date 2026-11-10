@@ -131,7 +131,7 @@ export const LEGEND_ENTRIES: { symbol: string; meaning: string }[] = [
   { symbol: 'Green strip', meaning: 'progress through the current stage' },
   { symbol: 'near pad / far pad', meaning: 'pad position; far pads trench a feeder and pay monthly line losses' },
   { symbol: '+$x/mo', meaning: 'rent the delivered hall earns each month' },
-  { symbol: 'Blue dashed outline', meaning: 'an action is queued for this tile this month' },
+  { symbol: 'Blue "Done" marker', meaning: 'you acted on this tile this month' },
   { symbol: '⚠️', meaning: 'past its outside date' },
   { symbol: '⏸', meaning: 'paused this month' },
   { symbol: '🚨', meaning: 'failed inspection - fix it to resume' },

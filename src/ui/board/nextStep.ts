@@ -46,7 +46,7 @@ export function nextStep(state: GameState, content: Content, remainingFocus = st
   const cost = content.actions.find(a=>a.id===next.actionId)?.ap ?? 0;
   if(cost>remainingFocus)return {
     title:'End the month',
-    why:`${next.title} needs ${cost} focus points; you have ${remainingFocus} left. End the month to commit your plan and refresh focus, or remove an instruction from Plan.`,
+    why:`${next.title} needs ${cost} focus points; you have ${remainingFocus} left. End the month to refresh focus, or undo your last action from the desk.`,
     objectId:next.objectId,
   };
   return next;

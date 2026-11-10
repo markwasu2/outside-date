@@ -410,7 +410,7 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
   const selectedHallId = useStore((s) => s.selectedHallId);
   const selectHall = useStore((s) => s.selectHall);
   const queueAction = useStore((s) => s.queueAction);
-  const removeAction = useStore((s) => s.removeAction);
+  const undoLastAction = useStore((s) => s.undoLastAction);
   const endMonth = useStore((s) => s.endMonth);
   const error = useStore((s) => s.error);
   const clearError = useStore((s) => s.clearError);
@@ -429,7 +429,7 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
   // (and the Hud's Fast forward button, see Hud.tsx) are disabled during this window so a click
   // can't race the modal and surface the engine's internal phase-guard error.
   const awaitingChoice = state.phase === 'awaitingChoice';
-  const takeoutQueued = plan.some((a) => a.actionId === 'priceTakeout');
+  // Do-it-now model: `plan` lists actions already applied this month (the undo scope).
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', fontFamily: 'sans-serif', fontSize: '0.85rem' }}>
@@ -555,32 +555,19 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
       )}
 
       <div style={{ borderTop: '1px solid #ccc', padding: '0.5rem' }}>
-        <strong>Planned this month</strong>
-        {plan.length === 0 && <div style={{ color: '#888' }}>Nothing queued.</div>}
-        {/* Fix 4 (playtest-fixes): queuing an action immediately updates the Hud's Cash/goodwill
-            preview (it reads `draft`, state+plan folded together) with no indication that
-            nothing is committed yet. Tag each queued row "Pending" and explain the preview once,
-            right where the queue list lives, rather than only in a one-off coach tip. */}
-        {plan.length > 0 && (
-          <div style={{ color: '#888', fontSize: '0.75rem', margin: '0.25rem 0' }}>
-            Pending - Cash/goodwill above already preview these effects, but nothing is committed until you end the month.
-          </div>
-        )}
+        <strong>Done this month</strong>
+        {plan.length === 0 && <div style={{ color: '#888' }}>Nothing yet - actions happen the moment you choose them.</div>}
         {plan.map((action, i) => (
           <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '0.5rem' }}>
-            <span>
-              {describeAction(action, content)}{' '}
-              <span
-                data-testid="queued-pending-tag"
-                style={{ fontSize: '0.7rem', color: '#b8860b', fontStyle: 'italic' }}
-              >
-                (pending)
-              </span>
-            </span>
-            <button onClick={() => removeAction(i)}>remove</button>
+            <span>{describeAction(action, content)}</span>
           </div>
         ))}
-        {!hideEndMonth && takeoutOpen && !takeoutQueued && (
+        {plan.length > 0 && (
+          <button data-testid="undo-last-action" onClick={undoLastAction} style={{ marginTop: '0.25rem' }}>
+            Undo last: {describeAction(plan[plan.length - 1]!, content)}
+          </button>
+        )}
+        {!hideEndMonth && takeoutOpen && (
           <button
             data-testid="price-takeout-banner"
             onClick={() => queueAction({ actionId: 'priceTakeout' })}
@@ -599,12 +586,12 @@ export function TracksPanel({ hideEndMonth = false }: { hideEndMonth?: boolean }
         )}
         {!hideEndMonth && <button
           onClick={endMonth}
-          disabled={(takeoutOpen && !takeoutQueued) || awaitingChoice}
+          disabled={takeoutOpen || awaitingChoice}
           title={
             awaitingChoice
               ? 'Resolve the pending event before ending the month'
-              : takeoutOpen && !takeoutQueued
-                ? 'The takeout window is open - price the takeout (above, or search the plan for takeout) to finish the campaign'
+              : takeoutOpen
+                ? 'The takeout window is open - price the takeout above to finish the campaign'
                 : undefined
           }
           style={{ marginTop: '0.5rem', width: '100%', padding: '0.5rem' }}

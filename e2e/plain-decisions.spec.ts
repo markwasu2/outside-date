@@ -13,7 +13,7 @@ test('first month explains role, goal, limit and consequence before reserving an
  await page.screenshot({path:'docs/screenshots/cold2/monthly-decision-preview.png'});
  await study.click();await expect(count).toHaveText('Focus this month: 4 of 6 left');
  await page.getByTestId('map-popover').getByRole('button',{name:'Close',exact:true}).click();
- await page.getByRole('button',{name:'Plan',exact:true}).click();await page.getByRole('button',{name:'remove',exact:true}).click();await expect(count).toHaveText('Focus this month: 6 of 6 left');
+ await page.getByRole('button',{name:'Plan',exact:true}).click();await page.getByTestId('undo-last-action').click();await expect(count).toHaveText('Focus this month: 6 of 6 left');
  await page.getByRole('button',{name:'Close panel',exact:true}).click();
  await page.getByRole('button',{name:'End month',exact:true}).click();await expect(count).toHaveText('Focus this month: 6 of 6 left');
  await count.click();await expect(help).toBeVisible();

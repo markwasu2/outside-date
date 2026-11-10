@@ -1,3 +1,16 @@
+# Redesign: do-it-now actions replace plan-and-approve
+
+Playtest feedback: the loop read as clicking actions into a plan and then approving your own plan at End month, with no visible cause and effect. Actions now apply the moment they are chosen - the campus, cash and focus react immediately - with a one-level Undo per month ("Done this month" in the desk and Plan drawer). End month only advances the clock. The takeout close keeps an explicit confirm through a priced preview modal. Event choices state stakes resolved against the live state (cash left, goodwill before/after and what it moves, owed focus against next month's 6). Engine step semantics unchanged: applied actions still land before the event draw and tick.
+
+| # | Criterion | Status | Evidence |
+|---|-----------|--------|----------|
+| 1 | Actions apply at click; no approve-your-plan step | PASS | applyImmediateAction in step.ts; store queueAction applies immediately; desk/popover say "Do it now" |
+| 2 | Undo restores the pre-action month snapshot | PASS | store.undoLastAction; e2e plain-decisions, visible-actions, persistent-action-feedback |
+| 3 | Takeout close stays an explicit priced commitment | PASS | TakeoutPreviewModal (takeout-preview-card/commit-takeout); e2e campus-closeout, immersive-journey, whale-journey |
+| 4 | Event choices state resolved stakes | PASS | describeEffectWithState in EventModal; e2e hiring-fair-benefit, subpoena-preview, failed-vote-stakes |
+| 5 | Full gates | PASS | 613 unit; 142 browser across 8 shards including both real-click journeys; lint, tsc, production build |
+| 6 | No balance or engine rule change | PASS | same action set, AP costs and ordering; no sim-grid change needed |
+
 # Replay: expansion reveals the power ceiling before accepting
 
 Personal Hard Whale dry-cooling expansion reached 5/6 delivered at Y5 M11. H6 needed 33.8MW against 25.3MW free, with both plants already online, yet guidance implied waiting for more plant capacity. Expansion disclosed money and pad costs but not the permanent capacity gap. It now compares the six-hall cooling load with final grid/plant supply before the choice. A fully online undersized campus says no more capacity is scheduled and waiting cannot close the gap. Engine allocation, power supply and cooling are unchanged.
