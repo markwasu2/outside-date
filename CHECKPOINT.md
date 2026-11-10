@@ -1480,3 +1480,14 @@ have transparent edges; the power timeline labels stay inside the panel.
 | safety | outstanding discovery, unsettled meetings and failed-docket recovery remain available; no discovery rule change from one seed |
 | gates | 547 unit, 93 browser (91 bounded nonjourney plus 2 complete journeys), lint, tsc, build; 1280px power popup inspected |
 | scope | UI presentation only, no engine, bot, rule or save change; no migration or seed grids required |
+
+# Personal Whale replay - distinguish risk losses from prevention spending
+
+| criterion | status |
+|---|---|
+| observed | paid rack retrofit followed by chip risk row No/$0; tenant-exit row exposed internal implementation wording |
+| source check | event handler deducts cash but stores no retrofit choice/cost itemization; do not reconstruct an exact bill from final hall count |
+| fixed | report labels recorded loss cost, explains prevention spending separately, names a recorded upgrade event and unitemized cost; tenant exit explicitly informational |
+| safety | no invented retrospective expense; hybrid and known decline states have exact wording; existing risk and grade calculations unchanged |
+| gates | 548 unit, 94 browser (92 bounded plus 2 complete journeys), lint, tsc, build; 1280px scope and chip-row pixels inspected |
+| scope | report presentation only, no engine/save/bot/rule change; existing saves interpreted without mutation |
