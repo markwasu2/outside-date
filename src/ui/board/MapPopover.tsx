@@ -5,6 +5,7 @@ import { checkAction, useStore } from '../store';
 import { buildRows } from '../components/TracksPanel';
 import { actionCostWords, decisionResult, isContextOnlyAction } from './decisionWords';
 import { plantWords, plantWaitingWords, substationWords, powerCapacityWords } from './powerWords';
+import { hallLaborWords } from './laborWords';
 import { pondProgressWords } from './pondWords';
 import { permitReviewWords } from './permitWords';
 import { DocketBrief } from './DocketBrief';
@@ -168,6 +169,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
           </div>
         )}
 
+        {hall && hallLaborWords(state,hall) && <p data-testid="hall-labor-clock" style={{lineHeight:1.4,background:'#f3e8c9',padding:6}}>{hallLaborWords(state,hall)}</p>}
         {objectId === 'laydownYard' && (() => {
           const row = buildRows('construction', state, content, null).find((r) => r.key === 'importCrews')!;
           const check = checkAction(committed, content, plan, row.action);
