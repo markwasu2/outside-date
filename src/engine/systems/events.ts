@@ -20,7 +20,7 @@ function clampGoodwill(value: number): number {
 }
 
 function hallCurrentStage(hall: GameState['halls'][number]): StageId | null {
-  return hall.stageActive ? STAGES[hall.stageIndex] ?? null : null;
+  return hall.stageActive && !hall.terminated && !hall.delivered ? STAGES[hall.stageIndex] ?? null : null;
 }
 
 // ---------------------------------------------------------------------------
@@ -54,7 +54,7 @@ function evalAtom(state: GameState, atom: string): boolean {
     case 'noHallDelivered':
       return !state.halls.some((h) => h.delivered);
     case 'constructionActive':
-      return state.halls.some((h) => h.stageActive);
+      return state.halls.some((h) => h.stageActive && !h.terminated && !h.delivered);
     case 'docketOpen':
       return state.docket.status === 'open';
     case 'docketApproved':
