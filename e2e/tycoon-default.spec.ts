@@ -11,7 +11,7 @@ for(const width of [1440,1280])test(`fresh player builds, waits and sells at des
  for(let month=0;month<35;month++){
   if(!await page.getByTestId('tycoon-game').count())break;
   const slider=page.getByTestId('event-scale');if(await slider.count()){await slider.fill('0');await page.getByTestId('event-choice-commit').click();}
-  if(await page.getByTestId('simple-sell').count()){await page.getByTestId('simple-sell').click();await page.getByTestId('commit-takeout').click();break;}
+  if(await page.getByTestId('simple-sell').count()){await expect(page.getByTestId('simple-feedback')).toContainText('Campus ready to sell');await page.screenshot({path:`/tmp/tycoon-${width}-ready-sale.png`});await page.getByTestId('simple-sell').click();await page.getByTestId('commit-takeout').click();break;}
   const cure=page.getByRole('button',{name:'Unfreeze building funds · 2 points',exact:true});if(await cure.count()&&await cure.isEnabled())await cure.click();
   for(const id of (width===1440?['road','substation','siteOffice','H1']:['road','siteOffice','H1','substation'])){
    const direct=page.locator(`[data-map-control="${id}"] button`);
