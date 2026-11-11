@@ -43,3 +43,9 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - In-progress stages now fade a blueprint into solid material instead of hiding all the frame until the reveal reaches it. Base and new-stage geometry remain aligned.
 - Starter event previews use action/trust wording and a clear Confirm choice button.
 - Validation: all 678 unit tests passed; 158 browser tests passed across four shards with the detailed review timeout and one shell-interrupted whale journey rerun separately (26.5s and 23.9s). Both default desktop full journeys and an accept-all early-offer route pass. Built-image decode, lint/build and diff checks pass. Actual offer and month-4 pixels inspected.
+
+## November 10 evening: failure and paused-work pass
+- Real-click no-build campaign reaches cash failure and restarts successfully. Its result now distinguishes cash for bills from unused construction commitments and names the missing foundation, rather than printing Game over: default.
+- Deadline-loss warning selection keeps the termination cause, not a later unrelated conversion warning.
+- An active order no longer implies progress: lender freeze, inspection failure and one-month stand-down have separate explanations. Active build orders are removed from the simple panel so the actual inspection repair is visible without scrolling.
+- Both desktop full journeys, no-build loss, deadline-loss fixture, repair fixture, starter choices, monthly receipt and detailed terminal-loss checks passed. Unit suite 682 passed; lint/build, built decode and diff checks passed. Inspected actual cash-loss, deadline-loss and repair pixels.
