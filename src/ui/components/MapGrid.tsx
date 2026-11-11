@@ -1,4 +1,5 @@
 import {unfundedWork} from '../board/constructionFunds';
+import {CampusGrounds} from '../board/CampusGrounds';
 import {CampusCompound} from '../board/CampusCompound';
 import {CampusLife} from '../board/CampusLife';
 import {TycoonObjectPanel} from '../board/TycoonObjectPanel';
@@ -292,7 +293,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
         background: `url("${siteTerrain(siteTheme).image}") center / 100% 100%, linear-gradient(#eadbbccc, #e0ca9acc), ${siteTheme.ground}`,
       }}
     >
-      {simple&&<CampusCompound night={night}/>}
+      {simple&&<><CampusGrounds night={night}/><CampusCompound night={night}/></>}
       <CampusLife night={night}/>
       {!simple && <BoardLegend />}
       <div {...selectableCellProps(boardPopover === 'people', () => openObject('people', null))}
