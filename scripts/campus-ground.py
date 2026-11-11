@@ -34,6 +34,11 @@ for i,(x,y) in enumerate(locations):
  species=i%4
  height=32+(i*7)%15
  spread=16+(i*3)%7
+ # Compensate the wide desktop map camera so crowns retain a vertical profile.
+ # The first trees stay shorter to leave the public road clear.
+ crown_scale=1.2 if y<160 else 1.5
+ if y==776:y=816;crown_scale=1.3
+ parts.append(f'<g data-tree="{i}" transform="translate({x} {y}) scale(1 {crown_scale}) translate({-x} {-y})">')
  # Quiet planting beds, trunk, ground shadow and a smaller companion shrub.
  parts.append(f'<ellipse cx="{x+4}" cy="{y+3}" rx="{spread+12}" ry="13" fill="#75815d" opacity=".3"/><ellipse cx="{x+15}" cy="{y+9}" rx="{spread+7}" ry="10" fill="#284b3b" opacity=".22" filter="url(#blur)"/><path d="M{x} {y}v-{height}" stroke="#726e4d" stroke-width="3.2"/>')
  if species==0:
@@ -56,6 +61,7 @@ for i,(x,y) in enumerate(locations):
    parts.append(f'<circle cx="{x+dx}" cy="{y+dy}" r="{r}" fill="{c}"/>')
  for dx,dy,r in [(-19,2,7),(15,-1,6),(23,4,4)]:
   parts.append(f'<ellipse cx="{x+dx+3}" cy="{y+dy+2}" rx="{r+2}" ry="3" fill="#284b3b" opacity=".2"/><ellipse cx="{x+dx}" cy="{y+dy-2}" rx="{r}" ry="{r*.65}" fill="{["#829566","#687f55","#a0aa74"][i%3]}"/>')
+ parts.append('</g>')
 parts.append('</g>')
 # Whole ground texture stays low contrast so interface remains quiet.
 parts.append('<path fill="#9ca088" opacity=".08" filter="url(#grain)" d="M0 0h1200v800H0z"/><path d="M68 110V752H1133V110" fill="none" stroke="#c6ccaf" stroke-opacity=".65" stroke-dasharray="3 4"/></svg>')
