@@ -1,3 +1,4 @@
+import {unfundedWork} from './constructionFunds';
 import {checkAction,useStore} from '../store';
 import {simpleRows,simpleActionName,simpleActionCost} from './simpleWords';
 
@@ -9,7 +10,7 @@ export function TycoonMapControl({objectId}:{objectId:string}){
  const available=rows.filter(r=>checkAction(state,content,plan,r.action).ok);
  // Keep spatial alternatives explicit: the first available plot is named on the button.
  const direct=objectId==='road'?available.find(r=>r.action.actionId==='optionSite'):hall?available.find(r=>['advanceHall','fixInspection','mitigateWetlands'].includes(r.action.actionId)):undefined;
- const paused=!!hall?.stageActive&&(!!draft.flags.drawFreeze||!!draft.flags[`inspectionFail:${hall.id}`]||!!hall.pausedThisMonth);
+ const paused=!!hall?.stageActive&&(!!draft.flags.drawFreeze||!!draft.flags[`inspectionFail:${hall.id}`]||!!hall.pausedThisMonth||unfundedWork(draft,content,hall)!==null);
  const title=direct?simpleActionName(direct.action,draft):objectId==='siteOffice'?'Permits':objectId==='substation'?'Power':hall?hall.delivered?'Open for rent':paused?'Inspect paused work':hall.stageActive?'Inspect building work':!draft.flags.siteOptioned&&!draft.flags.siteOptionedAtStart?'Buy land first':'Build options':objectId==='pond'?'Water permits':undefined;
  if(!title)return null;
  return <div data-map-control={objectId} style={{position:'absolute',left:'50%',bottom:objectId==='road'?'0':hall?'10%':'8%',transform:'translateX(-50%)',zIndex:8,width:hall?'min(92%,240px)':'auto',maxWidth:'95%',textAlign:'center'}}>

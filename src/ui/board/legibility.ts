@@ -1,3 +1,4 @@
+import {unfundedWork} from './constructionFunds';
 import type { Content } from '../../content/schemas';
 import { resolveContent } from '../../engine/resolve';
 import { resolveSite } from '../../content/sites';
@@ -90,6 +91,7 @@ export function hallCaption(state: GameState, content: Content, hall: Hall): str
   if (state.flags[`inspectionFail:${hall.id}`]) return 'Stopped - failed inspection';
   if (hall.stageActive && state.flags.drawFreeze) return 'Paused - lender draw freeze';
   if (hall.stageActive && hall.pausedThisMonth) return 'Paused this month';
+  if (unfundedWork(state,content,hall)!==null) return 'Paused - not enough building funds';
   if (hall.stageActive) {
     const current = hall.stageIndex >= 0 ? STAGES[hall.stageIndex] : undefined;
     return current === 'rfs' ? 'Commissioning - testing' : `${STAGE_WORDS[current ?? 'pad'] ?? 'Pad'} - building`;

@@ -1,3 +1,4 @@
+import {unfundedWork} from './constructionFunds';
 import steelYard from '../../assets/campus/yard-steel.svg';
 import panelYard from '../../assets/campus/yard-panels.svg';
 import crane from '../../assets/campus/vehicle-crane.svg';
@@ -14,13 +15,14 @@ import {formatDollars} from '../../engine/format';
 
 /** A picture of components included in the hall build, never extra grid capacity. */
 export function CampusCompound({night}:{night:boolean}){
+ const content=useStore(s=>s.content);
  const draft=useStore(s=>s.draft),plan=useStore(s=>s.plan),reduced=usePrefersReducedMotion();
  const land=!!draft.flags.siteOptioned||!!draft.flags.siteOptionedAtStart;
  const started=draft.halls.some(h=>h.stageIndex>=0),fitted=draft.halls.some(h=>h.stageIndex>=3),opened=draft.halls.some(h=>h.delivered);
  const stage=Math.max(-1,...draft.halls.filter(h=>!h.terminated).map(h=>h.stageIndex));
  const materialArt=stage>=2?panelYard:stage>=1?steelYard:yard;
  const workArt=stage>=2?truck:stage>=1?crane:excavator;
- const working=!draft.flags.drawFreeze&&draft.halls.some(h=>h.stageActive&&!h.delivered&&!h.terminated&&!h.pausedThisMonth&&!draft.flags[`inspectionFail:${h.id}`]);
+ const working=!draft.flags.drawFreeze&&draft.halls.some(h=>h.stageActive&&!h.delivered&&!h.terminated&&!h.pausedThisMonth&&!draft.flags[`inspectionFail:${h.id}`]&&unfundedWork(draft,content,h)===null);
  const last=plan.at(-1),previous=useRef(0),cash=useRef(draft.cash),[receipt,setReceipt]=useState<{label:string;cash:number;id:number}|null>(null);
  useEffect(()=>{
   if(plan.length>previous.current&&last){setReceipt({label:simpleActionName(last,draft)||'Order placed',cash:Math.max(0,cash.current-draft.cash),id:Date.now()});}

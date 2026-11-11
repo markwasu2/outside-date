@@ -1,3 +1,5 @@
+import {unfundedWork} from './constructionFunds';
+import {formatDollars} from '../../engine/format';
 import type {Content} from '../../content/schemas';
 import {hallBlocker} from './legibility';
 import {canConnectOnNextTick} from './powerWords';
@@ -9,6 +11,8 @@ export function turnFeedback(state:GameState,hadReview:boolean,content:Content):
  if(state.flags.drawFreeze)return {heading:'Construction funding is paused.',body:'Clear the lender paperwork before waiting for more building progress.'};
  if(active.some(h=>state.flags[`inspectionFail:${h.id}`]))return {heading:'A failed inspection stopped work.',body:'Inspect the building and repair the failed inspection. Waiting alone will not fix it.'};
  if(active.length&&active.every(h=>h.pausedThisMonth))return {heading:'Crews are stood down this month.',body:'This month adds no construction progress. Advance time to finish the pause.'};
+ const unfunded=active.map(h=>unfundedWork(state,content,h)).find((amount):amount is number=>amount!==null);
+ if(unfunded)return {heading:'Building funds are short.',body:`The next work needs ${formatDollars(unfunded)}. Inspect Money for funding and its arrival date. Check funding and scheduled arrivals before advancing; your existing build order stays in place.`};
  if(active.length)return {heading:hadReview?'No orders placed this month.':'Crews have an active order.',body:'Crews are working. No repeat build order needed. Inspect other options, or advance the month to let work continue.'};
  if(!state.flags.siteOptioned&&!state.flags.siteOptionedAtStart)return {heading:'Buy land to start.',body:'Each order uses points. Advance the month to let work finish.'};
  const permitBlocked=state.halls.map(h=>({hall:h,match:hallBlocker(state,content,h)?.match(/^waiting on (\w+) permit$/)})).find(x=>x.match);

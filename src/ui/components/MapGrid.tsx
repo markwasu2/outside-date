@@ -1,3 +1,4 @@
+import {unfundedWork} from '../board/constructionFunds';
 import {CampusCompound} from '../board/CampusCompound';
 import {CampusLife} from '../board/CampusLife';
 import {TycoonObjectPanel} from '../board/TycoonObjectPanel';
@@ -212,6 +213,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
       setPopoverPos(null);
       return;
     }
+    if(simple&&boardPopover==='finance'){setPopoverPos({left:18,top:12});return;}
     const el = cellRefs.current.get(boardPopover);
     const container = containerRef.current;
     if (!el || !container) {
@@ -233,7 +235,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
     const observer = new ResizeObserver(place);
     observer.observe(container);
     return () => observer.disconnect();
-  }, [boardPopover]);
+  }, [boardPopover,simple]);
 
   const [cueExpanded,setCueExpanded] = useState(false);
   useEffect(()=>setCueExpanded(false),[cue?.title, boardPopover]);
@@ -387,7 +389,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
           const extraFitout = draft.flags[`extraFitoutMonths:${hall.id}`];
           if (typeof extraFitout === 'number') hallMins[3] = (hallMins[3] ?? 1) + extraFitout;
           const visual = hallVisual(hall, hallMins);
-          if (hall.stageActive && draft.flags.drawFreeze) visual.flags.paused = true;
+          if (hall.stageActive && (draft.flags.drawFreeze || unfundedWork(draft,content,hall)!==null)) visual.flags.paused = true;
           const blocked = !hall.delivered && !hall.terminated && (!!hallBlocker(draft, content, hall) || visual.flags.paused || !!draft.flags[`inspectionFail:${hall.id}`]);
           const late = !hall.delivered && !hall.terminated && draft.month > hall.outsideMonth;
           const failedInspection = !!draft.flags[`inspectionFail:${hall.id}`];

@@ -134,3 +134,9 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Replaced the repeated round-tree border with four original silhouettes: layered spruce, branching broadleaf, pale-trunk open crown and a low spreading oak. Added small planting beds, companion shrubs and ground shadows.
 - All planting stays outside the circulation loop and construction boundary, leaving build space, road access, office/power labels and controls clear. No gameplay changes.
 - Inspected foundation-to-sale desktop journeys, full day/night map pixels and the built app. Both full journeys, art asset/bounds and six-hall checks, lint/build, built SVG decoding and deterministic regeneration pass.
+
+## Exhausted construction funds replay
+- Reproduced with an existing foundation order and exhausted committed debt/equity: after an actual month advance the stage stayed at 0% but the footer still said crews were working.
+- Reused the engine's exact construction increment and charge for read-only current-funds feedback, including half-work labor months, far pads, fit-out extensions, final partial increments and shared funds across multiple halls. Construction economics and tick behavior are unchanged.
+- Unfunded halls now show paused work, stop moving crews/vehicles, name the required charge and keep the existing order. The building explanation opens Money. Scheduled arrivals remain separate from cash already available.
+- Verified the real-click exhausted-budget route, both default desktop journeys, 176 browser regressions, 705 unit tests, lint/build and built ground-image decoding. Inspected map, explanation, Money and built-app pixels.
