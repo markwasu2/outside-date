@@ -46,9 +46,20 @@ export function CampusCompound({night}:{night:boolean}){
    </g>}
    {fitted&&<g data-testid="campus-landscape" style={{filter:night?'brightness(.6) saturate(.8)':undefined}}>
     <defs><linearGradient id="court-turf" x2=".6" y2="1"><stop stopColor="#6b9864"/><stop offset="1" stopColor="#476d53"/></linearGradient></defs>
-    <path d="M135 590H1024M733 649V208H1024" stroke="#c6c6b4" strokeWidth="49" fill="none"/>
-    <path d="M135 590H1024M733 649V208H1024" stroke="#657476" strokeWidth="40" fill="none"/>
-    <path d="M135 590H1024M733 649V208H1024" stroke="#d4d8bd" strokeWidth="1.2" strokeDasharray="11 16" fill="none"/>
+    <g data-testid="service-road-surface">
+     <defs>
+      <linearGradient id="service-asphalt" x2=".25" y2="1"><stop stopColor="#75817b"/><stop offset=".55" stopColor="#606f6c"/><stop offset="1" stopColor="#4d625e"/></linearGradient>
+      <pattern id="asphalt-aggregate" width="29" height="23" patternUnits="userSpaceOnUse"><path d="M3 5h2m12 13h3m6-14h1" stroke="#c2c7b0" strokeWidth=".9" opacity=".24"/><path d="M8 16h2m13-5h3" stroke="#304e49" strokeWidth="1" opacity=".24"/></pattern>
+     </defs>
+     {/* Existing circulation only: layered curb, asphalt aggregate and faded wheel lanes. */}
+     <path d="M135 593H1027M736 652V211H1024" stroke="#3d594c" strokeWidth="53" opacity=".2" fill="none"/>
+     <path d="M135 590H1024M733 649V208H1024" stroke="#b3baa7" strokeWidth="49" fill="none"/>
+     <path d="M135 588H1024M731 649V206H1024" stroke="#e1dfc7" strokeWidth="45" fill="none"/>
+     <path d="M135 590H1024M733 649V208H1024" stroke="url(#service-asphalt)" strokeWidth="40" fill="none"/>
+     <path d="M135 590H1024M733 649V208H1024" stroke="url(#asphalt-aggregate)" strokeWidth="38" fill="none"/>
+     <path d="M216 580H698M771 580H1007M216 600H698M771 600H1007M723 554V244M743 554V244M771 198H1007M771 218H1007" stroke="#a0ac9a" strokeWidth="4" opacity=".12" fill="none"/>
+     <path d="M135 590H1024M733 649V208H1024" stroke="#d4d8bd" strokeWidth="1.2" strokeDasharray="11 16" fill="none"/>
+    </g>
     <g data-testid="campus-entry">
      <path d="M177 548l31 -9 27 16 -31 11z" fill="#29443b" opacity=".25"/>
      <path d="M181 524l24 -8 21 12v25l-24 8 -21 -12z" fill="#b2b9a3"/>
