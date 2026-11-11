@@ -1,3 +1,4 @@
+import {CashWarning} from './CashWarning';
 import {constructionWorking} from './constructionFunds';
 import {turnFeedback} from './turnFeedback';
 import {MonthlyReceipt} from './MonthlyReceipt';
@@ -56,6 +57,7 @@ export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
   <nav data-testid="milestone-trail" aria-label="Campus milestones" style={{display:'flex',alignItems:'center',gap:6,padding:'6px 18px',background:'#f6f8ed',borderBottom:'1px solid #c7d2b4',fontSize:11}}><strong style={{marginRight:8,color:'#4c6a45'}}>{complete}/{milestones.length} ready</strong>{milestones.map(m=><button key={m.id} data-milestone={m.id} data-complete={m.done} title={m.done?`${m.label} complete`:`Inspect ${m.label.toLowerCase()}`} onClick={()=>open(m.target)} style={{border:`1px solid ${m.done?'#a7c494':'#d2d5c2'}`,borderRadius:20,padding:'4px 12px',background:m.done?'#deecd1':'#fffdf3',color:m.done?'#365d3f':'#85856c',fontSize:11}}>{m.done?'✓':'○'} {m.label}</button>)}<span style={{marginLeft:'auto',color:'#7b836a'}}>Click any step to inspect</span></nav>
   {review&&draft.phase!=='awaitingChoice'&&<MonthlyReceipt review={review} content={content} onOpen={()=>setHistory(!history)}/>}
   {freeze&&<div data-testid="simple-freeze" style={{background:'#f8dfc0',padding:'8px 18px',display:'flex',gap:16,alignItems:'center'}}><strong>Building paused: {draft.flags.outOfBalance?'loan funding gap':'lender paperwork'}</strong><span>{draft.flags.outOfBalance?'The lender needs enough committed funding to cover the remaining build.':'Fix it to restart construction funding.'}</span>{draft.flags.outOfBalance?<button style={button} onClick={()=>{open(null);setFinance(true);}}>Review funding in Money</button>:<button style={button} onClick={()=>queue({actionId:'cureDraw'})}>Unfreeze building funds · 2 points</button>}</div>}
+  <CashWarning state={draft} content={content} onReview={()=>{open(null);setHistory(false);setFinance(true);}}/>
   <div style={{flex:1,minHeight:0,position:'relative'}}>
    <MapGrid simple night={night}/>
    {finance&&<TycoonObjectPanel objectId="finance" left={18} top={12} onClose={()=>setFinance(false)}/>}
