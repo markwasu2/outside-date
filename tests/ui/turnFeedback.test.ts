@@ -12,3 +12,25 @@ describe('live turn feedback',()=>{
  it('a funding freeze never claims crews are working',()=>{const s=fresh();s.halls[0]!.stageActive=true;s.flags.drawFreeze=true;expect(turnFeedback(s,true,content).attention).toBe(true);expect(turnFeedback(s,true,content).heading).toContain('paused');expect(turnFeedback(s,true,content).body).not.toContain('Crews are working');});
  it('distinguishes one-month stand down from ordinary active orders',()=>{const s=fresh();s.halls[0]!.stageActive=true;s.halls[0]!.pausedThisMonth=true;expect(turnFeedback(s,false,content).attention).toBe(true);expect(turnFeedback(s,false,content).heading).toContain('stood down');s.halls[0]!.pausedThisMonth=false;expect(turnFeedback(s,false,content).attention).not.toBe(true);expect(turnFeedback(s,false,content).body).toContain('No repeat build order');});
 });
+
+it('distinguishes booked equipment, its unpaid due balance and automatic connection work',()=>{
+ const s=fresh();s.flags.siteOptioned=true;s.halls[0]!.stageIndex=4;s.power.studyStatus='pending';s.power.studyDoneMonth=9;
+ s.power.orders=[{kind:'switchgear',supplier:'standard',orderedMonth:0,arrivalMonth:12,price:100,deposit:25,arrived:false}];
+ const text=turnFeedback(s,false,content).body;expect(text).toContain('Study due month 10');expect(text).toContain('Electrical equipment due month 13');expect(text).toContain('scheduled work');expect(text).not.toContain('order missing');
+ s.month=12;expect(turnFeedback(s,false,content).body).toContain('inspect Money if its balance cannot be paid');
+ s.power.substationStatus='building';s.power.substationDoneMonth=15;expect(turnFeedback(s,false,content).body).toContain('due month 16');expect(turnFeedback(s,false,content).body).toContain('no separate build order');
+});
+it('does not call a missing required transformer a booked wait',()=>{
+ const s=fresh();s.flags.siteOptioned=true;s.halls[0]!.stageIndex=4;s.skipTransformerOrder=false;s.power.studyStatus='done';s.power.orders=[{kind:'switchgear',supplier:'standard',orderedMonth:0,arrivalMonth:12,price:100,deposit:25,arrived:false}];expect(turnFeedback(s,false,content).body).toContain('order a transformer');
+ s.power.orders.push({...s.power.orders[0]!,kind:'transformer',arrived:true});expect(turnFeedback(s,false,content).body).toContain('scheduled work');
+});
+it('uses the live delayed plant date and distinguishes an exhausted capacity plan',()=>{
+ const s=createGame(content,'whale',DEFAULT_SETUP,DEFAULT_NEGOTIATION,1);s.flags.siteOptioned=true;s.halls.forEach(h=>h.stageIndex=4);s.permitsRequired.forEach(id=>s.permits[id].status='granted');s.power.substationStatus='done';s.power.interimGridMW=0;s.power.plants[0]!.plannedOnlineMonth=20;s.power.plants[0]!.onlineMonth=25;s.power.plants[0]!.slipped=true;expect(turnFeedback(s,false,content).body).toContain('Plant A is scheduled for month 26');expect(turnFeedback(s,false,content).body).toContain('dates can slip');s.month=30;s.power.plants.forEach(p=>p.onlineMonth=25);s.halls.forEach((h,i)=>{h.energized=i<3;});s.power.interimGridMW=0;s.setup.cooling='dry';s.power.plants.forEach(p=>p.mwGrid=0);expect(turnFeedback(s,false,content).body).toContain('waiting will not close this gap');
+});
+it('names automatic start only when all required equipment arrived and does not include a waived transformer',()=>{
+ const s=fresh();s.flags.siteOptioned=true;s.halls[0]!.stageIndex=4;s.power.studyStatus='done';s.power.orders=[{kind:'switchgear',supplier:'standard',orderedMonth:0,arrivalMonth:12,price:100,deposit:25,arrived:true}];expect(turnFeedback(s,false,content).body).toContain('Study and equipment are ready');expect(turnFeedback(s,false,content).body).not.toContain('transformer');
+ s.power.studyStatus='pending';s.power.studyDoneMonth=null;expect(turnFeedback(s,false,content).body).toContain('Study underway');
+});
+it('unapproved capacity points to approval, never an invented plant date',()=>{
+ const s=createGame(content,'whale',DEFAULT_SETUP,DEFAULT_NEGOTIATION,1);s.flags.siteOptioned=true;s.halls.forEach(h=>h.stageIndex=4);s.permitsRequired.forEach(id=>s.permits[id].status='granted');s.power.substationStatus='done';s.power.interimGridMW=0;expect(turnFeedback(s,false,content).body).toContain('Inspect Permits for power approval');expect(turnFeedback(s,false,content).body).not.toContain('scheduled for month');
+});

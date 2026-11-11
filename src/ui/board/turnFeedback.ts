@@ -2,7 +2,7 @@ import {unfundedWork} from './constructionFunds';
 import {formatDollars} from '../../engine/format';
 import type {Content} from '../../content/schemas';
 import {hallBlocker} from './legibility';
-import {canConnectOnNextTick} from './powerWords';
+import {canConnectOnNextTick,noMorePowerScheduled} from './powerWords';
 import type {GameState} from '../../engine/types';
 
 /** The footer describes the live position, including resumed and paused orders. */
@@ -21,6 +21,23 @@ export function turnFeedback(state:GameState,hadReview:boolean,content:Content):
  const liquidBlocked=state.halls.find(h=>hallBlocker(state,content,h)==='waiting on liquid cooling');
  if(liquidBlocked)return {attention:true,heading:'Final testing needs liquid cooling.',body:'Install liquid cooling from the building before starting final testing. Inspect the building for its cost and required points. Waiting alone will not install it.'};
  const powerBlocked=state.halls.find(h=>hallBlocker(state,content,h)==='waiting on power hookup');
- if(powerBlocked)return {heading:'Final testing needs power.',body:canConnectOnNextTick(state,content,powerBlocked.id)?'Capacity is ready. Advance the month for the automatic hookup, then start final testing.':'Inspect the building for its power link, or inspect the power connection. Waiting alone will not order missing equipment or start a study.'};
+ if(powerBlocked)return {heading:'Final testing needs power.',body:powerWaitFeedback(state,content,powerBlocked.id)};
  return {heading:hadReview?'No orders placed this month.':state.halls.some(h=>h.stageIndex>=0)?'Building work needs its next order.':'Land is ready for work.',body:'Inspect the building for its next build order. Power and permit reviews advance separately; they do not start building work.'};
+}
+
+/** Booked clocks are different from work the player has not ordered. */
+export function powerWaitFeedback(state:GameState,content:Content,hallId:string):string{
+ if(canConnectOnNextTick(state,content,hallId))return 'Capacity is ready. Advance the month for the automatic hookup, then start final testing.';
+ const p=state.power;
+ if(p.substationStatus==='done'){
+  if(noMorePowerScheduled(state))return 'All scheduled power sources are online, but this hall still lacks capacity. Inspect Power plants for the capacity limit; waiting will not close this gap.';
+  const source=p.plants.filter(plant=>plant.onlineMonth===null||plant.onlineMonth>state.month).map(plant=>({id:plant.id,month:plant.onlineMonth??plant.plannedOnlineMonth})).filter(plant=>plant.month!==null).sort((a,b)=>a.month!-b.month!)[0];
+  return source?`The connection is energized; this hall is waiting for plant capacity. Plant ${source.id} is scheduled for month ${source.month!+1}; plant dates can slip. Advance time to run the booked work. Hookup is automatic once enough capacity is available.`:'The connection is energized, but more plant capacity is needed. Inspect Permits for power approval and Power plants for their live schedule.';
+ }
+ if(p.substationStatus==='building')return `The power connection is building automatically${p.substationDoneMonth!==null?'; due month '+(p.substationDoneMonth+1):''}. Advance time to run this work; no separate build order needed.`;
+ const kinds=state.skipTransformerOrder?['switchgear'] as const:['transformer','switchgear'] as const;
+ const missing=kinds.filter(kind=>!p.orders.some(o=>o.kind===kind));
+ if(p.studyStatus==='none'||missing.length)return 'Inspect the power connection to '+[...(p.studyStatus==='none'?['start the study']:[]),...missing.map(kind=>`order ${kind==='switchgear'?'electrical equipment':'a transformer'}`)].join(' and ')+'. Waiting alone will not order missing equipment or start a study.';
+ const clocks=[...(p.studyStatus==='pending'?[p.studyDoneMonth!==null?`Study due month ${p.studyDoneMonth+1}`:'Study underway']:[]),...kinds.flatMap(kind=>{const orders=p.orders.filter(o=>o.kind===kind);if(orders.some(o=>o.arrived))return [];const due=Math.min(...orders.map(o=>o.arrivalMonth));return [`${kind==='switchgear'?'Electrical equipment':'Transformer'} ${due<=state.month?'due now; inspect Money if its balance cannot be paid':'due month '+(due+1)}`];})];
+ return clocks.length?`${clocks.join('. ')}. Advance time to run this scheduled work. The connection builds automatically once the study and required equipment are ready.`:'Study and equipment are ready. Advance the month to start the automatic power connection; no separate build order needed.';
 }
