@@ -1,3 +1,4 @@
+import {ResultCampus} from './ResultCampus';
 import {useState} from 'react';
 import {useStore} from '../store';
 import {ReportCardScreen,equityMultipleLabel} from './ReportCardScreen';
@@ -5,12 +6,14 @@ import {formatDollars} from '../../engine/format';
 import {plainWords,buildingFunds} from '../board/simpleWords';
 
 export function SimpleResult(){
+ const content=useStore(s=>s.content);
  const state=useStore(s=>s.draft),setScreen=useStore(s=>s.setScreen);
  const [details,setDetails]=useState(false);
  if(details)return <><div style={{padding:12,background:'#fffdf4',borderBottom:'1px solid #d7ddc8'}}><button onClick={()=>setDetails(false)} style={{padding:'8px 14px'}}>Back to summary</button></div><ReportCardScreen/></>;
  const t=state.takeout,won=state.outcome?.kind==='win';
  const reason=state.outcome?.kind==='lose'?({default:'Cash ran out before the campus was ready.',allTerminated:'The tenant left because the building missed its final deadline.',docketDead:'Power approval failed.',equityWiped:'The sale did not cover the loans.'}[state.outcome.reason]??'The project could not finish.'):'';
- return <main data-testid="simple-result" style={{minHeight:'100vh',boxSizing:'border-box',display:'grid',placeItems:'center',padding:32,background:'#e9eddb',color:'#35442e',fontFamily:'system-ui,sans-serif'}}><section style={{width:580,maxWidth:'100%',padding:32,boxSizing:'border-box',background:'#fffdf4',border:'1px solid #b4bb98',borderRadius:14,boxShadow:'0 15px 40px #33442e15'}}>
+ return <main data-testid="simple-result" style={{minHeight:'100vh',boxSizing:'border-box',display:'grid',placeItems:'center',padding:32,background:'#e9eddb',color:'#35442e',fontFamily:'system-ui,sans-serif'}}><section style={{width:940,maxWidth:'100%',padding:24,boxSizing:'border-box',background:'#fffdf4',border:'1px solid #b4bb98',borderRadius:14,boxShadow:'0 15px 40px #33442e15'}}>
+  <div style={{display:'grid',gridTemplateColumns:'minmax(260px, .8fr) minmax(0, 1.2fr)',gap:28}}><ResultCampus state={state} content={content}/><div>
   <div style={{fontSize:13,color:'#687b59'}}>OUTSIDE DATE · MONTH {state.month+1}</div>
   <h1 style={{fontFamily:'Georgia,serif',fontSize:34}}>{won?'Campus sold': 'Project ended'}</h1>
   <p style={{fontSize:18}}>{state.halls.filter(h=>h.delivered).length}/{state.halls.length} data centers opened.</p>
@@ -26,5 +29,5 @@ export function SimpleResult(){
    {state.log.filter(e=>e.kind==='warning').filter(e=>state.outcome?.kind==='lose'&&state.outcome.reason==='allTerminated'?e.text.includes('terminated'):state.outcome?.kind==='lose'&&state.outcome.reason==='docketDead'?/docket.*(dead|fail)|vote.*fail/i.test(e.text):!e.text.includes('Game over')).slice(-1).map((e,i)=><p key={i} style={{color:'#735a43'}}>Last warning: {plainWords(e.text)}</p>)}
   </section>}
   <div style={{display:'flex',gap:12,marginTop:24}}><button onClick={()=>setScreen('start')} style={{padding:'12px 22px',background:'#365c45',border:0,borderRadius:6,color:'#fff',fontWeight:700}}>Play again</button><button onClick={()=>setDetails(true)} style={{padding:'12px 18px'}}>Full report</button></div>
- </section></main>;
+ </div></div></section></main>;
 }
