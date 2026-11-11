@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 import fs from 'node:fs';
 test.use({storageState:{cookies:[],origins:[]}});
 for(const width of [1280])test(`generous event choices and repeated optional visits still complete at desktop ${width}`,async({page})=>{
- test.setTimeout(65000);await page.setViewportSize({width,height:width===1280?720:900});const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));const trace:string[]=[];
+ test.setTimeout(65000);await page.setViewportSize({width,height:width===1280?720:900});const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));const trace:string[]=[];let visits=0;
  await page.goto('/');await expect(page.getByTestId('simple-start')).toContainText('Build a data center.');await page.screenshot({path:`/tmp/generous-audit-${width}-title.png`});
  await page.getByTestId('start-first-campus').click();await expect(page.getByTestId('tycoon-game')).toBeVisible();
  await expect(page.getByTestId('simple-goal')).toContainText('0/1');await expect(page.getByTestId('action-desk')).toHaveCount(0);await expect(page.getByTestId('cold-intro')).toHaveCount(0);await expect(page.getByTestId('month-review')).toHaveCount(0);
@@ -27,12 +27,12 @@ for(const width of [1280])test(`generous event choices and repeated optional vis
    }
    await panel.getByRole('button',{name:'Close',exact:true}).click();
   }
-  const explore=page.getByTestId('explore-contacts');if(await explore.count()){await explore.click();const panel=page.getByTestId('simple-object-panel'),choices=panel.getByTestId('simple-do-action');for(let i=0;i<await choices.count();i++){const choice=choices.nth(i);if(await choice.isEnabled()&&/Meet/.test(await choice.innerText())){await choice.click();break;}}await panel.getByRole('button',{name:'Close',exact:true}).click();}
+  const explore=page.getByTestId('explore-contacts');if([2,4].includes(month))await expect(explore).toBeVisible();if(await explore.count()){await explore.click();const panel=page.getByTestId('simple-object-panel'),choices=panel.getByTestId('simple-do-action');await expect(choices.first()).toBeVisible();for(let i=0;i<await choices.count();i++){const choice=choices.nth(i);if(await choice.isEnabled()&&/Meet/.test(await choice.innerText())){trace.push('VISIT: '+await choice.innerText());visits++;await choice.click();break;}}await panel.getByRole('button',{name:'Close',exact:true}).click();}
   trace.push(await page.getByTestId('simple-feedback').innerText());fs.writeFileSync('/tmp/generous-audit-trace.txt',trace.join('\n'));
   if([1,4,10,16,19].includes(month))await page.screenshot({path:`/tmp/generous-audit-${width}-month-${month+1}.png`});
   await page.getByTestId('simple-next-month').click();
  }
  for(let i=0;i<8;i++){const next=page.getByRole('button',{name:/^(Skip|Continue)$/});if(!await next.count())break;await next.first().click();}
  await expect(page.getByRole('heading',{name:'Campus sold',exact:true})).toBeVisible();await expect(page.locator('body')).toContainText('1/1 data centers opened');await expect(page.getByTestId('result-campus')).toContainText('CAMPUS SOLD');await expect(page.getByTestId('result-hall')).toHaveAttribute('data-stage','delivered');await expect(page.getByTestId('result-power-art')).toBeVisible();await page.getByTestId('result-campus').locator('img').evaluateAll(images=>Promise.all(images.map(img=>(img as HTMLImageElement).decode())));await expect(page.getByRole('button',{name:'Play again',exact:true})).toBeInViewport();await page.screenshot({path:`/tmp/generous-audit-${width}-result.png`});
- expect(errors).toEqual([]);fs.writeFileSync('/tmp/generous-audit-trace.txt',trace.join('\n'));
+ expect(visits).toBeGreaterThanOrEqual(2);expect(errors).toEqual([]);fs.writeFileSync('/tmp/generous-audit-trace.txt',trace.join('\n'));
 });
