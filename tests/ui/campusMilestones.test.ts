@@ -30,6 +30,12 @@ describe('small tycoon milestones and choices',()=>{
  it('prioritizes unfinished live work over an ended hall without marking its milestone complete',()=>{
   const s=fresh();s.halls[0]!.terminated=true;const next={...structuredClone(s.halls[0]!),id:'H2',terminated:false};s.halls.push(next);expect(campusMilestones(s).find(m=>m.id==='foundation')).toMatchObject({done:false,target:'H2'});next.delivered=true;expect(campusMilestones(s).find(m=>m.id==='foundation')).toMatchObject({done:false,target:'H1'});
  });
+ it('simple Permits includes the required wetlands filing and folds it after filing',()=>{
+  const s=createGame(content,'first-campus',{...DEFAULT_SETUP,site:'edge5-meadow'},DEFAULT_NEGOTIATION,1);
+  expect(simpleRows('siteOffice',s,content).filter(r=>r.action.actionId==='filePermit').map(r=>r.action.params?.permitId)).toEqual(['building','wetlands']);
+  s.permits.wetlands.status='pending';expect(simpleRows('siteOffice',s,content).some(r=>r.action.params?.permitId==='wetlands')).toBe(false);
+  expect(simpleRows('siteOffice',fresh(),content).some(r=>r.action.params?.permitId==='wetlands')).toBe(false);
+ });
  it('standard quote uses the same total/deposit and market-adjusted lead as the engine',()=>{
   const state=fresh();state.markets.equipmentIndex=1.137;const t=resolveContent(state,content).tuning;
   const text=standardEquipmentWords('switchgear',state,content);expect(text).toContain(formatDollars(priceWithIndex(t.power.switchgearDeposit+t.power.switchgearBalance,1.137))+' total');expect(text).toContain(formatDollars(priceWithIndex(t.power.switchgearDeposit,1.137))+' deposit');expect(text).toContain(`${leadWithIndex(t.power.switchgearLeadMin,1.137,t.markets.leadElasticity)}-${leadWithIndex(t.power.switchgearLeadMax,1.137,t.markets.leadElasticity)} months`);
