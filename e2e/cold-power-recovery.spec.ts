@@ -37,3 +37,23 @@ test('capacity ready for the next tick gives the automatic hookup instruction in
  });
  await page.locator('[data-campus-object="H1"]').click();await expect(page.getByTestId('simple-power-blocker')).toContainText('Advance the month for the automatic hookup');await expect(page.getByTestId('inspect-power')).toHaveCount(0);await expect(page.getByTestId('simple-feedback')).toContainText('Capacity is ready.');
 });
+
+test('a player who never provides power sees the unfinished hookup in the loss and can restart',async({page})=>{
+ test.setTimeout(60000);await page.setViewportSize({width:1280,height:720});await page.goto('/');await page.getByTestId('start-first-campus').click();await page.locator('[data-map-control="road"] button').click();await page.locator('[data-map-control="siteOffice"] button').click();await page.getByRole('button',{name:'Apply for building permit',exact:true}).click();await page.getByTestId('simple-object-panel').getByRole('button',{name:'Close',exact:true}).click();
+ for(let i=0;i<16;i++){
+  const slider=page.getByTestId('event-scale');if(await slider.count()){await slider.fill('0');await page.getByTestId('event-choice-commit').click();}
+  const control=page.locator('[data-map-control="H1"] button'),label=await control.innerText();
+  if(/Test & open/.test(label))break;
+  if(/Build foundation|Build frame|Build walls|Install interiors/.test(label)&&await control.isEnabled())await control.click();
+  const panel=page.getByTestId('simple-object-panel');if(await panel.count())await panel.getByRole('button',{name:'Close',exact:true}).click();
+  await page.getByTestId('simple-next-month').click();
+ }
+
+ await expect(page.getByTestId('simple-feedback')).toContainText('Final testing needs power.');
+ for(let i=0;i<30;i++){
+  const slider=page.getByTestId('event-scale');if(await slider.count()){await slider.fill('0');await page.getByTestId('event-choice-commit').click();}
+  if(await page.getByTestId('simple-result').count())break;
+  await page.getByTestId('simple-next-month').click();
+ }
+ await expect(page.getByRole('heading',{name:'Project ended',exact:true})).toBeVisible();await expect(page.getByTestId('loss-missing-power')).toContainText('H1 reached final testing but had no power hookup at close.');await expect(page.getByTestId('simple-result')).toContainText('Cash ran out');await expect(page.getByTestId('loss-position')).not.toContainText('No foundation was started');await page.screenshot({path:'/tmp/cold-unpowered-loss-fixed.png'});await expect(page.getByTestId('simple-result')).toContainText('0/1 data centers opened');await page.getByRole('button',{name:'Play again',exact:true}).click();await expect(page.getByTestId('start-first-campus')).toBeVisible();
+});
