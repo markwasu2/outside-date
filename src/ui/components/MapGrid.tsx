@@ -695,7 +695,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
               {planned ? <img src={online ? PLANT_ART.online : PLANT_ART.building} alt="" aria-hidden="true" draggable={false} style={{ width: '100%', aspectRatio:'1', minHeight: 0, objectFit: 'contain', pointerEvents: 'none', filter:'drop-shadow(0 4px 3px #4d3a2428)' }} />
                 : <div style={{ flex: 1, display: 'grid', placeItems: 'center', border: '1px dashed #ae9a77', color: '#776a53', fontSize: 11 }}>{draft.docket.status === 'approved' ? 'Approved' : 'Permitting'}</div>}
               {online&&<div aria-hidden="true" data-testid="plant-vapor" style={{position:'absolute',left:'55%',top:'10%',pointerEvents:'none'}}>{[0,1].map(i=><span key={i} className={reducedMotion?undefined:'site-vapor'} style={{position:'absolute',left:i*12,bottom:0,width:14,height:25,borderRadius:'50%',background:'radial-gradient(ellipse,#f4f5e8bb,transparent 70%)',filter:'blur(2px)',animationDelay:`-${i*2}s`}}/>)}</div>}
-              <div style={{ fontSize: '0.6rem', padding: 2, textAlign: 'center', background: online ? '#d6e9c9' : '#fff8e9' }}>
+              <div data-testid={`plant-caption-${p.id}`} style={{ position:'relative',zIndex:simple?4:undefined,fontSize: '0.6rem', padding: 2, textAlign: 'center', background: online ? '#d6e9c9' : '#fff8e9' }}>
                 <strong>{p.id} {online ? 'online' : planned ? p.slipped ? 'delayed' : 'building' : 'waiting'}</strong><br />
                 {online ? `${p.mwGrid} MW` : planned ? displayMonth(targetMonth ?? 0) : draft.docket.status === 'approved' ? 'starts next month' : 'needs docket'}
               </div>
