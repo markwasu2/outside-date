@@ -2,7 +2,7 @@ import type { Content } from '../../content/schemas';
 import { formatDollars, formatMonth } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
 import { dscr, runway, totalDebt } from '../../engine/selectors';
-import { STAGES, type GameState, type PlannedAction } from '../../engine/types';
+import { STAGES, type GameState, type GoodwillGroup, type PlannedAction } from '../../engine/types';
 import { STAGE_WORDS } from './legibility';
 import { nextStep, workInFlight } from './nextStep';
 
@@ -57,8 +57,9 @@ export function developments(review: MonthReview, content: Content): Development
   for (const group of ['town', 'tenant', 'commission'] as const) {
     const delta = after.goodwill[group] - before.goodwill[group];
     if (delta !== 0) {
+      const visited = review.actions.some(a=>a.actionId==='visitCast' && a.params?.group===group);
       const confirmed = group === 'tenant' && review.actions.some(a => a.actionId === 'confirmRackSchedule');
-      add(delta > 0 ? 'helped' : 'hurt', `${group[0]!.toUpperCase() + group.slice(1)} goodwill ${before.goodwill[group]} → ${after.goodwill[group]}.${confirmed ? ' Confirming the rack schedule added 3 tenant goodwill; the arrow is the net change after everything else this month.' : ' This is the net change across the month; the record does not isolate one action as its cause.'}`);
+      add(delta > 0 ? 'helped' : 'hurt', `${group[0]!.toUpperCase() + group.slice(1)} goodwill ${before.goodwill[group]} → ${after.goodwill[group]}.${confirmed ? ' Confirming the rack schedule added 3 tenant goodwill; the arrow is the net change after everything else this month.' : visited ? ' Your contact visit added up to 4 goodwill, capped at 100. The arrow includes any other changes this month.' : ' This is the net change across the month; the record does not isolate one action as its cause.'}`);
     }
   }
   if (!news.length) {
@@ -75,12 +76,34 @@ export function developments(review: MonthReview, content: Content): Development
 }
 
 export type OfficeView = 'permits' | 'money' | 'capital';
-export interface ReviewOption { title: string; text: string; target: string; officeView?: OfficeView }
+export interface ReviewOption { title: string; text: string; target: string; officeView?: OfficeView; visitGroup?: GoodwillGroup }
 export function runwayWords(months: number): string {
   if (!Number.isFinite(months)) return 'Recurring costs covered';
   if (months >= 24) return 'More than 2 years of recurring costs covered';
   if (months < 1) return 'Less than a month of runway';
   return `${months.toFixed(1)} months of runway`;
+}
+/** A concrete optional visit, not a promise that goodwill will fix a permit or deadline. */
+export function relationshipOption(state: GameState, content: Content): ReviewOption {
+  const groups: GoodwillGroup[] = ['town','commission','tenant','utility'];
+  const eligible = groups.filter(group => {
+    const last = state.flags[`visitCastLast:${group}`];
+    return state.goodwill[group] < 100 && (typeof last !== 'number' || state.month-last >= 3);
+  }).sort((a,b) => state.goodwill[a]-state.goodwill[b]);
+  const group = eligible[0];
+  if (!group) {
+    const returns = groups.map(g=>({g,last:state.flags[`visitCastLast:${g}`]})).filter(v=>typeof v.last==='number' && state.goodwill[v.g]<100).map(v=>`${v.g} ${formatMonth((v.last as number)+3)}`);
+    return {title:'Check contact availability',text:returns.length ? `Visits reopen: ${returns.join('; ')}. You can wait without spending focus.` : 'Your contacts are at maximum goodwill. No visit can add more right now.',target:'people'};
+  }
+  const value = state.goodwill[group], gain = Math.min(4,100-value);
+  const cost = content.actions.find(a=>a.id==='visitCast')?.ap ?? 2;
+  const left = state.apPerMonth-state.apUsedThisMonth;
+  return {title:`Visit ${group} contacts`,text:`${group[0]!.toUpperCase()+group.slice(1)} goodwill ${value} → ${value+gain}. ${cost} focus, $0. ${left<cost ? `Needs ${cost-left} more focus than you have. ` : ''}One visit per group every 3 months. This does not move a construction clock.`,target:'people',visitGroup:group};
+}
+export function waitOptionText(state: GameState, content: Content): string {
+  const step=nextStep(state,content);
+  if (step.progress && step.title==='End the month' && !step.why.includes('needs') && !step.why.includes('Wetlands')) return `${step.progress}. End month runs this work and pays recurring costs. No repeat instruction needed.`;
+  return step.why;
 }
 export function reviewOptions(state: GameState, content: Content): ReviewOption[] {
   const step = nextStep(state, content);
@@ -93,13 +116,13 @@ export function reviewOptions(state: GameState, content: Content): ReviewOption[
   const scheduleView: OfficeView = finished || step.actionId === 'cureDraw' || step.actionId === 'priceTakeout' ? 'money' : 'permits';
   const options: ReviewOption[] = [
     { title: step.title === 'End the month' ? 'Inspect work in progress' : step.title,
-      text: step.actionId ? `${focus} focus if you proceed. Inspect costs before committing.` : 'Check the active clocks before waiting or changing course.',
+      text: step.actionId ? `${focus} focus if you proceed. Inspect costs before committing.` : waitOptionText(state,content),
       target: step.objectId, officeView: step.objectId === 'siteOffice' ? scheduleView : undefined },
     finished || closing
       ? { title: closing ? 'Review debt before selling' : 'Review the lender test', text: `${debtText} Inspect the closing terms before ending the campaign.`, target: 'siteOffice', officeView: 'money' }
       : { title: 'Compare funding offers', text: `${runwayWords(months)}. New funding buys time, but changes the deal.`, target: 'siteOffice', officeView: 'capital' },
   ];
   if (!state.flags.rackScheduleConfirmed && state.halls.some(h => !h.delivered && !h.terminated)) options.push({ title: 'Check tenant rack dates', text: 'Free confirmation: +3 tenant goodwill. A later date swap is a separate decision.', target: 'siteOffice', officeView: 'permits' });
-  else options.push({ title: 'Meet the town or commission', text: `Goodwill: town ${state.goodwill.town} · commission ${state.goodwill.commission}. Visits use focus you could spend on building.`, target: 'people' });
+  else options.push(relationshipOption(state,content));
   return options;
 }

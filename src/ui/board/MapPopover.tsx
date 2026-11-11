@@ -52,6 +52,12 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
       clearOfficeView(null);
     }
   }, [objectId, requestedOfficeView, clearOfficeView]);
+  const requestedVisitGroup = useStore(s=>s.requestedVisitGroup);
+  const clearVisitGroup = useStore(s=>s.setVisitGroup);
+  const [visitGroup,setVisitGroup]=useState<string|null>(null);
+  useEffect(()=>{
+    if(objectId==='people' && requestedVisitGroup){setVisitGroup(requestedVisitGroup);clearVisitGroup(null);}
+  },[objectId,requestedVisitGroup,clearVisitGroup]);
   const committed = useStore((s) => s.state);
   const state = useStore((s) => s.draft);
   const [feedback, setFeedback] = useState('');
@@ -100,7 +106,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
   const title = hall ? `${hall.id} (${hall.mwIT} MW)` : (OBJECT_TITLES[objectId] ?? objectId);
   const rows = objectId === 'road' ? buildRows('land', state, content, null)
     : objectId === 'siteOffice' && officeView !== 'permits' ? buildRows(officeView, state, content, null)
-    : objectId === 'people' ? boardActionsForObject('siteOffice', state, content).filter((r) => r.action.actionId === 'visitCast' || r.action.actionId === 'meetIntervenor')
+    : objectId === 'people' ? boardActionsForObject('siteOffice', state, content).filter((r) => (r.action.actionId === 'visitCast' || r.action.actionId === 'meetIntervenor') && (!visitGroup || r.action.params?.group===visitGroup))
     : boardActionsForObject(objectId, state, content);
   // Put the decision that brought the player here above optional policy switches.
   if (objectId === 'siteOffice' && officeView === 'money') rows.sort((a,b) => {
@@ -183,6 +189,14 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
           </div>
         )}
 
+        <p style={{fontSize:11,color:'#71654f',margin:'5px 0 10px'}}>Choose an action to apply it now. Undo is in This month.</p>
+        {objectId==='people' && <div data-testid="contact-brief" style={{padding:9,background:'#eee8d7',borderRadius:6,marginBottom:10}}>
+          <strong>{visitGroup ? `${visitGroup[0]!.toUpperCase()+visitGroup.slice(1)} contacts` : 'Your contacts'}</strong>
+          {visitGroup && <p style={{margin:'5px 0'}}>A visit meets one member of this group.</p>}
+          {visitGroup && <details style={{fontSize:12,margin:'5px 0'}}><summary>Who's here</summary>{content.cast.cast.filter(m=>m.goodwillGroup===visitGroup).map(m=><div key={m.id} style={{marginTop:4}}>{m.name} · {m.role}</div>)}</details>}
+          <div>Visits add up to 4 goodwill, cost 2 focus and $0, and can repeat once per group every 3 months. They do not advance construction.</div>
+          {visitGroup && <button onClick={()=>setVisitGroup(null)} style={{marginTop:7}}>Show all contacts</button>}
+        </div>}
         {hall && hallLaborWords(state,hall) && <p data-testid="hall-labor-clock" style={{lineHeight:1.4,background:'#f3e8c9',padding:6}}>{hallLaborWords(state,hall)}</p>}
         {objectId === 'laydownYard' && (() => {
           const row = buildRows('construction', state, content, null).find((r) => r.key === 'importCrews')!;
@@ -200,7 +214,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
         {objectId === 'siteOffice' && officeView === 'money' && <div data-testid="lender-snapshot" style={{padding:'9px 10px',background:'#eee8d7',borderRadius:6,marginBottom:10,lineHeight:1.5}}>
           <strong>Debt & closing</strong><div>Outstanding debt: {formatDollars(totalDebt(state))}</div>
           <div>Income / annual debt service: {Number.isFinite(dscr(state,resolveContent(state,content))) ? `${dscr(state,resolveContent(state,content)).toFixed(2)}x` : 'No debt service'}</div>
-          <div>{state.phase === 'takeoutAvailable' ? 'Closing is available. Pricing the takeout ends this campaign.' : state.debt.converted ? 'Loan converted. Rent must season before closing.' : 'The lender tests income and debt payments each month.'}</div>
+          <div>{state.phase === 'takeoutAvailable' ? 'Closing is available. Pricing the takeout ends this campaign.' : state.debt.converted ? `Loan converted. Normal seasoning: ${typeof state.flags.conversionMonth==='number' ? formatMonth(state.flags.conversionMonth+resolveContent(state,content).tuning.takeout.seasoningMonths) : 'date pending'}. Campaign ends ${formatMonth(state.maxMonths)} if earlier.` : 'The lender tests income and debt payments each month.'}</div>
         </div>}
         {objectId === 'siteOffice' && officeView === 'permits' && <div data-testid="permit-review" style={{marginBottom:8,lineHeight:1.4}}>{permitReviewWords(state).map(words=><p key={words} style={{margin:'4px 0'}}>{words}</p>)}</div>}
         {objectId === 'pond' && <p data-testid="pond-progress" style={{lineHeight:1.4}}>{pondProgressWords(state)}</p>}

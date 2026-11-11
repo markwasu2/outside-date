@@ -44,6 +44,18 @@ test('review first: choose campus work, see its consequences, reach the close wi
    await page.getByTestId('map-popover').getByRole('button',{name:'Close',exact:true}).click();
   }
 
+  const contacts=page.getByTestId('review-option').filter({hasText:/^Visit .* contacts/});
+  if(month===5 && await contacts.count()) {
+   const before=await page.getByTestId('campus-status').innerText();
+   await contacts.click();
+   await expect(page.getByTestId('contact-brief')).toContainText('A visit meets one member');
+   const popup=page.getByTestId('map-popover');await expect(popup.getByTestId('popover-action')).toHaveCount(1);
+   expect(await page.getByTestId('campus-status').innerText()).toBe(before);
+   await page.screenshot({path:'/tmp/month-review/contacts.png'});
+   await popup.getByRole('button',{name:'Show all contacts',exact:true}).click();
+   expect(await popup.getByTestId('popover-action').count()).toBeGreaterThan(1);
+   await popup.getByRole('button',{name:'Close',exact:true}).click();
+  }
   const reviewText=await page.getByTestId('review-developments').count() ? await page.getByTestId('review-developments').innerText() : null;
   const notice=page.getByTestId('event-notice-dismiss');for(let n=0;n<5 && await notice.count();n++)await notice.first().click();
   // Inspect the actual campus, not the optional recommendation. Decide on prerequisites,
