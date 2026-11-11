@@ -89,6 +89,7 @@ export function hallCaption(state: GameState, content: Content, hall: Hall): str
   if (hall.terminated) return 'Terminated';
   if (hall.delivered) return 'Delivered';
   if (state.flags[`inspectionFail:${hall.id}`]) return 'Stopped - failed inspection';
+  if (hall.stageActive && state.flags.outOfBalance) return 'Paused - lender funding gap';
   if (hall.stageActive && state.flags.drawFreeze) return 'Paused - lender draw freeze';
   if (hall.stageActive && hall.pausedThisMonth) return 'Paused this month';
   if (unfundedWork(state,content,hall)!==null) return 'Paused - not enough building funds';
