@@ -59,4 +59,34 @@ for i,(x,y) in enumerate(locations):
 parts.append('</g>')
 # Whole ground texture stays low contrast so interface remains quiet.
 parts.append('<path fill="#9ca088" opacity=".08" filter="url(#grain)" d="M0 0h1200v800H0z"/><path d="M68 110V752H1133V110" fill="none" stroke="#c6ccaf" stroke-opacity=".65" stroke-dasharray="3 4"/></svg>')
-Path('src/assets/campus/campus-ground.svg').write_text(''.join(parts)+'\n')
+base=''.join(parts)+'\n'
+Path('src/assets/campus/campus-ground.svg').write_text(base)
+# Keep circulation and build coordinates identical. Terrain outside the access
+# loop carries the site's character; it is scenery, never buildable capacity.
+for theme in ('meadow','quarry','depot'):
+ ground=base
+ if theme=='meadow':
+  ground=ground.replace('#9fa773','#86a575').replace('#a9ad7b','#a6bd84').replace('#768d68','#60875c').replace('#d2c39d','#c4bd91').replace('#bba77e','#aaab7a')
+  detail='<g id="meadow-field-rows" fill="none" stroke-linecap="round">'
+  for y in (749,761,773,785,797):
+   detail+=f'<path d="M210 {y}H1067" stroke="#456d47" stroke-width="4" opacity=".42"/><path d="M211 {y-2}H1065" stroke="#c7d4a0" stroke-width="1.5" opacity=".65"/>'
+  for x in range(230,1060,47):
+   detail+=f'<path d="M{x} 754l-3 -6m3 6 4-5m43 23-3-6m3 6 4-5" stroke="#74935f" stroke-width="1.6"/>'
+  detail+='</g>'
+ elif theme=='quarry':
+  ground=ground.replace('#9fa773','#9f9e89').replace('#a9ad7b','#b5ad96').replace('#768d68','#858d75').replace('#d2c39d','#c4b9a3').replace('#bba77e','#a89e8b')
+  detail='<g id="quarry-rock-ledges" stroke-linejoin="round">'
+  for x,y,w in [(265,770,69),(448,776,91),(670,765,83),(872,779,74),(1129,252,30),(1138,488,32)]:
+   detail+=f'<path d="M{x-w} {y+15}l8 -24 25-15 {w} 4 20 16-8 24z" fill="#6d796e" opacity=".23"/><path d="M{x-w} {y+7}l8 -24 25-15 {w} 4 20 16-8 15z" fill="#8d9484" stroke="#747d71" stroke-width="1"/><path d="M{x-w+8} {y-17}l25 -15 {w} 4 20 16-42 -1-31 8z" fill="#bdbea6"/><path d="M{x-w+5} {y-4}l37 -5 34 3m-33 5 37-2" fill="none" stroke="#d4cfb6" stroke-width="1.5" opacity=".75"/>'
+  detail+='</g>'
+ else:
+  ground=ground.replace('#9fa773','#a3a17a').replace('#a9ad7b','#b4ae87').replace('#768d68','#7c8c6d').replace('#d2c39d','#d3c5a5').replace('#bba77e','#b8a98a')
+  detail='<g id="depot-old-siding"><path d="M209 775H1063" stroke="#515f58" stroke-width="27" opacity=".2"/><path d="M209 772H1063" stroke="#9b9d8d" stroke-width="23"/>'
+  for x in range(217,1060,13):
+   detail+=f'<path d="M{x} 760v25" stroke="#756e5a" stroke-width="4"/><path d="M{x+1} 762v21" stroke="#aaa086" stroke-width="1"/>'
+  for y in (765,779):
+   detail+=f'<path d="M209 {y+1}H1063" stroke="#555f58" stroke-width="3"/><path d="M209 {y}H1063" stroke="#bec3b0" stroke-width="1.5"/>'
+  detail+='<path d="M247 753v36m-4-36h8m-8 36h8" stroke="#826c4e" stroke-width="3"/></g>'
+ # Insert under the existing woodland, keeping its trunks and shadows in front.
+ ground=ground.replace('<g id="perimeter-woodland">',detail+'<g id="perimeter-woodland">')
+ Path('src/assets/campus/campus-ground-'+theme+'.svg').write_text(ground)
