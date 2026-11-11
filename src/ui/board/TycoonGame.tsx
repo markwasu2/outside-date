@@ -32,7 +32,7 @@ export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
  const saleMonth=draft.debt.converted&&typeof converted==='number'?Math.min(draft.maxMonths,converted+resolveContent(draft,content).tuning.takeout.seasoningMonths)+1:null;
  const alerts=warnings(draft,content);
  const freeze=!!draft.flags.drawFreeze;
- const feedback=turnFeedback(draft,!!review);
+ const feedback=turnFeedback(draft,!!review,content);
  const button={border:'1px solid #b6af95',borderRadius:6,padding:'7px 11px',background:'#fffdf4',color:'#3f4c38',cursor:'pointer'};
  return <main data-testid="tycoon-game" style={{height:'100vh',display:'flex',flexDirection:'column',background:'#f4eddb',color:'#343c2e',fontFamily:'system-ui,sans-serif'}}>
   <BoardStyles/>

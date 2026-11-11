@@ -1,3 +1,5 @@
+import {hallBlocker} from './legibility';
+import {canConnectOnNextTick,powerCapacityWords} from './powerWords';
 import {activeWorkWords} from './activeWorkWords';
 import {useEffect} from 'react';
 import {checkAction,useStore} from '../store';
@@ -21,9 +23,10 @@ export function TycoonObjectPanel({objectId,left,top,onClose}:{objectId:string;l
   {objectId==='people'&&<p style={{padding:8,background:'#eaf0de'}}>Use spare points to improve relationships, or keep cash for construction. Visits help trust, not construction speed.</p>}
   {objectId==='substation'&&<p>{draft.power.substationStatus==='done'?'Power connection ready. It connects buildings automatically when they are ready.':draft.power.substationStatus==='building'?'Connection being built. Advance the month to keep work moving.':draft.power.studyStatus==='pending'?'Power study running. Order the equipment while you wait.':'Plan the power connection before your buildings need it.'}</p>}
   {hall&&!hall.delivered&&!hall.terminated&&draft.permitsRequired.some(id=>draft.permits[id].status!=='granted')&&<div style={{padding:9,background:'#f5ecd2',borderRadius:6,marginTop:8}}>Permit reviews can block later stages. <button data-testid="inspect-permits" onClick={()=>open('siteOffice')} style={{marginTop:6,padding:'6px 10px',background:'#fffdf4',border:'1px solid #b7a67d',borderRadius:5,cursor:'pointer'}}>Inspect permits</button></div>}
+  {hall&&hallBlocker(draft,content,hall)==='waiting on power hookup'&&<div data-testid="simple-power-blocker" style={{padding:9,background:'#e9efdf',borderRadius:6,marginTop:8}}>{canConnectOnNextTick(draft,content,hall.id)?'Power capacity is ready. Advance the month for the automatic hookup, then start final testing.':<>Final testing needs power. <button data-testid="inspect-power" onClick={()=>open(draft.power.substationStatus==='done'?'powerPlants':'substation')} style={{marginTop:6,padding:'6px 10px',background:'#fffdf4',border:'1px solid #a3b194',borderRadius:5,cursor:'pointer'}}>Inspect power</button></>}</div>}
   {hall&&activeWorkWords(draft,hall)&&<p data-testid="active-work-explanation">{activeWorkWords(draft,hall)}</p>}
   {objectId==='laydownYard'&&draft.power.orders.map(o=><p key={o.kind}>{o.kind}: {o.arrived?'on site':`arrives month ${o.arrivalMonth+1}`}</p>)}
-  {objectId==='powerPlants'&&<p>{draft.docketEnabled?'Get power approval at Permits. Approved plants build automatically.':'This project uses the local grid. Finish the power connection; no separate plant is needed.'}</p>}
+  {objectId==='powerPlants'&&<><p>{draft.docketEnabled?'Get power approval at Permits. Approved plants build automatically.':'This project uses the local grid; no separate plant is needed.'}</p><p data-testid="simple-power-capacity">{plainWords(powerCapacityWords(draft,content))}</p></>}
   {rows.map(r=>{const check=checkAction(state,content,plan,r.action);return <div key={r.key} style={{padding:10,margin:'8px 0',border:'1px solid #c5c8b2',borderRadius:7,background:check.ok?'#fffef8':'#f0ede2'}}>
    <strong>{simpleActionName(r.action,draft)||r.label}</strong><div style={{color:'#496244',margin:'4px 0'}}>{simpleActionCost(r)}</div>
    <div style={{fontSize:12,color:'#625d4c'}}>{plainWords(r.action.actionId==='spotBuy'?`Arrives in ${tuning.markets.spotLeadMonths[r.action.params?.kind as 'transformer'|'switchgear']} month(s). More expensive than a standard order; still needs the power study.`:r.action.actionId==='orderSwitchgear'?standardEquipmentWords('switchgear',draft,content):decisionResult(r.action,draft,content,r.help))}</div>
