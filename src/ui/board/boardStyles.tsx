@@ -66,6 +66,8 @@ export function BoardStyles() {
       [data-scene-object="office"] > img, [data-scene-object="field"] > img { width:145% !important; max-width:none; left:-22.5% !important; }
       [data-scene-object="office"] > img { transform:translateY(18%); }
       [data-scene-object="substation"] > img { transform:translateY(12%); }
+      [data-simple-campus="true"] [data-scene-object="substation"] > img {width:145% !important; max-width:none;left:-22.5% !important;transform:translateY(-10%);}
+      [data-simple-campus="true"] [data-map-control="substation"] {bottom:0 !important;}
       [data-testid="campus-people"] { width:125px !important; height:125px !important; }
       [data-campus-scene] [data-testid="map-road"] { background: transparent !important; }
       [data-campus-scene] [data-testid="map-road"] > img { display: none; }

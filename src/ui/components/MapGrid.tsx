@@ -622,10 +622,8 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
           img={SUBSTATION_ART[power.substationStatus]}
           dimmed={power.studyStatus === 'none' && power.substationStatus === 'none'}
         />
-        <div style={ART_CHIP}>
-          {simple?'Power connection':TILE_ART.substation.label}
-        </div>
-        <div style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{simple?plainWords(substationStateWords(draft)):substationStateWords(draft)}</div>
+        {!simple&&<div style={ART_CHIP}>{TILE_ART.substation.label}</div>}
+        <div data-testid="power-map-state" style={{ ...ART_CHIP, fontSize: '0.65rem',...(simple?{position:'absolute',top:'100%',left:'50%',transform:'translateX(-50%)'}:{}) }}>{simple?plainWords(substationStateWords(draft)):substationStateWords(draft)}</div>
         {power.studyStatus === 'pending' && (
           <div style={ART_CHIP}>
             Study{studyMonthsLeft !== null ? studyMonthsLeft <= 0 ? ': decision this month' : `: ${studyMonthsLeft}mo left` : ''}

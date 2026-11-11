@@ -51,10 +51,13 @@ test('fix 14: fast-forwarding a whale campaign through Y3 never freezes silently
   // A real multi-year campaign driven by real clicks is inherently slow; give it real headroom.
   test.setTimeout(300_000);
   await startWhaleCampaign(page);
+  // The header now toggles the timed posture sim. Use the actual one-shot
+  // fast-forward control; repeatedly toggling Run sim can cancel its first tick.
+  await page.getByRole('button', { name: 'Postures', exact: true }).click();
 
   const dialog = page.getByRole('dialog');
   const endMonthButton = page.getByRole('button', { name: 'End month' });
-  const ffButton = page.getByTestId('fast-forward-button');
+  const ffButton = page.getByTestId('fast-forward-jump');
   const stopReason = page.getByText(/Fast-forward stopped/);
   const monthLabel = page.getByTestId('campus-status').locator('strong').first();
   const gameOverHeading = page.getByRole('heading', { name: /^(You win|You lose|You scraped by|Game over)/ });
