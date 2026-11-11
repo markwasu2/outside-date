@@ -63,7 +63,7 @@ export function developments(review: MonthReview, content: Content): Development
     if (delta !== 0) {
       const visited = review.actions.some(a=>a.actionId==='visitCast' && a.params?.group===group);
       const confirmed = group === 'tenant' && review.actions.some(a => a.actionId === 'confirmRackSchedule');
-      add(delta > 0 ? 'helped' : 'hurt', `${group[0]!.toUpperCase() + group.slice(1)} goodwill ${before.goodwill[group]} → ${after.goodwill[group]}.${confirmed ? ' Confirming the rack schedule added 3 tenant goodwill; the arrow is the net change after everything else this month.' : visited ? ' Your contact visit added up to 4 goodwill, capped at 100. The arrow includes any other changes this month.' : ' This is the net change across the month; the record does not isolate one action as its cause.'}`);
+      add(delta > 0 ? 'helped' : 'hurt', `${group[0]!.toUpperCase() + group.slice(1)} goodwill ${before.goodwill[group]} → ${after.goodwill[group]}.${confirmed ? ' Confirming the rack schedule added 3 tenant goodwill; the arrow is the net change after everything else this month.' : visited ? ' Your contact visit added up to 4 goodwill, capped at 100. The arrow includes any other changes this month.' : review.eventChoices?.length ? ' This arrow includes all changes across the month; immediate event-choice effects are listed separately.' : ' This is the net change across the month; the record does not isolate one action as its cause.'}`);
     }
   }
   const training=after.flags.hiringFairUntil,oldTraining=before.flags.hiringFairUntil;
