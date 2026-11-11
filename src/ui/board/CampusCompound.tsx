@@ -27,7 +27,7 @@ export function CampusCompound({night}:{night:boolean}){
  const working=constructionWorking(draft,content);
  const last=plan.at(-1),previous=useRef(0),cash=useRef(draft.cash),[receipt,setReceipt]=useState<{label:string;cash:number;id:number}|null>(null);
  useEffect(()=>{
-  if(plan.length>previous.current&&last){setReceipt({label:simpleActionName(last,draft)||'Order placed',cash:Math.max(0,cash.current-draft.cash),id:Date.now()});}
+  if(plan.length>previous.current&&last){const name=simpleActionName(last,draft)||'Order placed';const hallId=last.params?.hallId;setReceipt({label:draft.halls.length>1&&typeof hallId==='string'?`${hallId}: ${name}`:name,cash:Math.max(0,cash.current-draft.cash),id:Date.now()});}
   previous.current=plan.length;cash.current=draft.cash;
  },[plan.length,last,draft]);
  useEffect(()=>{if(!receipt)return;const id=window.setTimeout(()=>setReceipt(null),2500);return()=>clearTimeout(id);},[receipt]);
@@ -90,7 +90,7 @@ export function CampusCompound({night}:{night:boolean}){
    <div style={{position:'relative',width:'100%',height:'60%'}}><img src={fitted?backup:workArt} alt="" style={{width:'100%',height:'100%',objectFit:'contain',filter:night?'brightness(.73)':'none'}}/><span style={{position:'absolute',left:'50%',bottom:2,transform:'translateX(-50%)',fontSize:10,padding:'2px 7px',borderRadius:4,background:'#fff9e4d9',color:'#415748',whiteSpace:'nowrap'}}>{fitted?'Backup units · part of building':stage>=2?'Cladding deliveries':stage>=1?'Structural lifting':'Site preparation'}</span></div>
   </section>}
   {opened&&night&&<div style={{position:'absolute',left:'34%',top:'47%',width:'16%',height:20,background:'#ffe6a333',filter:'blur(14px)',borderRadius:'50%'}}/>}
-  {receipt&&<div key={receipt.id} data-testid="build-receipt" className={reduced?undefined:'site-build-receipt'} style={{position:'absolute',left:'40%',top:'17%',padding:'10px 15px',borderRadius:8,background:'#f5ffe8f2',boxShadow:'0 5px 18px #284b3426',border:'1px solid #8dad75',fontSize:13,color:'#36583d',fontWeight:700}}>{receipt.label} ✓{receipt.cash>0&&<small style={{display:'block',marginTop:4,color:'#966543'}}>Cash -{formatDollars(receipt.cash)}</small>}</div>}
+  {receipt&&<div key={receipt.id} data-testid="build-receipt" className={reduced?undefined:'site-build-receipt'} style={{position:'absolute',...(draft.halls.length>1?{right:'12%',top:'2%',maxWidth:'40%'}:{left:'40%',top:'17%'}),padding:'10px 15px',borderRadius:8,background:'#f5ffe8f2',boxShadow:'0 5px 18px #284b3426',border:'1px solid #8dad75',fontSize:13,color:'#36583d',fontWeight:700}}>{receipt.label} ✓{receipt.cash>0&&<small style={{display:'block',marginTop:4,color:'#966543'}}>Cash -{formatDollars(receipt.cash)}</small>}</div>}
   <style>{`
     @keyframes serviceDrive{0%,100%{translate:0 -95px}42%,58%{translate:0 160px}}.service-van{animation:serviceDrive 36s ease-in-out infinite}
     @keyframes visitorWalk{0%,100%{translate:0 0}50%{translate:14px 0}}.campus-visitor{animation:visitorWalk 24s ease-in-out infinite}.visitor-1{animation-delay:-11s}
