@@ -145,3 +145,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Added concrete-pour panels, recessed service channels, bolted column footings and short tied rebar cages to the completed foundation illustration. Surveyed dirt, concrete foundation and erected steel now have more distinct material detail.
 - Used the same original camera, palette and generator. No new mechanics or implied equipment purchases. Only hall-pad.svg changes when regenerating the art set.
 - Inspected the completed foundation in a real first-campus desktop journey and the full art sheet. Both default desktop journeys, all 176 browser regressions, asset/bounds and six-hall checks, deterministic regeneration, lint/build and built-image decoding passed. The unchanged engine baseline is 705 unit tests.
+
+## Steel-frame art payoff
+- Added light roof joists with open-web ties, selected diagonal braced bays, column shoes and connection plates. The frame stays open, so walls and roof remain a distinct next stage. Only hall-steel.svg changes on regeneration.
+- Added a built-app real-click route from land purchase through foundation and frame completion, decoding the actual packaged hall images after each month. This complements the existing built ground-image check.
+- Inspected both built-app stages, the live development journey and the art sheet. Both default desktop journeys, asset/bounds and six-hall checks, all 176 browser regressions (with interrupted batches reconciled by test title), two built-app checks, lint/build and deterministic regeneration pass. Engine unchanged from the 705-unit baseline.
