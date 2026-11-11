@@ -1,3 +1,4 @@
+import type {MonthReview} from './board/monthReview';
 import { emptyCapital, type DifficultyId, type NegotiationChoices } from '../engine/init';
 import tuningJson from '../../content/tuning.json';
 import { migrateSiteId } from '../content/sites';
@@ -25,6 +26,8 @@ export interface SaveFile {
   lastDifficultyId: DifficultyId;
   dismissedCoachTips: string[];
   financialSnapshots: FinancialSnapshot[];
+  /** Optional UI history. Old saves still load without a prior-month report. */
+  monthReview?:MonthReview|null;
 }
 
 /** Accepts a parsed save of any known version and returns a current-version SaveFile, or null
@@ -149,7 +152,8 @@ export function saveGame(save: SaveFile): void {
   try {
     localStorage.setItem(SAVE_KEY, JSON.stringify(save));
   } catch {
-    // best-effort; a failed autosave should never interrupt play
+    // Last-month history is optional. If storage is tight, still save the game itself.
+    if(save.monthReview){try{const core={...save};delete core.monthReview;localStorage.setItem(SAVE_KEY,JSON.stringify(core));}catch{/* Storage itself may be unavailable. */}}
   }
 }
 
