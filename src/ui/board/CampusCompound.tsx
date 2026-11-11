@@ -1,5 +1,5 @@
 import {UtilityOperations} from './UtilityOperations';
-import {unfundedWork} from './constructionFunds';
+import {constructionWorking} from './constructionFunds';
 import steelYard from '../../assets/campus/yard-steel.svg';
 import panelYard from '../../assets/campus/yard-panels.svg';
 import crane from '../../assets/campus/vehicle-crane.svg';
@@ -23,7 +23,7 @@ export function CampusCompound({night}:{night:boolean}){
  const stage=Math.max(-1,...draft.halls.filter(h=>!h.terminated).map(h=>h.stageIndex));
  const materialArt=stage>=2?panelYard:stage>=1?steelYard:yard;
  const workArt=stage>=2?truck:stage>=1?crane:excavator;
- const working=!draft.flags.drawFreeze&&draft.halls.some(h=>h.stageActive&&!h.delivered&&!h.terminated&&!h.pausedThisMonth&&!draft.flags[`inspectionFail:${h.id}`]&&unfundedWork(draft,content,h)===null);
+ const working=constructionWorking(draft,content);
  const last=plan.at(-1),previous=useRef(0),cash=useRef(draft.cash),[receipt,setReceipt]=useState<{label:string;cash:number;id:number}|null>(null);
  useEffect(()=>{
   if(plan.length>previous.current&&last){setReceipt({label:simpleActionName(last,draft)||'Order placed',cash:Math.max(0,cash.current-draft.cash),id:Date.now()});}

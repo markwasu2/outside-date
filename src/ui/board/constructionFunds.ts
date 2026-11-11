@@ -21,3 +21,8 @@ export function unfundedWork(state:GameState,content:Content,hall:Hall):number|n
  }
  return null;
 }
+
+/** Activity scenery follows the same current work/funding conditions as the work cues. */
+export function constructionWorking(state:GameState,content:Content):boolean{
+ return !state.flags.drawFreeze&&state.halls.some(h=>h.stageActive&&!h.delivered&&!h.terminated&&!h.pausedThisMonth&&!state.flags[`inspectionFail:${h.id}`]&&unfundedWork(state,content,h)===null);
+}
