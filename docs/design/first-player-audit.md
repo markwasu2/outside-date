@@ -156,3 +156,7 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - The order count and points remain visible, but stopped-work feedback now stays alongside them. It clears when the actual draft no longer has the blocker, not simply when an order is placed. No engine change.
 - Real-click regression queues an unrelated building permit while an inspection failure persists, checks the stopped crew and warning, then repairs from the on-map control and verifies both the warning and crew state clear. Inspected both desktop states.
 - All 177 browser regressions, 705 units, both built-app checks, lint/build and diff checks pass.
+
+## Site office detail
+- Replaced the blank-roof office with standing seams, roof service unit, window reflections, glass entrance, striped awning, steps, gutter and sheltered notice board. Shared original camera and palette stay unchanged; only tile-site-office.svg changes on regeneration.
+- Inspected the actual desktop opening and the full art sheet. The Permits control remains clear. Both desktop journeys, art/bounds and six-hall checks, all 177 browser cases, both built-app checks, lint/build and deterministic regeneration pass. Engine unchanged from 705 unit tests on PR188.
