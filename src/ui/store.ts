@@ -1,3 +1,4 @@
+import {choiceImpact} from './board/choiceImpact';
 import type { OfficeView, MonthReview } from './board/monthReview';
 import { milestoneWords } from './board/milestoneWords';
 import { create } from 'zustand';
@@ -611,7 +612,7 @@ export const useStore = create<UIStore>((set, get) => ({
       set((s) => ({
         state: result.state,
         draft: result.state,
-        monthReview: { before: s.monthReview?.before ?? state, after: result.state, actions: s.monthReview?.actions ?? [], eventChoices:[...(s.monthReview?.eventChoices??[]),{cardId:state.pending!.cardId,label}] },
+        monthReview: { before: s.monthReview?.before ?? state, after: result.state, actions: s.monthReview?.actions ?? [], eventChoices:[...(s.monthReview?.eventChoices??[]),{cardId:state.pending!.cardId,label,impact:choiceImpact(state,result.choiceState)}] },
         plan: [],
         snapshots: [],
         error: null,

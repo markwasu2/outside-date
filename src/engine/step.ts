@@ -140,14 +140,16 @@ export function resolveEvent(
   state: GameState,
   choiceId: string,
   content: Content,
-): { state: GameState; log: LogEntry[] } {
+): { state: GameState; log: LogEntry[]; choiceState:GameState } {
   if (state.phase !== 'awaitingChoice' || !state.pending) {
     throw new ActionError('resolveEvent() called with no pending event');
   }
   content = resolveContent(state, content);
   const resolved = resolveChoice(state, choiceId, content);
   const next: GameState = { ...resolved, phase: 'playing', pending: null };
-  return runWorldTick(next, content);
+  // Expose the committed choice before monthly bills/progress so UI history can
+  // attribute the actual choice effects without claiming the whole tick as its cost.
+  return {...runWorldTick(next, content),choiceState:resolved};
 }
 
 /**

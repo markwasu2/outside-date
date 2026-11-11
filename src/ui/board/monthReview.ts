@@ -12,7 +12,7 @@ export interface MonthReview {
   before: GameState;
   after: GameState;
   actions: PlannedAction[];
-  eventChoices?: {cardId:string;label:string}[];
+  eventChoices?: {cardId:string;label:string;impact?:string[]}[];
 }
 export interface Development {
   tone: 'helped' | 'hurt' | 'neutral';
@@ -68,7 +68,7 @@ export function developments(review: MonthReview, content: Content): Development
   }
   const training=after.flags.hiringFairUntil,oldTraining=before.flags.hiringFairUntil;
   if(typeof training==='number'&&training>after.month&&(typeof oldTraining!=='number'||training>oldTraining)) add('helped', `Crew training is active until month ${training+1}. It reduces the base labor-shortage chance, not normal construction time.`);
-  for(const choice of review.eventChoices??[]) {const card=content.events.find(c=>c.id===choice.cardId);add('neutral', `Event choice: ${card?.title??choice.cardId}. You chose: ${choice.label}.`);}
+  for(const choice of review.eventChoices??[]) {const card=content.events.find(c=>c.id===choice.cardId);add('neutral', `Event choice: ${card?.title??choice.cardId}. You chose: ${choice.label}.${choice.impact?.length?' Immediate choice effects: '+choice.impact.join('; ')+'.':''}`);}
   if (!news.length && after.phase === 'takeoutAvailable') add('helped', 'The campus is ready to sell. Review the debt and your share before confirming a sale.');
   if (!news.length && after.halls.some(h=>h.delivered&&!h.terminated) && after.halls.every(h=>h.delivered||h.terminated)) add('neutral', 'The open campus is in its operating period. Rent and running costs continue; the lender test controls when a sale becomes available.');
   if (!news.length) {
