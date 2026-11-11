@@ -183,6 +183,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
   const draft = useStore((s) => s.draft);
   const state = useStore((s) => s.state);
   const prevState = useStore((s) => s.prevState);
+  const displayMonth=(month:number)=>simple?`month ${month+1}`:formatMonth(month);
   const content = useStore((s) => s.content);
   const plan = useStore((s) => s.plan);
   const selectedHallId = useStore((s) => s.selectedHallId);
@@ -565,7 +566,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
                   ? `${o.kind}: on site`
                   : overdue
                     ? `${o.kind}: balance unpaid - the slot is lost in ${graceLeft}mo`
-                    : dueNow ? `${o.kind}: due this month. End month attempts delivery and pays the balance from available funding.` : `${o.kind} (${o.supplier === 'alt' ? 'second supplier' : o.supplier === 'spot' ? 'spot' : 'standard'}): arrives ${formatMonth(o.arrivalMonth)}`
+                    : dueNow ? `${o.kind}: due this month. End month attempts delivery and pays the balance from available funding.` : `${o.kind} (${o.supplier === 'alt' ? 'second supplier' : o.supplier === 'spot' ? 'spot' : 'standard'}): arrives ${displayMonth(o.arrivalMonth)}`
               }
               style={{
                 position: 'relative',
@@ -579,7 +580,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
             >
               {'\u{1F4E6}'} {o.kind}
               {o.supplier !== 'standard' && !o.arrived ? ` (${o.supplier === 'alt' ? '2nd' : 'spot'})` : ''}
-              {o.arrived ? ' on site' : overdue ? ` - slot lost in ${graceLeft}mo` : dueNow ? ' - due this month' : `: ${formatMonth(o.arrivalMonth)} (${Math.max(0, o.arrivalMonth - draft.month)}mo)`}
+              {o.arrived ? ' on site' : overdue ? ` - slot lost in ${graceLeft}mo` : dueNow ? ' - due this month' : `: ${displayMonth(o.arrivalMonth)} (${Math.max(0, o.arrivalMonth - draft.month)}mo)`}
             </div>
           );
         })}
@@ -628,8 +629,8 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
           </div>
         )}
         {power.substationStatus === 'building' && (
-          <div style={ART_CHIP}>
-            Done {power.substationDoneMonth !== null ? formatMonth(power.substationDoneMonth) : 'soon'}
+          <div data-testid="power-ready-date" style={ART_CHIP}>
+            Due {power.substationDoneMonth !== null ? displayMonth(power.substationDoneMonth) : 'soon'}
           </div>
         )}
         {simple && <TycoonMapControl objectId="substation"/>}
@@ -686,14 +687,14 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
           return (
             <div key={p.id} data-testid={`plant-buildout-${p.id}`} data-build-state={status}
               className={flash ? 'board-arrival-flash' : undefined}
-              title={online ? `Plant ${p.id}: online (${p.mwGrid} MW)` : planned ? `Plant ${p.id}: ${p.slipped ? 'delayed' : 'building'}, online ${formatMonth(targetMonth ?? 0)}` : `Plant ${p.id}: ${plantWaitingWords(draft)}`}
+              title={online ? `Plant ${p.id}: online (${p.mwGrid} MW)` : planned ? `Plant ${p.id}: ${p.slipped ? 'delayed' : 'building'}, online ${displayMonth(targetMonth ?? 0)}` : `Plant ${p.id}: ${plantWaitingWords(draft)}`}
               style={{ flex: 1, minWidth: 0, position: 'relative', borderRadius: 3, overflow: 'hidden', background: online ? '#e4efd9' : '#ede3d0', border: '1px solid #8d6e63', display: 'flex', flexDirection: 'column' }}>
               {planned ? <img src={online ? PLANT_ART.online : PLANT_ART.building} alt="" aria-hidden="true" draggable={false} style={{ width: '100%', aspectRatio:'1', minHeight: 0, objectFit: 'contain', pointerEvents: 'none', filter:'drop-shadow(0 4px 3px #4d3a2428)' }} />
                 : <div style={{ flex: 1, display: 'grid', placeItems: 'center', border: '1px dashed #ae9a77', color: '#776a53', fontSize: 11 }}>{draft.docket.status === 'approved' ? 'Approved' : 'Permitting'}</div>}
               {online&&<div aria-hidden="true" data-testid="plant-vapor" style={{position:'absolute',left:'55%',top:'10%',pointerEvents:'none'}}>{[0,1].map(i=><span key={i} className={reducedMotion?undefined:'site-vapor'} style={{position:'absolute',left:i*12,bottom:0,width:14,height:25,borderRadius:'50%',background:'radial-gradient(ellipse,#f4f5e8bb,transparent 70%)',filter:'blur(2px)',animationDelay:`-${i*2}s`}}/>)}</div>}
               <div style={{ fontSize: '0.6rem', padding: 2, textAlign: 'center', background: online ? '#d6e9c9' : '#fff8e9' }}>
                 <strong>{p.id} {online ? 'online' : planned ? p.slipped ? 'delayed' : 'building' : 'waiting'}</strong><br />
-                {online ? `${p.mwGrid} MW` : planned ? formatMonth(targetMonth ?? 0) : draft.docket.status === 'approved' ? 'starts next month' : 'needs docket'}
+                {online ? `${p.mwGrid} MW` : planned ? displayMonth(targetMonth ?? 0) : draft.docket.status === 'approved' ? 'starts next month' : 'needs docket'}
               </div>
             </div>
           );
