@@ -56,8 +56,14 @@ def hall(stage):
   s+=line(p(x,-38,47),p(x,40,47),TEAL,3)
  s+=line(p(-58,-38,47),p(60,-38,47),TEAL,3)+line(p(-58,40,47),p(60,40,47),TEAL,3)
  if stage=='steel':return s
- s+=box(-60,-40,4,120,80,43,'#cbd3d2','#a6b8ba','#6f898c')
- s+=box(-61,-41,46,122,82,2,'#e4e5dd','#b5c3c1','#91a7a7')
+ s+=box(-60,-40,4,120,80,43,'#a5b5bf','#7d98aa','#38566d')
+ s+=box(-61,-41,46,122,82,2,'#d7dfe2','#a6b9c1','#6e899b')
+ # Recessed roof membrane, perimeter parapet and ambient-occlusion seams.
+ s+=poly([p(-58,-38,48.1),p(58,-38,48.1),p(58,38,48.1),p(-58,38,48.1)],'#647d88','#3c5568',.8)
+ s+=poly([p(-58,-38,48.2),p(58,-38,48.2),p(55,-34,48.2),p(-54,-34,48.2)],'#334d5f','none')
+ s+=poly([p(55,-34,48.2),p(58,-38,48.2),p(58,38,48.2),p(55,34,48.2)],'#3b5564','none')
+ for x in range(-52,55,10):s+=line(p(x,-32,48.3),p(x,32,48.3),'#8b9ca3',.32)
+ for y in (-20,-4,12,28):s+=line(p(-53,y,48.4),p(54,y,48.4),'#405d6c',.4)
  for x in range(-54,59,7):s+=line(p(x,40,7),p(x,40,43),'#668286',.45)
  for y in range(-34,39,7):s+=line(p(60,y,7),p(60,y,44),'#536e77',.5)
  for z in (9,12,15,18,21):s+=line(p(60,-34,z),p(60,33,z),'#a5b6b5',.35)
@@ -70,11 +76,23 @@ def hall(stage):
  # Corrugated wall cladding and loading bays.
  for x in range(-51,57,9):s+=line(p(x,40,8),p(x,40,43),'#aab5a7',.8)
  for x in (-46,-5,36):s+=poly([p(x,40,5),p(x+20,40,5),p(x+20,40,25),p(x,40,25)],DARK)
+ # Warm masonry entrance pavilion breaks up the industrial metal facade.
+ s+=box(-55,38,3,29,4,27,'#b28d69','#ac785a','#765641')
+ for z in range(7,29,3):
+  s+=line(p(-54,42.1,z),p(-27,42.1,z),'#dfb08b',.38)
+  for x in range(-52+(z%2)*2,-27,6):s+=line(p(x,42.2,z),p(x,42.2,z+3),'#704c3c',.3)
+ for x in (-51,-43,-35):s+=pane(x,42.4,7,5,19)
+ # Side fire escape, conduit and downpipes.
+ for y in (-30,26):s+=line(p(60.5,y,5),p(60.5,y,43),'#b3c4c9',1.2)
+ s+=box(60,-10,4,5,24,4,'#8b9b9f','#6c7d84','#3d5869')
+ for z in range(11,40,3):s+=line(p(61,3,z),p(61,10,z),'#c8d0cb',.5)
  if stage=='shell':return s
  # Roof service walkway, safety rail and cable trays.
  for y in range(-28,29,10):s+=box(-57,y,48,9,7,2,'#626f74','#59696b','#40575c')
  for x in range(-55,62,14):s+=line(p(x,-40,49),p(x,-40,54),'#758e91',.7)
  s+=line(p(-58,-40,54),p(60,-40,54),'#96aeb0',.7)
+ # Equipment plinth shadows fall across the membrane before the machinery.
+ for x in (-45,-24,-3,18):s+=poly([p(x+4,-21,48.5),p(x+24,-21,48.5),p(x+24,2,48.5),p(x+4,2,48.5)],'#314e60','none')
  s+=fans(-45,-25,49,4)
  for x in (-42,-20,2,24):
   s+=box(x,-27,49,2,24,1.5,'#d0d8d1','#869d98','#627d7b')
@@ -88,7 +106,14 @@ def hall(stage):
   for x in range(-60,50,15):
    s+=line(p(x,50,1.2),p(x+9,50,1.2),'#e7e4ca',.8)
   for x in (-57,57):s+=shrub(x,53,4,5)
-  s+=box(-25,40,25,48,10,2,'#91b7b7','#608488','#486770')
+  s+=box(-55,43,26,32,9,2,'#dfc299','#9e7e59','#6b5a48')
+  for x in (-54,-25):s+=line(p(x,50,1),p(x,50,26),'#c2c9bf',1.1)
+  s+=box(-24,40,25,45,6,2,'#aecbd4','#779eae','#3d6478')
+  # Rooftop solar strips: small, deep-blue reflective modules.
+  for x in (-25,-6,13,32):
+   s+=box(x,18,49,16,15,1.7,'#244d6a','#244056','#152e44')
+   for xx in (x+5,x+10):s+=line(p(xx,18,51),p(xx,33,51),'#7892a8',.35)
+   s+=line(p(x,25.5,51),p(x+16,25.5,51),'#7892a8',.35)
   for x in (-72,68):
    s+=box(x,-53,1,8,9,4,'#91a87e','#7c956b','#6b865d')
    s+=shrub(x+4,52,2,6)
