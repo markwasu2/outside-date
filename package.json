@@ -10,7 +10,8 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint .",
-    "sim": "tsx src/sim/runSim.ts"
+    "sim": "tsx src/sim/runSim.ts",
+    "test:e2e:built": "playwright test --config playwright.built.config.ts"
   },
   "dependencies": {
     "immer": "^10.1.1",

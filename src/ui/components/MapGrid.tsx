@@ -276,7 +276,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
         boxSizing: 'border-box',
         fontFamily: 'sans-serif',
         fontSize: '0.75rem',
-        background: `url(${campusGroundImg}) center / 100% 100%, linear-gradient(#eadbbccc, #e0ca9acc), ${siteTheme.ground}`,
+        background: `url("${campusGroundImg}") center / 100% 100%, linear-gradient(#eadbbccc, #e0ca9acc), ${siteTheme.ground}`,
       }}
     >
       <BoardLegend />
