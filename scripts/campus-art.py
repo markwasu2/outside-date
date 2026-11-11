@@ -145,10 +145,24 @@ def hall(stage):
   s+=line(p(-54,42.1,z),p(-27,42.1,z),'#dfb08b',.38)
   for x in range(-52+(z%2)*2,-27,6):s+=line(p(x,42.2,z),p(x,42.2,z+3),'#704c3c',.3)
  for x in (-51,-43,-35):s+=pane(x,42.4,7,5,19)
- # Side fire escape, conduit and downpipes.
- for y in (-30,26):s+=line(p(60.5,y,5),p(60.5,y,43),'#b3c4c9',1.2)
- s+=box(60,-10,4,5,24,4,'#8b9b9f','#6c7d84','#3d5869')
- for z in range(11,40,3):s+=line(p(61,3,z),p(61,10,z),'#c8d0cb',.5)
+ # Service elevation: recessed intake louvers, a fire exit and a low access landing.
+ # All geometry uses the same hall camera and stays inside the existing pad.
+ s+='<g data-testid="hall-service-elevation">'
+ for y in (-31,27):s+=line(p(60.5,y,5),p(60.5,y,43),'#b3c4c9',1.2)
+ s+=poly([p(60.7,-25,11),p(60.7,-4,11),p(60.7,-4,32),p(60.7,-25,32)],'#243e49','#9fafab',.9)
+ for z in range(13,32,3):
+  s+=line(p(60.9,-24,z),p(60.9,-5,z),'#92a69f',1.1)
+  s+=line(p(61,-24,z-.9),p(61,-5,z-.9),'#405d63',.6)
+ s+=poly([p(60.7,12,4),p(60.7,23,4),p(60.7,23,25),p(60.7,12,25)],'#253f4b','#c2c9b9',.9)
+ s+=poly([p(60.9,13,5),p(60.9,22,5),p(60.9,22,24),p(60.9,13,24)],'#7d9290','#405d62',.5)
+ s+=line(p(61.2,14,14),p(61.2,21,14),'#d8d5b6',1.1)
+ s+=poly([p(61,15,26),p(61,21,26),p(61,21,29),p(61,15,29)],'#788f65','none')
+ s+=box(60,10,1,10,16,3,'#b1bbb0','#7f968d','#5b7776')
+ s+=box(67,11,1,5,14,1.4,'#c8cbb6','#91a294','#6d8681')
+ s+=line(p(71,11,2.5),p(71,25,2.5),'#e0d2a0',.8)
+ for y in (10,26):
+  s+=line(p(61,y,4),p(61,y,12),'#b6c6bc',.8)+line(p(68,y,4),p(68,y,12),'#b6c6bc',.8)+line(p(61,y,12),p(68,y,12),'#d0d6c6',.9)
+ s+='</g>'
  if stage=='shell':return s
  # Roof service walkway, safety rail and cable trays.
  for y in range(-28,29,10):s+=box(-57,y,48,9,7,2,'#626f74','#59696b','#40575c')
