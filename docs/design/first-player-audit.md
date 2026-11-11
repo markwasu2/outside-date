@@ -140,3 +140,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Reused the engine's exact construction increment and charge for read-only current-funds feedback, including half-work labor months, far pads, fit-out extensions, final partial increments and shared funds across multiple halls. Construction economics and tick behavior are unchanged.
 - Unfunded halls now show paused work, stop moving crews/vehicles, name the required charge and keep the existing order. The building explanation opens Money. Scheduled arrivals remain separate from cash already available.
 - Verified the real-click exhausted-budget route, both default desktop journeys, 176 browser regressions, 705 unit tests, lint/build and built ground-image decoding. Inspected map, explanation, Money and built-app pixels.
+
+## Foundation art payoff
+- Added concrete-pour panels, recessed service channels, bolted column footings and short tied rebar cages to the completed foundation illustration. Surveyed dirt, concrete foundation and erected steel now have more distinct material detail.
+- Used the same original camera, palette and generator. No new mechanics or implied equipment purchases. Only hall-pad.svg changes when regenerating the art set.
+- Inspected the completed foundation in a real first-campus desktop journey and the full art sheet. Both default desktop journeys, all 176 browser regressions, asset/bounds and six-hall checks, deterministic regeneration, lint/build and built-image decoding passed. The unchanged engine baseline is 705 unit tests.
