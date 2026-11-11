@@ -1,3 +1,4 @@
+import {UtilityOperations} from './UtilityOperations';
 import {unfundedWork} from './constructionFunds';
 import steelYard from '../../assets/campus/yard-steel.svg';
 import panelYard from '../../assets/campus/yard-panels.svg';
@@ -82,7 +83,7 @@ export function CampusCompound({night}:{night:boolean}){
    {working&&draft.halls.some(h=>h.stageIndex===0)&&<g className={reduced?undefined:'site-dust'}><ellipse cx="580" cy="500" rx="34" ry="13" fill="#ddcba1" opacity=".35"/><ellipse cx="602" cy="488" rx="23" ry="17" fill="#e7d5b0" opacity=".3"/></g>}
   </svg>}
   {started&&<section data-testid="support-yard" style={{position:'absolute',left:'68%',top:'23%',width:'23%',height:'42%',display:'flex',flexDirection:'column',alignItems:'center',gap:0}}>
-   <div style={{position:'relative',width:'100%',height:'60%'}}><img src={fitted?cooling:materialArt} alt="" style={{width:'100%',height:'100%',objectFit:'contain',filter:night?'brightness(.73)':'none'}}/><span style={{position:'absolute',left:'50%',bottom:2,transform:'translateX(-50%)',fontSize:10,padding:'2px 7px',borderRadius:4,background:'#fff9e4d9',color:'#415748',whiteSpace:'nowrap'}}>{fitted?'Cooling yard':stage>=2?'Wall panels & loading':stage>=1?'Steel bundles & lifting':'Materials & site crew'}</span></div>
+   <div style={{position:'relative',width:'100%',height:'60%'}}><img src={fitted?cooling:materialArt} alt="" style={{width:'100%',height:'100%',objectFit:'contain',filter:night?'brightness(.73)':'none'}}/>{fitted&&draft.halls.some(h=>h.delivered&&!h.terminated)&&<UtilityOperations reducedMotion={reduced} night={night}/>}<span style={{position:'absolute',left:'50%',bottom:2,transform:'translateX(-50%)',fontSize:10,padding:'2px 7px',borderRadius:4,background:'#fff9e4d9',color:'#415748',whiteSpace:'nowrap'}}>{fitted?'Cooling yard':stage>=2?'Wall panels & loading':stage>=1?'Steel bundles & lifting':'Materials & site crew'}</span></div>
    <div style={{position:'relative',width:'100%',height:'60%'}}><img src={fitted?backup:workArt} alt="" style={{width:'100%',height:'100%',objectFit:'contain',filter:night?'brightness(.73)':'none'}}/><span style={{position:'absolute',left:'50%',bottom:2,transform:'translateX(-50%)',fontSize:10,padding:'2px 7px',borderRadius:4,background:'#fff9e4d9',color:'#415748',whiteSpace:'nowrap'}}>{fitted?'Backup units · part of building':stage>=2?'Cladding deliveries':stage>=1?'Structural lifting':'Site preparation'}</span></div>
   </section>}
   {opened&&night&&<div style={{position:'absolute',left:'34%',top:'47%',width:'16%',height:20,background:'#ffe6a333',filter:'blur(14px)',borderRadius:'50%'}}/>}
