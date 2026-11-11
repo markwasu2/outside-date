@@ -263,6 +263,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
 
   const power = draft.power;
   const yard = laydownSummary(draft,content);
+  const nextEquipmentMonth=Math.min(...power.orders.filter(o=>!o.arrived).map(o=>o.arrivalMonth));
   const substationEnergized = power.substationStatus === 'done';
   const studyMonthsLeft = power.studyStatus === 'pending' && power.studyDoneMonth !== null ? power.studyDoneMonth - draft.month : null;
 
@@ -514,7 +515,8 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
         }}
         style={{
           gridColumn: '9 / 11',
-          gridRow: '2 / 8',
+          gridRow: simple ? '2 / 3' : '2 / 8',
+          ...(simple?{zIndex:4,alignSelf:'start',height:'auto'}:{}),
           background: TILE_ART.laydownYard.bg,
           border: boardPopover === 'laydownYard' ? '2px solid #000' : '1px solid #999',
           cursor: 'pointer',
@@ -529,7 +531,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
       >
         {!simple&&<ArtLayer img={TILE_ART.laydownYard.img} />}
         {/* GFX 2: a delivery truck flashes in the yard the month an order arrives. */}
-        {deltas.arrivedOrders.length > 0 && (
+        {!simple && deltas.arrivedOrders.length > 0 && (
           <img
             src={DELIVERY_TRUCK.img}
             alt={DELIVERY_TRUCK.label}
@@ -539,18 +541,18 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
             style={{ position: 'absolute', bottom: 4, right: 4, width: 64, borderRadius: 6, border: '1px solid #a1887f', background: '#fffdf8', pointerEvents: 'none' }}
           />
         )}
-        <div style={ART_CHIP}>
-          {TILE_ART.laydownYard.label}
-          {/* Phase 7 (scarcity pack): the yard holds a fixed number of crates; show the load. */}
+        <div data-testid={simple?'simple-yard-summary':undefined} style={{...ART_CHIP,...(simple?{whiteSpace:'nowrap',fontSize:10}:{} )}}>
+          {simple?'Deliveries':TILE_ART.laydownYard.label}
+          {/* The simple caption stays above the landscaping; inspect for the full inventory. */}
           <span style={{ color: '#6d4c41', fontSize: '0.65rem' }} data-testid="yard-capacity">
-            {' '}
-            {yard.reserved}/{yard.capacity}
+            {' '}{yard.reserved}/{yard.capacity}
           </span>
+          {simple&&power.orders.length>0&&<span>{' · '}{nextEquipmentMonth===Infinity?'on site':nextEquipmentMonth<draft.month?'check delivery':nextEquipmentMonth===draft.month?'due now':`next month ${nextEquipmentMonth+1}`} ↗</span>}
         </div>
-        {power.orders.length === 0 && (
+        {!simple&&power.orders.length === 0 && (
           <div style={{ ...ART_CHIP, color: '#6d4c41', fontSize: '0.65rem' }}>empty</div>
         )}
-        {power.orders.map((o) => {
+        {!simple&&power.orders.map((o) => {
           const flash = (deltas.arrivedOrders.includes(o.kind) || deltas.newOrders.includes(o.kind)) && !reducedMotion;
           // Phase 5 (pillar K): a booked slot is a crate you can lose - past its arrival month
           // with the balance unpaid, the crate turns red and counts down the grace window.
