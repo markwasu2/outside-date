@@ -122,14 +122,20 @@ export function BoardStyles() {
         0% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.9); }
         100% { box-shadow: 0 0 0 14px rgba(46, 125, 50, 0); }
       }
+      @keyframes hallOpeningGlow {
+        0%,100% { filter:drop-shadow(0 0 0 #94be7700); }
+        38% { filter:drop-shadow(0 0 5px #b3d187aa); }
+      }
       @keyframes boardChillerSpin {
         to { transform: rotate(360deg); }
       }
-      .board-arrival-flash {
-        animation: boardArrivalFlash 1.2s ease-out 3;
+      .board-arrival-flash:not([data-hall-id]) { animation: boardArrivalFlash 1.2s ease-out 3; }
+      /* Celebrate the building, never outline its empty rectangular map cell. */
+      .board-arrival-flash [data-testid="hall-art-frame"] {
+        animation: hallOpeningGlow 1.2s ease-out 3;
       }
       @media (prefers-reduced-motion: reduce) {
-        .board-anim, .board-arrival-flash {
+        .board-anim, .board-arrival-flash, .board-arrival-flash [data-testid="hall-art-frame"] {
           animation: none !important;
           transition: none !important;
         }
