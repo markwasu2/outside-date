@@ -71,3 +71,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Night view lights selected upper windows and entrance glass using the same camera and window coordinates as the original building illustration, with a small pool of light on the entrance pavement.
 - Lighting is purely visual and only appears for an opened, non-terminated building. It never suggests that an unpowered shell is operating. Day view is unchanged.
 - Eight targeted browser cases passed across both full desktop journeys, delayed-power recovery, hookup/capacity fixtures, original-art and multi-hall bounds, and paused inspection handling. Actual 1280/1440 night pixels, lint/build, built-image decode and diff checks passed.
+
+## November 10 evening: missed permits and inspectable active work
+- A real-click player starts foundation before filing the building permit, follows the blocked building's permit link, files late, and still reaches a sale. Footer now distinguishes never-filed, pending with its actual decision month, and denied reviews.
+- Active work is inspectable from its visible map button rather than disabled. Funding-paused work explicitly says Inspect paused work; inspection failures retain the direct repair action.
+- 693 unit cases, nine targeted browser cases, lint/build, built image decoding and diff checks passed. Inspected actual permit-filing and funding-paused pixels. Both complete desktop journeys and delayed-power recovery still pass.
