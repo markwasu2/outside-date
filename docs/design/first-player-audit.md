@@ -119,3 +119,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Added cash, unused committed build budget, all debt including accrued interest, contributed owner equity and the player's current ownership share above the existing actions.
 - Pending financing shows its arrival month and explicitly is not cash in the bank yet. The summary explains why committed construction money is not bill-paying cash and why ownership is not a guaranteed payout.
 - Actual opening and debt/pending-funds pixels inspected at 1280x720. Browser checks cover full debt components, changed ownership, pending cash, sticky Close, both complete desktop journeys and opening offers. Related financing/loss/sale/popup routes, lint/build and built decoding pass. No engine or insurance behavior changed.
+
+## November 10 evening: hear from the people you visit
+- Simple Contacts now shows the actual named character, portrait and recorded response after a visit, with the group's live trust total. No new dialogue, effect or random draw is introduced.
+- The panel returns to the response after a lower-row visit so it is not silently above the scroll position. Undo removes an undone visit; moving to the next month clears the current-month response.
+- Inspected town and tenant responses at desktop size. Browser checks compare the exact engine log/member/trust, undo, lower-row visibility and month expiry. Both full desktop journeys, opening offers, Money panel checks, lint/build and built decoding pass.

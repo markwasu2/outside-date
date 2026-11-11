@@ -1,8 +1,9 @@
+import {CastPortrait} from '../portraits';
 import {totalDebt} from '../../engine/selectors';
 import {hallBlocker} from './legibility';
 import {canConnectOnNextTick,powerCapacityWords} from './powerWords';
 import {activeWorkWords} from './activeWorkWords';
-import {useEffect} from 'react';
+import {useEffect,useRef} from 'react';
 import {checkAction,useStore} from '../store';
 import {simpleRows,simpleActionName,simpleActionCost,plainWords,standardEquipmentWords,buildingFunds} from './simpleWords';
 import {decisionResult} from './decisionWords';
@@ -18,7 +19,11 @@ export function TycoonObjectPanel({objectId,left,top,onClose}:{objectId:string;l
  const tuning=resolveContent(draft,content).tuning;
  const open=useStore(s=>s.setBoardPopover);
  const hall=draft.halls.find(h=>h.id===objectId);
- return <section data-testid="simple-object-panel" role="dialog" aria-label={titles[objectId]??`Build ${objectId}`} style={{position:'absolute',left,top,width:360,maxHeight:'min(440px,90%)',overflowY:'auto',boxSizing:'border-box',padding:14,border:'1px solid #aa9c7a',background:'#fffdf4',borderRadius:10,boxShadow:'0 10px 32px #30291833',zIndex:70,fontSize:13,lineHeight:1.4}}>
+ const visit=objectId==='people'?[...draft.log].reverse().find(e=>e.month===draft.month&&e.kind==='action'&&e.text.startsWith('Visited ')&&e.castId):undefined;
+ const visitor=visit?content.cast.cast.find(member=>member.id===visit.castId):undefined;
+ const panelRef=useRef<HTMLElement>(null);
+ useEffect(()=>{if(visit&&panelRef.current)panelRef.current.scrollTop=0;},[visit?.castId,visit?.month]);
+ return <section ref={panelRef} data-testid="simple-object-panel" role="dialog" aria-label={titles[objectId]??`Build ${objectId}`} style={{position:'absolute',left,top,width:360,maxHeight:'min(440px,90%)',overflowY:'auto',boxSizing:'border-box',padding:14,border:'1px solid #aa9c7a',background:'#fffdf4',borderRadius:10,boxShadow:'0 10px 32px #30291833',zIndex:70,fontSize:13,lineHeight:1.4}}>
   <header style={{display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:-14,padding:'8px 0',background:'#fffdf4',zIndex:2}}><strong style={{fontSize:17}}>{titles[objectId]??`Build ${objectId}`}</strong><button onClick={onClose}>Close</button></header>
   {objectId==='finance'&&<section data-testid="money-current-position" style={{padding:'10px 11px',background:'#edf1df',border:'1px solid #c0cba9',borderRadius:7,margin:'8px 0 12px'}}>
    <strong>Current position</strong>
@@ -34,6 +39,11 @@ export function TycoonObjectPanel({objectId,left,top,onClose}:{objectId:string;l
   </section>}
   {objectId==='siteOffice'&&permitReviewWords(draft).map(text=><p key={text} style={{padding:8,background:'#edf0df',borderRadius:4}}>{plainWords(text)}</p>)}
   {objectId==='people'&&<p style={{padding:8,background:'#eaf0de'}}>Use spare points to improve relationships, or keep cash for construction. Visits help trust, not construction speed.</p>}
+  {visitor&&visit&&<aside data-testid="contact-visit-response" aria-live="polite" style={{padding:10,margin:'10px 0',border:'1px solid #b8c5a0',borderRadius:7,background:'#edf1df'}}>
+   <div style={{display:'flex',gap:10,alignItems:'center'}}><CastPortrait portrait={visitor.portrait} size={44}/><div><strong>{visitor.name}</strong><div style={{fontSize:11,color:'#657156'}}>{visitor.role}</div></div></div>
+   {visit.detail&&<p style={{margin:'8px 0',fontFamily:'Georgia,serif',fontSize:14,color:'#46563c'}}>{visit.detail}</p>}
+   <div data-testid="contact-trust-result" style={{fontSize:11,color:'#526545'}}>Trust now {draft.goodwill[visitor.goodwillGroup]}/100. Your visit is recorded for this month.</div>
+  </aside>}
   {objectId==='substation'&&<p>{draft.power.substationStatus==='done'?'Power connection ready. It connects buildings automatically when they are ready.':draft.power.substationStatus==='building'?'Connection being built. Advance the month to keep work moving.':draft.power.studyStatus==='pending'?'Power study running. Order the equipment while you wait.':'Plan the power connection before your buildings need it.'}</p>}
   {hall&&!hall.delivered&&!hall.terminated&&draft.permitsRequired.some(id=>draft.permits[id].status!=='granted')&&<div style={{padding:9,background:'#f5ecd2',borderRadius:6,marginTop:8}}>Permit reviews can block later stages. <button data-testid="inspect-permits" onClick={()=>open('siteOffice')} style={{marginTop:6,padding:'6px 10px',background:'#fffdf4',border:'1px solid #b7a67d',borderRadius:5,cursor:'pointer'}}>Inspect permits</button></div>}
   {hall&&hallBlocker(draft,content,hall)==='waiting on power hookup'&&<div data-testid="simple-power-blocker" style={{padding:9,background:'#e9efdf',borderRadius:6,marginTop:8}}>{canConnectOnNextTick(draft,content,hall.id)?'Power capacity is ready. Advance the month for the automatic hookup, then start final testing.':<>Final testing needs power. <button data-testid="inspect-power" onClick={()=>open(draft.power.substationStatus==='done'?'powerPlants':'substation')} style={{marginTop:6,padding:'6px 10px',background:'#fffdf4',border:'1px solid #a3b194',borderRadius:5,cursor:'pointer'}}>Inspect power</button></>}</div>}
