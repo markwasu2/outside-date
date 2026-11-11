@@ -1,7 +1,7 @@
 import type { Content } from '../../content/schemas';
 import { formatDollars, formatMonth } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
-import { runway } from '../../engine/selectors';
+import { dscr, runway, totalDebt } from '../../engine/selectors';
 import { STAGES, type GameState, type PlannedAction } from '../../engine/types';
 import { STAGE_WORDS } from './legibility';
 import { nextStep, workInFlight } from './nextStep';
@@ -76,16 +76,28 @@ export function developments(review: MonthReview, content: Content): Development
 
 export type OfficeView = 'permits' | 'money' | 'capital';
 export interface ReviewOption { title: string; text: string; target: string; officeView?: OfficeView }
+export function runwayWords(months: number): string {
+  if (!Number.isFinite(months)) return 'Recurring costs covered';
+  if (months >= 24) return 'More than 2 years of recurring costs covered';
+  if (months < 1) return 'Less than a month of runway';
+  return `${months.toFixed(1)} months of runway`;
+}
 export function reviewOptions(state: GameState, content: Content): ReviewOption[] {
   const step = nextStep(state, content);
   const months = runway(state, resolveContent(state, content));
   const focus = content.actions.find(a => a.id === step.actionId)?.ap ?? 0;
-  const scheduleView: OfficeView = step.actionId === 'cureDraw' || step.actionId === 'priceTakeout' ? 'money' : 'permits';
+  const finished = state.halls.some(h => h.delivered) && state.halls.every(h => h.delivered || h.terminated);
+  const closing = state.phase === 'takeoutAvailable';
+  const ratio = dscr(state, resolveContent(state, content));
+  const debtText = `${formatDollars(totalDebt(state))} debt outstanding. ${Number.isFinite(ratio) ? `Income covers annual debt service ${ratio.toFixed(2)}x.` : 'No annual debt service.'}`;
+  const scheduleView: OfficeView = finished || step.actionId === 'cureDraw' || step.actionId === 'priceTakeout' ? 'money' : 'permits';
   const options: ReviewOption[] = [
     { title: step.title === 'End the month' ? 'Inspect work in progress' : step.title,
       text: step.actionId ? `${focus} focus if you proceed. Inspect costs before committing.` : 'Check the active clocks before waiting or changing course.',
       target: step.objectId, officeView: step.objectId === 'siteOffice' ? scheduleView : undefined },
-    { title: 'Compare funding offers', text: `${Number.isFinite(months) ? `${months.toFixed(1)} months of runway` : 'Recurring costs covered'}. New funding buys time, but changes the deal.`, target: 'siteOffice', officeView: 'capital' },
+    finished || closing
+      ? { title: closing ? 'Review debt before selling' : 'Review the lender test', text: `${debtText} Inspect the closing terms before ending the campaign.`, target: 'siteOffice', officeView: 'money' }
+      : { title: 'Compare funding offers', text: `${runwayWords(months)}. New funding buys time, but changes the deal.`, target: 'siteOffice', officeView: 'capital' },
   ];
   if (!state.flags.rackScheduleConfirmed && state.halls.some(h => !h.delivered && !h.terminated)) options.push({ title: 'Check tenant rack dates', text: 'Free confirmation: +3 tenant goodwill. A later date swap is a separate decision.', target: 'siteOffice', officeView: 'permits' });
   else options.push({ title: 'Meet the town or commission', text: `Goodwill: town ${state.goodwill.town} · commission ${state.goodwill.commission}. Visits use focus you could spend on building.`, target: 'people' });

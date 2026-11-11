@@ -21,6 +21,7 @@ test('review first: choose campus work, see its consequences, reach the close wi
  await page.getByRole('button',{name:'Compare funding offers',exact:false}).click();
  await expect(page.getByTestId('map-popover').getByRole('button',{name:'Raise capital',exact:true})).toHaveAttribute('aria-pressed','true');
  expect(await page.getByTestId('campus-status').innerText()).toBe(cash);
+ await page.screenshot({path:'/tmp/month-review/funding.png'});
 
  await page.getByTestId('map-popover').getByRole('button',{name:'Close',exact:true}).click();
  for(let month=0;month<35;month++){
@@ -35,6 +36,14 @@ test('review first: choose campus work, see its consequences, reach the close wi
    await page.getByTestId('price-takeout-banner').click();await page.getByTestId('commit-takeout').click();break;
   }
   trace.push(((await page.getByTestId('month-review').textContent() ?? '')).replaceAll('\n',' '));
+  if(await page.getByRole('button',{name:'Review the lender test',exact:false}).count()) {
+   await expect(page.getByRole('button',{name:'Compare funding offers',exact:false})).toHaveCount(0);
+   await page.getByRole('button',{name:'Review the lender test',exact:false}).click();
+   await expect(page.getByTestId('lender-snapshot')).toContainText('Outstanding debt:');
+   await page.screenshot({path:'/tmp/month-review/lender.png'});
+   await page.getByTestId('map-popover').getByRole('button',{name:'Close',exact:true}).click();
+  }
+
   const reviewText=await page.getByTestId('review-developments').count() ? await page.getByTestId('review-developments').innerText() : null;
   const notice=page.getByTestId('event-notice-dismiss');for(let n=0;n<5 && await notice.count();n++)await notice.first().click();
   // Inspect the actual campus, not the optional recommendation. Decide on prerequisites,

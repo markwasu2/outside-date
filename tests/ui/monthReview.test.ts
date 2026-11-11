@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame } from '../../src/engine/init';
 import { DEFAULT_SETUP, DEFAULT_NEGOTIATION } from '../../src/ui/defaultGame';
-import { developments, reviewOptions } from '../../src/ui/board/monthReview';
+import { developments, reviewOptions, runwayWords } from '../../src/ui/board/monthReview';
 const content = loadContent();
 const fresh = () => createGame(content, 'tutorial-edge5', DEFAULT_SETUP, DEFAULT_NEGOTIATION, 1);
 describe('evidence-backed month review', () => {
@@ -42,5 +42,21 @@ describe('evidence-backed month review', () => {
   expect(reviewOptions(state,content)[0]).toMatchObject({target:'siteOffice',officeView:'money'});
   state.flags.drawFreeze=false;state.phase='takeoutAvailable';
   expect(reviewOptions(state,content)[0]).toMatchObject({target:'siteOffice',officeView:'money'});
+ });
+ it('bounds runway wording without pretending large positive burn is income',()=>{
+  expect(runwayWords(2095.6)).toBe('More than 2 years of recurring costs covered');
+  expect(runwayWords(Infinity)).toBe('Recurring costs covered');
+  expect(runwayWords(.3)).toBe('Less than a month of runway');
+  expect(runwayWords(6.23)).toBe('6.2 months of runway');
+ });
+ it('replaces capital raising with the lender test and closing review after delivery',()=>{
+  const state=fresh();state.halls[0]!.delivered=true;
+  let options=reviewOptions(state,content);
+  expect(options[1]).toMatchObject({title:'Review the lender test',officeView:'money'});
+  expect(options.every(o=>o.officeView!=='capital')).toBe(true);
+  expect(options[0]?.officeView).toBe('money');
+  state.phase='takeoutAvailable';options=reviewOptions(state,content);
+  expect(options[1]).toMatchObject({title:'Review debt before selling',officeView:'money'});
+  expect(options[1]?.text).toContain('debt outstanding');
  });
 });

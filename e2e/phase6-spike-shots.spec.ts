@@ -28,7 +28,7 @@ test('phase 6 spike shots', async ({ page }) => {
   await startCampaign(page);
 
   // Month 0: every hall is unplaced, and H1's popover offers the two pads.
-  await expect(page.getByTestId('pad-H1')).toContainText('unplaced');
+  await expect(page.getByTestId('pad-H1')).toContainText('Choose pad');
   await page.screenshot({ path: '/downloads/p6-unplaced-1440.png' });
   await page.getByText('H1', { exact: true }).click();
   await expect(page.getByTestId('map-popover').getByTestId('popover-action').filter({ hasText: 'near pad' })).toBeVisible();
