@@ -4,15 +4,31 @@ Run from repository root. All geometry is authored here; no external assets.
 """
 from pathlib import Path
 import math
+import random
+random.seed(17)
 OUT=Path('src/assets/campus'); OUT.mkdir(exist_ok=True)
-INK='#4c554c'; SAND='#e0c99b'; IVORY='#f4edd9'; TEAL='#547d78'; DARK='#35575a'; GOLD='#d8a341'
+INK='#44535a'; SAND='#e0c99b'; IVORY='#f4edd9'; TEAL='#547d78'; DARK='#35575a'; GOLD='#d8a341'
 def p(x,y,z=0): return (160+(x-y)*.866, 126+(x+y)*.5-z)
 def pts(v): return ' '.join(f'{x:.1f},{y:.1f}' for x,y in v)
-def poly(v,c,stroke=INK,w=1.5):return f'<polygon points="{pts(v)}" fill="{c}" stroke="{stroke}" stroke-width="{w}" stroke-linejoin="round"/>'
+def poly(v,c,stroke=INK,w=.65):return f'<polygon points="{pts(v)}" fill="{c}" stroke="{stroke}" stroke-width="{w}" stroke-linejoin="round"/>'
 def line(a,b,c=INK,w=1.5,dash=''):return f'<path d="M{a[0]:.1f},{a[1]:.1f} L{b[0]:.1f},{b[1]:.1f}" fill="none" stroke="{c}" stroke-width="{w}" stroke-linecap="round"'+(f' stroke-dasharray="{dash}"' if dash else '')+'/>'
+GRADIENTS={}
+def material(c,face):
+ key=c.strip('#')+'-'+face
+ GRADIENTS[key]=(c,face)
+ return f'url(#{key})'
 def box(x,y,z,dx,dy,h,top=IVORY,left='#c9c6ae',right='#a7b5a4'):
- return poly([p(x,y+dy,z),p(x+dx,y+dy,z),p(x+dx,y+dy,z+h),p(x,y+dy,z+h)],left)+poly([p(x+dx,y,z),p(x+dx,y+dy,z),p(x+dx,y+dy,z+h),p(x+dx,y,z+h)],right)+poly([p(x,y,z+h),p(x+dx,y,z+h),p(x+dx,y+dy,z+h),p(x,y+dy,z+h)],top)
-def pad():return box(-77,-57,-3,154,114,4,'#e3d1ad','#c4af88','#bba781')
+ return poly([p(x,y+dy,z),p(x+dx,y+dy,z),p(x+dx,y+dy,z+h),p(x,y+dy,z+h)],material(left,'wall'))+poly([p(x+dx,y,z),p(x+dx,y+dy,z),p(x+dx,y+dy,z+h),p(x+dx,y,z+h)],material(right,'shade'))+poly([p(x,y,z+h),p(x+dx,y,z+h),p(x+dx,y+dy,z+h),p(x,y+dy,z+h)],material(top,'roof'))+line(p(x,y,z+h),p(x+dx,y,z+h),'#ffffff',.5)
+def shrub(x,y,z=0,r=7):
+ cx,cy=p(x,y,z)
+ return f'<ellipse cx="{cx+5}" cy="{cy+4}" rx="{r*1.3}" ry="{r*.45}" fill="#263d33" opacity=".18"/><circle cx="{cx}" cy="{cy-4}" r="{r}" fill="url(#foliage)"/><circle cx="{cx-2}" cy="{cy-7}" r="{r*.45}" fill="#bbcf7b" opacity=".5"/>'
+def pane(x,y,z,w=16,h=10):
+ return poly([p(x,y,z),p(x+w,y,z),p(x+w,y,z+h),p(x,y,z+h)],'url(#glass)','#506976',.7)+line(p(x+w*.45,y,z),p(x+w*.45,y,z+h),'#8da4ab',.5)
+def pad():
+ s=box(-77,-57,-3,154,114,4,'#a9b4af','#7f918c','#6a7e78')
+ for x in range(-70,78,18):s+=line(p(x,-56,1.2),p(x,56,1.2),'#7e8d87',.35)
+ for y in range(-48,57,18):s+=line(p(-76,y,1.2),p(76,y,1.2),'#c3cbc1',.4)
+ return s
 def plot():return poly([p(-77,-57),p(77,-57),p(77,57),p(-77,57)],'#dcc99f','#ad9c77')
 def bollards():
  return ''.join(box(x,y,1,2,2,6,GOLD,'#c08c39','#ae7d31') for x,y in [(-74,-54),(72,-54),(72,52),(-74,52)])
@@ -22,7 +38,7 @@ def fans(x,y,z,n=3):
   xx=x+i*21
   s+=box(xx,y,z,17,19,8,'#d9e0d3','#a7bbb0','#7c9c91')
   cx,cy=p(xx+8.5,y+9.5,z+8)
-  s+=f'<ellipse cx="{cx}" cy="{cy}" rx="6" ry="3.5" fill="{DARK}"/>'
+  s+=f'<ellipse cx="{cx}" cy="{cy}" rx="6.5" ry="3.7" fill="#203d49" stroke="#d0dcda" stroke-width=".8"/>'
   for a in (0,math.pi*2/3,math.pi*4/3): s+=line((cx,cy),(cx+5*math.cos(a),cy+2.5*math.sin(a)),'#b5d0bc',1)
  return s
 def hall(stage):
@@ -40,20 +56,42 @@ def hall(stage):
   s+=line(p(x,-38,47),p(x,40,47),TEAL,3)
  s+=line(p(-58,-38,47),p(60,-38,47),TEAL,3)+line(p(-58,40,47),p(60,40,47),TEAL,3)
  if stage=='steel':return s
- s+=box(-60,-40,4,120,80,43,'#e8e3ce','#c8cbbb','#9eafa2')
+ s+=box(-60,-40,4,120,80,43,'#cbd3d2','#a6b8ba','#6f898c')
+ s+=box(-61,-41,46,122,82,2,'#e4e5dd','#b5c3c1','#91a7a7')
+ for x in range(-54,59,7):s+=line(p(x,40,7),p(x,40,43),'#668286',.45)
+ for y in range(-34,39,7):s+=line(p(60,y,7),p(60,y,44),'#536e77',.5)
+ for z in (9,12,15,18,21):s+=line(p(60,-34,z),p(60,33,z),'#a5b6b5',.35)
+ for x in range(-54,56,18):s+=pane(x,40.2,32,13,7)
+ for x in (-48,-8,32):
+  s+=box(x,37,2,25,10,2,'#b1b5af','#879c97','#667f7b')
+  for z in (9,12,15,18,21):s+=line(p(x+3,40.5,z),p(x+18,40.5,z),'#89a0a0',.55)
+ for x in range(-55,58,13):s+=line(p(x,-36,48.2),p(x,36,48.2),'#a6b6b3',.45)
+ s+=box(45,-32,48,8,55,1.4,'#e0e6df','#9daea7','#728b88')
  # Corrugated wall cladding and loading bays.
  for x in range(-51,57,9):s+=line(p(x,40,8),p(x,40,43),'#aab5a7',.8)
  for x in (-46,-5,36):s+=poly([p(x,40,5),p(x+20,40,5),p(x+20,40,25),p(x,40,25)],DARK)
  if stage=='shell':return s
- s+=fans(-45,-25,47,4)
- s+=box(-38,10,47,65,18,8,'#afc4b3','#7c9c91','#688b82')
+ # Roof service walkway, safety rail and cable trays.
+ for y in range(-28,29,10):s+=box(-57,y,48,9,7,2,'#626f74','#59696b','#40575c')
+ for x in range(-55,62,14):s+=line(p(x,-40,49),p(x,-40,54),'#758e91',.7)
+ s+=line(p(-58,-40,54),p(60,-40,54),'#96aeb0',.7)
+ s+=fans(-45,-25,49,4)
+ for x in (-42,-20,2,24):
+  s+=box(x,-27,49,2,24,1.5,'#d0d8d1','#869d98','#627d7b')
+ s+=line(p(-43,-29,50),p(45,-29,50),'#b3c7c4',2)
+ s+=line(p(-43,-31,50),p(45,-31,50),'#526f73',.7)
+ s+=box(-38,10,49,65,18,8,'#afc4b3','#7c9c91','#688b82')
  if stage in ('rfs','delivered'):
   s+=box(-72,-46,1,7,8,13,TEAL,'#456b66',DARK)
   for x in (-35,8,47):s+=box(x,-51,1,5,5,2,'#8da97c','#6f8f65','#637d59')
  if stage=='delivered':
+  for x in range(-60,50,15):
+   s+=line(p(x,50,1.2),p(x+9,50,1.2),'#e7e4ca',.8)
+  for x in (-57,57):s+=shrub(x,53,4,5)
+  s+=box(-25,40,25,48,10,2,'#91b7b7','#608488','#486770')
   for x in (-72,68):
    s+=box(x,-53,1,8,9,4,'#91a87e','#7c956b','#6b865d')
-   cx,cy=p(x+4,-49,18);s+=f'<circle cx="{cx}" cy="{cy}" r="8" fill="#78966b" stroke="{INK}" stroke-width="1.5"/>'
+   s+=shrub(x+4,52,2,6)
  return s
 
 def substation(stage):
@@ -65,9 +103,12 @@ def substation(stage):
  for x in (-45,30):
   for y in (-43,40):s+=box(x,y,1,3,3,64,'#b5c7bd','#809e92','#5f7f77')
   s+=line(p(x,-43,65),p(x,43,65),TEAL,3)
+ for xx in range(-48,-9,4):s+=box(xx,-31,3,1,42,23,'#9eb5b3','#607d82','#3b5864')
  for y in (-27,0,26):
   s+=box(20,y,1,32,13,22,'#cdd6c8','#91a99a','#708f81')
-  s+=line(p(-44,y,51),p(32,y,48),DARK,1.3)
+  s+=line(p(-44,y,51),p(32,y,48),DARK,.7)
+  for xx in (-42,28):
+   for zz in range(43,53,2):s+=box(xx,y,zz,3,3,.5,'#dbdfd0','#bdc8bc','#8baba0')
  return s
 
 def plant(online):
@@ -75,25 +116,50 @@ def plant(online):
  s+=box(22,-28,1,30,60,21,'#abc0b0','#8ba79b','#698b82')
  for x in (-43,-14):s+=box(x,-18,33,17,17,10,'#e1e4d4','#a8b9a8','#809d90')
  for y in (-18,18):s+=box(34,y,22,7,7,60,IVORY,'#a8b9a8','#809d90')+box(34,y,68,7,7,5,GOLD,'#b28a43','#a07736')
+ for yy in range(-25,28,7):
+  for zz in range(8,27,4):s+=line(p(19,yy,zz),p(19,yy+4,zz),'#4d6a71',1)
+ for xx in range(-50,17,10):s+=pane(xx,31.5,17,7,9)
+ for y in (-18,18):
+  for z in (30,42,54,66):s+=box(33,y-1,z,9,9,.7,'#b8c6bf','#849c95','#516f72')
  if not online:s+=bollards()+line(p(-68,50,1),p(70,50,1),GOLD,4)
  else:
   for y in (-18,18):
    cx,cy=p(37,y+3,92);s+=f'<path d="M{cx},{cy} q-9,-9 1,-17 q10,-9 0,-18" stroke="#e7e9dd" stroke-width="7" fill="none" stroke-linecap="round"/>'
  return s
 
+def wheel(x,y,z=6,r=7):
+ cx,cy=p(x,y,z)
+ return f'<ellipse cx="{cx}" cy="{cy}" rx="{r*.7}" ry="{r}" fill="#20323b" stroke="#43565d" stroke-width="1"/><ellipse cx="{cx+.5}" cy="{cy-1}" rx="{r*.36}" ry="{r*.58}" fill="#8c9c99"/><ellipse cx="{cx+1}" cy="{cy-1}" rx="{r*.16}" ry="{r*.25}" fill="#364d58"/>'
 def vehicle(kind):
  s=''
  if kind=='crane':
   s=box(-35,-20,2,65,35,12,GOLD,'#bf8b3d','#a47132')+box(-5,-12,14,20,22,16,IVORY,'#afb8aa','#78988b')
   s+=line(p(-10,0,28),p(-15,0,112),GOLD,8)+line(p(-40,0,105),p(80,0,119),GOLD,6)+line(p(65,0,117),p(65,0,63),INK,1.5)
-  for z in range(35,103,14):s+=line(p(-15,0,z),p(-10,0,z+10),INK,1)
+  s+='<g class="crane-boom">'
+  s+=line(p(-15,0,112),p(80,0,119),'#ffe295',2)+line(p(-30,0,104),p(65,0,113),'#ab7330',1)
+  for x in range(-25,75,12):s+=line(p(x,0,106),p(x+9,0,118),'#775e36',.8)
+  s+='</g>'
+  for z in range(35,103,14):
+   s+=line(p(-15,0,z),p(-10,0,z+10),INK,.7)+line(p(-10,0,z),p(-15,0,z+10),'#ffe2a1',.8)
+  s+=pane(-2,10,19,14,10)
+  for x in (-28,-15,0,15,27):s+=wheel(x,16,6,6)
+  s+=line(p(65,0,63),p(65,0,58),INK,2)+line(p(65,0,58),p(69,0,57),INK,2)
+  for x,y in [(-39,-21),(35,22),(-39,22),(35,-21)]:s+=box(x,y,0,7,6,3,'#6a7c76','#435654','#2d454b')
  elif kind=='excavator':
   s=box(-35,-20,1,65,36,10,DARK,DARK,DARK)+box(-29,-15,12,50,27,13,GOLD,'#b5863a','#a67831')+box(-20,-12,25,20,24,22,IVORY,'#9bb5aa',TEAL)
+  s+=pane(-18,12,28,15,15)
+  for x in (-27,-15,-3,9,21):s+=wheel(x,18,7,6)
+  for xx in range(-26,20,5):s+=line(p(xx,18,3),p(xx+2,18,12),'#738078',.8)
   s+=line(p(11,0,28),p(47,0,59),GOLD,9)+line(p(47,0,59),p(65,0,16),GOLD,7)+box(60,-12,0,19,25,12,DARK,TEAL,DARK)
  else:
   s=box(-44,-21,10,58,40,24,'#d5d7c7','#aebcae','#8ca597')+box(15,-21,8,28,40,22,GOLD,'#bd8e42','#a77e3b')+box(19,-19,30,21,36,6,IVORY,'#aac3b6',TEAL)
-  for x in (-27,27):
-   cx,cy=p(x,20,8);s+=f'<ellipse cx="{cx}" cy="{cy}" rx="8" ry="10" fill="{DARK}" stroke="{INK}" stroke-width="1.5"/>'
+  for x in (-31,-15,29):s+=wheel(x,21,8,8)
+  s+=pane(19,19.5,22,19,8)
+  s+=poly([p(43,-17,22),p(43,17,22),p(43,17,30),p(43,-17,30)],'url(#glass)','#5b7980',.6)
+  s+=line(p(39,21,10),p(39,21,22),'#885e30',.7)+line(p(23,21,18),p(28,21,18),'#334c54',1)
+  for xx in range(-40,12,6):s+=line(p(xx,20,13),p(xx,20,32),'#8ea29f',.4)
+  for yy in (-16,13):s+=box(43,yy,11,2,4,3,'#fff4bc','#e0c98d','#bfa271')
+  s+=line(p(45,-18,9),p(45,18,9),'#596c71',2)
  return s
 
 def equipment(kind):
@@ -128,7 +194,13 @@ def people():
  return s
 
 def save(name,body):
- (OUT/(name+'.svg')).write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="25 0 270 215">'+body+'</svg>\n')
+ defs='<defs><radialGradient id="foliage" cx="30%" cy="25%"><stop stop-color="#c6d58b"/><stop offset=".4" stop-color="#729558"/><stop offset="1" stop-color="#355d47"/></radialGradient><linearGradient id="glass" x2="1" y2="1"><stop stop-color="#b4d8dc"/><stop offset=".45" stop-color="#4f7d8a"/><stop offset=".5" stop-color="#b3cace"/><stop offset="1" stop-color="#355461"/></linearGradient><filter id="shadow" x="-35%" y="-35%" width="180%" height="190%"><feDropShadow dx="7" dy="10" stdDeviation="4" flood-color="#223c3c" flood-opacity=".32"/></filter>'
+ for key,(c,face) in GRADIENTS.items():
+  rgb=[int(c[i:i+2],16) for i in (1,3,5)]
+  def tint(f):return '#'+''.join(f'{max(0,min(255,round(v*f))):02x}' for v in rgb)
+  defs+=f'<linearGradient id="{key}" x1="0" y1="0" x2=".65" y2="1"><stop stop-color="{tint(1.12)}"/><stop offset=".52" stop-color="{c}"/><stop offset="1" stop-color="{tint(.88)}"/></linearGradient>'
+ defs+='</defs><style>.crane-boom{transform-origin:147px 21px;animation:sway 7s ease-in-out infinite alternate}@keyframes sway{to{transform:rotate(2deg)}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}</style>'
+ (OUT/(name+'.svg')).write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="15 -12 300 242">'+defs+'<g filter="url(#shadow)">'+body+'</g></svg>\n')
 for stage in ('not-started','pad','steel','shell','fitout','rfs','delivered'):save('hall-'+stage,hall(stage))
 for stage in ('planned','building','done'):save('substation-'+stage,substation(stage))
 for online in (False,True):save('plant-'+('online' if online else 'building'),plant(online))
@@ -136,7 +208,6 @@ for kind in ('crane','excavator','truck'):save('vehicle-'+kind,vehicle(kind))
 for kind in ('cooling-tower','dry-cooler','hybrid-chiller','transformer','switchgear'):save('equip-'+kind,equipment(kind))
 for kind in ('site-office','laydown','pond','dry-field'):save('tile-'+kind,tile(kind))
 save('campus-people',people())
-# Low-noise surveyed site. Transparent field lets each scenario's soil color remain visible.
-ground='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="none"><defs><pattern id="soil" width="56" height="44" patternUnits="userSpaceOnUse"><path d="M4 8h4m28 20h3" stroke="#968761" stroke-opacity=".16" stroke-width="2"/></pattern></defs><path fill="url(#soil)" d="M0 0h1200v800H0z"/><path d="M0 52H1200" stroke="#d5c5a0" stroke-width="56"/><path d="M0 52H1200" stroke="#737c71" stroke-width="40"/><path d="M0 52H1200" stroke="#ddd8b9" stroke-width="2" stroke-dasharray="24 18"/><path d="M190 110V680H1010M190 400H1010" fill="none" stroke="#f3e5c7" stroke-opacity=".4" stroke-width="18"/><path d="M32 112V740H1168V112" fill="none" stroke="#9d9472" stroke-opacity=".35" stroke-dasharray="4 8"/></svg>'
-(OUT/'campus-ground.svg').write_text(ground+'\n')
+# Ground has its own deterministic landscape generator.
+exec(Path('scripts/campus-ground.py').read_text())
 print(f'Wrote {len(list(OUT.glob("*.svg")))} original campus assets')
