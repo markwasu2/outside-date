@@ -97,3 +97,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Simple sale results reuse the precise return label from the detailed report. An actual 0.996x result says just under 1.00x rather than rounding a loss into apparent break-even.
 - Full report has Back to summary so a simple-mode player can inspect details and return without restarting or going to the title.
 - Five browser cases passed: engine-priced near-break-even sale, return-to-summary and restart, both full regular desktop journeys, no-build loss/restart and deadline-loss fixture. Sixteen report unit cases, lint/build, built image decoding, actual sale pixels and diff checks passed.
+
+## November 10 evening: the early construction compound
+- Early construction now has temporary gravel access, tire tracks, separate laydown pads, cones and a small safety barrier instead of a single blank sand field.
+- These are scenery included in construction, not new purchases, money, road capacity or automatic progress. They are replaced by the finished road/courtyard when fit-out starts.
+- Inspected foundation, steel, panels, fit-out, day and night at desktop size. Stage-yard checks enforce the construction/finished transition. Both full desktop playthroughs, paused-work routes, long-campaign fast-forward, 699 unit cases, lint/build and built-image decoding passed. Prior sale step full regression is 171 cases, including a rerun of the long campaign after the first test runner was interrupted.
