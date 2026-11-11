@@ -82,6 +82,7 @@ export function BoardStyles() {
       [data-testid^="pad-"] { border-color:#a59c82 !important; background:#f6f0df !important; color:#635b47; }
       [data-testid="campus-people"] > img { filter:drop-shadow(0 5px 4px #4d3a2428); }
       [data-simple-campus="true"] [data-simple-hidden="true"], [data-simple-local-grid="true"] [data-scene-object="plants"] { visibility:hidden; pointer-events:none; }
+      [data-simple-campus="true"] [data-testid="hall-art-frame"] {max-width:520px !important;max-height:410px !important;}
       [data-simple-campus="true"] [data-testid^="pad-"] { display:none; }
       [data-simple-campus="true"] [data-scene-object="hall"] > div:first-child { font-size:13px !important; }
       [data-simple-campus="true"] [data-testid^="caption-"] { max-width:90%; font-size:11px !important; }

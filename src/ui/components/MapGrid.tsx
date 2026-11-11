@@ -1,3 +1,4 @@
+import {CampusLife} from '../board/CampusLife';
 import {TycoonObjectPanel} from '../board/TycoonObjectPanel';
 import {TycoonMapControl} from '../board/TycoonMapControl';
 import {plainWords} from '../board/simpleWords';
@@ -284,6 +285,7 @@ export function MapGrid({cue,simple=false}: {simple?:boolean;cue?: {title:string
         background: `url("${campusGroundImg}") center / 100% 100%, linear-gradient(#eadbbccc, #e0ca9acc), ${siteTheme.ground}`,
       }}
     >
+      <CampusLife/>
       {!simple && <BoardLegend />}
       <div {...selectableCellProps(boardPopover === 'people', () => openObject('people', null))}
         ref={(el) => { if (el) { el.dataset.campusObject = 'people'; cellRefs.current.set('people', el); } }} aria-label="People on site" data-testid="campus-people" data-simple-hidden={simple&&!draft.halls.some(h=>h.delivered)}
@@ -489,6 +491,7 @@ export function MapGrid({cue,simple=false}: {simple?:boolean;cue?: {title:string
                 rent={rent}
                 spendFloat={deltas.spendByHall[hall.id] ?? 0}
                 coinBurst={deltas.monthsAdvanced > 0 ? (deltas.rentByHall[hall.id] ?? 0) : 0}
+                coolingSteam={hall.delivered&&draft.setup.cooling!=='dry'}
                 reducedMotion={reducedMotion}
               />
             </div>
@@ -601,7 +604,7 @@ export function MapGrid({cue,simple=false}: {simple?:boolean;cue?: {title:string
                 : '1px solid #999',
           cursor: 'pointer',
           position: 'relative',
-          ...(substationEnergized && !reducedMotion ? { animation: 'boardGlowPulse 2.4s ease-in-out infinite' } : {}),
+          ...(substationEnergized && !reducedMotion && !simple ? { animation: 'boardGlowPulse 2.4s ease-in-out infinite' } : {}),
           ...cellStyle,
         }}
         data-scene-object="substation"
@@ -685,6 +688,7 @@ export function MapGrid({cue,simple=false}: {simple?:boolean;cue?: {title:string
               style={{ flex: 1, minWidth: 0, position: 'relative', borderRadius: 3, overflow: 'hidden', background: online ? '#e4efd9' : '#ede3d0', border: '1px solid #8d6e63', display: 'flex', flexDirection: 'column' }}>
               {planned ? <img src={online ? PLANT_ART.online : PLANT_ART.building} alt="" aria-hidden="true" draggable={false} style={{ width: '100%', aspectRatio:'1', minHeight: 0, objectFit: 'contain', pointerEvents: 'none', filter:'drop-shadow(0 4px 3px #4d3a2428)' }} />
                 : <div style={{ flex: 1, display: 'grid', placeItems: 'center', border: '1px dashed #ae9a77', color: '#776a53', fontSize: 11 }}>{draft.docket.status === 'approved' ? 'Approved' : 'Permitting'}</div>}
+              {online&&<div aria-hidden="true" data-testid="plant-vapor" style={{position:'absolute',left:'55%',top:'10%',pointerEvents:'none'}}>{[0,1].map(i=><span key={i} className={reducedMotion?undefined:'site-vapor'} style={{position:'absolute',left:i*12,bottom:0,width:14,height:25,borderRadius:'50%',background:'radial-gradient(ellipse,#f4f5e8bb,transparent 70%)',filter:'blur(2px)',animationDelay:`-${i*2}s`}}/>)}</div>}
               <div style={{ fontSize: '0.6rem', padding: 2, textAlign: 'center', background: online ? '#d6e9c9' : '#fff8e9' }}>
                 <strong>{p.id} {online ? 'online' : planned ? p.slipped ? 'delayed' : 'building' : 'waiting'}</strong><br />
                 {online ? `${p.mwGrid} MW` : planned ? formatMonth(targetMonth ?? 0) : draft.docket.status === 'approved' ? 'starts next month' : 'needs docket'}
@@ -708,7 +712,8 @@ export function MapGrid({cue,simple=false}: {simple?:boolean;cue?: {title:string
             y1={31}
             x2={72}
             y2={31}
-            stroke="#ffb300"
+            stroke={simple?'#618d80':'#ffb300'}
+            opacity={simple?.45:1}
             strokeWidth={1.2}
             strokeDasharray="4 4"
             vectorEffect="non-scaling-stroke"

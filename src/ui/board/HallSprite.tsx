@@ -18,10 +18,11 @@ interface HallSpriteProps {
   spendFloat: number;
   /** Rent received on the last committed month (coin animation); 0 = none. */
   coinBurst: number;
+  coolingSteam?: boolean;
   reducedMotion: boolean;
 }
 
-export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, spendFloat, coinBurst, reducedMotion }: HallSpriteProps) {
+export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, spendFloat, coinBurst, coolingSteam, reducedMotion }: HallSpriteProps) {
   const { stage, progress0to1 } = visual;
   const look = STAGE_ART[stage] ?? STAGE_ART.notStarted;
   const baseLook = STAGE_ART[visual.baseStage] ?? STAGE_ART.notStarted;
@@ -43,6 +44,7 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
         )}
       </div>
 
+      {coolingSteam&&<div data-testid="cooling-vapor" aria-hidden="true" style={{position:'absolute',left:'43%',top:'24%',width:70,height:65,pointerEvents:'none',opacity:.7}}>{[0,1,2].map(i=><span key={i} className={reducedMotion?undefined:'site-vapor'} style={{position:'absolute',left:i*12,bottom:4,width:19,height:27,borderRadius:'50%',background:'radial-gradient(ellipse,#f4f5e9cc,transparent 70%)',filter:'blur(3px)',animationDelay:`-${i*1.5}s`}}/>)}</div>}
       {/* done marker: an action applied this month targets this hall */}
       {queuedGhost && (
         <div
@@ -147,6 +149,7 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
           draggable={false}
           title={VEHICLE_ART[stage]!.label}
           data-testid="stage-vehicle"
+          className={reducedMotion?undefined:stage==='steel'||stage==='shell'?'site-crane':stage==='pad'?'site-excavator':'site-work-truck'}
           style={{
             position: 'absolute',
             top: '57%',
@@ -158,7 +161,17 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
         />
       )}
 
-      {/* keep the stage icon whisper-small in a corner so the tile still reads at a glance */}
+      <style>{`
+       @keyframes siteVapor{0%{transform:translate(0,0) scale(.5);opacity:0}20%{opacity:.5}100%{transform:translate(14px,-52px) scale(1.8);opacity:0}}
+       @keyframes craneWork{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(1.5deg)}}
+       @keyframes excavatorWork{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+       @keyframes truckIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
+       .site-vapor{animation:siteVapor 5.5s ease-out infinite}
+       .site-crane{animation:craneWork 9s ease-in-out infinite;transform-origin:40% 80%}
+       .site-excavator{animation:excavatorWork 7s ease-in-out infinite}
+       .site-work-truck{animation:truckIdle 1.5s ease-in-out infinite}
+       @media(prefers-reduced-motion:reduce){.site-vapor,.site-crane,.site-excavator,.site-work-truck{animation:none!important}}
+      `}</style>
       
     </div>
   );

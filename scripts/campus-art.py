@@ -82,8 +82,8 @@ def hall(stage):
  s+=line(p(-43,-31,50),p(45,-31,50),'#526f73',.7)
  s+=box(-38,10,49,65,18,8,'#afc4b3','#7c9c91','#688b82')
  if stage in ('rfs','delivered'):
-  s+=box(-72,-46,1,7,8,13,TEAL,'#456b66',DARK)
-  for x in (-35,8,47):s+=box(x,-51,1,5,5,2,'#8da97c','#6f8f65','#637d59')
+  s+=box(-72,28,1,7,8,13,TEAL,'#456b66',DARK)
+  for x in (-35,8,47):s+=box(x,51,1,5,5,2,'#8da97c','#6f8f65','#637d59')
  if stage=='delivered':
   for x in range(-60,50,15):
    s+=line(p(x,50,1.2),p(x+9,50,1.2),'#e7e4ca',.8)
