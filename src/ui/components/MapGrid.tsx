@@ -372,8 +372,9 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
       {/* D5: the hall area is one generic sub-grid sized to the actual hall count. */}
       <div
         style={{
-          gridColumn: '2 / 9',
-          gridRow: '2 / 8',
+          gridColumn: simple&&draft.halls.length>4?'2 / 8':'2 / 9',
+          gridRow: simple&&draft.halls.length>4?'2 / 7':'2 / 8',
+          ...(simple&&draft.halls.length>4?{marginBottom:20}:{}),
           display: 'grid',
           gridTemplateColumns: `repeat(${layout.columns}, 1fr)`,
           gridTemplateRows: `repeat(${layout.rows}, 1fr)`,
@@ -416,6 +417,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
               className={arrivalFlash ? 'board-arrival-flash' : undefined}
               style={{
                 background: look.bg,
+                ...(simple&&draft.halls.length>4?{zIndex:3}:{}),
                 border: selected ? '2px solid #000' : '1px solid #999',
                 cursor: 'pointer',
                 position: 'relative',
