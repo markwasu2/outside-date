@@ -71,7 +71,23 @@ def hall(stage):
   for y in (-38,38):s+=box(x,y,4,2,2,43,'#8b9b97','#67817e','#466561')
   s+=line(p(x,-38,47),p(x,40,47),TEAL,3)
  s+=line(p(-58,-38,47),p(60,-38,47),TEAL,3)+line(p(-58,40,47),p(60,40,47),TEAL,3)
- if stage=='steel':return s
+ if stage=='steel':
+  # Open structure stays open: light roof joists and selected braced bays, not
+  # opaque wall panels that would imply the next stage is already finished.
+  for y in (-20,0,20):
+   s+=line(p(-58,y,47),p(60,y,47),'#708d8a',1.8)
+   s+=line(p(-58,y,45),p(60,y,45),'#a0b0a5',.6)
+   for x in (-40,-20,0,20,40):
+    s+=line(p(x,y,45),p(x+9,y,47),'#849c93',.6)
+  for x1,x2,y in [(-58,-20,40),(20,58,-38)]:
+   s+=line(p(x1,y,7),p(x2,y,43),'#77938c',1.2)
+   s+=line(p(x1,y,43),p(x2,y,7),'#77938c',1.2)
+  for x in (-58,-20,20,58):
+   for y in (-38,38):
+    s+=box(x-2,y-2,3,6,6,2,'#aebdb0','#80998e','#5f7d78')
+    s+=box(x-.7,y-.7,42,3.4,3.4,3,'#9bb0a6','#718d84','#55756f')
+    for z in (43,44):s+=line(p(x+1,y+2.8,z),p(x+1.3,y+2.8,z),'#d0d9c6',.7)
+  return s
  s+=box(-60,-40,4,120,80,43,'#a5b5bf','#7d98aa','#38566d')
  s+=box(-61,-41,46,122,82,2,'#d7dfe2','#a6b9c1','#6e899b')
  # Recessed roof membrane, perimeter parapet and ambient-occlusion seams.
