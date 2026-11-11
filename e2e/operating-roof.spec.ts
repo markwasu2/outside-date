@@ -1,0 +1,12 @@
+import {test,expect} from '@playwright/test';
+test.use({storageState:{cookies:[],origins:[]}});
+test('only an open hall runs the roof fans, with aligned day/night art and reduced motion',async({page})=>{
+ await page.setViewportSize({width:1280,height:720});await page.goto('/');await page.getByTestId('start-first-campus').click();await expect(page.getByTestId('hall-operating-fans')).toHaveCount(0);
+ await page.evaluate(async()=>{
+ // @ts-expect-error test browser import
+ const {useStore}=await import('/src/ui/store.ts');const s=structuredClone(useStore.getState().draft);s.flags.siteOptioned=true;s.halls[0].delivered=true;s.halls[0].energized=true;s.halls[0].deliveredMonth=0;s.halls[0].stageIndex=5;useStore.setState({state:s,draft:s,plan:[]});});
+ await expect(page.getByTestId('roof-fan-rotor')).toHaveCount(4);await expect(page.getByTestId('roof-fan-rotor').first()).toHaveCSS('animation-name','roofFanTurn');const firstRotation=await page.getByTestId('roof-fan-rotor').first().evaluate(el=>getComputedStyle(el).transform);await page.waitForFunction(before=>getComputedStyle(document.querySelector('[data-testid=roof-fan-rotor]')!).transform!==before,firstRotation);await page.screenshot({path:'/tmp/operating-roof-day.png'});await page.getByTestId('night-view').click();await expect(page.getByTestId('hall-night-lights')).toBeVisible();await page.screenshot({path:'/tmp/operating-roof-night.png'});await page.emulateMedia({reducedMotion:'reduce'});await expect(page.getByTestId('roof-fan-rotor').first()).toHaveCSS('animation-name','none');
+ await page.evaluate(async()=>{
+ // @ts-expect-error test browser import
+ const {useStore}=await import('/src/ui/store.ts');const s=structuredClone(useStore.getState().draft);s.halls[0].terminated=true;useStore.setState({state:s,draft:s});});await expect(page.getByTestId('hall-operating-fans')).toHaveCount(0);
+});
