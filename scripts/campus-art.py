@@ -49,9 +49,17 @@ def fans(x,y,z,n=3):
 def hall(stage):
  s=pad()
  if stage=='not-started':
-  s=plot()+bollards()
-  for y in (-30,0,30):s+=line(p(-58,y),p(58,y),'#b29e77',1,'4 5')
-  return s
+  # An unbuilt parcel is a survey on the soil, not a raised beige platform.
+  s='<g data-testid="surveyed-hall-plot">'
+  corners=[(-77,-57),(77,-57),(77,57),(-77,57)]
+  for i,(x,y) in enumerate(corners):
+   nx,ny=corners[(i+1)%4]
+   s+=line(p(x,y),p(nx,ny),'#f0dfb2',1.2,'5 4')
+  for x,y in [(-58,-36),(58,-36),(58,36),(-58,36),(0,0)]:
+   s+=line(p(x-4,y),p(x+4,y),'#827b5f',.85)
+   s+=line(p(x,y-4),p(x,y+4),'#827b5f',.85)
+  s+=bollards()
+  return s+'</g>'
  s+=box(-60,-40,1,120,80,3,'#bdbeb0','#9d9c8d','#8b978d')
  if stage=='pad':
   # Concrete pours, recessed service channels and bolted column footings make the
@@ -366,7 +374,13 @@ def save(name,body):
  detail=detail_path.read_text().strip() if detail_path.exists() else ''
  # Detail groups belong inside the scene shadow only for the office entry rails.
  if name=='tile-site-office':body+=detail;detail=''
- (OUT/(name+'.svg')).write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="15 -12 300 242">'+defs+'<g filter="url(#shadow)">'+body+'</g>'+detail+'</svg>\n')
+ # Keep surveyed ground flat and foundation contact tight to the soil.
+ if name=='hall-not-started':body_group='<g>'+body+'</g>'
+ elif name=='hall-pad':
+  defs=defs.replace('dx="7" dy="10" stdDeviation="4"','dx="2" dy="3" stdDeviation="1"')
+  body_group='<g filter="url(#shadow)">'+body+'</g>'
+ else:body_group='<g filter="url(#shadow)">'+body+'</g>'
+ (OUT/(name+'.svg')).write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="15 -12 300 242">'+defs+body_group+detail+'</svg>\n')
 for stage in ('not-started','pad','steel','shell','fitout','rfs','delivered'):save('hall-'+stage,hall(stage))
 for stage in ('planned','building','done'):save('substation-'+stage,substation(stage))
 for online in (False,True):save('plant-'+('online' if online else 'building'),plant(online))
