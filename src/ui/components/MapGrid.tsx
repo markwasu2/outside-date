@@ -373,7 +373,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
       {/* D5: the hall area is one generic sub-grid sized to the actual hall count. */}
       <div
         style={{
-          gridColumn: simple&&draft.halls.length>1?'2 / 8':'2 / 9',
+          gridColumn: simple&&draft.halls.length>1?'3 / 8':'2 / 9',
           gridRow: simple&&draft.halls.length>1?'2 / 7':'2 / 8',
           ...(simple&&draft.halls.length>1?{marginBottom:20}:{}),
           display: 'grid',
