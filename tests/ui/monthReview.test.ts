@@ -6,6 +6,18 @@ import { developments, reviewOptions, relationshipOption, waitOptionText, runway
 const content = loadContent();
 const fresh = () => createGame(content, 'tutorial-edge5', DEFAULT_SETUP, DEFAULT_NEGOTIATION, 1);
 describe('evidence-backed month review', () => {
+ it('reports an actual lender funding gap rather than suggesting a paperwork cure',()=>{
+  const before=fresh(),after=structuredClone(before);after.flags.drawFreeze=true;after.flags.outOfBalance=true;
+  const first=developments({before,after,actions:[]},content)[0];expect(first?.tone).toBe('hurt');expect(first?.text).toContain('Review Money');expect(first?.text).toContain('paperwork cannot cure');
+ });
+ it('does not claim funding resumed when a separate paperwork freeze remains',()=>{
+  const before=fresh(),after=structuredClone(before);before.flags.drawFreeze=true;before.flags.outOfBalance=true;after.flags.drawFreeze=true;
+  const text=developments({before,after,actions:[]},content).map(n=>n.text).join(' ');expect(text).toContain('funding gap cleared');expect(text).toContain('separate paperwork freeze');expect(text).not.toContain('funding is available again');
+ });
+ it('reports a cleared funding gap without inventing paperwork when funding resumed',()=>{
+  const before=fresh(),after=structuredClone(before);before.flags.drawFreeze=true;before.flags.outOfBalance=true;
+  const text=developments({before,after,actions:[]},content).map(n=>n.text).join(' ');expect(text).toContain('funding gap cleared');expect(text).toContain('funding is available again');expect(text).not.toContain('You cured');
+ });
  it('reports policy payments without claiming insurance prevented damage',()=>{
   const before=fresh(),after=structuredClone(before);
   after.claims.push({id:'storm:1:H1',month:1,cardId:'storm',kind:'storm',hallId:'H1',gross:2000000,paid:1500000,outOfPocket:500000,insured:true,deductible:500000});
