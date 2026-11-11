@@ -8,6 +8,7 @@ import type {GameState} from '../../engine/types';
 /** The footer describes the live position, including resumed and paused orders. */
 export function turnFeedback(state:GameState,hadReview:boolean,content:Content):{heading:string;body:string;attention?:boolean}{
  const active=state.halls.filter(h=>!h.delivered&&!h.terminated&&h.stageActive);
+ if(state.flags.outOfBalance)return {attention:true,heading:'The lender found a funding gap.',body:'Open Money to review the remaining build and financing options. The paperwork button cannot clear this gap; the lender retests when funding changes.'};
  if(state.flags.drawFreeze)return {attention:true,heading:'Construction funding is paused.',body:'Clear the lender paperwork before waiting for more building progress.'};
  if(active.some(h=>state.flags[`inspectionFail:${h.id}`]))return {attention:true,heading:'A failed inspection stopped work.',body:'Inspect the building and repair the failed inspection. Waiting alone will not fix it.'};
  if(active.length&&active.every(h=>h.pausedThisMonth))return {attention:true,heading:'Crews are stood down this month.',body:'This month adds no construction progress. Advance time to finish the pause.'};
