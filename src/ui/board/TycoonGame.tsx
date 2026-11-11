@@ -1,15 +1,16 @@
+import {constructionWorking} from './constructionFunds';
 import {turnFeedback} from './turnFeedback';
 import {MonthlyReceipt} from './MonthlyReceipt';
 import {campusMilestones} from './campusMilestones';
 import {useState} from 'react';
-import {useStore} from '../store';
+import {checkAction,useStore} from '../store';
 import {BoardStyles} from './boardStyles';
 import {MapGrid} from '../components/MapGrid';
 import {EventModal} from '../components/EventModal';
 import {TakeoutPreviewModal} from '../components/TakeoutPreviewModal';
 import {TycoonObjectPanel} from './TycoonObjectPanel';
 import {developments} from './monthReview';
-import {plainWords,simpleTimelineLabel,buildingFunds} from './simpleWords';
+import {simpleRows,plainWords,simpleTimelineLabel,buildingFunds} from './simpleWords';
 import {formatDollars} from '../../engine/format';
 import {ledger} from '../../engine/selectors';
 import {resolveContent} from '../../engine/resolve';
@@ -17,7 +18,7 @@ import {warnings} from './warnings';
 
 /** Familiar build -> advance time -> see results loop. No expert dashboard required. */
 export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
- const draft=useStore(s=>s.draft),content=useStore(s=>s.content),plan=useStore(s=>s.plan),review=useStore(s=>s.monthReview);
+ const state=useStore(s=>s.state),draft=useStore(s=>s.draft),content=useStore(s=>s.content),plan=useStore(s=>s.plan),review=useStore(s=>s.monthReview);
  const endMonth=useStore(s=>s.endMonth),queue=useStore(s=>s.queueAction),undo=useStore(s=>s.undoLastAction),open=useStore(s=>s.setBoardPopover),error=useStore(s=>s.error);
  const [finance,setFinance]=useState(false),[history,setHistory]=useState(false),[night,setNight]=useState(false);
  const muted=useStore(s=>s.muted),toggleMuted=useStore(s=>s.toggleMuted);
@@ -33,6 +34,7 @@ export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
  const alerts=warnings(draft,content);
  const freeze=!!draft.flags.drawFreeze;
  const feedback=turnFeedback(draft,!!review,content);
+ const canExploreContacts=draft.permitsRequired.every(id=>draft.permits[id].status==='granted')&&draft.power.studyStatus!=='none'&&(draft.power.orders.length>0||draft.power.substationStatus!=='none')&&constructionWorking(draft,content)&&!feedback.attention&&simpleRows('people',draft,content).some(r=>r.action.actionId==='visitCast'&&checkAction(state,content,plan,r.action).ok);
  const button={border:'1px solid #b6af95',borderRadius:6,padding:'7px 11px',background:'#fffdf4',color:'#3f4c38',cursor:'pointer'};
  return <main data-testid="tycoon-game" style={{height:'100vh',display:'flex',flexDirection:'column',background:'#f4eddb',color:'#343c2e',fontFamily:'system-ui,sans-serif'}}>
   <BoardStyles/>
@@ -64,6 +66,7 @@ export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
   </section>
   <footer style={{padding:'10px 18px',background:'#fffdf5',display:'flex',alignItems:'center',gap:12,borderTop:'1px solid #d6cbb0',minHeight:48}}>
    <div data-testid="simple-feedback" style={{flex:1,fontSize:13,lineHeight:1.4}}>{error?<strong style={{color:'#a54d34'}}>{plainWords(error)}</strong>:plan.length?<><strong>{plan.length} order{plan.length===1?'':'s'} placed.</strong> {points} action points left. {feedback.attention?<><strong>{feedback.heading}</strong> {feedback.body}</>:'Crews work when time advances.'}</>:draft.phase==='takeoutAvailable'?<><strong>Campus ready to sell.</strong> Open Money to review the numbers, or sell your campus now.</>:remaining.length===0?<><strong>Campus open.</strong> Collect rent while the lender checks your income; the sale button appears when ready.</>:<><strong>{feedback.heading}</strong> {feedback.body}</>}</div>
+   {canExploreContacts&&<button data-testid="explore-contacts" title="Optional: compare contact visits while crews keep working. Opening this panel spends no points." style={button} onClick={()=>{setFinance(false);setHistory(false);open('people');}}>Explore contacts</button>}
    {plan.length>0&&<button style={button} onClick={undo}>Undo last order</button>}
    {review&&<button style={button} onClick={()=>setHistory(!history)}>Last month{alerts.length?` (${alerts.length} alerts)`:''}</button>}
    {draft.phase==='takeoutAvailable'?<button data-testid="simple-sell" style={{...button,background:'#365c45',color:'#fff'}} onClick={()=>queue({actionId:'priceTakeout'})}>Sell campus</button>:<button data-testid="simple-next-month" disabled={draft.phase==='awaitingChoice'} onClick={e=>{if(e.detail>=2)return;open(null);setFinance(false);setHistory(false);endMonth();}} style={{...button,padding:'12px 22px',background:'#365c45',color:'#fff',fontWeight:700}}>Next month ▶</button>}
