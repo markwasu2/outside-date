@@ -23,6 +23,7 @@ export function TycoonObjectPanel({objectId,left,top,onClose}:{objectId:string;l
  const visitor=visit?content.cast.cast.find(member=>member.id===visit.castId):undefined;
  const panelRef=useRef<HTMLElement>(null);
  useEffect(()=>{if(visit&&panelRef.current)panelRef.current.scrollTop=0;},[visit?.castId,visit?.month]);
+ useEffect(()=>{if(objectId==='finance'&&draft.capital.pending.length&&panelRef.current)panelRef.current.scrollTop=0;},[objectId,draft.capital.pending.length]);
  return <section ref={panelRef} data-testid="simple-object-panel" role="dialog" aria-label={titles[objectId]??`Build ${objectId}`} style={{position:'absolute',left,top,width:360,maxHeight:'min(440px,90%)',overflowY:'auto',boxSizing:'border-box',padding:14,border:'1px solid #aa9c7a',background:'#fffdf4',borderRadius:10,boxShadow:'0 10px 32px #30291833',zIndex:70,fontSize:13,lineHeight:1.4}}>
   <header style={{display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:-14,padding:'8px 0',background:'#fffdf4',zIndex:2}}><strong style={{fontSize:17}}>{titles[objectId]??`Build ${objectId}`}</strong><button onClick={onClose}>Close</button></header>
   {objectId==='finance'&&<section data-testid="money-current-position" style={{padding:'10px 11px',background:'#edf1df',border:'1px solid #c0cba9',borderRadius:7,margin:'8px 0 12px'}}>
