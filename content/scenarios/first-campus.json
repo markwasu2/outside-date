@@ -10,7 +10,20 @@
     "gc_foreman",
     "tenant_rep"
   ],
-  "scriptedEvents": [],
+  "scriptedEvents": [
+    {
+      "cardId": "starter_neighbors",
+      "month": 0
+    },
+    {
+      "cardId": "starter_crews",
+      "month": 1
+    },
+    {
+      "cardId": "starter_tenant",
+      "month": 2
+    }
+  ],
   "scriptedEffects": [],
   "docket": {
     "enabled": false

@@ -36,3 +36,10 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - A blocked build can jump straight to permit inspection. The footer describes current choices rather than duplicating the prior-month report.
 - Removed unused material-gradient definitions from each generated SVG, taking the authored SVG set from 859,240 to 471,654 bytes without changing rendered geometry.
 - Validation: full unit suite 670 passed, then six receipt tests plus 12 review tests passed after the final fallback fix (671 unit tests total). Browser regressions: 40+38+39+39 passed, one detailed journey hit its 55s wall under shard load and passed separately in 29s. Lint/build and built-image decode passed. Actual early/result pixels inspected; both default desktop journeys complete.
+
+## November 10 evening: starter turns with real choices
+- Scenario-only month-end offers in the first three turns: spend $100K for 5 town trust; spend $250K for eight months of lower base shortage odds; borrow one next-month action point for 6 tenant trust. Each can be declined with no resource charge. Other scenarios cannot draw these cards.
+- Choices are recorded in the frozen month history and count as decisions; crew training's expiry is reported from the actual flag. No fabricated normal-speed gain.
+- In-progress stages now fade a blueprint into solid material instead of hiding all the frame until the reveal reaches it. Base and new-stage geometry remain aligned.
+- Starter event previews use action/trust wording and a clear Confirm choice button.
+- Validation: all 678 unit tests passed; 158 browser tests passed across four shards with the detailed review timeout and one shell-interrupted whale journey rerun separately (26.5s and 23.9s). Both default desktop full journeys and an accept-all early-offer route pass. Built-image decode, lint/build and diff checks pass. Actual offer and month-4 pixels inspected.

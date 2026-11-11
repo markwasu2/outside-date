@@ -311,6 +311,7 @@ export function EventModal() {
   const isSynthetic = pending.cardId === 'docketVoteFail';
   const eventCard = isSynthetic ? null : content.events.find((e) => e.id === pending.cardId);
 
+  const choiceWords=(text:string)=>draft.scenarioId==='first-campus'?text.replaceAll('focus','action').replaceAll('goodwill','trust').replaceAll('outside-date','deadline'):text;
   const title = isSynthetic ? DOCKET_VOTE_FAIL_CARD.title : eventCard?.title ?? pending.cardId;
   // pending.body carries this occurrence's flavor pick (base body or a bodyVariant), chosen by
   // events.ts's applyCard when the card fired; the content-file body is the fallback.
@@ -390,7 +391,7 @@ export function EventModal() {
         {/* Phase 2 (D5): every event card says who holds the risk it represents, linking to
             the Codex's Stakeholders view. */}
         {(() => {
-          const mapping = EVENT_STAKEHOLDER[pending.cardId];
+          const mapping = draft.scenarioId==='first-campus'?null:EVENT_STAKEHOLDER[pending.cardId];
           if (!mapping) return null;
           return (
             <div style={{ marginTop: '0.5rem' }}>
@@ -418,14 +419,14 @@ export function EventModal() {
             <div style={{ fontWeight: 600 }}>{eventCard.scale.levels[scaleLevel]?.label}</div>
             {(() => {
               const stakes = describeChoiceEffects(`level:${scaleLevel}`, eventCard, draft.setup.hallTier, draft);
-              return stakes ? <div data-testid="event-scale-stakes" style={{ fontSize: '0.75rem', color: '#555' }}>{stakes}</div> : null;
+              return stakes ? <div data-testid="event-scale-stakes" style={{ fontSize: '0.75rem', color: '#555' }}>{choiceWords(stakes)}</div> : null;
             })()}
             <button
               data-testid="event-choice-commit"
               onClick={() => resolveEventChoice(`level:${scaleLevel}`)}
               style={{ marginTop: 8, width: '100%', padding: '0.5rem' }}
             >
-              Set it
+              Confirm choice
             </button>
           </div>
         ) : (
@@ -440,7 +441,7 @@ export function EventModal() {
                 style={{ flex: 1, padding: '0.5rem', textAlign: 'left' }}
               >
                 <div>{choice.label}</div>
-                {costText && <div style={{ fontSize: '0.75rem', color: '#555' }}>{costText}</div>}
+                {costText && <div style={{ fontSize: '0.75rem', color: '#555' }}>{choiceWords(costText)}</div>}
               </button>
             );
           })}

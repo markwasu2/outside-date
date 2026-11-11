@@ -2,7 +2,7 @@ import { formatDollars } from '../../engine/format';
 import { STAGE_ART, VEHICLE_ART } from '../art';
 import type { HallVisual } from './hallVisual';
 
-/** Layer the next stage over the completed structure, revealing it upwards as work
+/** Layer the next stage over the completed structure, fading its blueprint into solid materials as work
  * advances. Pauses keep their exact progress and remove working vehicles. */
 
 interface HallSpriteProps {
@@ -38,9 +38,8 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
           <img src={look.img} alt="" draggable={false} data-testid="hall-growth"
             data-progress={progress0to1.toFixed(3)}
             style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'contain',
-              clipPath:`inset(${progress0to1 === 0 ? 100 : (1 - progress0to1) * 65}% 0 0 0)`,
-              transition: reducedMotion ? undefined : 'clip-path 0.6s ease',
-              opacity: visual.flags.terminated ? 0.45 : 1}} />
+              transition: reducedMotion ? undefined : 'opacity 0.6s ease',
+              opacity: visual.flags.terminated ? 0.45 : .12+.88*progress0to1}} />
         )}
       </div>
 

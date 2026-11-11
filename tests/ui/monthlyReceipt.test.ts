@@ -24,6 +24,9 @@ describe('frozen monthly receipt',()=>{
  it('does not advise looking for blockers once a sale is available',()=>{
   const before=fresh(),after=structuredClone(before);before.halls[0]!.delivered=true;after.halls[0]!.delivered=true;after.phase='takeoutAvailable';after.month++;const r=monthlyReceipt({before,after,actions:[]},content);expect(r.changes[0]?.text).toContain('ready to sell');expect(r.changes.some(n=>n.text.includes('Review the blockers'))).toBe(false);
  });
+ it('counts and preserves an event choice alongside ordinary orders',()=>{
+  const before=fresh(),after=structuredClone(before);after.month++;const r=monthlyReceipt({before,after,actions:[{actionId:'optionSite'}],eventChoices:[{cardId:'starter_tenant',label:'Host the walkthrough'}]},content);expect(r.decisions).toBe(2);expect(r.changes.some(n=>n.text.includes('You chose: Host the walkthrough'))).toBe(true);
+ });
  it('does not fabricate a new cash change or construction work from an unchanged month',()=>{
   const before=fresh(),after=structuredClone(before);after.month++;const r=monthlyReceipt({before,after,actions:[]},content);expect(r.cashDelta).toBe(0);expect(r.construction).toBe(0);expect(r.completed).toEqual([]);
  });
