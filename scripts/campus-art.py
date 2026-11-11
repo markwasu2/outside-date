@@ -49,6 +49,22 @@ def hall(stage):
   return s
  s+=box(-60,-40,1,120,80,3,'#bdbeb0','#9d9c8d','#8b978d')
  if stage=='pad':
+  # Concrete pours, recessed service channels and bolted column footings make the
+  # completed foundation visibly different from its surveyed dirt outline.
+  for x in (-42,0,42):
+   s+=poly([p(x-10,-34,4.2),p(x+10,-34,4.2),p(x+10,34,4.2),p(x-10,34,4.2)],'#c9cec4','#b1b9af',.35)
+  for y in (-24,24):
+   s+=poly([p(-55,y-2,4.3),p(55,y-2,4.3),p(55,y+2,4.3),p(-55,y+2,4.3)],'#697d7b','none')
+   s+=line(p(-55,y+2,4.4),p(55,y+2,4.4),'#e4e5d5',.7)
+  for x in (-54,-18,18,54):
+   for y in (-33,33):
+    s+=box(x-4,y-4,4,8,8,2,'#e2dfc9','#a3ada2','#82958d')
+    for dx,dy in [(-2,-2),(2,-2),(-2,2),(2,2)]:
+     s+=line(p(x+dx,y+dy,6),p(x+dx,y+dy,9),'#526c6b',.8)
+  # Short tied rebar cages at the corners, not full-height steel-frame columns.
+  for x,y in [(-55,-34),(53,32)]:
+   for dx in (0,4):s+=line(p(x+dx,y,5),p(x+dx,y,15),'#637b75',.7)
+   for z in (8,12):s+=line(p(x,y,z),p(x+4,y,z),'#9aa596',.65)
   for x in (-54,-18,18,54):s+=line(p(x,-36,5),p(x,36,5),'#dadbcf',1)
   return s+bollards()
  for x in (-58,-20,20,58):
