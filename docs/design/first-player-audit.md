@@ -92,3 +92,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Continue saved game now restores the frozen last monthly result, including the exact chosen event and its immediate effects. New orders after that result do not rewrite it when reloading again. Exported saves carry the same optional report.
 - Existing version-eight saves without report history remain usable; no history is fabricated. If the report makes local storage exceed its quota, save the core game without the optional report. Disabled storage still cannot break play.
 - 699 unit cases and ten targeted browser cases passed: real reloads before/after new orders, legacy-save omission, both regular full desktop journeys, late permit/power recovery and milestone/mute behavior. Unit checks cover migration, exact report serialization, quota fallback and unavailable storage. Actual reload pixels, lint/build, built image decoding and diff checks passed.
+
+## November 10 evening: accurate sale return and a way back
+- Simple sale results reuse the precise return label from the detailed report. An actual 0.996x result says just under 1.00x rather than rounding a loss into apparent break-even.
+- Full report has Back to summary so a simple-mode player can inspect details and return without restarting or going to the title.
+- Five browser cases passed: engine-priced near-break-even sale, return-to-summary and restart, both full regular desktop journeys, no-build loss/restart and deadline-loss fixture. Sixteen report unit cases, lint/build, built image decoding, actual sale pixels and diff checks passed.
