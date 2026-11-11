@@ -133,17 +133,9 @@ function applyFundExtensionsPenalty(state: GameState): GameState {
   };
 }
 
-function progressHall(state: GameState, content: Content, hall: Hall): { state: GameState; hall: Hall } {
-  if (hall.delivered || hall.terminated || !hall.stageActive) {
-    return { state, hall };
-  }
-
-  const paused =
-    hall.pausedThisMonth || !!state.flags.drawFreeze || !!state.flags[`inspectionFail:${hall.id}`];
-  if (paused) {
-    return { state, hall };
-  }
-
+/** Exact next construction increment and charge. Content must already have scenario overrides resolved.
+ * Shared with read-only funding feedback so the display cannot invent a different bill. */
+export function hallWorkForMonth(state: GameState, content: Content, hall: Hall): {minMonths:number;increment:number;costThisMonth:number} {
   const stageId = STAGES[hall.stageIndex];
   if (!stageId) throw new Error(`Hall ${hall.id} has an invalid active stage index ${hall.stageIndex}`);
   const stageDef = content.tuning.stages.find((s) => s.id === stageId);
@@ -179,6 +171,22 @@ function progressHall(state: GameState, content: Content, hall: Hall): { state: 
   // charged again, matching 4.11's damage model.
   const costThisMonth = Math.round(monthlyCost * increment);
 
+  return {minMonths,increment,costThisMonth};
+}
+
+function progressHall(state: GameState, content: Content, hall: Hall): { state: GameState; hall: Hall } {
+  if (hall.delivered || hall.terminated || !hall.stageActive) {
+    return { state, hall };
+  }
+
+  const paused =
+    hall.pausedThisMonth || !!state.flags.drawFreeze || !!state.flags[`inspectionFail:${hall.id}`];
+  if (paused) {
+    return { state, hall };
+  }
+
+  const { minMonths, increment, costThisMonth } = hallWorkForMonth(state, content, hall);
+
   const funded = tryFundAmount(state, costThisMonth);
   if (!funded.funded) {
     // Out of committed funds this month (4.8): the hall pauses, no progress, no cost.
@@ -192,6 +200,7 @@ function progressHall(state: GameState, content: Content, hall: Hall): { state: 
     return { state: funded.state, hall: { ...hall, stageMonthsDone, costSpent } };
   }
 
+  const stageId = STAGES[hall.stageIndex];
   const nextStageIndex = hall.stageIndex + 1;
   let nextState: GameState = {
     ...funded.state,
