@@ -351,7 +351,11 @@ def save(name,body):
   def tint(f):return '#'+''.join(f'{max(0,min(255,round(v*f))):02x}' for v in rgb)
   defs+=f'<linearGradient id="{key}" x1="0" y1="0" x2=".65" y2="1"><stop stop-color="{tint(1.12)}"/><stop offset=".52" stop-color="{c}"/><stop offset="1" stop-color="{tint(.88)}"/></linearGradient>'
  defs+='</defs><style>.crane-boom{transform-origin:147px 21px;animation:sway 7s ease-in-out infinite alternate}@keyframes sway{to{transform:rotate(2deg)}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}</style>'
- (OUT/(name+'.svg')).write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="15 -12 300 242">'+defs+'<g filter="url(#shadow)">'+body+'</g></svg>\n')
+ detail_path=Path('scripts/campus-details')/(name+'.svg')
+ detail=detail_path.read_text().strip() if detail_path.exists() else ''
+ # Detail groups belong inside the scene shadow only for the office entry rails.
+ if name=='tile-site-office':body+=detail;detail=''
+ (OUT/(name+'.svg')).write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="15 -12 300 242">'+defs+'<g filter="url(#shadow)">'+body+'</g>'+detail+'</svg>\n')
 for stage in ('not-started','pad','steel','shell','fitout','rfs','delivered'):save('hall-'+stage,hall(stage))
 for stage in ('planned','building','done'):save('substation-'+stage,substation(stage))
 for online in (False,True):save('plant-'+('online' if online else 'building'),plant(online))
