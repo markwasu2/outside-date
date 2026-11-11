@@ -64,6 +64,18 @@ export function BoardStyles() {
       [data-campus-scene] [data-testid^="plant-buildout-"] { background: transparent !important; border: none !important; }
       [data-campus-scene] [data-testid^="plant-buildout-"] > div:first-child { border: none !important; }
 
+      [data-testid="compact-review-toggle"] { display:none; }
+      @media (max-width: 1050px) {
+        [data-testid="month-review"] { position:absolute; right:10px; bottom:10px; width:310px !important; max-width:calc(100% - 20px); max-height:calc(100% - 20px); z-index:40; border:1px solid #b9aa8b; border-radius:10px; padding:0 !important; }
+        [data-testid="compact-review-toggle"] { position:sticky; top:0; z-index:2; display:flex; justify-content:space-between; gap:12px; width:100%; border:0; background:#365c45; color:#fffdf5; padding:12px; text-align:left; cursor:pointer; font:inherit; font-weight:bold; }
+        [data-testid="compact-review-toggle"] span { font-weight:normal; }
+        [data-testid="review-body"] { display:none; padding:12px 14px; }
+        [data-compact-open="true"] [data-testid="review-body"] { display:block; }
+      }
+      [data-scene-object="hall"] { border-radius:6px; }
+      [data-testid^="caption-"] { box-shadow:0 1px 3px #5b401c18; }
+      [data-testid^="pad-"] { border-color:#a59c82 !important; background:#f6f0df !important; color:#635b47; }
+      [data-testid="campus-people"] > img { filter:drop-shadow(0 5px 4px #4d3a2428); }
       @keyframes boardGlowPulse {
         0%, 100% { box-shadow: 0 0 4px 1px rgba(255, 200, 60, 0.55); }
         50% { box-shadow: 0 0 12px 4px rgba(255, 200, 60, 0.95); }
