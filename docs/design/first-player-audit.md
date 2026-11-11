@@ -129,3 +129,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - A real bridge-loan playthrough revealed the new arrival row was above the scroll position after choosing financing lower in the list. Money now returns to the current-position summary when pending financing changes.
 - Actual pixels show the arrival confirmation, current cash and debt together. A real-action browser test verifies the confirmation is in view without scrolling, pending proceeds are not cash yet, and undo restores the entire previous summary.
 - Both full desktop journeys, Money state/real-bridge tests, contact response/undo and built decoding pass. Lint/build/diff checks pass. The prior 182 baseline completed all 174 browser and 699 unit cases.
+
+## November 10 late evening: mixed perimeter woodland
+- Replaced the repeated round-tree border with four original silhouettes: layered spruce, branching broadleaf, pale-trunk open crown and a low spreading oak. Added small planting beds, companion shrubs and ground shadows.
+- All planting stays outside the circulation loop and construction boundary, leaving build space, road access, office/power labels and controls clear. No gameplay changes.
+- Inspected foundation-to-sale desktop journeys, full day/night map pixels and the built app. Both full journeys, art asset/bounds and six-hall checks, lint/build, built SVG decoding and deterministic regeneration pass.
