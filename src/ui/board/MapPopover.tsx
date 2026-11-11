@@ -42,6 +42,14 @@ const OBJECT_TITLES: Record<string, string> = {
 
 export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
   const [officeView, setOfficeView] = useState<'permits' | 'money' | 'capital'>(() => useStore.getState().draft.flags.drawFreeze || useStore.getState().draft.phase === 'takeoutAvailable' ? 'money' : 'permits');
+  const requestedOfficeView = useStore(s => s.requestedOfficeView);
+  const clearOfficeView = useStore(s => s.setOfficeView);
+  useEffect(() => {
+    if (objectId === 'siteOffice' && requestedOfficeView) {
+      setOfficeView(requestedOfficeView);
+      clearOfficeView(null);
+    }
+  }, [objectId, requestedOfficeView, clearOfficeView]);
   const committed = useStore((s) => s.state);
   const state = useStore((s) => s.draft);
   const [feedback, setFeedback] = useState('');

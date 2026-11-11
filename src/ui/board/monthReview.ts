@@ -74,16 +74,20 @@ export function developments(review: MonthReview, content: Content): Development
   return [...news.filter(n => n.tone === 'hurt'), ...news.filter(n => n.tone !== 'hurt')];
 }
 
-export interface ReviewOption { title: string; text: string; target: string }
+export type OfficeView = 'permits' | 'money' | 'capital';
+export interface ReviewOption { title: string; text: string; target: string; officeView?: OfficeView }
 export function reviewOptions(state: GameState, content: Content): ReviewOption[] {
   const step = nextStep(state, content);
-  const resolved = resolveContent(state, content);
-  const months = runway(state, resolved);
+  const months = runway(state, resolveContent(state, content));
+  const focus = content.actions.find(a => a.id === step.actionId)?.ap ?? 0;
+  const scheduleView: OfficeView = step.actionId === 'cureDraw' || step.actionId === 'priceTakeout' ? 'money' : 'permits';
   const options: ReviewOption[] = [
-    { title: step.actionId ? 'Work on the schedule' : 'Let work run, or intervene', text: `${step.title}. ${step.actionId ? `This option uses ${content.actions.find(a => a.id === step.actionId)?.ap ?? 0} focus; choosing it may leave less attention for people or funding. Inspect the cost and alternatives first.` : 'You can let the existing clocks run, or inspect the blocker and other ways to spend this month.'}`, target: step.objectId },
-    { title: 'Keep cash or change your exposure', text: `Cash ${formatDollars(state.cash)}; ${Number.isFinite(months) ? `${months.toFixed(1)} months of runway at the current net burn` : 'current net income covers recurring burn'}. Holding cash keeps a buffer. Compare new funding and commitments with keeping your cash buffer.`, target: 'siteOffice' },
+    { title: step.title === 'End the month' ? 'Inspect work in progress' : step.title,
+      text: step.actionId ? `${focus} focus if you proceed. Inspect costs before committing.` : 'Check the active clocks before waiting or changing course.',
+      target: step.objectId, officeView: step.objectId === 'siteOffice' ? scheduleView : undefined },
+    { title: 'Compare funding offers', text: `${Number.isFinite(months) ? `${months.toFixed(1)} months of runway` : 'Recurring costs covered'}. New funding buys time, but changes the deal.`, target: 'siteOffice', officeView: 'capital' },
   ];
-  if (!state.flags.rackScheduleConfirmed && state.halls.some(h => !h.delivered && !h.terminated)) options.push({ title: 'Talk to the tenant', text: 'Confirming the rack schedule costs no focus and adds tenant goodwill. It also opens a possible delivery-date swap; a swap is a separate choice, not guaranteed relief.', target: 'siteOffice' });
-  else options.push({ title: 'Invest attention in people', text: `Town goodwill ${state.goodwill.town}, commission ${state.goodwill.commission}. Time with people can improve goodwill, but competes with building work for focus.`, target: 'people' });
+  if (!state.flags.rackScheduleConfirmed && state.halls.some(h => !h.delivered && !h.terminated)) options.push({ title: 'Check tenant rack dates', text: 'Free confirmation: +3 tenant goodwill. A later date swap is a separate decision.', target: 'siteOffice', officeView: 'permits' });
+  else options.push({ title: 'Meet the town or commission', text: `Goodwill: town ${state.goodwill.town} · commission ${state.goodwill.commission}. Visits use focus you could spend on building.`, target: 'people' });
   return options;
 }
