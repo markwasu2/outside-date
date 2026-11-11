@@ -8,7 +8,7 @@ test('built foundation and frame art decode through real construction',async({pa
   const build=page.locator('[data-map-control="H1"] button');if(/^Build frame/.test(await build.innerText()))await build.click();
   await page.getByTestId('simple-next-month').click();const scale=page.getByTestId('event-scale');if(await scale.count()){await scale.fill('0');await page.getByTestId('event-choice-commit').click();}
   await page.locator('[data-testid="hall-art-frame"] img').evaluateAll(images=>Promise.all(images.map(img=>(img as HTMLImageElement).decode())));
-  if(i===0)await page.screenshot({path:'/tmp/steel-built-foundation.png'});
+  if(i===0){await page.screenshot({path:'/tmp/steel-built-foundation.png'});await page.getByTestId('night-view').click();await expect(page.locator('[data-testid=hall-art-frame] img[data-art-stage=pad]').first()).toHaveCSS('filter','brightness(0.68) saturate(0.76) drop-shadow(rgba(16, 30, 49, 0.25) 1px 2px 1px)');await page.screenshot({path:'/tmp/foundation-contact-night.png'});await page.getByTestId('night-view').click();}
  }
  await expect(page.locator('[data-milestone="frame"]')).toHaveAttribute('data-complete','true');await page.screenshot({path:'/tmp/steel-built-frame.png'});
 });
