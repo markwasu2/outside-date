@@ -29,7 +29,7 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
   const underConstruction = stage !== 'notStarted' && stage !== 'delivered';
 
   return (
-    <div data-testid="hall-art-frame" style={{ position: 'relative', width: '100%', height: '100%', maxWidth: 400, maxHeight: 330, margin: 'auto' }}>
+    <div className={reducedMotion?undefined:'site-placement'} data-testid="hall-art-frame" style={{ position: 'relative', width: '100%', height: '100%', maxWidth: 400, maxHeight: 330, margin: 'auto' }}>
       {/* pictorial layer: the stage illustration over its warm fallback color */}
       <div style={{ position: 'absolute', inset: 0, background: 'transparent', borderRadius: 6, overflow: 'hidden' }} aria-hidden="true">
         {baseLook?.img && <img src={baseLook.img} alt="" draggable={false}
@@ -162,6 +162,8 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
       )}
 
       <style>{`
+       @keyframes sitePlacement{from{opacity:.6;translate:0 5px}to{opacity:1;translate:0 0}}
+       .site-placement{animation:sitePlacement .35s ease-out}
        @keyframes siteVapor{0%{transform:translate(0,0) scale(.5);opacity:0}20%{opacity:.5}100%{transform:translate(14px,-52px) scale(1.8);opacity:0}}
        @keyframes craneWork{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(1.5deg)}}
        @keyframes excavatorWork{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
@@ -170,7 +172,7 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
        .site-crane{animation:craneWork 9s ease-in-out infinite;transform-origin:40% 80%}
        .site-excavator{animation:excavatorWork 7s ease-in-out infinite}
        .site-work-truck{animation:truckIdle 1.5s ease-in-out infinite}
-       @media(prefers-reduced-motion:reduce){.site-vapor,.site-crane,.site-excavator,.site-work-truck{animation:none!important}}
+       @media(prefers-reduced-motion:reduce){.site-placement,.site-vapor,.site-crane,.site-excavator,.site-work-truck{animation:none!important}}
       `}</style>
       
     </div>

@@ -193,6 +193,40 @@ def people():
   cx,cy=p(x,y,55);s+=f'<circle cx="{cx}" cy="{cy}" r="7" fill="#d8ad7c" stroke="{INK}" stroke-width="1.5"/><path d="M{cx-9},{cy-2} q0,-12 18,0z" fill="{GOLD}" stroke="{INK}" stroke-width="1.5"/>'
  return s
 
+def compound(kind):
+ s=box(-95,-68,-3,190,136,4,'#98a9a4','#6e8480','#526f6c')
+ for x in range(-88,90,15):s+=line(p(x,-66,1),p(x,66,1),'#c5cfbf',.45)
+ for y in range(-60,66,15):s+=line(p(-94,y,1),p(94,y,1),'#657d76',.4)
+ # Chain-link perimeter, service gate and perimeter fixtures.
+ for x in range(-92,94,16):
+  s+=line(p(x,-65,1),p(x,-65,16),'#a9b6af',1.1)
+  s+=line(p(x,-65,16),p(min(x+16,94),-65,1),'#b0bdb1',.35)
+ s+=line(p(-92,-65,16),p(92,-65,16),'#c8d2c1',.7)
+ for y in range(-62,66,16):
+  s+=line(p(94,y,1),p(94,y,16),'#9eb0aa',1.1)+line(p(94,y,16),p(94,min(y+16,66),1),'#b4c2b6',.35)
+ s+=line(p(94,-64,16),p(94,66,16),'#b6c8be',.8)
+ if kind=='cooling':
+  for x in (-78,-24,30):
+   s+=box(x,-42,3,40,52,22,'#c3d6cf','#819d99','#4e7278')
+   s+=fans(x+2,-32,25,2)
+   for y in range(-36,7,5):s+=line(p(x+40,y,5),p(x+40,y,22),'#294f5d',.6)
+  for x in (-75,-20,35):s+=box(x,25,2,30,17,12,'#9db8af','#6e9790','#3d6972')
+  for y in (16,21):s+=line(p(-82,y,8),p(80,y,8),'#adc8c3',3)
+  s+=box(-85,50,1,31,12,16,'#c9d4c5','#8fa9a0','#5b817e')
+ else:
+  for x in (-78,-20,38):
+   s+=box(x,-41,2,42,71,23,'#d3d2b7','#9ba896','#68847c')
+   for y in range(-35,22,5):s+=line(p(x+42,y,7),p(x+42,y,20),'#3b6065',1)
+   s+=box(x+5,-30,25,9,9,22,'#bac9be','#8ba49c','#496f75')
+   s+=box(x+4,-31,47,11,11,2,'#536d70','#435d60','#304e56')
+   s+=poly([p(x+6,30,10),p(x+30,30,10),p(x+30,30,17),p(x+6,30,17)],'#b7c99e','#718876',.4)
+  s+=box(-81,44,1,53,15,16,'#b0c4bb','#739892','#416e77')
+  for x in (-74,-60,-46):s+=line(p(x,59,4),p(x,59,15),'#456973',.8)
+ for x in (-90,84):
+  s+=line(p(x,56,1),p(x,56,46),'#6b8782',2)+line(p(x,56,46),p(x+10,56,46),'#718c87',1.5)
+  s+=box(x+7,54,45,6,5,2,'#e4e4cb','#b5c8b3','#8ba59c')
+ return s
+
 def save(name,body):
  defs='<defs><radialGradient id="foliage" cx="30%" cy="25%"><stop stop-color="#c6d58b"/><stop offset=".4" stop-color="#729558"/><stop offset="1" stop-color="#355d47"/></radialGradient><linearGradient id="glass" x2="1" y2="1"><stop stop-color="#b4d8dc"/><stop offset=".45" stop-color="#4f7d8a"/><stop offset=".5" stop-color="#b3cace"/><stop offset="1" stop-color="#355461"/></linearGradient><filter id="shadow" x="-35%" y="-35%" width="180%" height="190%"><feDropShadow dx="7" dy="10" stdDeviation="4" flood-color="#223c3c" flood-opacity=".32"/></filter>'
  for key,(c,face) in GRADIENTS.items():
@@ -208,6 +242,7 @@ for kind in ('crane','excavator','truck'):save('vehicle-'+kind,vehicle(kind))
 for kind in ('cooling-tower','dry-cooler','hybrid-chiller','transformer','switchgear'):save('equip-'+kind,equipment(kind))
 for kind in ('site-office','laydown','pond','dry-field'):save('tile-'+kind,tile(kind))
 save('campus-people',people())
+for kind in ('cooling','backup'):save('compound-'+kind,compound(kind))
 # Ground has its own deterministic landscape generator.
 exec(Path('scripts/campus-ground.py').read_text())
 print(f'Wrote {len(list(OUT.glob("*.svg")))} original campus assets')
