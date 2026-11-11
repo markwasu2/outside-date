@@ -672,7 +672,7 @@ export const useStore = create<UIStore>((set, get) => ({
       error: null,
       boardPopover: null,
       prevState: null,
-      monthReview: null,
+      monthReview: save.monthReview ?? null,
       requestedOfficeView: null,
       requestedVisitGroup: null,
       seenBoardObjects: [],
@@ -698,8 +698,8 @@ export const useStore = create<UIStore>((set, get) => ({
    * state-committing actions above, right after their own `set()`, so it always reads the
    * just-committed values rather than a stale snapshot. */
   autosave: () => {
-    const { state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots } = get();
-    saveGame({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots });
+    const { state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots,monthReview } = get();
+    saveGame({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots,monthReview });
   },
 }));
 

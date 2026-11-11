@@ -409,7 +409,7 @@ export function Hud({ hideFastForward = false }: { hideFastForward?: boolean }) 
       <button
         title="Download the current save as a JSON file"
         onClick={() =>
-          exportSaveToFile({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots })
+          exportSaveToFile({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots,monthReview:useStore.getState().monthReview })
         }
       >
         Export save
