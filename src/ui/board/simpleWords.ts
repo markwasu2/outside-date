@@ -41,7 +41,7 @@ export function simpleRows(objectId:string,state:GameState,content:Content):Acti
  if(objectId==='siteOffice')rows=rows.filter(r=>['filePermit','fileDocket','prepTestimony','answerDiscovery','meetIntervenor','cureDraw'].includes(r.action.actionId));
  if(objectId==='people')rows=[...rows.filter(r=>r.action.actionId==='visitCast'&&(r.action.params?.group!=='utility'||state.docketEnabled)),...buildRows('construction',state,content,null).filter(r=>r.action.actionId==='importCrews'&&state.halls.some(h=>h.stageIndex>=2&&!h.delivered))];
  if(objectId==='substation')rows=rows.filter(r=>['commissionStudy','orderTransformer','orderSwitchgear','spotBuy','secondSource'].includes(r.action.actionId));
- if(state.halls.some(h=>h.id===objectId))rows=rows.filter(r=>['advanceHall','fixInspection','readyLiquid','mitigateWetlands'].includes(r.action.actionId));
+ if(state.halls.some(h=>h.id===objectId)){const hall=state.halls.find(h=>h.id===objectId)!;rows=rows.filter(r=>['advanceHall','fixInspection','readyLiquid','mitigateWetlands'].includes(r.action.actionId)&&(r.action.actionId!=='advanceHall'||!hall.stageActive));}
  return rows.filter(r=>!isContextOnlyAction(r.action,state,content)).filter(r=>r.action.actionId!=='filePermit'||state.permitsRequired.includes(String(r.action.params?.permitId) as keyof GameState['permits']));
 }
 export function plainWords(text:string):string {
