@@ -1,5 +1,6 @@
 import type { Content } from '../../content/schemas';
-import type { GameState, PlannedAction } from '../../engine/types';
+import { contactPurpose } from './relationships';
+import type { GoodwillGroup, GameState, PlannedAction } from '../../engine/types';
 import { resolveContent } from '../../engine/resolve';
 import { hasLiveDiscovery } from '../../engine/selectors';
 import { formatMonth } from '../../engine/format';
@@ -8,6 +9,7 @@ export const actionCostWords=(cost:number)=>cost===0?'No focus cost':`Uses ${cos
 export function decisionResult(action:PlannedAction,state:GameState,content:Content,fallback:string):string {
  const t=resolveContent(state,content).tuning;
  switch(action.actionId){
+ case 'visitCast':return contactPurpose(state,content,String(action.params?.group) as GoodwillGroup);
  case 'commissionStudy':return `Starts the power-connection study. It takes ${t.power.studyMonthsMin} to ${t.power.studyMonthsMax} months; it does not give you power immediately.`;
  case 'orderTransformer':return 'Books a transformer order and pays the deposit. Delivery takes months; the laydown yard shows the booked date. It does not switch the power on today.';
  case 'orderSwitchgear':return 'Books the electrical switchgear and pays the deposit. When the study and equipment are ready, substation construction starts automatically.';

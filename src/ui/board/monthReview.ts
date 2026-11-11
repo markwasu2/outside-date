@@ -5,6 +5,7 @@ import { dscr, runway, totalDebt } from '../../engine/selectors';
 import { STAGES, type GameState, type GoodwillGroup, type PlannedAction } from '../../engine/types';
 import { STAGE_WORDS } from './legibility';
 import { nextStep, workInFlight } from './nextStep';
+import { campusFinished, contactPurpose, relevantContactGroups } from './relationships';
 
 /** Immutable UI history. Actions in the new month must never rewrite this review. */
 export interface MonthReview {
@@ -85,20 +86,19 @@ export function runwayWords(months: number): string {
 }
 /** A concrete optional visit, not a promise that goodwill will fix a permit or deadline. */
 export function relationshipOption(state: GameState, content: Content): ReviewOption {
-  const groups: GoodwillGroup[] = ['town','commission','tenant','utility'];
-  const eligible = groups.filter(group => {
-    const last = state.flags[`visitCastLast:${group}`];
-    return state.goodwill[group] < 100 && (typeof last !== 'number' || state.month-last >= 3);
-  }).sort((a,b) => state.goodwill[a]-state.goodwill[b]);
+  const groups: GoodwillGroup[] = campusFinished(state) ? ['tenant','town','commission'] : ['town','commission','tenant','utility'];
+  const eligible = relevantContactGroups(state,content);
   const group = eligible[0];
   if (!group) {
     const returns = groups.map(g=>({g,last:state.flags[`visitCastLast:${g}`]})).filter(v=>typeof v.last==='number' && state.goodwill[v.g]<100).map(v=>`${v.g} ${formatMonth((v.last as number)+3)}`);
-    return {title:'Check contact availability',text:returns.length ? `Visits reopen: ${returns.join('; ')}. You can wait without spending focus.` : 'Your contacts are at maximum goodwill. No visit can add more right now.',target:'people'};
+    return {title:'Check contact availability',text:returns.length ? `Visits reopen: ${returns.join('; ')}. You can wait without spending focus.` : campusFinished(state) ? 'Tenant and community contacts are at maximum goodwill. Utility visits cannot improve those closing results.' : 'Your contacts are at maximum goodwill. No visit can add more right now.',target:'people'};
   }
   const value = state.goodwill[group], gain = Math.min(4,100-value);
   const cost = content.actions.find(a=>a.id==='visitCast')?.ap ?? 2;
   const left = state.apPerMonth-state.apUsedThisMonth;
-  return {title:`Visit ${group} contacts`,text:`Goodwill ${value} → ${value+gain} · ${cost} focus · $0. ${left<cost ? `Needs ${cost-left} more focus. ` : ''}Every 3 months; no construction progress.`,target:'people',visitGroup:group};
+  const purpose=contactPurpose(state,content,group);
+  const stakes=campusFinished(state) ? purpose.split('. ')[0]+'. ' : '';
+  return {title:`Visit ${group} contacts`,text:`${stakes}Goodwill ${value} → ${value+gain} · ${cost} focus · $0. ${left<cost ? `Needs ${cost-left} more focus. ` : ''}Every 3 months; no construction progress.`,target:'people',visitGroup:group,detail:contactPurpose(state,content,group)};
 }
 export function waitOptionText(state: GameState, content: Content): string {
   const step=nextStep(state,content);
@@ -118,7 +118,7 @@ export function reviewOptions(state: GameState, content: Content): ReviewOption[
   const shortWait=step.progress && step.title==='End the month' && !step.why.includes('needs') && !step.why.includes('Wetlands') ? `${step.progress}. No repeat instruction needed.` : waitText.split('. ').slice(0,2).join('. ')+(waitText.split('. ').length>2 ? '.' : '');
   const options: ReviewOption[] = [
     { title: step.title === 'End the month' ? 'Inspect work in progress' : step.title,
-      text: step.actionId ? `${focus} focus if you proceed. Inspect costs before committing.` : shortWait, detail: !step.actionId && waitText!==shortWait ? waitText : undefined,
+      text: step.actionId ? `${focus} focus. ${step.why.split('. ')[0]!.replace(/\.$/,'')}.` : shortWait, detail: !step.actionId && waitText!==shortWait ? waitText : undefined,
       target: step.objectId, officeView: step.objectId === 'siteOffice' ? scheduleView : undefined },
     finished || closing
       ? { title: closing ? 'Review debt before selling' : 'Review the lender test', text: debtText, target: 'siteOffice', officeView: 'money' }
