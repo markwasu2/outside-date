@@ -1,0 +1,9 @@
+import {test,expect} from '@playwright/test';
+test.use({storageState:{cookies:[],origins:[]}});
+for(const width of [1280,1440])test(`plant dates and output remain in front of the boundary fence at desktop ${width}`,async({page})=>{
+ await page.setViewportSize({width,height:width===1280?720:900});await page.addInitScript(()=>localStorage.setItem('outside-date-detailed','true'));await page.goto('/');await page.locator('select').first().selectOption('whale');await page.getByRole('button',{name:'New game',exact:true}).click();for(let step=0;step<8;step++)await page.getByRole('button',{name:/^Next:/}).click();await page.getByRole('button',{name:'Review closing table',exact:true}).click();await page.getByRole('button',{name:'Start campaign',exact:true}).click();await page.getByRole('button',{name:'Simple view',exact:true}).click();
+ for(const status of ['waiting','building','delayed','online']){await page.evaluate(async(status)=>{
+ // @ts-expect-error fixture
+ const {useStore}=await import('/src/ui/store.ts');const s=structuredClone(useStore.getState().draft);s.flags.siteOptioned=true;s.halls.forEach(h=>h.stageIndex=4);s.month=40;s.power.plants.forEach(p=>{p.plannedOnlineMonth=status==='waiting'?null:42;p.onlineMonth=status==='waiting'?null:status==='online'?39:43;p.slipped=status==='delayed';});useStore.setState({state:s,draft:s,plan:[]});
+ },status);const caption=page.getByTestId('plant-caption-A');await expect(caption).toContainText(status);await expect(caption).toHaveCSS('z-index','4');await expect(caption).toBeInViewport();const a=await caption.boundingBox(),b=await page.getByTestId('support-equipment-caption').boundingBox();expect(a&&b).toBeTruthy();expect(a!.x>=b!.x+b!.width||a!.y>=b!.y+b!.height||b!.y>=a!.y+a!.height).toBe(true);await page.screenshot({path:`/tmp/plant-caption-${width}-${status}.png`});}
+});
