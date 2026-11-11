@@ -1,3 +1,4 @@
+import {turnFeedback} from './turnFeedback';
 import {MonthlyReceipt} from './MonthlyReceipt';
 import {campusMilestones} from './campusMilestones';
 import {useState} from 'react';
@@ -31,6 +32,7 @@ export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
  const saleMonth=draft.debt.converted&&typeof converted==='number'?Math.min(draft.maxMonths,converted+resolveContent(draft,content).tuning.takeout.seasoningMonths)+1:null;
  const alerts=warnings(draft,content);
  const freeze=!!draft.flags.drawFreeze;
+ const feedback=turnFeedback(draft,!!review);
  const button={border:'1px solid #b6af95',borderRadius:6,padding:'7px 11px',background:'#fffdf4',color:'#3f4c38',cursor:'pointer'};
  return <main data-testid="tycoon-game" style={{height:'100vh',display:'flex',flexDirection:'column',background:'#f4eddb',color:'#343c2e',fontFamily:'system-ui,sans-serif'}}>
   <BoardStyles/>
@@ -61,7 +63,7 @@ export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
    <button data-testid="night-view" aria-pressed={night} style={{...button,padding:'3px 7px'}} onClick={()=>setNight(!night)}>{night?'Day view':'Night view'}</button><button aria-pressed={!muted} style={{...button,padding:'3px 7px'}} onClick={toggleMuted}>{muted?'Sound off':'Sound on'}</button><strong>Coming up</strong>{nextEvents.length?nextEvents.map((e,i)=><span key={i}>Month {e.month+1}: {simpleTimelineLabel(e.label)}</span>):<span>Buildings and running costs update each month.</span>}
   </section>
   <footer style={{padding:'10px 18px',background:'#fffdf5',display:'flex',alignItems:'center',gap:12,borderTop:'1px solid #d6cbb0',minHeight:48}}>
-   <div data-testid="simple-feedback" style={{flex:1,fontSize:13,lineHeight:1.4}}>{error?<strong style={{color:'#a54d34'}}>{plainWords(error)}</strong>:plan.length?<><strong>{plan.length} order{plan.length===1?'':'s'} placed.</strong> {points} action points left. Crews work when time advances.</>:draft.phase==='takeoutAvailable'?<><strong>Campus ready to sell.</strong> Open Money to review the numbers, or sell your campus now.</>:remaining.length===0?<><strong>Campus open.</strong> Collect rent while the lender checks your income; the sale button appears when ready.</>:review?<><strong>No orders placed this month.</strong> {draft.halls.some(h=>h.stageActive&&!h.terminated&&!h.delivered)?'Crews are working. Spare points can go to contacts, or advance the month to keep work moving.':'Inspect build and power options, or advance the month to move work and review clocks.'}</>:<><strong>Buy land to start.</strong> Each order uses points. Advance the month to let work finish.</>}</div>
+   <div data-testid="simple-feedback" style={{flex:1,fontSize:13,lineHeight:1.4}}>{error?<strong style={{color:'#a54d34'}}>{plainWords(error)}</strong>:plan.length?<><strong>{plan.length} order{plan.length===1?'':'s'} placed.</strong> {points} action points left. Crews work when time advances.</>:draft.phase==='takeoutAvailable'?<><strong>Campus ready to sell.</strong> Open Money to review the numbers, or sell your campus now.</>:remaining.length===0?<><strong>Campus open.</strong> Collect rent while the lender checks your income; the sale button appears when ready.</>:<><strong>{feedback.heading}</strong> {feedback.body}</>}</div>
    {plan.length>0&&<button style={button} onClick={undo}>Undo last order</button>}
    {review&&<button style={button} onClick={()=>setHistory(!history)}>Last month{alerts.length?` (${alerts.length} alerts)`:''}</button>}
    {draft.phase==='takeoutAvailable'?<button data-testid="simple-sell" style={{...button,background:'#365c45',color:'#fff'}} onClick={()=>queue({actionId:'priceTakeout'})}>Sell campus</button>:<button data-testid="simple-next-month" disabled={draft.phase==='awaitingChoice'} onClick={e=>{if(e.detail>=2)return;open(null);setFinance(false);setHistory(false);endMonth();}} style={{...button,padding:'12px 22px',background:'#365c45',color:'#fff',fontWeight:700}}>Next month ▶</button>}
