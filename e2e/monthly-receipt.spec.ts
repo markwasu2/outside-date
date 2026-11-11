@@ -1,0 +1,9 @@
+import {test,expect} from '@playwright/test';
+test.use({storageState:{cookies:[],origins:[]}});
+test('monthly receipt shows actual results, stays frozen during new orders and opens all developments',async({page})=>{
+ await page.setViewportSize({width:1280,height:720});await page.goto('/');await page.getByTestId('start-first-campus').click();await expect(page.getByTestId('monthly-receipt')).toHaveCount(0);
+ await page.locator('[data-map-control="road"] button').click();await page.locator('[data-map-control="H1"] button').click();await page.getByTestId('simple-next-month').click();
+ const receipt=page.getByTestId('monthly-receipt');await expect(receipt).toContainText('Month 1 results');await expect(receipt).toContainText('Foundation complete');await expect(receipt).toContainText('2 decisions made');await expect(receipt.getByTestId('receipt-cash')).toContainText('-');const frozen=await receipt.innerText();
+ await page.locator('[data-map-control="H1"] button').click();expect(await receipt.innerText()).toBe(frozen);
+ await receipt.getByTestId('receipt-details').click();await expect(page.getByTestId('simple-month-results')).toBeVisible();await expect(page.getByTestId('simple-next-month')).toBeInViewport();await page.getByTestId('simple-month-results').getByRole('button',{name:'Close',exact:true}).click();await page.getByTestId('inspect-permits').click();await expect(page.getByTestId('simple-object-panel')).toContainText('Apply for building permit');await page.getByTestId('simple-object-panel').getByRole('button',{name:'Apply for building permit',exact:true}).click();expect(await receipt.innerText()).toBe(frozen);await page.getByTestId('simple-object-panel').getByRole('button',{name:'Close',exact:true}).click();await page.screenshot({path:'/tmp/monthly-receipt-cold.png'});
+});

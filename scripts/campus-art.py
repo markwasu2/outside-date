@@ -255,6 +255,7 @@ def compound(kind):
 def save(name,body):
  defs='<defs><radialGradient id="foliage" cx="30%" cy="25%"><stop stop-color="#c6d58b"/><stop offset=".4" stop-color="#729558"/><stop offset="1" stop-color="#355d47"/></radialGradient><linearGradient id="glass" x2="1" y2="1"><stop stop-color="#b4d8dc"/><stop offset=".45" stop-color="#4f7d8a"/><stop offset=".5" stop-color="#b3cace"/><stop offset="1" stop-color="#355461"/></linearGradient><filter id="shadow" x="-35%" y="-35%" width="180%" height="190%"><feDropShadow dx="7" dy="10" stdDeviation="4" flood-color="#223c3c" flood-opacity=".32"/></filter>'
  for key,(c,face) in GRADIENTS.items():
+  if f'url(#{key})' not in body:continue
   rgb=[int(c[i:i+2],16) for i in (1,3,5)]
   def tint(f):return '#'+''.join(f'{max(0,min(255,round(v*f))):02x}' for v in rgb)
   defs+=f'<linearGradient id="{key}" x1="0" y1="0" x2=".65" y2="1"><stop stop-color="{tint(1.12)}"/><stop offset=".52" stop-color="{c}"/><stop offset="1" stop-color="{tint(.88)}"/></linearGradient>'

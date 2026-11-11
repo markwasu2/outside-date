@@ -39,6 +39,7 @@ export function developments(review: MonthReview, content: Content): Development
     if (!old) continue;
     if (!old.delivered && h.delivered) add('helped', `${h.id} delivered ${formatMonth(h.deliveredMonth ?? after.month)}. ${h.deliveredMonth !== null && h.deliveredMonth > h.deliveryMonth ? `It missed the lease target ${formatMonth(h.deliveryMonth)}; delivery still brings rent, but lateness counts against the time grade.` : 'It met the lease delivery target. The hall can now earn rent.'}`);
     else if (!old.terminated && h.terminated) add('hurt', `${h.id} lost its tenant after its outside date. That hall is no longer a live delivery opportunity.`);
+    else if (old.stageIndex < 0 && h.stageIndex >= 1) add('helped', `${h.id}: Foundation work finished. The next stage needs its own construction order.`);
     else if (old.stageIndex >= 0 && h.stageIndex > old.stageIndex) add('helped', `${h.id}: ${STAGE_WORDS[STAGES[old.stageIndex] ?? 'pad']} work finished. Your construction instruction carried the stage through; inspect the hall before starting its next stage.`);
     else if (h.stageMonthsDone > old.stageMonthsDone) add('helped', `${h.id}: ${STAGE_WORDS[STAGES[h.stageIndex] ?? 'pad']} gained ${(h.stageMonthsDone - old.stageMonthsDone).toFixed(1).replace('.0', '')} ${h.stageMonthsDone - old.stageMonthsDone === 1 ? 'month' : 'months'} of work. The crew you started kept working without another instruction.`);
     else if (h.stageMonthsDone < old.stageMonthsDone) add('hurt', `${h.id} lost ${(old.stageMonthsDone - h.stageMonthsDone).toFixed(1).replace('.0', '')} ${old.stageMonthsDone - h.stageMonthsDone === 1 ? 'month' : 'months'} of stage progress. Check the damage and event record before pushing the schedule.`);
@@ -48,6 +49,7 @@ export function developments(review: MonthReview, content: Content): Development
     if (after.permits[id].status === 'granted') add('helped', `The ${id} permit was granted. Filing earlier put its review clock in motion; the permit no longer blocks work that requires it.`);
     else if (after.permits[id].status === 'denied') add('hurt', `The ${id} permit was denied. The time spent filing did not secure approval; inspect the office for a new review.`);
   }
+  if (before.power.studyStatus !== 'done' && after.power.studyStatus === 'done') add('helped', `The power study finished. ${after.power.substationStatus==='building'?'The equipment is ready and connection work has begun.':after.power.substationStatus==='done'?'The power connection is ready.':'The remaining equipment must be on site before connection work can begin.'}`);
   if (before.power.substationStatus !== 'done' && after.power.substationStatus === 'done') add('helped', 'The substation energized. Your earlier study and equipment orders have turned into a usable power connection. Halls still need capacity, hookup and commissioning.');
   for (const o of after.power.orders.filter(o => o.arrived && !before.power.orders.some(p => p.kind === o.kind && p.orderedMonth === o.orderedMonth && p.supplier === o.supplier && p.arrived))) add('helped', `The ${o.kind} you ordered arrived. Its delivery slot is now equipment on site, not yet a delivered hall.`);
   const freshLogs = after.log.slice(before.log.length);
@@ -63,6 +65,8 @@ export function developments(review: MonthReview, content: Content): Development
       add(delta > 0 ? 'helped' : 'hurt', `${group[0]!.toUpperCase() + group.slice(1)} goodwill ${before.goodwill[group]} → ${after.goodwill[group]}.${confirmed ? ' Confirming the rack schedule added 3 tenant goodwill; the arrow is the net change after everything else this month.' : visited ? ' Your contact visit added up to 4 goodwill, capped at 100. The arrow includes any other changes this month.' : ' This is the net change across the month; the record does not isolate one action as its cause.'}`);
     }
   }
+  if (!news.length && after.phase === 'takeoutAvailable') add('helped', 'The campus is ready to sell. Review the debt and your share before confirming a sale.');
+  if (!news.length && after.halls.some(h=>h.delivered&&!h.terminated) && after.halls.every(h=>h.delivered||h.terminated)) add('neutral', 'The open campus is in its operating period. Rent and running costs continue; the lender test controls when a sale becomes available.');
   if (!news.length) {
     const pending = after.permitsRequired.filter(id => after.permits[id].status === 'pending');
     if (pending.length) add('neutral', pending.map(id => `${id} review is still running${after.permits[id].decisionMonth !== null ? `; decision scheduled ${formatMonth(after.permits[id].decisionMonth!)}` : ''}`).join('. ') + '. Waiting moves these clocks without another filing.');
