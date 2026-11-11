@@ -39,6 +39,11 @@ export function simpleRows(objectId:string,state:GameState,content:Content):Acti
  let rows=objectId==='road'?buildRows('land',state,content,null):boardActionsForObject(objectId==='people'?'siteOffice':objectId,state,content);
  if(objectId==='finance')return [...buildRows('money',state,content,null),...buildRows('capital',state,content,null)].filter(r=>!state.flags.outOfBalance||r.action.actionId!=='cureDraw');
  if(state.flags.outOfBalance)rows=rows.filter(r=>r.action.actionId!=='cureDraw');
+ if(objectId==='siteOffice'){
+  // The simple Permits panel must contain every filing its review text names.
+  const extra=boardActionsForObject('pond',state,content).filter(r=>r.action.actionId==='filePermit'&&!rows.some(old=>old.action.actionId==='filePermit'&&old.action.params?.permitId===r.action.params?.permitId));
+  rows=[...rows,...extra];
+ }
  if(objectId==='siteOffice')rows=rows.filter(r=>['filePermit','fileDocket','prepTestimony','answerDiscovery','meetIntervenor','cureDraw'].includes(r.action.actionId));
  if(objectId==='people')rows=[...rows.filter(r=>r.action.actionId==='visitCast'&&(r.action.params?.group!=='utility'||state.docketEnabled)),...buildRows('construction',state,content,null).filter(r=>r.action.actionId==='importCrews'&&state.halls.some(h=>h.stageIndex>=2&&!h.delivered))];
  if(objectId==='substation')rows=rows.filter(r=>['commissionStudy','orderTransformer','orderSwitchgear','spotBuy','secondSource'].includes(r.action.actionId));
