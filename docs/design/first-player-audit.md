@@ -29,3 +29,10 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Fit-out now reveals connected campus service roads and a planted courtyard with walks, benches and shrubs. These are scenery in the hall build, not new power or income.
 - Night shading applies to the added landscape as well as buildings.
 - Seven relevant browser regressions passed including both desktop full journeys and six-hall art. Built image decode, build and lint passed; inspected actual day and night images at 1280x720.
+
+## November 10 evening: frozen monthly receipts and cold-player fixes
+- Always-visible results after each finished month: actual bank change, separate construction spend, completed milestones and the most important development. It is frozen while today's choices change live state; pending event choices must be resolved first.
+- Same-month foundation completion and power-study completion now appear in news. Sale-ready/operating months no longer get generic blocker advice.
+- A blocked build can jump straight to permit inspection. The footer describes current choices rather than duplicating the prior-month report.
+- Removed unused material-gradient definitions from each generated SVG, taking the authored SVG set from 859,240 to 471,654 bytes without changing rendered geometry.
+- Validation: full unit suite 670 passed, then six receipt tests plus 12 review tests passed after the final fallback fix (671 unit tests total). Browser regressions: 40+38+39+39 passed, one detailed journey hit its 55s wall under shard load and passed separately in 29s. Lint/build and built-image decode passed. Actual early/result pixels inspected; both default desktop journeys complete.
