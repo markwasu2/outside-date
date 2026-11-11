@@ -2,7 +2,8 @@ import type {GameState} from '../../engine/types';
 import type {Content} from '../../content/schemas';
 import {HallSprite} from '../board/HallSprite';
 import {hallVisual,stageMinMonths} from '../board/hallVisual';
-import ground from '../../assets/campus/campus-ground.svg';
+import {resolveSite} from '../../content/sites';
+import {siteTerrain} from '../board/siteTerrain';
 import substation from '../../assets/campus/substation-done.svg';
 
 const stageNames:Record<string,string>={notStarted:'No foundation started',pad:'Foundation',steel:'Frame',shell:'Walls',fitout:'Interiors',rfs:'Final testing',delivered:'Open'};
@@ -11,10 +12,11 @@ const stageNames:Record<string,string>={notStarted:'No foundation started',pad:'
  * Stopped projects keep their unfinished art; power appears only if connected. */
 export function ResultCampus({state,content}:{state:GameState;content:Content}){
  const sold=state.outcome?.kind==='win',months=stageMinMonths(state,content);
+ const terrain=siteTerrain(resolveSite(content,state.scenarioId,state.setup.site,content.tuning).mapTheme);
  return <figure data-testid="result-campus" style={{margin:0,alignSelf:'stretch',background:sold?'#dce6cb':'#e5e2d1',borderRadius:9,overflow:'hidden',display:'flex',flexDirection:'column'}}>
   <div style={{padding:'18px 20px 0',fontSize:11,letterSpacing:1.4,color:'#53664a',fontWeight:700}}>{sold?'CAMPUS SOLD':'SITE AT CLOSE'}</div>
   <div style={{position:'relative',flex:1,minHeight:220,display:'grid',placeItems:'center',padding:'12px 20px',isolation:'isolate'}}>
-   <img src={ground} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:.28,zIndex:-1}}/>
+   <img data-testid="result-terrain" data-terrain={terrain.id} src={terrain.image} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:.28,zIndex:-1}}/>
    <div style={{display:'grid',gridTemplateColumns:state.halls.length>1?'1fr 1fr':'1fr',width:'100%'}}>{state.halls.map(h=>{
     const visual=hallVisual(h,months),stage=visual.stage;
     const stageName=stage==='rfs'&&!h.stageActive?'Final testing not started':stageNames[stage];
