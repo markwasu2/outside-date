@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { formatDollars, formatMonth } from '../../engine/format';
 import { useStore } from '../store';
-import { developments, reviewOptions, type ReviewOption } from './monthReview';
+import { developments, prominentDevelopments, reviewOptions, type ReviewOption } from './monthReview';
 
 /** Keep the consequence visible; move the audit trail behind an explicit disclosure. */
 export function MonthReviewPanel({ onInspect }: { onInspect: (option: ReviewOption) => void }) {
@@ -11,7 +11,8 @@ export function MonthReviewPanel({ onInspect }: { onInspect: (option: ReviewOpti
   const content = useStore(s => s.content);
   const options = reviewOptions(state, content);
   const news = review ? developments(review, content) : [];
-  const visible = news.slice(0, 2);
+  const visible = prominentDevelopments(news);
+  const remaining = news.filter(n => !visible.includes(n));
   return <aside data-testid="month-review" aria-label="Month review" data-compact-open={compactOpen} style={{width:340,flexShrink:0,background:'#fffdf6',borderLeft:'1px solid #cdbf9f',overflowY:'auto',padding:'12px 16px',boxSizing:'border-box',fontSize:13,lineHeight:1.4}}>
     <button data-testid="compact-review-toggle" aria-expanded={compactOpen} onClick={()=>setCompactOpen(!compactOpen)}>{review ? `${formatMonth(review.after.month)} review · ${news.length} development${news.length===1?'':'s'}` : 'Your position & options'} <span>{compactOpen?'Close':'Open'}</span></button>
     <div data-testid="review-body">
@@ -32,10 +33,10 @@ export function MonthReviewPanel({ onInspect }: { onInspect: (option: ReviewOpti
         </div>;
       })}</div>
       <details data-testid="review-history" style={{fontSize:12,color:'#635b49',margin:'6px 0 12px'}} key={`${review.after.month}-${review.after.log.length}`}>
-        <summary style={{cursor:'pointer'}}>Month record{news.length>2?` · ${news.length-2} more developments`:''}</summary>
+        <summary style={{cursor:'pointer'}}>Month record{news.length>2?` · ${remaining.length} more development${remaining.length===1?'':'s'}`:''}</summary>
         <p>{formatMonth(review.before.month)} → {formatMonth(review.after.month)}. Cash {formatDollars(review.before.cash)} → {formatDollars(review.after.cash)} includes actions, funding and monthly costs.</p>
         {review.actions.length>0 && <p data-testid="review-choices">You chose: {review.actions.map(a=>`${content.actions.find(def=>def.id===a.actionId)?.label ?? a.actionId}${a.params?.permitId?` (${a.params.permitId})`:a.params?.hallId?` (${a.params.hallId})`:''}`).join('; ')}.</p>}
-        {news.slice(2).map((n,i)=><p key={i}>{n.text}</p>)}
+        {remaining.map((n,i)=><p key={i}>{n.text}</p>)}
       </details>
     </> : <p style={{color:'#635b49',margin:'0 0 14px'}}>{state.month>0 ? 'Review history starts after your next month.' : 'Start the long clocks, protect your cash, or build goodwill. You choose the priorities.'}</p>}
     <h3 style={{fontSize:13,margin:'12px 0 3px'}}>Your options now</h3>

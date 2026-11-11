@@ -1,5 +1,5 @@
-import campusPeopleImg from '../../assets/art/campus-people.png';
-import campusGroundImg from '../../assets/art/campus-ground.jpg';
+import campusPeopleImg from '../../assets/campus/campus-people.svg';
+import campusGroundImg from '../../assets/campus/campus-ground.svg';
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 
 import { formatMonth } from '../../engine/format';
@@ -276,7 +276,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
         boxSizing: 'border-box',
         fontFamily: 'sans-serif',
         fontSize: '0.75rem',
-        background: `url(${campusGroundImg}) center / cover, ${siteTheme.ground}`,
+        background: `url(${campusGroundImg}) center / 100% 100%, linear-gradient(#eadbbccc, #e0ca9acc), ${siteTheme.ground}`,
       }}
     >
       <BoardLegend />
@@ -416,7 +416,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
                 data-testid={`caption-${hall.id}`}
                 style={{
                   position: 'absolute',
-                  top: 14,
+                  top: 23,
                   left: 3,
                   fontSize: '0.6rem',
                   zIndex: 2,

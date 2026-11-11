@@ -28,7 +28,7 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
   const underConstruction = stage !== 'notStarted' && stage !== 'delivered';
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div data-testid="hall-art-frame" style={{ position: 'relative', width: '100%', height: '100%', maxWidth: 400, maxHeight: 330, margin: 'auto' }}>
       {/* pictorial layer: the stage illustration over its warm fallback color */}
       <div style={{ position: 'absolute', inset: 0, background: 'transparent', borderRadius: 6, overflow: 'hidden' }} aria-hidden="true">
         {baseLook?.img && <img src={baseLook.img} alt="" draggable={false}
@@ -149,9 +149,9 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
           data-testid="stage-vehicle"
           style={{
             position: 'absolute',
-            bottom: 6,
-            right: 2,
-            width: '30%',
+            top: '57%',
+            right: '10%',
+            width: '28%',
             borderRadius: 4,
             pointerEvents: 'none',
           }}
