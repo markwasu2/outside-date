@@ -150,3 +150,9 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Added light roof joists with open-web ties, selected diagonal braced bays, column shoes and connection plates. The frame stays open, so walls and roof remain a distinct next stage. Only hall-steel.svg changes on regeneration.
 - Added a built-app real-click route from land purchase through foundation and frame completion, decoding the actual packaged hall images after each month. This complements the existing built ground-image check.
 - Inspected both built-app stages, the live development journey and the art sheet. Both default desktop journeys, asset/bounds and six-hall checks, all 176 browser regressions (with interrupted batches reconciled by test title), two built-app checks, lint/build and deterministic regeneration pass. Engine unchanged from the 705-unit baseline.
+
+## Keep stopped-work feedback visible after an order
+- Cold replay exposed a footer contradiction: any queued order hid an active inspection/funding/stand-down warning behind "Crews work when time advances", even when the order did not clear that blocker.
+- The order count and points remain visible, but stopped-work feedback now stays alongside them. It clears when the actual draft no longer has the blocker, not simply when an order is placed. No engine change.
+- Real-click regression queues an unrelated building permit while an inspection failure persists, checks the stopped crew and warning, then repairs from the on-map control and verifies both the warning and crew state clear. Inspected both desktop states.
+- All 177 browser regressions, 705 units, both built-app checks, lint/build and diff checks pass.
