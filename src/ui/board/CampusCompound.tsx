@@ -30,6 +30,16 @@ export function CampusCompound({night}:{night:boolean}){
  return <div data-testid="campus-compound" aria-hidden="true" style={{position:'absolute',inset:0,pointerEvents:'none',zIndex:2,overflow:'hidden'}}>
   {land&&<svg viewBox="0 0 1200 800" preserveAspectRatio="none" style={{position:'absolute',inset:0,width:'100%',height:'100%'}}>
    <defs><radialGradient id="site-light"><stop stopColor="#ffdf8b" stopOpacity=".32"/><stop offset="1" stopColor="#ffdf8b" stopOpacity="0"/></radialGradient></defs>
+   {started&&!fitted&&<g data-testid="construction-haul-yard" opacity={night?.64:1}>
+    {/* Temporary construction surfaces, not purchased roads or extra building capacity. */}
+    <defs><pattern id="haul-gravel" width="19" height="17" patternUnits="userSpaceOnUse"><path d="M2 4h3m6 8h4m-11 3h2m8-13h2" stroke="#8b8b73" strokeWidth="1" opacity=".4"/></pattern></defs>
+    <path d="M190 590H1005M736 590V263H1005" fill="none" stroke="#c9bc96" strokeWidth="51"/>
+    <path d="M190 590H1005M736 590V263H1005" fill="none" stroke="url(#haul-gravel)" strokeWidth="49"/>
+    <path d="M204 581H994M204 598H994M728 567V271H993M744 567V288H993" fill="none" stroke="#a99c7b" strokeWidth="2.6" opacity=".65"/>
+    {[{x:822,y:300,w:206,h:122},{x:840,y:455,w:188,h:113}].map(({x,y,w,h})=><g key={y}><rect x={x+5} y={y+5} width={w} height={h} rx="3" fill="#6d725d" opacity=".18"/><rect x={x} y={y} width={w} height={h} rx="3" fill="#bdbaa0" stroke="#9e9e85" strokeWidth="2"/><rect x={x+3} y={y+3} width={w-6} height={h-6} fill="url(#haul-gravel)"/><path d={`M${x+9} ${y+10}h24m${w-42} 0h-24M${x+9} ${y+h-10}h24m${w-42} 0h-24`} stroke="#e2d5a5" strokeWidth="2"/></g>)}
+    {[{x:293,y:534},{x:331,y:554},{x:570,y:531},{x:605,y:550}].map(({x,y})=><g key={x}><ellipse cx={x+3} cy={y+5} rx="7" ry="3" fill="#605b42" opacity=".25"/><path d={`M${x-5} ${y+2}h10l2 3h-14z`} fill="#626b5c"/><path d={`M${x} ${y-10}l4 13h-8z`} fill="#d28b47"/><path d={`M${x-2.5} ${y-2}h5`} stroke="#f1dfad" strokeWidth="2.5"/></g>)}
+    <g transform="translate(766 530)"><path d="M-14 0h28v7h-28zM-10 7v13m20-13v13" fill="none" stroke="#5f7264" strokeWidth="3"/><path d="M-14 0h28v7h-28z" fill="#e4c478"/><path d="M-10 0l-5 7m17-7 -5 7m17-7 -5 7" stroke="#977547" strokeWidth="3"/></g>
+   </g>}
    {fitted&&<g data-testid="campus-landscape" style={{filter:night?'brightness(.6) saturate(.8)':undefined}}>
     <defs><linearGradient id="court-turf" x2=".6" y2="1"><stop stopColor="#6b9864"/><stop offset="1" stopColor="#476d53"/></linearGradient></defs>
     <path d="M135 590H1024M733 649V208H1024" stroke="#c6c6b4" strokeWidth="49" fill="none"/>
