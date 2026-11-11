@@ -157,7 +157,7 @@ function CampusGame() {
         <div>Crews and review clocks keep running without another action. Quick confirmations are free. Events can reserve focus from next month. Money and elapsed construction time are separate costs. With 6 points you could do 3 major instructions, 6 small ones, or a mix.</div>
         <strong>{goalSentence(draft).replace('all 1 hall', 'your hall').replace('outside date', 'tenant deadline').replace('close the takeout', 'sell/refinance the finished campus (the takeout)')}</strong>
       </section>}
-      <div style={{display:'flex',flex:1,minHeight:0}}><div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minWidth:0, minHeight: 0, position: 'relative' }}>
+      <div data-testid="campus-body" style={{display:'flex',flex:1,minHeight:0,position:'relative'}}><div onMouseDown={(e) => { if (!(e.target as HTMLElement).closest('aside')) setDrawer(null); }} style={{ flex: 1, minWidth:0, minHeight: 0, position: 'relative' }}>
         <MapGrid cue={showAdvice ? {title: `Advice: ${step.title}`, why: step.why, objectId: step.objectId, waiting: step.waiting || step.title==='End the month', whileYouWait: step.whileYouWait, progress: step.progress, prepAction: step.prepAction, onShow: showMe, actionId: step.actionId, params: step.params} : undefined} /><EventNotices />
         {drawer && (
           <aside data-testid={`${drawer}-drawer`} style={{ position: 'absolute', right: 12, top: 10, bottom: 10, width: drawer === 'actions' ? 400 : 600, maxWidth: '80vw', zIndex: 60, background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

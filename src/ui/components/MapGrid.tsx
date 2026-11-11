@@ -660,7 +660,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
             />
           )}
         </div>
-        <div style={{ display: 'flex', gap: 3, flex: 1, minHeight: 0, width: '100%', marginTop: 3 }}>
+        <div style={{ display: 'flex', gap: 3, alignItems:'flex-start', minHeight: 0, width: '100%', marginTop: 3 }}>
         {!draft.docketEnabled && <div data-testid="local-grid-supply" style={{...ART_CHIP,alignSelf:'flex-start'}}>Local grid supply<br />No power docket needed</div>}
         {draft.docketEnabled && power.plants.map((p) => {
           const online = p.onlineMonth !== null && p.onlineMonth <= draft.month;
@@ -673,7 +673,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
               className={flash ? 'board-arrival-flash' : undefined}
               title={online ? `Plant ${p.id}: online (${p.mwGrid} MW)` : planned ? `Plant ${p.id}: ${p.slipped ? 'delayed' : 'building'}, online ${formatMonth(targetMonth ?? 0)}` : `Plant ${p.id}: ${plantWaitingWords(draft)}`}
               style={{ flex: 1, minWidth: 0, position: 'relative', borderRadius: 3, overflow: 'hidden', background: online ? '#e4efd9' : '#ede3d0', border: '1px solid #8d6e63', display: 'flex', flexDirection: 'column' }}>
-              {planned ? <img src={online ? PLANT_ART.online : PLANT_ART.building} alt="" aria-hidden="true" draggable={false} style={{ width: '100%', flex: 1, minHeight: 0, objectFit: 'cover', pointerEvents: 'none' }} />
+              {planned ? <img src={online ? PLANT_ART.online : PLANT_ART.building} alt="" aria-hidden="true" draggable={false} style={{ width: '100%', aspectRatio:'1', minHeight: 0, objectFit: 'contain', pointerEvents: 'none', filter:'drop-shadow(0 4px 3px #4d3a2428)' }} />
                 : <div style={{ flex: 1, display: 'grid', placeItems: 'center', border: '1px dashed #ae9a77', color: '#776a53', fontSize: 11 }}>{draft.docket.status === 'approved' ? 'Approved' : 'Permitting'}</div>}
               <div style={{ fontSize: '0.6rem', padding: 2, textAlign: 'center', background: online ? '#d6e9c9' : '#fff8e9' }}>
                 <strong>{p.id} {online ? 'online' : planned ? p.slipped ? 'delayed' : 'building' : 'waiting'}</strong><br />

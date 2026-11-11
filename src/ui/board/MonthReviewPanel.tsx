@@ -1,16 +1,20 @@
+import { useState } from 'react';
 import { formatDollars, formatMonth } from '../../engine/format';
 import { useStore } from '../store';
 import { developments, reviewOptions, type ReviewOption } from './monthReview';
 
 /** Keep the consequence visible; move the audit trail behind an explicit disclosure. */
 export function MonthReviewPanel({ onInspect }: { onInspect: (option: ReviewOption) => void }) {
+  const [compactOpen,setCompactOpen]=useState(false);
   const review = useStore(s => s.monthReview);
   const state = useStore(s => s.state);
   const content = useStore(s => s.content);
   const options = reviewOptions(state, content);
   const news = review ? developments(review, content) : [];
   const visible = news.slice(0, 2);
-  return <aside data-testid="month-review" aria-label="Month review" style={{width:340,flexShrink:0,background:'#fffdf6',borderLeft:'1px solid #cdbf9f',overflowY:'auto',padding:'12px 16px',boxSizing:'border-box',fontSize:13,lineHeight:1.4}}>
+  return <aside data-testid="month-review" aria-label="Month review" data-compact-open={compactOpen} style={{width:340,flexShrink:0,background:'#fffdf6',borderLeft:'1px solid #cdbf9f',overflowY:'auto',padding:'12px 16px',boxSizing:'border-box',fontSize:13,lineHeight:1.4}}>
+    <button data-testid="compact-review-toggle" aria-expanded={compactOpen} onClick={()=>setCompactOpen(!compactOpen)}>{review ? `${formatMonth(review.after.month)} review · ${news.length} development${news.length===1?'':'s'}` : 'Your position & options'} <span>{compactOpen?'Close':'Open'}</span></button>
+    <div data-testid="review-body">
     <div style={{fontSize:10,letterSpacing:1.3,color:'#6a624e'}}>DEVELOPER'S DESK</div>
     <h2 style={{fontFamily:'Georgia,serif',fontSize:21,margin:'4px 0 10px'}}>{review ? `${formatMonth(review.after.month)} review` : state.month > 0 ? 'Your current position' : 'Your opening position'}</h2>
     {review ? <>
@@ -24,7 +28,7 @@ export function MonthReviewPanel({ onInspect }: { onInspect: (option: ReviewOpti
         const detail=dot<0?'':n.text.slice(dot+2);
         return <div key={i} style={{borderLeft:`3px solid ${n.tone==='hurt'?'#ad684b':n.tone==='helped'?'#52765a':'#b6a989'}`,paddingLeft:9,marginBottom:10}}>
           <div style={{fontSize:10,fontWeight:'bold',textTransform:'uppercase',letterSpacing:.6,color:n.tone==='hurt'?'#935539':'#47634b'}}>{n.tone==='hurt'?'Setback':n.tone==='helped'?'Paid off':'In flight'}</div>
-          <div>{headline}</div>{detail && <div style={{fontSize:12,marginTop:3,color:'#635b49'}}>{detail}</div>}
+          <div>{headline}</div>{detail && <div style={{fontSize:12,marginTop:3,color:'#635b49'}}>{detail.length>150 && detail.includes('. ') ? <>{detail.slice(0,detail.indexOf('. ')+1)}<details><summary>More context</summary>{detail.slice(detail.indexOf('. ')+2)}</details></> : detail}</div>}
         </div>;
       })}</div>
       <details data-testid="review-history" style={{fontSize:12,color:'#635b49',margin:'6px 0 12px'}} key={`${review.after.month}-${review.after.log.length}`}>
@@ -37,8 +41,9 @@ export function MonthReviewPanel({ onInspect }: { onInspect: (option: ReviewOpti
     <h3 style={{fontSize:13,margin:'12px 0 3px'}}>Your options now</h3>
     <p style={{fontSize:11,color:'#635b49',margin:'0 0 8px'}}>Inspect first. Opening an option spends nothing.</p>
     <div data-testid="review-options">{options.map(o=><div key={o.title} style={{marginBottom:8}}>
-      <button data-testid="review-option" onClick={()=>onInspect(o)} style={{background:'none',border:0,padding:0,textAlign:'left',color:'#325b48',fontWeight:'bold',cursor:'pointer'}}>{o.title}</button>
-      <div style={{marginTop:3,fontSize:12,color:'#635b49'}}>{o.text}</div>
+      <button data-testid="review-option" onClick={()=>{setCompactOpen(false);onInspect(o);}} style={{background:'none',border:0,padding:0,textAlign:'left',color:'#325b48',fontWeight:'bold',cursor:'pointer'}}>{o.title}</button>
+      <div style={{marginTop:3,fontSize:12,color:'#635b49'}}>{o.text}</div>{o.detail && <details style={{fontSize:11,color:'#635b49',marginTop:4}}><summary>Clock details</summary><p style={{margin:'5px 0'}}>{o.detail}</p></details>}
     </div>)}</div>
+    </div>
   </aside>;
 }

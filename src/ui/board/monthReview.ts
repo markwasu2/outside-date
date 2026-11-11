@@ -76,7 +76,7 @@ export function developments(review: MonthReview, content: Content): Development
 }
 
 export type OfficeView = 'permits' | 'money' | 'capital';
-export interface ReviewOption { title: string; text: string; target: string; officeView?: OfficeView; visitGroup?: GoodwillGroup }
+export interface ReviewOption { title: string; text: string; target: string; officeView?: OfficeView; visitGroup?: GoodwillGroup; detail?: string }
 export function runwayWords(months: number): string {
   if (!Number.isFinite(months)) return 'Recurring costs covered';
   if (months >= 24) return 'More than 2 years of recurring costs covered';
@@ -98,7 +98,7 @@ export function relationshipOption(state: GameState, content: Content): ReviewOp
   const value = state.goodwill[group], gain = Math.min(4,100-value);
   const cost = content.actions.find(a=>a.id==='visitCast')?.ap ?? 2;
   const left = state.apPerMonth-state.apUsedThisMonth;
-  return {title:`Visit ${group} contacts`,text:`${group[0]!.toUpperCase()+group.slice(1)} goodwill ${value} → ${value+gain}. ${cost} focus, $0. ${left<cost ? `Needs ${cost-left} more focus than you have. ` : ''}One visit per group every 3 months. This does not move a construction clock.`,target:'people',visitGroup:group};
+  return {title:`Visit ${group} contacts`,text:`Goodwill ${value} → ${value+gain} · ${cost} focus · $0. ${left<cost ? `Needs ${cost-left} more focus. ` : ''}Every 3 months; no construction progress.`,target:'people',visitGroup:group};
 }
 export function waitOptionText(state: GameState, content: Content): string {
   const step=nextStep(state,content);
@@ -114,13 +114,15 @@ export function reviewOptions(state: GameState, content: Content): ReviewOption[
   const ratio = dscr(state, resolveContent(state, content));
   const debtText = `${formatDollars(totalDebt(state))} debt outstanding. ${Number.isFinite(ratio) ? `Income covers annual debt service ${ratio.toFixed(2)}x.` : 'No annual debt service.'}`;
   const scheduleView: OfficeView = finished || step.actionId === 'cureDraw' || step.actionId === 'priceTakeout' ? 'money' : 'permits';
+  const waitText=waitOptionText(state,content);
+  const shortWait=step.progress && step.title==='End the month' && !step.why.includes('needs') && !step.why.includes('Wetlands') ? `${step.progress}. No repeat instruction needed.` : waitText.split('. ').slice(0,2).join('. ')+(waitText.split('. ').length>2 ? '.' : '');
   const options: ReviewOption[] = [
     { title: step.title === 'End the month' ? 'Inspect work in progress' : step.title,
-      text: step.actionId ? `${focus} focus if you proceed. Inspect costs before committing.` : waitOptionText(state,content),
+      text: step.actionId ? `${focus} focus if you proceed. Inspect costs before committing.` : shortWait, detail: !step.actionId && waitText!==shortWait ? waitText : undefined,
       target: step.objectId, officeView: step.objectId === 'siteOffice' ? scheduleView : undefined },
     finished || closing
-      ? { title: closing ? 'Review debt before selling' : 'Review the lender test', text: `${debtText} Inspect the closing terms before ending the campaign.`, target: 'siteOffice', officeView: 'money' }
-      : { title: 'Compare funding offers', text: `${runwayWords(months)}. New funding buys time, but changes the deal.`, target: 'siteOffice', officeView: 'capital' },
+      ? { title: closing ? 'Review debt before selling' : 'Review the lender test', text: debtText, target: 'siteOffice', officeView: 'money' }
+      : { title: 'Compare funding offers', text: `${runwayWords(months)}. Inspect dilution, fees and timing.`, target: 'siteOffice', officeView: 'capital' },
   ];
   if (!state.flags.rackScheduleConfirmed && state.halls.some(h => !h.delivered && !h.terminated)) options.push({ title: 'Check tenant rack dates', text: 'Free confirmation: +3 tenant goodwill. A later date swap is a separate decision.', target: 'siteOffice', officeView: 'permits' });
   else options.push(relationshipOption(state,content));
