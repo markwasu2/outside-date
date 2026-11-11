@@ -6,13 +6,13 @@ import {canConnectOnNextTick} from './powerWords';
 import type {GameState} from '../../engine/types';
 
 /** The footer describes the live position, including resumed and paused orders. */
-export function turnFeedback(state:GameState,hadReview:boolean,content:Content):{heading:string;body:string}{
+export function turnFeedback(state:GameState,hadReview:boolean,content:Content):{heading:string;body:string;attention?:boolean}{
  const active=state.halls.filter(h=>!h.delivered&&!h.terminated&&h.stageActive);
- if(state.flags.drawFreeze)return {heading:'Construction funding is paused.',body:'Clear the lender paperwork before waiting for more building progress.'};
- if(active.some(h=>state.flags[`inspectionFail:${h.id}`]))return {heading:'A failed inspection stopped work.',body:'Inspect the building and repair the failed inspection. Waiting alone will not fix it.'};
- if(active.length&&active.every(h=>h.pausedThisMonth))return {heading:'Crews are stood down this month.',body:'This month adds no construction progress. Advance time to finish the pause.'};
+ if(state.flags.drawFreeze)return {attention:true,heading:'Construction funding is paused.',body:'Clear the lender paperwork before waiting for more building progress.'};
+ if(active.some(h=>state.flags[`inspectionFail:${h.id}`]))return {attention:true,heading:'A failed inspection stopped work.',body:'Inspect the building and repair the failed inspection. Waiting alone will not fix it.'};
+ if(active.length&&active.every(h=>h.pausedThisMonth))return {attention:true,heading:'Crews are stood down this month.',body:'This month adds no construction progress. Advance time to finish the pause.'};
  const unfunded=active.map(h=>unfundedWork(state,content,h)).find((amount):amount is number=>amount!==null);
- if(unfunded)return {heading:'Building funds are short.',body:`The next work needs ${formatDollars(unfunded)}. Inspect Money for funding and its arrival date. Check funding and scheduled arrivals before advancing; your existing build order stays in place.`};
+ if(unfunded)return {attention:true,heading:'Building funds are short.',body:`The next work needs ${formatDollars(unfunded)}. Inspect Money for funding and its arrival date. Check funding and scheduled arrivals before advancing; your existing build order stays in place.`};
  if(active.length)return {heading:hadReview?'No orders placed this month.':'Crews have an active order.',body:'Crews are working. No repeat build order needed. Inspect other options, or advance the month to let work continue.'};
  if(!state.flags.siteOptioned&&!state.flags.siteOptionedAtStart)return {heading:'Buy land to start.',body:'Each order uses points. Advance the month to let work finish.'};
  const permitBlocked=state.halls.map(h=>({hall:h,match:hallBlocker(state,content,h)?.match(/^waiting on (\w+) permit$/)})).find(x=>x.match);
