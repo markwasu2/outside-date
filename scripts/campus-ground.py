@@ -26,8 +26,37 @@ for i in range(400):
  x=random.randrange(1200);y=random.randrange(800)
  if 20<y<82 or 176<x<1029 and 112<y<700:continue
  c=random.choice(['#d4d3a0','#536e48','#bdc38d']);parts.append(f'<path d="M{x} {y}l3 -2m-1 2l3 0" stroke="{c}" opacity=".27" stroke-width="1"/>')
-for x,y in [(35,y)for y in range(140,730,96)]+[(1163,y)for y in range(130,760,78)]+[(x,776)for x in range(185,1100,89)]:
- parts.append(f'<ellipse cx="{x+12}" cy="{y+9}" rx="22" ry="11" fill="#304c3e" opacity=".23" filter="url(#blur)"/><path d="M{x} {y}v-20" stroke="#6f7150" stroke-width="4"/><circle cx="{x}" cy="{y-25}" r="19" fill="url(#tree)"/><circle cx="{x-8}" cy="{y-27}" r="11" fill="#95ae70" opacity=".55"/>')
+# Mixed woodland lies outside the circulation loop and construction boundary.
+# Hand-set positions keep the office, power connection and clickable labels clear.
+parts.append('<g id="perimeter-woodland">')
+locations=[(35,y) for y in range(140,730,96)]+[(1163,y) for y in range(130,760,78)]+[(x,776) for x in range(185,1100,89)]
+for i,(x,y) in enumerate(locations):
+ species=i%4
+ height=32+(i*7)%15
+ spread=16+(i*3)%7
+ # Quiet planting beds, trunk, ground shadow and a smaller companion shrub.
+ parts.append(f'<ellipse cx="{x+4}" cy="{y+3}" rx="{spread+12}" ry="13" fill="#75815d" opacity=".3"/><ellipse cx="{x+15}" cy="{y+9}" rx="{spread+7}" ry="10" fill="#284b3b" opacity=".22" filter="url(#blur)"/><path d="M{x} {y}v-{height}" stroke="#726e4d" stroke-width="3.2"/>')
+ if species==0:
+  # Layered spruce, darker below and lit from the upper left.
+  for dz,w in [(14,spread),(25,spread-3),(35,spread-8)]:
+   parts.append(f'<path d="M{x} {y-dz-14}Q{x-w/2} {y-dz-3} {x-w} {y-dz+7}Q{x} {y-dz+13} {x+w} {y-dz+7}Q{x+w/2} {y-dz-3} {x} {y-dz-14}Z" fill="{["#456b50","#5c7d56","#839b68"][(dz-14)//10]}"/><path d="M{x-2} {y-dz-10}l{-w+5} 16" stroke="#a1b47b" stroke-width="1" opacity=".35"/>')
+ elif species==1:
+  # Branching broadleaf canopy, not a single repeated circle.
+  parts.append(f'<path d="M{x} {y-9}l-9 -15m9 15 10-21" stroke="#6e6f4d" stroke-width="2"/>')
+  for dx,dy,r,c in [(-8,-28,spread-4,'#648654'),(9,-29,spread-3,'#52794f'),(0,-42,spread-2,'url(#tree)'),(-9,-40,spread-7,'#a1b576')]:
+   parts.append(f'<circle cx="{x+dx}" cy="{y+dy}" r="{r}" fill="{c}"/>')
+ elif species==2:
+  # Slender pale-trunk trees and a light, open crown.
+  parts.append(f'<path d="M{x-2} {y}l-2 -43m4 37 7 -29" stroke="#c0b997" stroke-width="2.8"/>')
+  for dx,dy,rx,ry in [(-7,-32,12,16),(6,-38,13,18),(-2,-49,10,13)]:
+   parts.append(f'<ellipse cx="{x+dx}" cy="{y+dy}" rx="{rx}" ry="{ry}" fill="url(#tree)"/><path d="M{x+dx-5} {y+dy-6}l5 -2" stroke="#c0cc8d" stroke-width="2" opacity=".45"/>')
+ else:
+  # Low, spreading oak: a different profile between taller specimens.
+  for dx,dy,r,c in [(-12,-24,13,'#58744e'),(9,-23,16,'#486c4c'),(-1,-33,18,'url(#tree)'),(-11,-35,9,'#a0b174')]:
+   parts.append(f'<circle cx="{x+dx}" cy="{y+dy}" r="{r}" fill="{c}"/>')
+ for dx,dy,r in [(-19,2,7),(15,-1,6),(23,4,4)]:
+  parts.append(f'<ellipse cx="{x+dx+3}" cy="{y+dy+2}" rx="{r+2}" ry="3" fill="#284b3b" opacity=".2"/><ellipse cx="{x+dx}" cy="{y+dy-2}" rx="{r}" ry="{r*.65}" fill="{["#829566","#687f55","#a0aa74"][i%3]}"/>')
+parts.append('</g>')
 # Whole ground texture stays low contrast so interface remains quiet.
 parts.append('<path fill="#9ca088" opacity=".08" filter="url(#grain)" d="M0 0h1200v800H0z"/><path d="M68 110V752H1133V110" fill="none" stroke="#c6ccaf" stroke-opacity=".65" stroke-dasharray="3 4"/></svg>')
 Path('src/assets/campus/campus-ground.svg').write_text(''.join(parts)+'\n')
