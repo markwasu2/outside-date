@@ -15,7 +15,7 @@ interface HallSpriteProps {
   failedInspection: boolean;
   /** An action already applied this month targets this hall: mark it "Done". */
   queuedGhost: boolean;
-  /** Net monthly rent once delivered (rent ticker); null while under construction. */
+  /** Usual rent after landlord share/line losses, not cash profit; null during construction. */
   rent: number | null;
   /** Construction spend that hit this hall on the last committed month (red float); 0 = none. */
   spendFloat: number;
@@ -86,6 +86,7 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
       {rent !== null && (
         <div
           data-testid="rent-ticker"
+          title="Usual rent after the landlord share and line losses. Before loan payments and other bills; a rent-free period can reduce actual receipts."
           style={{
             position: 'absolute',
             bottom: 2,
@@ -99,7 +100,7 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
             whiteSpace: 'nowrap',
           }}
         >
-          +{formatDollars(rent)}/mo
+          Rent {formatDollars(rent)}/mo
         </div>
       )}
 
