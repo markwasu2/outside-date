@@ -5,6 +5,8 @@ Run from repository root. All geometry is authored here; no external assets.
 from pathlib import Path
 import math
 import random
+import sys
+ONLY_HALLS="--only-halls" in sys.argv
 random.seed(17)
 OUT=Path('src/assets/campus'); OUT.mkdir(exist_ok=True)
 INK='#44535a'; SAND='#e0c99b'; IVORY='#f4edd9'; TEAL='#547d78'; DARK='#35575a'; GOLD='#d8a341'
@@ -19,6 +21,9 @@ def material(c,face):
  return f'url(#{key})'
 def box(x,y,z,dx,dy,h,top=IVORY,left='#c9c6ae',right='#a7b5a4'):
  return poly([p(x,y+dy,z),p(x+dx,y+dy,z),p(x+dx,y+dy,z+h),p(x,y+dy,z+h)],material(left,'wall'))+poly([p(x+dx,y,z),p(x+dx,y+dy,z),p(x+dx,y+dy,z+h),p(x+dx,y,z+h)],material(right,'shade'))+poly([p(x,y,z+h),p(x+dx,y,z+h),p(x+dx,y+dy,z+h),p(x,y+dy,z+h)],material(top,'roof'))+line(p(x,y,z+h),p(x+dx,y,z+h),'#ffffff',.5)
+def dock_box(x,y,z,dx,dy,h,top,left,right):
+ # Small fixtures use solid face colors, leaving the shared material registry alone.
+ return poly([p(x,y+dy,z),p(x+dx,y+dy,z),p(x+dx,y+dy,z+h),p(x,y+dy,z+h)],left)+poly([p(x+dx,y,z),p(x+dx,y+dy,z),p(x+dx,y+dy,z+h),p(x+dx,y,z+h)],right)+poly([p(x,y,z+h),p(x+dx,y,z+h),p(x+dx,y+dy,z+h),p(x,y+dy,z+h)],top)
 def shrub(x,y,z=0,r=7):
  cx,cy=p(x,y,z)
  return f'<ellipse cx="{cx+5}" cy="{cy+4}" rx="{r*1.3}" ry="{r*.45}" fill="#263d33" opacity=".18"/><circle cx="{cx}" cy="{cy-4}" r="{r}" fill="url(#foliage)"/><circle cx="{cx-2}" cy="{cy-7}" r="{r*.45}" fill="#bbcf7b" opacity=".5"/>'
@@ -107,7 +112,25 @@ def hall(stage):
  s+=box(45,-32,48,8,55,1.4,'#e0e6df','#9daea7','#728b88')
  # Corrugated wall cladding and loading bays.
  for x in range(-51,57,9):s+=line(p(x,40,8),p(x,40,43),'#aab5a7',.8)
- for x in (-46,-5,36):s+=poly([p(x,40,5),p(x+20,40,5),p(x+20,40,25),p(x,40,25)],DARK)
+ # Closed loading doors read as equipment access, never as an open/leased hall.
+ # First bay sits behind the entrance pavilion; the two exposed bays get dock seals,
+ # ribbed roll-up doors, curb bumpers and short loading aprons in the same camera.
+ for x in (-46,-5,36):
+  s+=poly([p(x-1,40.2,4),p(x+21,40.2,4),p(x+21,40.2,26),p(x-1,40.2,26)],'#243e49','#b2c3be',.6)
+  s+=poly([p(x+1,40.4,5),p(x+19,40.4,5),p(x+19,40.4,24),p(x+1,40.4,24)],'#728b95','#405b69',.5)
+  for z in range(7,24,3):
+   s+=line(p(x+1,40.5,z),p(x+19,40.5,z),'#aabcb9',.55)
+   s+=line(p(x+1,40.6,z-.6),p(x+19,40.6,z-.6),'#4c6874',.35)
+  s+=line(p(x+8,40.8,8),p(x+12,40.8,8),'#d5d6bd',.8)
+  if x!=-46:
+   s+=dock_box(x-1,41,1,22,13,2,'#aeb6ac','#869b92','#5f7b75')
+   for xx in (x-2,x+21):
+    s+=dock_box(xx,41.2,3,2,2.8,7,'#52685f','#2e4948','#243b3e')
+    s+=dock_box(xx,49,3,1.8,1.8,6,GOLD,'#ae833d','#826b3f')
+    s+=line(p(xx,49,6),p(xx+1.8,49,6),'#f2d892',.65)
+   s+=dock_box(x-2,39.6,26,24,3,2,'#a6b9b7','#6c8791','#405c6c')
+   # High-contrast stand-clear stripes stay within the existing concrete pad.
+   for xx in (x+2,x+9,x+16):s+=line(p(xx,54,1.2),p(xx+4,57,1.2),'#e0c981',.8)
  # Warm masonry entrance pavilion breaks up the industrial metal facade.
  s+=box(-55,38,3,29,4,27,'#b28d69','#ac785a','#765641')
  for z in range(7,29,3):
@@ -320,6 +343,7 @@ def compound(kind):
  return s
 
 def save(name,body):
+ if ONLY_HALLS and not name.startswith("hall-"):return
  defs='<defs><radialGradient id="foliage" cx="30%" cy="25%"><stop stop-color="#c6d58b"/><stop offset=".4" stop-color="#729558"/><stop offset="1" stop-color="#355d47"/></radialGradient><linearGradient id="glass" x2="1" y2="1"><stop stop-color="#b4d8dc"/><stop offset=".45" stop-color="#4f7d8a"/><stop offset=".5" stop-color="#b3cace"/><stop offset="1" stop-color="#355461"/></linearGradient><filter id="shadow" x="-35%" y="-35%" width="180%" height="190%"><feDropShadow dx="7" dy="10" stdDeviation="4" flood-color="#223c3c" flood-opacity=".32"/></filter>'
  for key,(c,face) in GRADIENTS.items():
   if f'url(#{key})' not in body:continue
@@ -338,5 +362,5 @@ save('campus-people',people())
 for kind in ('steel','panels'):save('yard-'+kind,construction_yard(kind))
 for kind in ('cooling','backup'):save('compound-'+kind,compound(kind))
 # Ground has its own deterministic landscape generator.
-exec(Path('scripts/campus-ground.py').read_text())
+if not ONLY_HALLS:exec(Path('scripts/campus-ground.py').read_text())
 print(f'Wrote {len(list(OUT.glob("*.svg")))} original campus assets')
