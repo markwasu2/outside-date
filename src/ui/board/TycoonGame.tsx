@@ -16,7 +16,8 @@ import {warnings} from './warnings';
 export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
  const draft=useStore(s=>s.draft),content=useStore(s=>s.content),plan=useStore(s=>s.plan),review=useStore(s=>s.monthReview);
  const endMonth=useStore(s=>s.endMonth),queue=useStore(s=>s.queueAction),undo=useStore(s=>s.undoLastAction),open=useStore(s=>s.setBoardPopover),error=useStore(s=>s.error);
- const [finance,setFinance]=useState(false),[history,setHistory]=useState(false);
+ const [finance,setFinance]=useState(false),[history,setHistory]=useState(false),[night,setNight]=useState(false);
+ const muted=useStore(s=>s.muted),toggleMuted=useStore(s=>s.toggleMuted);
  const live=draft.halls.filter(h=>!h.terminated),remaining=live.filter(h=>!h.delivered),built=live.filter(h=>h.delivered).length;
  const deadline=remaining.length?Math.min(...remaining.map(h=>h.outsideMonth))+1:null;
  const target=remaining.length?Math.min(...remaining.map(h=>h.deliveryMonth))+1:null;
@@ -47,12 +48,12 @@ export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
   </section>
   {freeze&&<div data-testid="simple-freeze" style={{background:'#f8dfc0',padding:'8px 18px',display:'flex',gap:16,alignItems:'center'}}><strong>Building paused: lender paperwork</strong><span>Fix it to restart construction funding.</span><button style={button} onClick={()=>queue({actionId:'cureDraw'})}>Unfreeze building funds · 2 points</button></div>}
   <div style={{flex:1,minHeight:0,position:'relative'}}>
-   <MapGrid simple/>
+   <MapGrid simple night={night}/>
    {finance&&<TycoonObjectPanel objectId="finance" left={18} top={12} onClose={()=>setFinance(false)}/>}
    {history&&<section data-testid="simple-month-results" style={{position:'absolute',right:16,top:16,width:330,maxHeight:'85%',overflow:'auto',padding:16,background:'#fffdf5',border:'1px solid #c4b693',borderRadius:8,zIndex:80,boxShadow:'0 8px 24px #30291822',fontSize:13}}><button style={{...button,float:'right'}} onClick={()=>setHistory(false)}>Close</button><h3>Last month</h3>{news.length?news.map((n,i)=><p key={i} style={{borderLeft:`3px solid ${n.tone==='hurt'?'#b36e4f':'#67855d'}`,paddingLeft:9}}>{plainWords(n.text)}</p>):<p>No month has passed yet.</p>}</section>}
   </div>
   <section data-testid="simple-timeline" style={{padding:'8px 18px',display:'flex',gap:14,alignItems:'center',background:'#eee4ca',borderTop:'1px solid #d7c7a3',fontSize:12}}>
-   <strong>Coming up</strong>{nextEvents.length?nextEvents.map((e,i)=><span key={i}>Month {e.month+1}: {simpleTimelineLabel(e.label)}</span>):<span>Buildings and running costs update each month.</span>}
+   <button data-testid="night-view" aria-pressed={night} style={{...button,padding:'3px 7px'}} onClick={()=>setNight(!night)}>{night?'Day view':'Night view'}</button><button aria-pressed={!muted} style={{...button,padding:'3px 7px'}} onClick={toggleMuted}>{muted?'Sound off':'Sound on'}</button><strong>Coming up</strong>{nextEvents.length?nextEvents.map((e,i)=><span key={i}>Month {e.month+1}: {simpleTimelineLabel(e.label)}</span>):<span>Buildings and running costs update each month.</span>}
   </section>
   <footer style={{padding:'10px 18px',background:'#fffdf5',display:'flex',alignItems:'center',gap:12,borderTop:'1px solid #d6cbb0',minHeight:48}}>
    <div data-testid="simple-feedback" style={{flex:1,fontSize:13,lineHeight:1.4}}>{error?<strong style={{color:'#a54d34'}}>{plainWords(error)}</strong>:plan.length?<><strong>{plan.length} order{plan.length===1?'':'s'} placed.</strong> {points} action points left. Crews work when time advances.</>:review?<><strong>Last month:</strong> {plainWords(news[0]?.text.split('. ').slice(0,2).join('. ')??'Work and review clocks moved forward.')}</>:<><strong>Buy land to start.</strong> Each order uses points. Advance the month to let work finish.</>}</div>

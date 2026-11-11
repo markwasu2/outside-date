@@ -1,3 +1,4 @@
+import {CampusCompound} from '../board/CampusCompound';
 import {CampusLife} from '../board/CampusLife';
 import {TycoonObjectPanel} from '../board/TycoonObjectPanel';
 import {TycoonMapControl} from '../board/TycoonMapControl';
@@ -177,7 +178,7 @@ function QueuedGhost() {
   );
 }
 
-export function MapGrid({cue,simple=false}: {simple?:boolean;cue?: {title:string;why:string;objectId:string;waiting?:boolean;whileYouWait?:string;progress?:string;prepAction?:{label:string;actionId:string};onShow:()=>void;actionId?:string;params?:Record<string,string|number>}} = {}) {
+export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:boolean;cue?: {title:string;why:string;objectId:string;waiting?:boolean;whileYouWait?:string;progress?:string;prepAction?:{label:string;actionId:string};onShow:()=>void;actionId?:string;params?:Record<string,string|number>}} = {}) {
   const draft = useStore((s) => s.draft);
   const state = useStore((s) => s.state);
   const prevState = useStore((s) => s.prevState);
@@ -268,6 +269,7 @@ export function MapGrid({cue,simple=false}: {simple?:boolean;cue?: {title:string
       data-testid="map-root"
       data-campus-scene="true"
       data-simple-campus={simple}
+      data-night={night}
       data-simple-local-grid={simple&&!draft.docketEnabled}
       data-ground={siteTheme.ground}
       style={{
@@ -285,6 +287,7 @@ export function MapGrid({cue,simple=false}: {simple?:boolean;cue?: {title:string
         background: `url("${campusGroundImg}") center / 100% 100%, linear-gradient(#eadbbccc, #e0ca9acc), ${siteTheme.ground}`,
       }}
     >
+      {simple&&<CampusCompound night={night}/>}
       <CampusLife/>
       {!simple && <BoardLegend />}
       <div {...selectableCellProps(boardPopover === 'people', () => openObject('people', null))}
@@ -483,7 +486,7 @@ export function MapGrid({cue,simple=false}: {simple?:boolean;cue?: {title:string
                       : 'far pad'}
               </div>
               {simple && <TycoonMapControl objectId={hall.id}/>}
-              <HallSprite
+              <HallSprite key={`${hall.id}-${hall.stageIndex}-${hall.stageActive}`}
                 visual={visual}
                 late={late}
                 failedInspection={failedInspection}

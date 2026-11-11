@@ -83,6 +83,9 @@ export function BoardStyles() {
       [data-testid="campus-people"] > img { filter:drop-shadow(0 5px 4px #4d3a2428); }
       [data-simple-campus="true"] [data-simple-hidden="true"], [data-simple-local-grid="true"] [data-scene-object="plants"] { visibility:hidden; pointer-events:none; }
       [data-simple-campus="true"] [data-testid="hall-art-frame"] {max-width:520px !important;max-height:410px !important;}
+      [data-night="true"]::before {content:'';position:absolute;inset:0;background:#102c50aa;z-index:0;pointer-events:none;}
+      [data-night="true"] [data-testid="hall-art-frame"] img, [data-night="true"] [data-scene-object] > img {filter:brightness(.68) saturate(.76) drop-shadow(4px 8px 6px #101e31aa);}
+      [data-night="true"] [data-scene-object="substation"] > img {filter:brightness(.82) drop-shadow(0 0 5px #f4e2aa44);}
       [data-simple-campus="true"] [data-testid^="pad-"] { display:none; }
       [data-simple-campus="true"] [data-scene-object="hall"] > div:first-child { font-size:13px !important; }
       [data-simple-campus="true"] [data-testid^="caption-"] { max-width:90%; font-size:11px !important; }
