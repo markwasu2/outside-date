@@ -322,6 +322,8 @@ interface UIStore {
   /** Internal: not called directly by UI code, only via `get().autosave()` from the four
    * state-committing actions themselves. */
   autosave: () => void;
+  /** Same complete snapshot for autosave and downloaded exports. */
+  saveSnapshot:()=>SaveFile;
   /** Steps with no actions until a ledger item is due soon, runway/DSCR headroom gets tight, or
    * the game leaves 'playing' (engine's own stop conditions, step.ts's `fastForward`). No-ops if
    * actions are already queued this month, since fast-forwarding would silently discard them. */
@@ -710,12 +712,13 @@ export const useStore = create<UIStore>((set, get) => ({
   /** Not part of `UIStore`'s public interface - called via `get().autosave()` from the four
    * state-committing actions above, right after their own `set()`, so it always reads the
    * just-committed values rather than a stale snapshot. */
-  autosave: () => {
+  saveSnapshot: () => {
     const { state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots,monthReview,restoredMonth,plan,snapshots } = get();
     const actions=[...(restoredMonth?.actions??[]),...plan],before=restoredMonth?.before??snapshots[0];
     const currentMonth=before&&actions.length?{before,actions}:null;
-    saveGame({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots,monthReview,currentMonth });
+    return { version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots,monthReview,currentMonth };
   },
+  autosave:()=>saveGame(get().saveSnapshot()),
 }));
 
 /**
