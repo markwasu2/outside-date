@@ -1,3 +1,4 @@
+import {CampusPerimeter} from './CampusPerimeter';
 import {UtilityOperations} from './UtilityOperations';
 import {constructionWorking} from './constructionFunds';
 import steelYard from '../../assets/campus/yard-steel.svg';
@@ -77,7 +78,7 @@ export function CampusCompound({night}:{night:boolean}){
     </g></g>
     {opened&&[0,1].map(i=><g key={i} transform={`translate(${607+i*24} ${405+i*10})`}><g className={reduced?undefined:`campus-visitor visitor-${i}`}><ellipse cy="7" rx="5" ry="2" fill="#233e35" opacity=".22"/><path d="M-2 2l-2 5m5-5 2 5" stroke="#3d5960" strokeWidth="2"/><path d="M0 -5v8" stroke={i?'#cbb68d':'#738e9d'} strokeWidth="4"/><circle cy="-8" r="3" fill="#d5b78e"/></g></g>)}
    </g>}
-   <g stroke="#a6b5a0" strokeWidth="1" fill="none"><path d="M172 124H1047V705H172V124"/><path d="M172 137H1047M172 692H1047" opacity=".45"/>{Array.from({length:31},(_,i)=><path key={i} d={`M${172+i*29} 124v15M${172+i*29} 692v14`}/>)}{Array.from({length:20},(_,i)=><path key={i} d={`M172 ${140+i*28}h4M1044 ${140+i*28}h5`}/>)}</g>
+   <CampusPerimeter fitted={fitted} night={night}/>
    {[{x:205,y:190},{x:1025,y:195},{x:205,y:658},{x:1025,y:658}].map(({x,y},i)=><g key={i}><ellipse cx={x+8} cy={y+6} rx="13" ry="5" fill="#243e35" opacity=".2"/><path d={`M${x} ${y}v-43l13 -3`} stroke="#658079" strokeWidth="2" fill="none"/><path d={`M${x+8} ${y-47}h12v4h-12z`} fill={night?'#ffe6a3':'#c6d4c5'}/>{night&&<ellipse cx={x+18} cy={y+7} rx="62" ry="37" fill="url(#site-light)"/>}</g>)}
    {working&&[0,1,2,3].map(i=><g key={i} className={reduced?undefined:`site-worker worker-${i}`} transform={`translate(${650+i*24} ${590+i*11})`} data-testid="walking-worker"><ellipse cy="6" rx="6" ry="2.5" fill="#243e35" opacity=".25"/><path d="M-2 1l-2 6m5-6 2 6" stroke="#3b5962" strokeWidth="2"/><path d="M0 -7V2" stroke={i%2?'#d9ab50':'#e5c871'} strokeWidth="5"/><circle cy="-10" r="3.2" fill="#e7cda0"/><path d="M-4 -11h8" stroke="#ffe4a1" strokeWidth="2"/></g>)}
    {working&&draft.halls.some(h=>h.stageIndex===0)&&<g className={reduced?undefined:'site-dust'}><ellipse cx="580" cy="500" rx="34" ry="13" fill="#ddcba1" opacity=".35"/><ellipse cx="602" cy="488" rx="23" ry="17" fill="#e7d5b0" opacity=".3"/></g>}
