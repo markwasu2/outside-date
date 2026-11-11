@@ -137,7 +137,7 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
   if (power.studyStatus === 'none') {
     return {
       title: 'Commission the interconnection study',
-      why: `It takes ${resolved.tuning.power.studyMonthsMin} to ${resolved.tuning.power.studyMonthsMax} months and gates the power docket and the substation. Start the clock now.`,
+      why: `It takes ${resolved.tuning.power.studyMonthsMin} to ${resolved.tuning.power.studyMonthsMax} months and gates ${state.docketEnabled ? 'the power docket and ' : ''}the substation. Start the clock now.`,
       objectId: 'substation',
       actionId: 'commissionStudy',
     };

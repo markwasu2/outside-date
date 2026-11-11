@@ -43,7 +43,7 @@ export function MonthReviewPanel({ onInspect }: { onInspect: (option: ReviewOpti
     <p style={{fontSize:11,color:'#635b49',margin:'0 0 8px'}}>Inspect first. Opening an option spends nothing.</p>
     <div data-testid="review-options">{options.map(o=><div key={o.title} style={{marginBottom:8}}>
       <button data-testid="review-option" onClick={()=>{setCompactOpen(false);onInspect(o);}} style={{background:'none',border:0,padding:0,textAlign:'left',color:'#325b48',fontWeight:'bold',cursor:'pointer'}}>{o.title}</button>
-      <div style={{marginTop:3,fontSize:12,color:'#635b49'}}>{o.text}</div>{o.detail && <details style={{fontSize:11,color:'#635b49',marginTop:4}}><summary>Clock details</summary><p style={{margin:'5px 0'}}>{o.detail}</p></details>}
+      <div style={{marginTop:3,fontSize:12,color:'#635b49'}}>{o.text}</div>{o.detail && <details style={{fontSize:11,color:'#635b49',marginTop:4}}><summary>{o.visitGroup ? 'What this changes' : 'Clock details'}</summary><p style={{margin:'5px 0'}}>{o.detail}</p></details>}
     </div>)}</div>
     </div>
   </aside>;

@@ -1,3 +1,5 @@
+import { contactPurpose } from './relationships';
+import type { GoodwillGroup } from '../../engine/types';
 import { Fragment, useEffect, useRef, useState } from 'react';
 
 import { formatDollars, formatMonth } from '../../engine/format';
@@ -162,6 +164,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
           left,
           top,
           width: POPOVER_WIDTH,
+          boxSizing: 'border-box',
           maxHeight: POPOVER_MAX_HEIGHT,
           overflowY: 'auto',
           zIndex: 50,
@@ -192,7 +195,7 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
         <p style={{fontSize:11,color:'#71654f',margin:'5px 0 10px'}}>Choose an action to apply it now. Undo is in This month.</p>
         {objectId==='people' && <div data-testid="contact-brief" style={{padding:9,background:'#eee8d7',borderRadius:6,marginBottom:10}}>
           <strong>{visitGroup ? `${visitGroup[0]!.toUpperCase()+visitGroup.slice(1)} contacts` : 'Your contacts'}</strong>
-          {visitGroup && <p style={{margin:'5px 0'}}>A visit meets one member of this group.</p>}
+          {visitGroup && <><p style={{margin:'5px 0'}}>A visit meets one member of this group.</p><p data-testid="contact-purpose" style={{margin:'6px 0',fontSize:12,lineHeight:1.45}}>{contactPurpose(state,content,visitGroup as GoodwillGroup)}</p></>}
           {visitGroup && <details style={{fontSize:12,margin:'5px 0'}}><summary>Who's here</summary>{content.cast.cast.filter(m=>m.goodwillGroup===visitGroup).map(m=><div key={m.id} style={{marginTop:4}}>{m.name} · {m.role}</div>)}</details>}
           <div>Visits add up to 4 goodwill, cost 2 focus and $0, and can repeat once per group every 3 months. They do not advance construction.</div>
           {visitGroup && <button onClick={()=>setVisitGroup(null)} style={{marginTop:7}}>Show all contacts</button>}
