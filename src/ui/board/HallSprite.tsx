@@ -1,3 +1,4 @@
+import {HallWorkLights} from './HallWorkLights';
 import {HallOperations} from './HallOperations';
 import {HallNightLights} from './HallNightLights';
 import { formatDollars } from '../../engine/format';
@@ -44,6 +45,7 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
               transition: reducedMotion ? undefined : 'opacity 0.6s ease',
               opacity: visual.flags.terminated ? 0.45 : .12+.88*progress0to1}} />
         )}
+        {night&&underConstruction&&visual.flags.active&&!visual.flags.paused&&!visual.flags.terminated&&!failedInspection&&<HallWorkLights/>}
         {stage==='delivered'&&!visual.flags.terminated&&<HallOperations reducedMotion={reducedMotion} night={night}/>}
         {night&&stage==='delivered'&&!visual.flags.terminated&&<HallNightLights/>}
       </div>
