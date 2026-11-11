@@ -4,7 +4,7 @@ import type { Content } from '../../content/schemas';
 import { formatDollars, formatMonth, formatMonths } from '../../engine/format';
 import { dscr, forwardNoi, hallGrossRent, runway } from '../../engine/selectors';
 import type { GameState, GoodwillGroup } from '../../engine/types';
-import { exportSaveToFile, SAVE_VERSION } from '../save';
+import { exportSaveToFile } from '../save';
 import { STAT_EXPLAINERS } from '../explainers';
 import { useStore } from '../store';
 import { CastHover } from './CastHover';
@@ -177,10 +177,6 @@ export function Hud({ hideFastForward = false }: { hideFastForward?: boolean }) 
   const plan = useStore((s) => s.plan);
   const content = useStore((s) => s.content);
   const state = useStore((s) => s.state);
-  const lastNegotiation = useStore((s) => s.lastNegotiation);
-  const lastDifficultyId = useStore((s) => s.lastDifficultyId);
-  const dismissedCoachTips = useStore((s) => s.dismissedCoachTips);
-  const financialSnapshots = useStore((s) => s.financialSnapshots);
   const seenExplainers = useStore((s) => s.seenExplainers);
   const muted = useStore((s) => s.muted);
   const toggleMuted = useStore((s) => s.toggleMuted);
@@ -409,7 +405,7 @@ export function Hud({ hideFastForward = false }: { hideFastForward?: boolean }) 
       <button
         title="Download the current save as a JSON file"
         onClick={() =>
-          exportSaveToFile({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots,monthReview:useStore.getState().monthReview })
+          exportSaveToFile(useStore.getState().saveSnapshot())
         }
       >
         Export save
