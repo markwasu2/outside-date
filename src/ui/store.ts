@@ -360,6 +360,9 @@ function initialState(): GameState {
   return createGame(content, 'whale', DEFAULT_SETUP, DEFAULT_NEGOTIATION, DEFAULT_SEED);
 }
 
+// Each resume owns its clock. Stale callbacks from a paused run cannot join it.
+let simGeneration=0;
+
 export const useStore = create<UIStore>((set, get) => ({
   content,
   state: initialState(),
@@ -491,6 +494,7 @@ export const useStore = create<UIStore>((set, get) => ({
   },
 
   toggleSim: () => {
+    const generation=++simGeneration;
     if (get().simRunning) {
       set({ simRunning: false });
       return;
@@ -501,7 +505,7 @@ export const useStore = create<UIStore>((set, get) => ({
     }
     set({ simRunning: true, error: null });
     const tick = () => {
-      if (!get().simRunning) return;
+      if (!get().simRunning||generation!==simGeneration) return;
       const s = get();
       // Pause for anything that needs the player: an event choice, the takeout window, the end.
       if (s.state.phase !== 'playing') {
