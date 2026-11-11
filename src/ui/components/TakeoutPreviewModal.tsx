@@ -1,3 +1,4 @@
+import {equityMultipleLabel} from '../screens/ReportCardScreen';
 import { formatDollars, formatMonth } from '../../engine/format';
 import { useStore } from '../store';
 import { timeExplain } from '../reportCardExplain';
@@ -27,8 +28,10 @@ export function TakeoutPreviewModal() {
         <h2 style={{ marginTop: 0 }}>{simple?'Sell campus':'The priced close'}, {simple?`month ${t.month+1}`:formatMonth(t.month)}</h2>
         <div style={{ lineHeight: 1.7, fontSize: 14 }}>
           <div>Campus value: <strong>{formatDollars(t.campusValue)}</strong></div>
-          <div>Total debt repaid: {formatDollars(t.totalDebt)}</div>
-          <div>Your equity is worth <strong>{formatDollars(t.playerEquityValue)}</strong> - a {t.equityMultiple.toFixed(2)}x multiple.</div>
+          <div>Loans owed: {formatDollars(t.totalDebt)}</div>
+          <div>Your share after debt: <strong>{formatDollars(t.playerEquityValue)}</strong></div>
+          <div>Return on owners' investment: <strong>{equityMultipleLabel(t.equityMultiple)}</strong></div>
+          {t.equityMultiple<1&&<p data-testid="preview-investor-loss" style={{color:'#974f35',margin:'6px 0 0'}}>The owners recover less than they invested.</p>}
           {!simple&&<div style={{ marginTop: 6 }}>
             Report card: time {card.time} · cost {card.cost} · risk {card.riskAllocation} · community {card.community} · value {card.value}
             <div data-testid="close-time-explanation" style={{fontSize:12,color:'#6b5a33'}}>{timeExplain(preview)} The outside date is the last-chance deadline, not the time-grade target.</div>

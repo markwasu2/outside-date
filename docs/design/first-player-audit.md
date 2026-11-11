@@ -106,4 +106,10 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 ## November 10 evening: operating rooftop detail
 - Four roof fans now turn after a hall opens. Their centers and flat-plane projection match the original roof equipment exactly, with quieter night contrast.
 - No fans run during construction or on a terminated hall. Reduced motion keeps them static. This is scenery only, with no added capacity or progress.
-- Inspected enlarged actual roof pixels and full day/night desktop views. Browser checks verify genuine rotation over rendered frames, open/terminated states and reduced motion. Both full desktop journeys and eight focused event/art/loss cases pass, plus lint/build and built-image decoding. The 699-unit suite passed before this display-only addition.
+- Inspected enlarged actual roof pixels and full day/night desktop views. Browser checks verify genuine rotation over rendered frames, open/terminated states and reduced motion. Both full desktop journeys and seven focused event/art/loss cases pass, plus lint/build and built-image decoding. The 699-unit suite passed before this display-only addition.
+
+
+## November 10 evening: honest sale confirmation too
+- Replayed the final sale confirmation and found it still rounded a 0.996x owner return to 1.00x. It now shares the precise return label with the summary/report and warns when owners recover less than they invested.
+- Separated the player share from the owners' return. Debt is labeled loans owed rather than claiming every loan has been repaid before the sale is committed.
+- The real engine-priced edge test now exercises preview, cancel without ending, reprice, commit, summary, full report, return and restart. Both normal desktop journeys, related close/rating routes, report unit cases, lint/build and built decoding pass. Actual confirmation pixels inspected.
