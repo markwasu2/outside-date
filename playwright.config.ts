@@ -12,6 +12,8 @@ export default defineConfig({
   reporter: 'list',
   use: {
     baseURL: 'http://localhost:5173',
+    // Existing detailed-mode regression suite. Default-player tests explicitly use empty storage.
+    storageState: {cookies:[],origins:[{origin:'http://localhost:5173',localStorage:[{name:'outside-date-detailed',value:'true'}]}]},
     trace: 'retain-on-failure',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],

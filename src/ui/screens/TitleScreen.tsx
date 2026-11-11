@@ -69,6 +69,16 @@ export function TitleScreen({ scenarioId, difficultyId, onScenarioChange, onDiff
       .catch((err) => setImportError(err instanceof Error ? err.message : String(err)));
   }
 
+  if(localStorage.getItem('outside-date-detailed')!=='true')return <div data-testid="simple-start" style={{padding:28,display:'flex',flexDirection:'column',justifyContent:'center',minHeight:'100%',boxSizing:'border-box',fontFamily:'system-ui,sans-serif',color:'#35442e'}}>
+    <div style={{fontSize:12,textTransform:'uppercase',letterSpacing:1,color:'#788363'}}>A building tycoon game</div>
+    <h1 style={{fontFamily:'Georgia,serif',fontSize:36,margin:'10px 0'}}>Build a data center.<br/>Open it. Make a profit.</h1>
+    <p style={{fontSize:17,lineHeight:1.5,margin:'10px 0 22px'}}>Start with land and a building budget. Finish construction before your tenant leaves, collect rent, then sell the campus.</p>
+    <div style={{display:'flex',gap:10,marginBottom:22}}>{[['1','BUILD','Land, permits, power'],['2','OPEN','Finished buildings earn rent'],['3','SELL','Repay loans, keep the profit']].map(([n,title,text])=><div key={n} style={{flex:1,padding:12,border:'1px solid #c4c6a8',borderRadius:8,background:'#f5f1dd'}}><strong style={{display:'block',color:'#365c45'}}>{n} · {title}</strong><small style={{display:'block',marginTop:6,lineHeight:1.4}}>{text}</small></div>)}</div>
+    <button data-testid="start-first-campus" onClick={onTutorial} style={{padding:15,background:'#365c45',color:'#fff',border:0,borderRadius:7,fontSize:17,fontWeight:700,cursor:'pointer'}}>Build my first campus ▶</button>
+    <p style={{textAlign:'center',fontSize:12,color:'#74765e'}}>One building · ready-made budget · learn by building</p>
+    <div style={{display:'flex',gap:10,justifyContent:'center'}}><button disabled={!saved} onClick={()=>saved&&loadGame(saved)} style={{padding:'8px 14px'}}>Continue saved game</button><button onClick={onNewGame} style={{padding:'8px 14px'}}>Custom campus</button></div>
+  </div>;
+
   return (
     <div
       style={{

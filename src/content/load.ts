@@ -9,6 +9,7 @@ import codexJson from '../../content/codex.json';
 import castJson from '../../content/cast.json';
 import millbrookRelayJson from '../../content/scenarios/millbrook-relay.json';
 import whaleJson from '../../content/scenarios/whale.json';
+import firstCampusJson from '../../content/scenarios/first-campus.json';
 import tutorialEdge5Json from '../../content/scenarios/tutorial-edge5.json';
 import sitesJson from '../../content/sites.json';
 
@@ -187,7 +188,8 @@ export function loadContent(): Content {
     millbrookRelayJson,
     'content/scenarios/millbrook-relay.json',
   );
-  const scenarios = { [whale.id]: whale, [tutorialEdge5.id]: tutorialEdge5, [millbrookRelay.id]: millbrookRelay };
+  const firstCampus=ScenarioSchema.parse(firstCampusJson);
+  const scenarios = { [whale.id]: whale, [tutorialEdge5.id]: tutorialEdge5, [millbrookRelay.id]: millbrookRelay, [firstCampus.id]:firstCampus };
 
   // Phase 4 (pillar A): three sites per scenario, ids unique, and each scenario must be able
   // to resolve the legacy 'megasite'/'farmland' union members (by literal id or `replaces`) so

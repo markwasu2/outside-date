@@ -9,7 +9,7 @@ import { STAGE_ART, TILE_ART, COOLING_ART, SUBSTATION_ART } from '../art';
 
 const STEPS = ['title','setup','tier','cooling','contractor','lease','forecast','capital','power','insurance','review'];
 const OPENING: Record<string,{place:string;line:string}> = {
-  title:{place:'At the site gate',line:'A piece of land, a tenant deadline, and a campus to build.'},
+  title:{place:'At the site gate',line:'Build your first campus, one month at a time.'},
   setup:{place:'Walking the land',line:'Choose your ground and the kind of campus you want to build.'},
   tier:{place:'At the hall pads',line:'Choose what these halls will hold. Cost, rent and future chip risk change together.'},
   cooling:{place:'At the cooling plant',line:'Choose how the campus sheds heat. Water, power use and drought risk are linked.'},
@@ -39,7 +39,7 @@ export function OpeningCampus({step,preview,content,children,onNavigate}:{step:s
     <header style={{display:'flex',alignItems:'center',gap:24,padding:'12px 22px',background:'#fffdf6',borderBottom:'1px solid #cdbf9f'}}>
       <span style={{fontFamily:'Georgia,serif',fontSize:20}}>Outside Date</span>
       <strong>{step === 'title' ? 'Your next campus' : 'Before construction'}</strong>
-      <span>{site.name}</span><span style={{marginLeft:'auto',fontSize:12}}>Click the land, halls, cooling, crew or office to edit</span>
+      <span>{site.name}</span>{step!=='title'&&<span style={{marginLeft:'auto',fontSize:12}}>Click a place to edit your setup</span>}
     </header>
     <div style={{flex:1,minHeight:0,position:'relative',backgroundImage:`url("${campusGround}")`,backgroundSize:'100% 100%',backgroundColor:'#e9dcb8',backgroundPosition:'center'}}>
       <div data-testid="opening-land" data-pond={String(site.mapTheme.pond)} style={{position:'absolute',inset:0,overflow:'hidden',background:site.mapTheme.pond?'#65905c1a':site.extraPadMonths?'#ae74451a':'transparent'}}>
@@ -58,10 +58,10 @@ export function OpeningCampus({step,preview,content,children,onNavigate}:{step:s
         <div className="opening-content" style={{flex:1,minHeight:0,overflowY:'auto'}}>{children}</div>
       </aside>
     </div>
-    <footer style={{display:'flex',gap:24,padding:'10px 22px',background:'#fffdf6',borderTop:'1px solid #cdbf9f',fontSize:12}}>
+    {step!=='title'&&<footer style={{display:'flex',gap:24,padding:'10px 22px',background:'#fffdf6',borderTop:'1px solid #cdbf9f',fontSize:12}}>
       <span>{preview.halls.length} halls planned · {preview.setup.hallTier} racks · {preview.setup.gc === 'gmp' ? 'Fixed-price contractor' : 'Cost-plus contractor'}</span>
       {step!=='title'&&<span style={{marginLeft:'auto'}}>Current project budget: {formatDollars(preview.budgetAtClose)} · Not signed yet</span>}
-    </footer>
+    </footer>}
     <style>{`.opening-content > div {padding:18px !important;max-width:none !important;margin:0 !important;height:auto !important;min-height:0 !important;box-sizing:border-box}.opening-content h1 {margin:4px 0}.opening-content h2 {margin-top:0}.opening-content p {line-height:1.35}`}</style>
   </div>;
 }

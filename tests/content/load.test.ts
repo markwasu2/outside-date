@@ -43,7 +43,7 @@ describe('loadContent', () => {
     expect(content.codex.length).toBe(36);
     expect(content.cast.cast.length).toBe(10);
     expect(content.cast.intervenors.length).toBe(4);
-    expect(Object.keys(content.scenarios).sort()).toEqual(['millbrook-relay', 'tutorial-edge5', 'whale']);
+    expect(Object.keys(content.scenarios).sort()).toEqual(['first-campus', 'millbrook-relay', 'tutorial-edge5', 'whale']);
   });
 
   it('loads content/sites.json: three sites per scenario with every field from the design doc (Phase 4)', () => {
