@@ -181,7 +181,7 @@ function CampusGame() {
           </aside>
         )}
       </div>
-      {showReview && <MonthReviewPanel onInspect={(target) => {setDrawer(null);setBoardPopover(target);selectHall(state.halls.some(h => h.id === target) ? target : null);}} />}
+      {showReview && <MonthReviewPanel onInspect={(option) => {setDrawer(null);useStore.getState().setOfficeView(option.officeView ?? null);setBoardPopover(option.target);selectHall(state.halls.some(h => h.id === option.target) ? option.target : null);}} />}
       {deskOpen && <ActionDesk />}</div>
       {isFreshStart && state.phase === 'playing' && content.scenarios[state.scenarioId]?.coachTips === true && !dismissedCoachTips.includes('cold-intro') && (
         <div data-testid="cold-intro" style={{ position: 'fixed', bottom: 64, left: '50%', transform: 'translateX(-50%)', zIndex: 70, maxWidth: 520, padding: '12px 16px', background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', fontSize: 13, lineHeight: 1.5, pointerEvents: 'none' }}>

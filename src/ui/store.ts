@@ -1,4 +1,4 @@
-import type { MonthReview } from './board/monthReview';
+import type { OfficeView, MonthReview } from './board/monthReview';
 import { milestoneWords } from './board/milestoneWords';
 import { create } from 'zustand';
 
@@ -231,6 +231,8 @@ interface UIStore {
    * change. null before the first committed month of a run. */
   prevState: GameState | null;
   monthReview: MonthReview | null;
+  requestedOfficeView: OfficeView | null;
+  setOfficeView: (view: OfficeView | null) => void;
   /** Phase 1 (D6): map objects whose "what this is" teaching line has been seen this run - same
    * pattern as dismissedCoachTips (UI-only, cleared by newGame/loadGame). */
   seenBoardObjects: string[];
@@ -367,6 +369,7 @@ export const useStore = create<UIStore>((set, get) => ({
   boardPopover: null,
   prevState: null,
   monthReview: null,
+  requestedOfficeView: null,
   seenBoardObjects: [],
   requestedTab: null,
   screen: 'start',
@@ -393,6 +396,7 @@ export const useStore = create<UIStore>((set, get) => ({
   requestTab: (tab) => set({ requestedTab: tab }),
   setOpenPanel: (panel) => set((s) => ({ openPanel: s.openPanel === panel ? null : panel })),
   setScreen: (screen) => set({ screen }),
+  setOfficeView: (view) => set({ requestedOfficeView: view }),
   dismissCoachTip: (id) => set((s) => ({ dismissedCoachTips: [...s.dismissedCoachTips, id] })),
   openCodex: (entryId, stakeholderFocus) =>
     set({ codexOpen: true, codexSelectedId: entryId ?? null, codexStakeholderFocus: stakeholderFocus ?? null }),
@@ -628,7 +632,8 @@ export const useStore = create<UIStore>((set, get) => ({
       error: null,
       boardPopover: null,
       prevState: null,
-  monthReview: null,
+      monthReview: null,
+      requestedOfficeView: null,
       seenBoardObjects: [],
       requestedTab: null,
       screen: 'game',
@@ -656,7 +661,8 @@ export const useStore = create<UIStore>((set, get) => ({
       error: null,
       boardPopover: null,
       prevState: null,
-  monthReview: null,
+      monthReview: null,
+      requestedOfficeView: null,
       seenBoardObjects: [],
       requestedTab: null,
       screen: 'game',

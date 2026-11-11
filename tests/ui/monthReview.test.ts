@@ -33,6 +33,14 @@ describe('evidence-backed month review', () => {
  it('offers distinct schedule, cash and relationship routes, not automatic execution',()=>{
   const options=reviewOptions(fresh(),content);
   expect(options).toHaveLength(3);expect(new Set(options.map(o=>o.title)).size).toBe(3);
-  expect(options[0]?.target).toBe('substation');expect(options[1]?.text).toContain('Holding cash');
+  expect(options[0]?.target).toBe('substation');expect(options[1]?.officeView).toBe('capital');
+  expect(options[1]?.title).toBe('Compare funding offers');
+  expect(options[2]?.officeView).toBe('permits');
+ });
+ it('routes blocked funding and closing work to the lender, not permits',()=>{
+  const state=fresh();state.flags.drawFreeze=true;
+  expect(reviewOptions(state,content)[0]).toMatchObject({target:'siteOffice',officeView:'money'});
+  state.flags.drawFreeze=false;state.phase='takeoutAvailable';
+  expect(reviewOptions(state,content)[0]).toMatchObject({target:'siteOffice',officeView:'money'});
  });
 });

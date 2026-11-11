@@ -8,12 +8,20 @@ test('review first: choose campus work, see its consequences, reach the close wi
  await expect(page.getByTestId('next-step-card')).toHaveCount(0);
  await expect(page.getByTestId('review-option')).toHaveCount(3);
  await page.getByTestId('cold-intro-dismiss').click();
+ await page.setViewportSize({width:1280,height:720});
+ await expect(page.getByTestId('review-option').last()).toBeInViewport();
  await page.screenshot({path:'/tmp/month-review/opening.png'});
+ await page.setViewportSize({width:1440,height:900});
  // An option opens a place to inspect; it cannot spend money or focus.
  const cash=await page.getByTestId('campus-status').innerText();
  await page.getByTestId('review-option').first().click();
  await expect(page.getByTestId('map-popover')).toBeVisible();
  expect(await page.getByTestId('campus-status').innerText()).toBe(cash);
+ await page.getByTestId('map-popover').getByRole('button',{name:'Close',exact:true}).click();
+ await page.getByRole('button',{name:'Compare funding offers',exact:false}).click();
+ await expect(page.getByTestId('map-popover').getByRole('button',{name:'Raise capital',exact:true})).toHaveAttribute('aria-pressed','true');
+ expect(await page.getByTestId('campus-status').innerText()).toBe(cash);
+
  await page.getByTestId('map-popover').getByRole('button',{name:'Close',exact:true}).click();
  for(let month=0;month<35;month++){
   if(!await page.getByTestId('month-review').count())break;
@@ -26,7 +34,7 @@ test('review first: choose campus work, see its consequences, reach the close wi
   if(await page.getByTestId('price-takeout-banner').count()){
    await page.getByTestId('price-takeout-banner').click();await page.getByTestId('commit-takeout').click();break;
   }
-  trace.push((await page.getByTestId('month-review').innerText()).replaceAll('\n',' '));
+  trace.push(((await page.getByTestId('month-review').textContent() ?? '')).replaceAll('\n',' '));
   const reviewText=await page.getByTestId('review-developments').count() ? await page.getByTestId('review-developments').innerText() : null;
   const notice=page.getByTestId('event-notice-dismiss');for(let n=0;n<5 && await notice.count();n++)await notice.first().click();
   // Inspect the actual campus, not the optional recommendation. Decide on prerequisites,
