@@ -362,8 +362,29 @@ def compound(kind):
    s+=fans(x+2,-32,25,2)
    for y in range(-36,7,5):s+=line(p(x+40,y,5),p(x+40,y,22),'#294f5d',.6)
   for x in (-75,-20,35):s+=box(x,25,2,30,17,12,'#9db8af','#6e9790','#3d6972')
-  for y in (16,21):s+=line(p(-82,y,8),p(80,y,8),'#adc8c3',3)
+  s+='<g data-testid="cooling-yard-pipework">'
+  # Shared supply/return headers sit on saddles with short risers to the fan banks.
+  for x in (-67,-9,49):
+   s+=box(x,12,1,4,14,6,'#91a79a','#708e82','#4f736b')
+  for y in (16,21):
+   s+=line(p(-82,y,7),p(80,y,7),'#416d71',4.5)
+   s+=line(p(-82,y,8),p(80,y,8),'#b5d1c7',3)
+   s+=line(p(-82,y,9),p(80,y,9),'#dce4cf',.65)
+  for x in (-58,-4,50):
+   for y in (16,21):
+    s+=line(p(x,y,8),p(x,y,14),'#8db7aa',2.4)
+    s+=line(p(x,y,14),p(x,8,14),'#b5d1bf',2.4)
+   s+=box(x-2,19,6,5,4,5,'#8eada1','#608f85','#3d6f71')
+   cx,cy=p(x+.5,21,15)
+   s+=f'<ellipse cx="{cx}" cy="{cy}" rx="3.2" ry="1.8" fill="none" stroke="#bd9660" stroke-width="1.1"/>'
+   s+=line((cx-3,cy),(cx+3,cy),'#d3ba80',.65)
   s+=box(-85,50,1,31,12,16,'#c9d4c5','#8fa9a0','#5b817e')
+  # Access doors and a small recessed control face make the front cabinet readable.
+  for x in (-82,-68):
+   s+=poly([p(x,62.2,3),p(x+11,62.2,3),p(x+11,62.2,15),p(x,62.2,15)],'#94aa9b','#d1d8bf',.45)
+   s+=line(p(x+8.5,62.4,7),p(x+8.5,62.4,10),'#e4dfc1',.8)
+  s+=poly([p(-80,62.4,10),p(-74,62.4,10),p(-74,62.4,13),p(-80,62.4,13)],'#365e66','#a5bfa6',.35)
+  s+='</g>'
  else:
   s+='<g data-testid="backup-generator-detail">'
   for x in (-78,-20,38):
