@@ -1,3 +1,4 @@
+import {transitionMilestones} from './board/transitionMilestones';
 import {choiceImpact} from './board/choiceImpact';
 import type { OfficeView, MonthReview } from './board/monthReview';
 import { milestoneWords } from './board/milestoneWords';
@@ -58,7 +59,7 @@ function applyWarningCrossings(before: GameState, after: GameState, planContent:
 function playTransitionSounds(before: GameState, after: GameState, planContent: Content, muted: boolean): void {
   const newlyDelivered = deliveredCount(after) > deliveredCount(before);
   const newlyWon = after.phase === 'ended' && after.outcome?.kind === 'win' && before.phase !== 'ended';
-  if (newlyDelivered || newlyWon) playSound('milestone', muted);
+  if (newlyDelivered || newlyWon || transitionMilestones(before,after).length>0) playSound('milestone', muted);
 
   const newlyLow = runway(after, planContent) < WARNING_RUNWAY_MONTHS && runway(before, planContent) >= WARNING_RUNWAY_MONTHS;
   const newlyLost = after.phase === 'ended' && after.outcome?.kind === 'lose' && before.phase !== 'ended';
@@ -600,24 +601,26 @@ export const useStore = create<UIStore>((set, get) => ({
   },
 
   resolveEventChoice: (choiceId) => {
-    const { state, content: c } = get();
+    const { state, content: c,muted } = get();
     // Fix 12 (playtest-fixes): guards a double dispatch (e.g. two rapid clicks on event-choice
     // buttons before React removes the modal) from reaching `resolveEvent()`, which throws when
     // there's no pending event - the first click already resolved it, so the second is a no-op.
     if (state.phase !== 'awaitingChoice' || !state.pending) return;
     try {
       const result = resolveEvent(state, choiceId, c);
+      const next=applyWarningCrossings(state,result.state,c,muted);
       const card=c.events.find(e=>e.id===state.pending?.cardId),level=/^level:(\d+)$/.exec(choiceId);
       const label=(level?card?.scale?.levels[Number(level[1])]?.label:state.pending.choices.find(c=>c.id===choiceId)?.label)??choiceId;
       set((s) => ({
-        state: result.state,
-        draft: result.state,
-        monthReview: { before: s.monthReview?.before ?? state, after: result.state, actions: s.monthReview?.actions ?? [], eventChoices:[...(s.monthReview?.eventChoices??[]),{cardId:state.pending!.cardId,label,impact:choiceImpact(state,result.choiceState)}] },
+        state: next,
+        draft: next,
+        monthReview: { before: s.monthReview?.before ?? state, after: next, actions: s.monthReview?.actions ?? [], eventChoices:[...(s.monthReview?.eventChoices??[]),{cardId:state.pending!.cardId,label,impact:choiceImpact(state,result.choiceState)}] },
         plan: [],
         snapshots: [],
         error: null,
-        financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(result.state, c)),
+        financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(next, c)),
       }));
+      playTransitionSounds(state,next,c,muted);
       get().autosave();
     } catch (e) {
       set({ error: humanizeActionError(e instanceof Error ? e.message : String(e)) });

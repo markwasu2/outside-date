@@ -81,3 +81,9 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Added original, same-camera steel-bundle and cladding-panel yard illustrations. Structure gets lifting equipment, walls get a delivery truck, and later buildout gets cooling/backup yards. A permanent excavator no longer stands beside every construction stage.
 - Removed the duplicate generic laydown illustration from the simple map while preserving actual order counts, delivery notices and the inspectable yard. Detailed map art remains unchanged.
 - Twelve targeted browser cases passed across stage transitions, original asset bounds, yard count, both normal build-to-sale journeys, late power/permit recovery and paused work. Actual steel/panel stage pixels, lint/build, built image decoding and diff checks passed. No game-state changes.
+
+## November 10 evening: finished work gets a small reward
+- Newly completed milestones get a brief result-bar highlight and the existing optional milestone tone. No bonus is invented, no modal blocks the game, and a setback keeps its warning treatment rather than a green celebration.
+- Months resolved after a choice now run the same fresh-warning and transition-sound checks as ordinary months. Previously this path silently skipped those checks, including real foundation completions in the opening month.
+- Sound remains off by default and honors mute. New orders do not repeat the completion tone. Reduced-motion disables the highlight. A real-click browser check observes the one milestone tone through a test audio stub and verifies mute/reduced-motion behavior.
+- 695 unit cases and twelve targeted browser cases passed across milestone feedback, monthly results, opening choices, ordinary desktop completion, late permit recovery, losses, partner-dispute event and detailed/whale paths. Actual foundation pixels, lint/build, built image decoding and diff checks passed.

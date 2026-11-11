@@ -11,6 +11,9 @@ import { useEffect, useState } from 'react';
 export function BoardStyles() {
   return (
     <style>{`
+      @keyframes monthlyAchievement {0%{box-shadow:inset 5px 0 #6a9158;background:#e8f0dc}100%{box-shadow:inset 0 0 transparent;background:#fffdf5}}
+      .monthly-achievement {animation:monthlyAchievement 1.6s ease-out both}
+      @media(prefers-reduced-motion:reduce){.monthly-achievement{animation:none!important}}
       [data-testid="campus-workspace"] > header,
       [data-testid="campus-workspace"] > footer { box-shadow: 0 2px 8px #3e372012; }
       [data-testid="campus-status"] { flex-wrap: wrap; row-gap: 6px !important; }
