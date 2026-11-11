@@ -55,3 +55,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Working people and dust disappear while a funding freeze, failed inspection or stand-down stops construction.
 - Fitted campuses get a connected entrance road, gatehouse, barrier, crossing and slow service van. Open campuses get parked cars and courtyard visitors. Night headlights and reduced-motion fallbacks checked in actual desktop screenshots.
 - 686 unit cases and all 161 browser cases passed in four sequential shards. Built image decoding, lint/build and diff checks passed. Both complete default journeys also checked day/night and reduced-motion service traffic.
+
+## November 10 evening: show what the actual choice changed
+- Monthly bar now retains the last chosen event answer with its immediate cash, trust and next-month-point effects. Crew training also shows its actual expiry.
+- Choice effects come from the committed choice state before the world tick. An accepted $100K open house is not blamed for the entire month's cash burn. Capped trust gains use the actual gain rather than the authored maximum. Existing saves/history without effects remain readable.
+- 691 unit tests passed. Thirteen targeted browser cases passed: accept all opening choices, frozen monthly results, both complete desktop journeys, generic/bespoke event cards, terminal-event handling, detailed review-to-sale and whale fast-forward. Lint/build, built image decoding, diff check and actual training/walkthrough pixels passed.
