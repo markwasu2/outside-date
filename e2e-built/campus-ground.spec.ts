@@ -9,5 +9,6 @@ test('built campus ground survives CSS parsing and the image decodes',async({pag
  await page.getByTestId('start-first-campus').click();
  const css=await page.getByTestId('map-root').evaluate(el=>getComputedStyle(el).backgroundImage);
  expect(css).toMatch(/url\("(?:data:image\/svg|http[^" ]*campus-ground-)/);
+ await page.locator('[data-scene-object="office"] > img').evaluate(async img=>{await (img as HTMLImageElement).decode();if(!(img as HTMLImageElement).naturalWidth)throw new Error('Office image failed to decode');});
  await page.screenshot({path:'/tmp/campus-built-ground.png'});
 });
