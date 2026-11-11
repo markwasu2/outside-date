@@ -1,0 +1,94 @@
+{
+  "id": "first-campus",
+  "halls": 1,
+  "hallMwIT": 5,
+  "maxMonths": 30,
+  "introText": "One data center. Buy land, get the building permit, connect power, build and open for rent. Sell the finished campus before the campaign ends.",
+  "castIds": [
+    "utility_ceo",
+    "lenders_engineer",
+    "gc_foreman",
+    "tenant_rep"
+  ],
+  "scriptedEvents": [],
+  "scriptedEffects": [],
+  "docket": {
+    "enabled": false
+  },
+  "permitsRequired": [
+    "building"
+  ],
+  "skipTransformerOrder": true,
+  "tuningOverrides": {
+    "land": {
+      "megasite": 20000000
+    },
+    "power": {
+      "interimGridMW": 8,
+      "studyCost": 500000,
+      "studyMonthsMin": 2,
+      "studyMonthsMax": 3,
+      "switchgearLeadMin": 2,
+      "switchgearLeadMax": 3,
+      "switchgearDeposit": 500000,
+      "switchgearBalance": 1000000,
+      "substationBuildMonths": 1
+    },
+    "stages": [
+      {
+        "id": "pad",
+        "minMonths": 1,
+        "costShare": 0.12
+      },
+      {
+        "id": "steel",
+        "minMonths": 3,
+        "costShare": 0.22
+      },
+      {
+        "id": "shell",
+        "minMonths": 3,
+        "costShare": 0.22
+      },
+      {
+        "id": "fitout",
+        "minMonths": 3,
+        "costShare": 0.34
+      },
+      {
+        "id": "rfs",
+        "minMonths": 1,
+        "costShare": 0.1
+      }
+    ],
+    "campaign": {
+      "monthlyBurn": 150000
+    },
+    "insurance": {
+      "buildersRiskMonthly": 100000,
+      "dsuMonthly": 0,
+      "deductible": 500000
+    },
+    "events": {
+      "stormDamage": 1000000,
+      "fireDamage": 1000000
+    }
+  },
+  "lease": {
+    "firstDeliveryMonth": 22,
+    "outsideDateMonths": 6,
+    "lateRemedy": "liquidatedDamages"
+  },
+  "capital": {
+    "seniorLtc": 0.65,
+    "playerEquityCash": 8000000
+  },
+  "coachTips": false,
+  "difficulties": {
+    "normal": {
+      "flags": {
+        "fundExtensionsDone": true
+      }
+    }
+  }
+}

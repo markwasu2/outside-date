@@ -81,6 +81,13 @@ export function BoardStyles() {
       [data-testid^="caption-"] { box-shadow:0 1px 3px #5b401c18; }
       [data-testid^="pad-"] { border-color:#a59c82 !important; background:#f6f0df !important; color:#635b47; }
       [data-testid="campus-people"] > img { filter:drop-shadow(0 5px 4px #4d3a2428); }
+      [data-simple-campus="true"] [data-simple-hidden="true"], [data-simple-local-grid="true"] [data-scene-object="plants"] { visibility:hidden; pointer-events:none; }
+      [data-simple-campus="true"] [data-testid^="pad-"] { display:none; }
+      [data-simple-campus="true"] [data-scene-object="hall"] > div:first-child { font-size:13px !important; }
+      [data-simple-campus="true"] [data-testid^="caption-"] { max-width:90%; font-size:11px !important; }
+      [data-simple-campus="true"] [data-testid="map-road"] > span { transform:translateX(-160px); }
+      [data-simple-campus="true"] [data-scene-object="office"] > span,
+      [data-simple-campus="true"] [data-scene-object="substation"] > div { font-size:11px; }
       @keyframes boardGlowPulse {
         0%, 100% { box-shadow: 0 0 4px 1px rgba(255, 200, 60, 0.55); }
         50% { box-shadow: 0 0 12px 4px rgba(255, 200, 60, 0.95); }

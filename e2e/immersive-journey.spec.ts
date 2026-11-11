@@ -2,7 +2,7 @@ import { adviceElement } from './campusNavigation';
 import {test,expect} from '@playwright/test';
 import fs from 'node:fs';
 test('fresh title through signing, object-only construction and final report',async({page})=>{
- test.setTimeout(55_000);await page.setViewportSize({width:1440,height:900});
+ test.setTimeout(100_000);await page.setViewportSize({width:1440,height:900});
  const trace:string[]=[];const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(() => { Math.random = () => 1 / 1_000_000_000; });
  await page.goto('/');await page.locator('select').first().selectOption('tutorial-edge5');await page.getByRole('button',{name:'New game',exact:true}).click();

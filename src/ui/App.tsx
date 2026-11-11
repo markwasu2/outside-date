@@ -1,3 +1,5 @@
+import {SimpleResult} from './screens/SimpleResult';
+import {TycoonGame} from './board/TycoonGame';
 import { MonthReviewPanel } from './board/MonthReviewPanel';
 import { useEffect, useState } from 'react';
 
@@ -80,7 +82,7 @@ function useKeyboardShortcuts() {
 }
 
 /** Desktop campus-first stage: the map owns the canvas; detail stays on demand. */
-function CampusGame() {
+function CampusGame({onSimple}:{onSimple:()=>void}) {
   const [deskOpen, setDeskOpen] = useState(false);
   const [showAdvice, setShowAdvice] = useState(false);
   const [showReview, setShowReview] = useState(true);
@@ -146,6 +148,7 @@ function CampusGame() {
         <button style={{ color: alerts.some((a) => a.level === 'critical') ? '#a52a21' : undefined, fontWeight: alerts.length ? 'bold' : undefined }} aria-expanded={drawer === 'status'} onClick={() => setDrawer(drawer === 'status' ? null : 'status')}>Status & guide{alerts.length ? ` (${alerts.length} alerts)` : ''}</button>
         <button aria-expanded={showReview} onClick={() => setShowReview(!showReview)}>Month review</button>
         <button aria-expanded={showAdvice} onClick={() => setShowAdvice(!showAdvice)}>{showAdvice ? 'Hide advice' : 'Show advice'}</button>
+        <button onClick={onSimple}>Simple view</button>
         <button aria-expanded={deskOpen} onClick={() => setDeskOpen(!deskOpen)}>Actions</button>
         <button aria-expanded={drawer === 'postures'} onClick={() => setDrawer(drawer === 'postures' ? null : 'postures')}>Postures</button>
         <button aria-expanded={drawer === 'actions'} onClick={() => setDrawer(drawer === 'actions' ? null : 'actions')}>Plan</button>
@@ -208,6 +211,8 @@ function CampusGame() {
 }
 
 export function App() {
+  const [detailed,setDetailed]=useState(()=>localStorage.getItem('outside-date-detailed')==='true');
+  const setView=(value:boolean)=>{localStorage.setItem('outside-date-detailed',String(value));setDetailed(value);};
   const screen = useStore((s) => s.screen);
   const phase = useStore((s) => s.state.phase);
   useKeyboardShortcuts();
@@ -217,9 +222,9 @@ export function App() {
       {screen === 'start' ? (
         <SetupWizard />
       ) : phase === 'ended' ? (
-        <EndedFlow />
+        detailed ? <EndedFlow /> : <SimpleResult />
       ) : (
-        <CampusGame />
+        detailed ? <CampusGame onSimple={()=>setView(false)}/> : <TycoonGame onDetailed={()=>setView(true)}/>
       )}
       {/* P9.3: mounted regardless of screen, so the Title screen's Codex button and any
        * <Term>'s "more" link mid-game (or mid-wizard) can open it. */}

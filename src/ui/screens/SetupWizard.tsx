@@ -31,7 +31,7 @@ export function SetupWizard() {
   const newGame = useStore((s) => s.newGame);
 
   const [step, setStep] = useState<Step>('title');
-  const [scenarioId, setScenarioId] = useState(Object.keys(content.scenarios)[0] ?? 'whale');
+  const [scenarioId, setScenarioId] = useState(localStorage.getItem('outside-date-detailed')==='true'?(Object.keys(content.scenarios)[0] ?? 'whale'):'first-campus');
   const [difficultyId, setDifficultyId] = useState<DifficultyId>('normal');
   const [setup, setSetup] = useState<Setup>(DEFAULT_SETUP);
   const [negotiation, setNegotiation] = useState<NegotiationChoices>({
@@ -52,7 +52,7 @@ export function SetupWizard() {
   // the scripted storm/switchgear-slip timing (and the eventual Playwright smoke test, Phase 10)
   // deterministic.
   function startTutorial() {
-    newGame('tutorial-edge5', DEFAULT_SETUP, DEFAULT_NEGOTIATION, 1, 'normal');
+    newGame(localStorage.getItem('outside-date-detailed')==='true'?'tutorial-edge5':'first-campus', DEFAULT_SETUP, DEFAULT_NEGOTIATION, 1, 'normal');
   }
 
   function renderStep() {

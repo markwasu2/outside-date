@@ -16,6 +16,6 @@ test('double clicking End month commits only one turn',async({page})=>{
 });
 test('unfocused Space advances once and a held key does not repeat',async({page})=>{
  await page.goto('/');await page.getByRole('button',{name:'Tutorial',exact:true}).click();
- await page.getByTestId('campus-status').click();await page.keyboard.down('Space');await page.keyboard.down('Space');await page.keyboard.up('Space');
+ await page.getByTestId('campus-status').click({position:{x:8,y:8}});await page.keyboard.down('Space');await page.keyboard.down('Space');await page.keyboard.up('Space');
  await expect(page.getByTestId('campus-status')).toContainText('Y1 M2');
 });

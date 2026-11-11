@@ -223,5 +223,79 @@
         "poles": 3
       }
     }
+  ],
+  "first-campus": [
+    {
+      "id": "edge5-campus",
+      "name": "Edge 5 Campus",
+      "summary": "The practice parcel: priced in the middle of nowhere on purpose, no extra permits, no extra pad months, and a $1.0M small-campus grant from the county.",
+      "landCost": 20000000,
+      "extraPadMonths": 0,
+      "permits": [],
+      "studyMonthsMin": 2,
+      "studyMonthsMax": 3,
+      "interimGridMW": 8,
+      "incentive": {
+        "kind": "cashGrant",
+        "amount": 1000000,
+        "label": "County small-campus grant: $1.0M cash at close"
+      },
+      "goodwill": {},
+      "mapTheme": {
+        "ground": "#d7ccc8",
+        "pond": false,
+        "poles": 2
+      },
+      "replaces": "megasite"
+    },
+    {
+      "id": "edge5-meadow",
+      "name": "Edge 5 Meadow",
+      "summary": "Cheaper ground with a pond: $8.0M less land and a $1.0M easement payment, but a wetlands permit and two extra pad months on a short clock.",
+      "landCost": 12000000,
+      "extraPadMonths": 2,
+      "permits": [
+        "wetlands"
+      ],
+      "studyMonthsMin": 2,
+      "studyMonthsMax": 3,
+      "interimGridMW": 8,
+      "incentive": {
+        "kind": "cashGrant",
+        "amount": 1000000,
+        "label": "Meadow easement payment: $1.0M cash at close"
+      },
+      "goodwill": {
+        "town": 5
+      },
+      "mapTheme": {
+        "ground": "#c5e1a5",
+        "pond": true,
+        "poles": 0
+      },
+      "replaces": "farmland"
+    },
+    {
+      "id": "edge5-siding",
+      "name": "Edge 5 Siding",
+      "summary": "By the spur line: a little fill work (one extra pad month), but the study runs 1 to 2 months, the grid is roomier, and the building permit is already cured.",
+      "landCost": 15000000,
+      "extraPadMonths": 1,
+      "permits": [],
+      "studyMonthsMin": 1,
+      "studyMonthsMax": 2,
+      "interimGridMW": 12,
+      "incentive": {
+        "kind": "permitFastTrack",
+        "permitId": "building",
+        "label": "Building permit already cured at close"
+      },
+      "goodwill": {},
+      "mapTheme": {
+        "ground": "#e0d2b0",
+        "pond": false,
+        "poles": 3
+      }
+    }
   ]
 }

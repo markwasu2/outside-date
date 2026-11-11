@@ -1,3 +1,6 @@
+import {TycoonObjectPanel} from '../board/TycoonObjectPanel';
+import {TycoonMapControl} from '../board/TycoonMapControl';
+import {plainWords} from '../board/simpleWords';
 import campusPeopleImg from '../../assets/campus/campus-people.svg';
 import campusGroundImg from '../../assets/campus/campus-ground.svg';
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
@@ -173,7 +176,7 @@ function QueuedGhost() {
   );
 }
 
-export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;waiting?:boolean;whileYouWait?:string;progress?:string;prepAction?:{label:string;actionId:string};onShow:()=>void;actionId?:string;params?:Record<string,string|number>}} = {}) {
+export function MapGrid({cue,simple=false}: {simple?:boolean;cue?: {title:string;why:string;objectId:string;waiting?:boolean;whileYouWait?:string;progress?:string;prepAction?:{label:string;actionId:string};onShow:()=>void;actionId?:string;params?:Record<string,string|number>}} = {}) {
   const draft = useStore((s) => s.draft);
   const state = useStore((s) => s.state);
   const prevState = useStore((s) => s.prevState);
@@ -263,6 +266,8 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
       ref={containerRef}
       data-testid="map-root"
       data-campus-scene="true"
+      data-simple-campus={simple}
+      data-simple-local-grid={simple&&!draft.docketEnabled}
       data-ground={siteTheme.ground}
       style={{
         position: 'relative',
@@ -279,9 +284,9 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
         background: `url("${campusGroundImg}") center / 100% 100%, linear-gradient(#eadbbccc, #e0ca9acc), ${siteTheme.ground}`,
       }}
     >
-      <BoardLegend />
+      {!simple && <BoardLegend />}
       <div {...selectableCellProps(boardPopover === 'people', () => openObject('people', null))}
-        ref={(el) => { if (el) { el.dataset.campusObject = 'people'; cellRefs.current.set('people', el); } }} aria-label="People on site" data-testid="campus-people"
+        ref={(el) => { if (el) { el.dataset.campusObject = 'people'; cellRefs.current.set('people', el); } }} aria-label="People on site" data-testid="campus-people" data-simple-hidden={simple&&!draft.halls.some(h=>h.delivered)}
         style={{ position: 'absolute', left: '7%', bottom: '8%', width: 110, height: 110, cursor: 'pointer', zIndex: 3 }}>
         <img src={campusPeopleImg} alt="" aria-hidden="true" style={{width:'100%',height:'100%',objectFit:'contain',pointerEvents:'none'}} />
         <span style={{...ART_CHIP,position:'absolute',bottom:0,left:16,fontSize:11}}>People on site</span>
@@ -298,6 +303,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
             {siteTheme.poles} poles
           </span>
         )}
+        {simple && <TycoonMapControl objectId="road"/>}
       </div>
 
       {/* Site office (D1: air/building permits, docket, discovery, testimony, intervenors, cast). */}
@@ -320,14 +326,15 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
       >
         <ArtLayer img={TILE_ART.siteOffice.img} />
         <span style={ART_CHIP}>
-          {TILE_ART.siteOffice.label}
+          {simple ? 'Permits' : TILE_ART.siteOffice.label}
         </span>
-        {objectHasQueuedAction('siteOffice', plan, hallIds) && <QueuedGhost />}
+        {simple && <TycoonMapControl objectId="siteOffice"/>}{objectHasQueuedAction('siteOffice', plan, hallIds) && <QueuedGhost />}
       </div>
 
       {/* Wetland slot (D1: water permit, plus the site's extra permits). Phase 4: the site's
           theme decides whether this is a pond or a dry low field - same slot, same popover. */}
       <div
+        data-simple-hidden={simple&&!draft.permitsRequired.some(id=>['water','wetlands'].includes(id))}
         {...selectableCellProps(boardPopover === 'pond', () => openObject('pond', null))}
         ref={(el) => {
           if (el) { el.dataset.campusObject = 'pond'; cellRefs.current.set('pond', el); }
@@ -429,7 +436,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
                   maxWidth: '90%',
                 }}
               >
-                {hallCaption(draft, content, hall)}{hall.stageActive && !hall.delivered && !hall.terminated ? ` (${Math.round(visual.progress0to1 * 100)}%)` : ''}
+                {simple ? plainWords(hallCaption(draft, content, hall)).replace('Delivered','Open for rent').replace('Not started - ','').replace('site not bought yet','Buy the land first') : hallCaption(draft, content, hall)}{hall.stageActive && !hall.delivered && !hall.terminated ? ` (${Math.round(visual.progress0to1 * 100)}%)` : ''}
               </div>
               {/* Phase 6 (spatial spike): the pad chip. Unbroken halls are unplaced; broken
                   ground fixes near (adjacent to the substation, free) or far (feeder + line
@@ -473,11 +480,12 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
                       ? 'near pad'
                       : 'far pad'}
               </div>
+              {simple && <TycoonMapControl objectId={hall.id}/>}
               <HallSprite
                 visual={visual}
                 late={late}
                 failedInspection={failedInspection}
-                queuedGhost={objectHasQueuedAction(hall.id, plan, hallIds)}
+                queuedGhost={!simple&&objectHasQueuedAction(hall.id, plan, hallIds)}
                 rent={rent}
                 spendFloat={deltas.spendByHall[hall.id] ?? 0}
                 coinBurst={deltas.monthsAdvanced > 0 ? (deltas.rentByHall[hall.id] ?? 0) : 0}
@@ -506,6 +514,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
           justifyContent: 'flex-start',
           padding: 4,
         }}
+        data-simple-hidden={simple&&!power.orders.length}
         data-scene-object="yard"
         title="Laydown yard"
       >
@@ -605,9 +614,9 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
           dimmed={power.studyStatus === 'none' && power.substationStatus === 'none'}
         />
         <div style={ART_CHIP}>
-          {TILE_ART.substation.label}
+          {simple?'Power connection':TILE_ART.substation.label}
         </div>
-        <div style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{substationStateWords(draft)}</div>
+        <div style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{simple?plainWords(substationStateWords(draft)):substationStateWords(draft)}</div>
         {power.studyStatus === 'pending' && (
           <div style={ART_CHIP}>
             Study{studyMonthsLeft !== null ? studyMonthsLeft <= 0 ? ': decision this month' : `: ${studyMonthsLeft}mo left` : ''}
@@ -618,6 +627,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
             Done {power.substationDoneMonth !== null ? formatMonth(power.substationDoneMonth) : 'soon'}
           </div>
         )}
+        {simple && <TycoonMapControl objectId="substation"/>}
         {objectHasQueuedAction('substation', plan, hallIds) && <QueuedGhost />}
       </div>
 
@@ -712,7 +722,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
         <button aria-expanded={cueExpanded} onClick={()=>setCueExpanded(!cueExpanded)} style={{background:'none',border:0,padding:0,textAlign:'left',fontWeight:'bold',color:'inherit'}}>{cue.title}</button>{cue.progress && <span data-testid="work-in-flight" style={{flexBasis:'100%',color:'#325b48'}}>{cue.progress}</span>}{cue.prepAction && (()=>{const a={actionId:cue.prepAction.actionId};return checkAction(state,content,plan,a).ok ? <button data-testid="wait-prep-action" onClick={()=>queueAction(a)}>{cue.prepAction.label}</button>:null;})()}{cue.whileYouWait && <span data-testid="next-step-prep" style={{flexBasis:'100%',fontWeight:'normal',color:'#5a5344'}}>{cue.whileYouWait}</span>}<button data-testid="next-step-show-me" aria-expanded={cue.waiting ? cueExpanded : undefined} onClick={cue.waiting ? ()=>setCueExpanded(!cueExpanded) : ()=>{setCueExpanded(false);cue.onShow();}} style={{whiteSpace:'nowrap'}}>{cue.waiting ? 'Why wait?' : 'Show me'}</button>{!cue.waiting && cue.actionId && (()=>{const action={actionId:cue.actionId,params:cue.params};const check=checkAction(state,content,plan,action);return check.ok?<button data-testid="next-step-do-it" onClick={()=>{setCueExpanded(false);queueAction(action);}} style={{whiteSpace:'nowrap',background:'#325b48',color:'#fff',border:'1px solid #274737',borderRadius:5,padding:'3px 8px'}}>Do it now</button>:null;})()}{cueExpanded && <div data-testid="next-step-explanation" style={{pointerEvents:'none',position:'absolute',top:'100%',left:0,width:280,padding:10,background:'#fffdf3',border:'1px solid #65866b',borderRadius:6,lineHeight:1.4}}>{cue.why}</div>}<span aria-hidden="true" style={{position:'absolute',bottom:-12,left:18,color:'#325b48'}}>▼</span>
       </div>}
 
-      {boardPopover && popoverPos && (
+      {boardPopover && popoverPos && (simple ? <TycoonObjectPanel key={boardPopover} objectId={boardPopover} left={popoverPos.left} top={popoverPos.top} onClose={()=>setBoardPopover(null)}/> : (
         <MapPopover
           key={boardPopover}
           objectId={boardPopover}
@@ -720,7 +730,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
           top={popoverPos.top}
           onClose={() => setBoardPopover(null)}
         />
-      )}
+      ))}
     </div>
   );
 }

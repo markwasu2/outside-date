@@ -6,7 +6,7 @@ import { expect, test } from '@playwright/test';
 // defaults) and lands the player on the board.
 test('quick start skips all six setup screens and lands on the board', async ({ page }) => {
   await page.goto('/');
-  await page.evaluate(() => localStorage.clear());
+  await page.evaluate(() => {localStorage.clear();localStorage.setItem('outside-date-detailed','true');});
   await page.goto('/');
   await page.locator('select').first().selectOption('whale');
 
@@ -27,7 +27,7 @@ test('quick start skips all six setup screens and lands on the board', async ({ 
 // a panel with the four live score components and the win tiers.
 test('goal strip surfaces the scoring rules on demand', async ({ page }) => {
   await page.goto('/');
-  await page.evaluate(() => localStorage.clear());
+  await page.evaluate(() => {localStorage.clear();localStorage.setItem('outside-date-detailed','true');});
   await page.goto('/');
   await page.locator('select').first().selectOption('whale');
   await page.getByTestId('quick-start').click();
