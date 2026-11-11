@@ -26,6 +26,20 @@ for i in range(400):
  x=random.randrange(1200);y=random.randrange(800)
  if 20<y<82 or 176<x<1029 and 112<y<700:continue
  c=random.choice(['#d4d3a0','#536e48','#bdc38d']);parts.append(f'<path d="M{x} {y}l3 -2m-1 2l3 0" stroke="{c}" opacity=".27" stroke-width="1"/>')
+# Surveyed earthwork detail belongs to the dirt plane, not paid roads or capacity.
+# Low-contrast blade passes and a compacted perimeter loop give an empty site scale.
+parts.append('<g id="graded-site-earthwork">')
+for row,y in enumerate(range(210,618,31)):
+ # Blade passes break into patches instead of reading as a painted sports pitch.
+ for col in range(3):
+  x=255+col*231+(row%3)*9
+  w=142+(row*17+col*29)%63
+  parts.append(f'<path d="M{x} {y}h{w}l-9 6H{x+4}z" fill="#9f916e" opacity=".065"/><path d="M{x+13} {y+7}h{w-23}" stroke="#eee0b8" stroke-width="1" opacity=".12"/>')
+# A few discontinuous tire impressions, never a new road.
+for x,y,w in [(285,645,210),(557,659,160),(767,635,151)]:
+ parts.append(f'<path d="M{x} {y}h{w}m{-w} 7h{w}" stroke="#8c8669" stroke-width="2.5" stroke-dasharray="2 5" opacity=".19" fill="none"/>')
+# A quiet cut-and-fill edge, with a narrow shadow and sunlit irregular shoulder.
+parts.append('<path d="M270 153l154 -2 78 6 152 -5 123 3 168 -2 22 12-173 -2-137 3-159 -1-121 -3-119 3z" fill="#998f70" opacity=".18"/><path d="M270 153l154 -2 78 6 152 -5 123 3 168 -2-10 -7-157 3-126 -3-153 5-81 -6-137 1z" fill="#e6d3a7" opacity=".34"/><path d="M981 215V610" stroke="#8c8c70" stroke-width="4" opacity=".12"/><path d="M985 215V610" stroke="#e6d8b0" stroke-width="2" opacity=".3"/></g>')
 # Mixed woodland lies outside the circulation loop and construction boundary.
 # Hand-set positions keep the office, power connection and clickable labels clear.
 parts.append('<g id="perimeter-woodland">')
