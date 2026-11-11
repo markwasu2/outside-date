@@ -1,3 +1,6 @@
+import {resolveContent} from '../../engine/resolve';
+import {priceWithIndex,leadWithIndex} from '../../engine/systems/markets';
+import {formatDollars} from '../../engine/format';
 import type { Content } from '../../content/schemas';
 import type { GameState, PlannedAction } from '../../engine/types';
 import { boardActionsForObject, type ActionRow } from './actions';
@@ -13,6 +16,10 @@ export function simpleActionName(action: PlannedAction, state: GameState): strin
  case 'orderSwitchgear':return 'Order electrical equipment';
  case 'filePermit':return `Apply for ${String(action.params?.permitId)} permit`;
  case 'advanceHall':return hall?.stageIndex===-1 ? `Build foundation${action.params?.pad==='far'?' (far plot)':''}` : ['Build foundation','Build frame','Build walls & roof','Install interiors','Test & open'][hall?.stageIndex??0]??'Build';
+ case 'spotBuy':return `Express ${action.params?.kind==='transformer'?'transformer':'electrical equipment'}`;
+ case 'secondSource':return 'Backup supplier';
+ case 'importCrews':return 'Hire extra crews';
+ case 'visitCast':return action.params?.group==='town'?'Meet the town':action.params?.group==='commission'?'Meet permit officials':action.params?.group==='tenant'?'Meet your tenant':'Meet the utility';
  case 'fixInspection':return 'Repair failed inspection';
  case 'cureDraw':return 'Unfreeze building funds';
  case 'priceTakeout':return 'Sell campus';
@@ -32,8 +39,8 @@ export function simpleRows(objectId:string,state:GameState,content:Content):Acti
  let rows=objectId==='road'?buildRows('land',state,content,null):boardActionsForObject(objectId==='people'?'siteOffice':objectId,state,content);
  if(objectId==='finance')return [...buildRows('money',state,content,null),...buildRows('capital',state,content,null)];
  if(objectId==='siteOffice')rows=rows.filter(r=>['filePermit','fileDocket','prepTestimony','answerDiscovery','meetIntervenor','cureDraw'].includes(r.action.actionId));
- if(objectId==='people')rows=rows.filter(r=>r.action.actionId==='visitCast');
- if(objectId==='substation')rows=rows.filter(r=>['commissionStudy','orderTransformer','orderSwitchgear'].includes(r.action.actionId));
+ if(objectId==='people')rows=[...rows.filter(r=>r.action.actionId==='visitCast'&&(r.action.params?.group!=='utility'||state.docketEnabled)),...buildRows('construction',state,content,null).filter(r=>r.action.actionId==='importCrews'&&state.halls.some(h=>h.stageIndex>=2&&!h.delivered))];
+ if(objectId==='substation')rows=rows.filter(r=>['commissionStudy','orderTransformer','orderSwitchgear','spotBuy','secondSource'].includes(r.action.actionId));
  if(state.halls.some(h=>h.id===objectId))rows=rows.filter(r=>['advanceHall','fixInspection','readyLiquid','mitigateWetlands'].includes(r.action.actionId));
  return rows.filter(r=>!isContextOnlyAction(r.action,state,content)).filter(r=>r.action.actionId!=='filePermit'||state.permitsRequired.includes(String(r.action.params?.permitId) as keyof GameState['permits']));
 }
@@ -46,4 +53,12 @@ export function simpleTimelineLabel(label:string):string {
 }
 export function buildingFunds(state:GameState):number {
  return Math.max(0,state.equity.committedTotal-state.equity.calledTotal)+Math.max(0,state.debt.seniorCommitment-state.debt.seniorDrawn)+Math.max(0,state.debt.mezzCommitment-state.debt.mezzDrawn);
+}
+
+export function standardEquipmentWords(kind:'switchgear'|'transformer',state:GameState,content:Content):string {
+ const {power,markets}=resolveContent(state,content).tuning,index=state.markets.equipmentIndex;
+ const deposit=priceWithIndex(kind==='switchgear'?power.switchgearDeposit:power.transformerDeposit,index);
+ const total=priceWithIndex(kind==='switchgear'?power.switchgearDeposit+power.switchgearBalance:power.transformerDeposit+power.transformerBalance,index),balance=total-deposit;
+ const min=kind==='switchgear'?power.switchgearLeadMin:power.transformerLeadMonths,max=kind==='switchgear'?power.switchgearLeadMax:power.transformerLeadMonths;
+ return `Standard: ${formatDollars(deposit+balance)} total. ${formatDollars(deposit)} deposit now, ${formatDollars(balance)} on arrival. Takes ${leadWithIndex(min,index,markets.leadElasticity)}-${leadWithIndex(max,index,markets.leadElasticity)} months.`;
 }
