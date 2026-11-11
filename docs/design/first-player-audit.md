@@ -102,3 +102,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Early construction now has temporary gravel access, tire tracks, separate laydown pads, cones and a small safety barrier instead of a single blank sand field.
 - These are scenery included in construction, not new purchases, money, road capacity or automatic progress. They are replaced by the finished road/courtyard when fit-out starts.
 - Inspected foundation, steel, panels, fit-out, day and night at desktop size. Stage-yard checks enforce the construction/finished transition. Both full desktop playthroughs, paused-work routes, long-campaign fast-forward, 699 unit cases, lint/build and built-image decoding passed. Prior sale step full regression is 171 cases, including a rerun of the long campaign after the first test runner was interrupted.
+
+## November 10 evening: operating rooftop detail
+- Four roof fans now turn after a hall opens. Their centers and flat-plane projection match the original roof equipment exactly, with quieter night contrast.
+- No fans run during construction or on a terminated hall. Reduced motion keeps them static. This is scenery only, with no added capacity or progress.
+- Inspected enlarged actual roof pixels and full day/night desktop views. Browser checks verify genuine rotation over rendered frames, open/terminated states and reduced motion. Both full desktop journeys and eight focused event/art/loss cases pass, plus lint/build and built-image decoding. The 699-unit suite passed before this display-only addition.
