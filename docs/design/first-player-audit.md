@@ -49,3 +49,9 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Deadline-loss warning selection keeps the termination cause, not a later unrelated conversion warning.
 - An active order no longer implies progress: lender freeze, inspection failure and one-month stand-down have separate explanations. Active build orders are removed from the simple panel so the actual inspection repair is visible without scrolling.
 - Both desktop full journeys, no-build loss, deadline-loss fixture, repair fixture, starter choices, monthly receipt and detailed terminal-loss checks passed. Unit suite 682 passed; lint/build, built decode and diff checks passed. Inspected actual cash-loss, deadline-loss and repair pixels.
+
+## November 10 evening: truthful turn feedback and campus life
+- Live turn feedback distinguishes unbought land, land ready for orders, active work, lender freeze, inspection stop and deliberate crew stand-down. Restored state without a monthly review no longer says Buy land.
+- Working people and dust disappear while a funding freeze, failed inspection or stand-down stops construction.
+- Fitted campuses get a connected entrance road, gatehouse, barrier, crossing and slow service van. Open campuses get parked cars and courtyard visitors. Night headlights and reduced-motion fallbacks checked in actual desktop screenshots.
+- 686 unit cases and all 161 browser cases passed in four sequential shards. Built image decoding, lint/build and diff checks passed. Both complete default journeys also checked day/night and reduced-motion service traffic.
