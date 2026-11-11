@@ -5,7 +5,7 @@ import {TycoonObjectPanel} from '../board/TycoonObjectPanel';
 import {TycoonMapControl} from '../board/TycoonMapControl';
 import {plainWords} from '../board/simpleWords';
 import campusPeopleImg from '../../assets/campus/campus-people.svg';
-import campusGroundImg from '../../assets/campus/campus-ground.svg';
+import {siteTerrain} from '../board/siteTerrain';
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 
 import { formatMonth } from '../../engine/format';
@@ -275,6 +275,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
       data-night={night}
       data-simple-local-grid={simple&&!draft.docketEnabled}
       data-ground={siteTheme.ground}
+      data-terrain={siteTerrain(siteTheme).id}
       style={{
         position: 'relative',
         isolation: 'isolate',
@@ -287,7 +288,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
         boxSizing: 'border-box',
         fontFamily: 'sans-serif',
         fontSize: '0.75rem',
-        background: `url("${campusGroundImg}") center / 100% 100%, linear-gradient(#eadbbccc, #e0ca9acc), ${siteTheme.ground}`,
+        background: `url("${siteTerrain(siteTheme).image}") center / 100% 100%, linear-gradient(#eadbbccc, #e0ca9acc), ${siteTheme.ground}`,
       }}
     >
       {simple&&<CampusCompound night={night}/>}
