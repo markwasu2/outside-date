@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame } from '../../src/engine/init';
 import { DEFAULT_SETUP, DEFAULT_NEGOTIATION } from '../../src/ui/defaultGame';
-import { developments, reviewOptions, runwayWords } from '../../src/ui/board/monthReview';
+import { developments, reviewOptions, relationshipOption, waitOptionText, runwayWords } from '../../src/ui/board/monthReview';
 const content = loadContent();
 const fresh = () => createGame(content, 'tutorial-edge5', DEFAULT_SETUP, DEFAULT_NEGOTIATION, 1);
 describe('evidence-backed month review', () => {
@@ -58,5 +58,25 @@ describe('evidence-backed month review', () => {
   state.phase='takeoutAvailable';options=reviewOptions(state,content);
   expect(options[1]).toMatchObject({title:'Review debt before selling',officeView:'money'});
   expect(options[1]?.text).toContain('debt outstanding');
+ });
+ it('makes an available social choice specific and respects visit cooldowns and caps',()=>{
+  const state=fresh();state.goodwill.town=22;state.goodwill.tenant=60;state.goodwill.utility=65;
+  expect(relationshipOption(state,content)).toMatchObject({title:'Visit town contacts',visitGroup:'town'});
+  expect(relationshipOption(state,content).text).toContain('22 → 26');
+  state.flags['visitCastLast:town']=state.month;
+  expect(relationshipOption(state,content).visitGroup).not.toBe('town');
+  state.goodwill.town=100;state.goodwill.tenant=100;state.goodwill.utility=100;state.goodwill.commission=100;
+  expect(relationshipOption(state,content).text).toContain('maximum goodwill');
+ });
+ it('explains the actual seasoning date and exhausted-focus wait instead of generic clocks',()=>{
+  const state=fresh();state.halls[0]!.delivered=true;state.debt.converted=true;state.flags.conversionMonth=state.month;state.maxMonths=100;
+  expect(waitOptionText(state,content)).toContain('rent must season until');
+  state.halls[0]!.delivered=false;state.apUsedThisMonth=state.apPerMonth;
+  expect(waitOptionText(state,content)).toContain('focus points');
+ });
+ it('names the earlier campaign hard stop instead of a later seasoning date',()=>{
+  const state=fresh();state.halls[0]!.delivered=true;state.debt.converted=true;state.flags.conversionMonth=18;state.month=19;
+  expect(waitOptionText(state,content)).toContain('campaign ends Y2 M9');
+  expect(waitOptionText(state,content)).not.toContain('rent must season until Y2 M10');
  });
 });

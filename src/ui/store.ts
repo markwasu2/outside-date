@@ -232,6 +232,8 @@ interface UIStore {
   prevState: GameState | null;
   monthReview: MonthReview | null;
   requestedOfficeView: OfficeView | null;
+  requestedVisitGroup: string | null;
+  setVisitGroup: (group: string | null) => void;
   setOfficeView: (view: OfficeView | null) => void;
   /** Phase 1 (D6): map objects whose "what this is" teaching line has been seen this run - same
    * pattern as dismissedCoachTips (UI-only, cleared by newGame/loadGame). */
@@ -370,6 +372,7 @@ export const useStore = create<UIStore>((set, get) => ({
   prevState: null,
   monthReview: null,
   requestedOfficeView: null,
+  requestedVisitGroup: null,
   seenBoardObjects: [],
   requestedTab: null,
   screen: 'start',
@@ -397,6 +400,7 @@ export const useStore = create<UIStore>((set, get) => ({
   setOpenPanel: (panel) => set((s) => ({ openPanel: s.openPanel === panel ? null : panel })),
   setScreen: (screen) => set({ screen }),
   setOfficeView: (view) => set({ requestedOfficeView: view }),
+  setVisitGroup: (group) => set({ requestedVisitGroup: group }),
   dismissCoachTip: (id) => set((s) => ({ dismissedCoachTips: [...s.dismissedCoachTips, id] })),
   openCodex: (entryId, stakeholderFocus) =>
     set({ codexOpen: true, codexSelectedId: entryId ?? null, codexStakeholderFocus: stakeholderFocus ?? null }),
@@ -634,6 +638,7 @@ export const useStore = create<UIStore>((set, get) => ({
       prevState: null,
       monthReview: null,
       requestedOfficeView: null,
+      requestedVisitGroup: null,
       seenBoardObjects: [],
       requestedTab: null,
       screen: 'game',
@@ -663,6 +668,7 @@ export const useStore = create<UIStore>((set, get) => ({
       prevState: null,
       monthReview: null,
       requestedOfficeView: null,
+      requestedVisitGroup: null,
       seenBoardObjects: [],
       requestedTab: null,
       screen: 'game',

@@ -112,10 +112,12 @@ function nextStepUnbudgeted(state: GameState, content: Content): NextStep {
       ? `${active.length} of ${state.halls.length} halls are delivered. ${terminated} ${terminated === 1 ? 'hall was' : 'halls were'} terminated.`
       : 'Every hall is delivered.';
     return {
-      title:state.debt.converted ? 'Let the rent season before closing' : 'Wait for the lender retest',
+      title:state.debt.converted ? typeof conversionMonth==='number' && conversionMonth+resolved.tuning.takeout.seasoningMonths > state.maxMonths ? `Closing opens ${formatMonth(state.maxMonths)}` : 'Let the rent season before closing' : 'Wait for the lender retest',
       waiting:true,
       why:state.debt.converted && typeof conversionMonth === 'number'
-        ? `${deliverySummary} The loan converted; rent must season until ${formatMonth(conversionMonth+resolved.tuning.takeout.seasoningMonths)}. End the month to advance this clock. Then Price the takeout at the site office to finish.`
+        ? conversionMonth+resolved.tuning.takeout.seasoningMonths > state.maxMonths
+          ? `${deliverySummary} The campaign ends ${formatMonth(state.maxMonths)}, before the normal rent-seasoning window. End month advances to that closing date. Price the takeout at the site office when closing opens.`
+          : `${deliverySummary} The loan converted; rent must season until ${formatMonth(conversionMonth+resolved.tuning.takeout.seasoningMonths)}. End the month to advance this clock. Then Price the takeout at the site office to finish.`
         : `${deliverySummary} The lender retests income against debt payments each month before the closing window can open. Check financing at the site office; End month runs the next test.`,
       objectId:'siteOffice',
     };
