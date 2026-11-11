@@ -39,8 +39,8 @@ export function developments(review: MonthReview, content: Content): Development
     if (!old.delivered && h.delivered) add('helped', `${h.id} delivered ${formatMonth(h.deliveredMonth ?? after.month)}. ${h.deliveredMonth !== null && h.deliveredMonth > h.deliveryMonth ? `It missed the lease target ${formatMonth(h.deliveryMonth)}; delivery still brings rent, but lateness counts against the time grade.` : 'It met the lease delivery target. The hall can now earn rent.'}`);
     else if (!old.terminated && h.terminated) add('hurt', `${h.id} lost its tenant after its outside date. That hall is no longer a live delivery opportunity.`);
     else if (old.stageIndex >= 0 && h.stageIndex > old.stageIndex) add('helped', `${h.id}: ${STAGE_WORDS[STAGES[old.stageIndex] ?? 'pad']} work finished. Your construction instruction carried the stage through; inspect the hall before starting its next stage.`);
-    else if (h.stageMonthsDone > old.stageMonthsDone) add('helped', `${h.id}: ${STAGE_WORDS[STAGES[h.stageIndex] ?? 'pad']} gained ${(h.stageMonthsDone - old.stageMonthsDone).toFixed(1).replace('.0', '')} month(s) of work. The crew you started kept working without another instruction.`);
-    else if (h.stageMonthsDone < old.stageMonthsDone) add('hurt', `${h.id} lost ${(old.stageMonthsDone - h.stageMonthsDone).toFixed(1).replace('.0', '')} month(s) of stage progress. Check the damage and event record before pushing the schedule.`);
+    else if (h.stageMonthsDone > old.stageMonthsDone) add('helped', `${h.id}: ${STAGE_WORDS[STAGES[h.stageIndex] ?? 'pad']} gained ${(h.stageMonthsDone - old.stageMonthsDone).toFixed(1).replace('.0', '')} ${h.stageMonthsDone - old.stageMonthsDone === 1 ? 'month' : 'months'} of work. The crew you started kept working without another instruction.`);
+    else if (h.stageMonthsDone < old.stageMonthsDone) add('hurt', `${h.id} lost ${(old.stageMonthsDone - h.stageMonthsDone).toFixed(1).replace('.0', '')} ${old.stageMonthsDone - h.stageMonthsDone === 1 ? 'month' : 'months'} of stage progress. Check the damage and event record before pushing the schedule.`);
   }
   for (const id of after.permitsRequired) {
     if (before.permits[id].status === after.permits[id].status) continue;
@@ -54,7 +54,7 @@ export function developments(review: MonthReview, content: Content): Development
   for (const log of freshLogs.filter(l => l.kind === 'warning' && !/draw freeze/i.test(l.text))) {
     if (!news.some(n => n.text === log.text)) add(/due soon|upcoming|due this month/i.test(log.text) ? 'neutral' : 'hurt', log.text);
   }
-  for (const group of ['town', 'tenant', 'commission'] as const) {
+  for (const group of ['town', 'tenant', 'commission', 'utility'] as const) {
     const delta = after.goodwill[group] - before.goodwill[group];
     if (delta !== 0) {
       const visited = review.actions.some(a=>a.actionId==='visitCast' && a.params?.group===group);
@@ -127,4 +127,12 @@ export function reviewOptions(state: GameState, content: Content): ReviewOption[
   if (!state.flags.rackScheduleConfirmed && state.halls.some(h => !h.delivered && !h.terminated)) options.push({ title: 'Check tenant rack dates', text: 'Free confirmation: +3 tenant goodwill. A later date swap is a separate decision.', target: 'siteOffice', officeView: 'permits' });
   else options.push(relationshipOption(state,content));
   return options;
+}
+
+/** Keep one setback visible, without burying construction progress behind routine warnings. */
+export function prominentDevelopments(news: Development[]): Development[] {
+  const first = news[0];
+  if (!first) return [];
+  const progress = first.tone === 'hurt' ? news.find(n => n.tone === 'helped') : undefined;
+  return [first, progress ?? news[1]].filter((n): n is Development => !!n);
 }

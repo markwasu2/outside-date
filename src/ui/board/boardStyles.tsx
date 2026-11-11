@@ -58,7 +58,12 @@ export function BoardStyles() {
       [data-campus-scene] [data-scene-object][aria-pressed="true"] > img {
         filter: drop-shadow(0 0 7px #325b48) !important;
       }
-      [data-campus-scene] [data-scene-object] > img { filter: drop-shadow(0 8px 4px #4a3b252a); }
+      [data-campus-scene] [data-scene-object] > img { filter: drop-shadow(0 5px 3px #4a3b251a); }
+      [data-scene-object="office"], [data-scene-object="field"], [data-scene-object="substation"] { justify-content:flex-start !important; padding-top:8px !important; }
+      [data-scene-object="office"] > img, [data-scene-object="field"] > img { width:145% !important; max-width:none; left:-22.5% !important; }
+      [data-scene-object="office"] > img { transform:translateY(18%); }
+      [data-scene-object="substation"] > img { transform:translateY(12%); }
+      [data-testid="campus-people"] { width:125px !important; height:125px !important; }
       [data-campus-scene] [data-testid="map-road"] { background: transparent !important; }
       [data-campus-scene] [data-testid="map-road"] > img { display: none; }
       [data-campus-scene] [data-testid^="plant-buildout-"] { background: transparent !important; border: none !important; }

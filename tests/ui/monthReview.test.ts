@@ -80,3 +80,14 @@ describe('evidence-backed month review', () => {
   expect(waitOptionText(state,content)).not.toContain('rent must season until Y2 M10');
  });
 });
+
+
+describe('prominent review developments', () => {
+  it('keeps a setback and construction progress visible when warnings pile up', async () => {
+    const { prominentDevelopments } = await import('../../src/ui/board/monthReview');
+    const news = [{tone:'hurt' as const,text:'Late delivery'}, {tone:'hurt' as const,text:'Town goodwill fell'}, {tone:'helped' as const,text:'Fitout finished'}];
+    expect(prominentDevelopments(news)).toEqual([news[0],news[2]]);
+    expect(prominentDevelopments([])).toEqual([]);
+    expect(prominentDevelopments(news.slice(0,2))).toEqual(news.slice(0,2));
+  });
+});

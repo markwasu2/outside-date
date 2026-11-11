@@ -3,8 +3,8 @@ import type { Content } from '../../content/schemas';
 import { resolveSite } from '../../content/sites';
 import type { GameState } from '../../engine/types';
 import { formatDollars } from '../../engine/format';
-import campusGround from '../../assets/art/campus-ground.jpg';
-import people from '../../assets/art/campus-people.png';
+import campusGround from '../../assets/campus/campus-ground.svg';
+import people from '../../assets/campus/campus-people.svg';
 import { STAGE_ART, TILE_ART, COOLING_ART, SUBSTATION_ART } from '../art';
 
 const STEPS = ['title','setup','tier','cooling','contractor','lease','forecast','capital','power','insurance','review'];
@@ -41,7 +41,7 @@ export function OpeningCampus({step,preview,content,children,onNavigate}:{step:s
       <strong>{step === 'title' ? 'Your next campus' : 'Before construction'}</strong>
       <span>{site.name}</span><span style={{marginLeft:'auto',fontSize:12}}>Click the land, halls, cooling, crew or office to edit</span>
     </header>
-    <div style={{flex:1,minHeight:0,position:'relative',backgroundImage:`url(${campusGround})`,backgroundSize:'cover',backgroundPosition:'center'}}>
+    <div style={{flex:1,minHeight:0,position:'relative',backgroundImage:`url(${campusGround})`,backgroundSize:'100% 100%',backgroundColor:'#e9dcb8',backgroundPosition:'center'}}>
       <div data-testid="opening-land" data-pond={String(site.mapTheme.pond)} style={{position:'absolute',inset:0,overflow:'hidden',background:site.mapTheme.pond?'#65905c1a':site.extraPadMonths?'#ae74451a':'transparent'}}>
         {sprite(TILE_ART.siteOffice.img,'2%','16%','10vw','Site office',at==='office','lease')}
         {sprite(site.mapTheme.pond?TILE_ART.pond.img:TILE_ART.dryField.img,'1%','57%','11vw',site.mapTheme.pond?'Wetland pond':'Low field',step==='setup','setup')}

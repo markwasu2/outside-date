@@ -2,26 +2,22 @@
  * P10.2: single source of truth mapping every map-tile/hall-stage key to its look - a warm
  * palette plus a small icon, so `MapGrid.tsx` never hardcodes a color inline.
  *
- * Graphics pass 1 (2026-11-09, isometric art direction from the user's reference image):
- * `img` carries a generated isometric illustration per key (src/assets/art/, 480px, ~350KB
- * each). The illustration replaces the flat color tile as the pictorial layer; `bg` stays as
- * the letterbox/fallback behind it and `icon` stays for tiny-corner and text-only contexts.
- * GENERATED ASSETS - first pass; per-site-theme variants (farmland green, quarry brown) are
- * future work, the current set is site-neutral.
+ * Original campus SVG set: shared isometric camera, footprint, outlines and
+ * colors. Regenerate with python3 scripts/campus-art.py.
  */
-import hallDeliveredImg from '../assets/art/hall-delivered.png';
-import hallFitoutImg from '../assets/art/hall-fitout.png';
-import hallNotStartedImg from '../assets/art/hall-not-started.png';
-import hallPadImg from '../assets/art/hall-pad.png';
-import hallRfsImg from '../assets/art/hall-rfs.png';
-import hallShellImg from '../assets/art/hall-shell.png';
-import hallSteelImg from '../assets/art/hall-steel.png';
-import tileLaydownImg from '../assets/art/tile-laydown.png';
-import tileDryFieldImg from '../assets/art/tile-dry-field.png';
-import tileRoadImg from '../assets/art/tile-road.png';
-import tilePondImg from '../assets/art/tile-pond.png';
-import tileSiteOfficeImg from '../assets/art/tile-site-office.png';
-import tileSubstationImg from '../assets/art/tile-substation.png';
+import hallDeliveredImg from '../assets/campus/hall-delivered.svg';
+import hallFitoutImg from '../assets/campus/hall-fitout.svg';
+import hallNotStartedImg from '../assets/campus/hall-not-started.svg';
+import hallPadImg from '../assets/campus/hall-pad.svg';
+import hallRfsImg from '../assets/campus/hall-rfs.svg';
+import hallShellImg from '../assets/campus/hall-shell.svg';
+import hallSteelImg from '../assets/campus/hall-steel.svg';
+import tileLaydownImg from '../assets/campus/tile-laydown.svg';
+import tileDryFieldImg from '../assets/campus/tile-dry-field.svg';
+import tileRoadImg from '../assets/campus/campus-ground.svg';
+import tilePondImg from '../assets/campus/tile-pond.svg';
+import tileSiteOfficeImg from '../assets/campus/tile-site-office.svg';
+import tileSubstationImg from '../assets/campus/substation-done.svg';
 
 export interface TileArt {
   bg: string;
@@ -58,15 +54,15 @@ export const STAGE_ART: Record<string, TileArt> = {
 
 /** Graphics pass 2 (user ask: vehicles, cooling/electrical equipment, delivery trucks):
  * small isometric sprites overlaid where the work, gear and deliveries actually are. */
-import vehicleExcavatorImg from '../assets/art/vehicle-excavator.png';
-import vehicleCraneImg from '../assets/art/vehicle-crane.png';
-import vehicleTruckImg from '../assets/art/vehicle-truck.png';
-import equipCoolingTowerImg from '../assets/art/equip-cooling-tower.png';
-import equipDryCoolerImg from '../assets/art/equip-dry-cooler.png';
-import equipHybridChillerImg from '../assets/art/equip-hybrid-chiller.png';
-import equipTransformerImg from '../assets/art/equip-transformer.png';
-import equipSwitchgearImg from '../assets/art/equip-switchgear.png';
-import truckDeliveryImg from '../assets/art/truck-delivery.png';
+import vehicleExcavatorImg from '../assets/campus/vehicle-excavator.svg';
+import vehicleCraneImg from '../assets/campus/vehicle-crane.svg';
+import vehicleTruckImg from '../assets/campus/vehicle-truck.svg';
+import equipCoolingTowerImg from '../assets/campus/equip-cooling-tower.svg';
+import equipDryCoolerImg from '../assets/campus/equip-dry-cooler.svg';
+import equipHybridChillerImg from '../assets/campus/equip-hybrid-chiller.svg';
+import equipTransformerImg from '../assets/campus/equip-transformer.svg';
+import equipSwitchgearImg from '../assets/campus/equip-switchgear.svg';
+import truckDeliveryImg from '../assets/campus/vehicle-truck.svg';
 
 /** Construction vehicle per active stage: excavator moves earth on the pad, the crane swings
  * steel and shell panels, trucks feed fitout and RFS. Rendered only while the stage is active. */
@@ -95,12 +91,12 @@ export const EQUIP_ART: Record<'transformer' | 'switchgear', { img: string; labe
 /** Delivery truck flashed in the laydown yard the month an order arrives. */
 export const DELIVERY_TRUCK = { img: truckDeliveryImg, label: 'Delivery arrived' };
 
-import substationPlannedImg from '../assets/art/substation-planned.png';
-import substationBuildingImg from '../assets/art/substation-building.png';
+import substationPlannedImg from '../assets/campus/substation-planned.svg';
+import substationBuildingImg from '../assets/campus/substation-building.svg';
 
 /** Physical substation state, not the study status: empty surveyed plot, active build, complete. */
 export const SUBSTATION_ART = { none: substationPlannedImg, building: substationBuildingImg, done: tileSubstationImg };
 
-import plantBuildingImg from '../assets/art/plant-building.png';
-import plantOnlineImg from '../assets/art/plant-online.png';
+import plantBuildingImg from '../assets/campus/plant-building.svg';
+import plantOnlineImg from '../assets/campus/plant-online.svg';
 export const PLANT_ART = { building: plantBuildingImg, online: plantOnlineImg };
