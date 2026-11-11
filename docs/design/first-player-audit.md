@@ -76,3 +76,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - A real-click player starts foundation before filing the building permit, follows the blocked building's permit link, files late, and still reaches a sale. Footer now distinguishes never-filed, pending with its actual decision month, and denied reviews.
 - Active work is inspectable from its visible map button rather than disabled. Funding-paused work explicitly says Inspect paused work; inspection failures retain the direct repair action.
 - 693 unit cases, nine targeted browser cases, lint/build, built image decoding and diff checks passed. Inspected actual permit-filing and funding-paused pixels. Both complete desktop journeys and delayed-power recovery still pass.
+
+## November 10 evening: construction materials follow the build
+- Added original, same-camera steel-bundle and cladding-panel yard illustrations. Structure gets lifting equipment, walls get a delivery truck, and later buildout gets cooling/backup yards. A permanent excavator no longer stands beside every construction stage.
+- Removed the duplicate generic laydown illustration from the simple map while preserving actual order counts, delivery notices and the inspectable yard. Detailed map art remains unchanged.
+- Twelve targeted browser cases passed across stage transitions, original asset bounds, yard count, both normal build-to-sale journeys, late power/permit recovery and paused work. Actual steel/panel stage pixels, lint/build, built image decoding and diff checks passed. No game-state changes.

@@ -525,7 +525,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
         data-scene-object="yard"
         title="Laydown yard"
       >
-        <ArtLayer img={TILE_ART.laydownYard.img} />
+        {!simple&&<ArtLayer img={TILE_ART.laydownYard.img} />}
         {/* GFX 2: a delivery truck flashes in the yard the month an order arrives. */}
         {deltas.arrivedOrders.length > 0 && (
           <img

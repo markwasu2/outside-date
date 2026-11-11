@@ -210,6 +210,23 @@ def tile(kind):
   return s
  return plot()+''.join(line(p(x,-25),p(x+12,-13),'#9aa37d',2) for x in range(-50,51,18))
 
+def construction_yard(kind):
+ s=pad()
+ if kind=='steel':
+  for x,y,n in [(-55,-27,5),(-21,-27,4),(15,-27,3)]:
+   for z in range(n):
+    s+=box(x,y,2+z*4,20,66,3,'#9db1af','#6d888a','#3c5e69')
+    s+=line(p(x+3,y+3,5+z*4),p(x+3,y+62,5+z*4),'#c5d0bf',.8)
+   for yy in (-13,17):s+=line(p(x,yy,2),p(x+20,yy,2+n*4),'#d9b66d',1.6)
+  for x in (-59,52):s+=box(x,41,1,8,8,6,GOLD,'#ad7836','#8c622f')
+ else:
+  for x,y in [(-56,-30),(-11,-30),(34,-30)]:
+   s+=box(x,y,1,33,58,8,'#8b9c98','#6a817d','#526d6b')
+   for xx in range(x,x+32,5):s+=box(xx,y,10,3,58,18,'#cad4ca','#8ea6a2','#5a7e85')
+   for yy in (-17,12):s+=line(p(x,yy,10),p(x+33,yy,28),'#d6b571',1.5)
+  s+=box(-53,37,1,60,12,5,'#d7c29a','#bba172','#8b815e')
+ return s
+
 def people():
  s=box(-55,-26,-2,110,52,3,'#ded0af','#c1b18c','#ac9f80')
  for x,y,col in [(-30,0,TEAL),(0,6,GOLD),(30,0,TEAL)]:
@@ -268,6 +285,7 @@ for kind in ('crane','excavator','truck'):save('vehicle-'+kind,vehicle(kind))
 for kind in ('cooling-tower','dry-cooler','hybrid-chiller','transformer','switchgear'):save('equip-'+kind,equipment(kind))
 for kind in ('site-office','laydown','pond','dry-field'):save('tile-'+kind,tile(kind))
 save('campus-people',people())
+for kind in ('steel','panels'):save('yard-'+kind,construction_yard(kind))
 for kind in ('cooling','backup'):save('compound-'+kind,compound(kind))
 # Ground has its own deterministic landscape generator.
 exec(Path('scripts/campus-ground.py').read_text())
