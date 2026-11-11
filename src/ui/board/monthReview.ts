@@ -27,14 +27,16 @@ export function developments(review: MonthReview, content: Content): Development
   for (const claim of after.claims.filter(c => !before.claims.some(old => old.id === c.id))) {
     add(claim.paid > 0 ? 'helped' : 'hurt', `${claim.hallId}: ${claim.kind} damage cost ${formatDollars(claim.gross)}. ${claim.insured ? `Your builder's risk policy paid ${formatDollars(claim.paid)}; you kept ${formatDollars(claim.outOfPocket)} of the loss.` : `With no builder's risk policy, you paid the full ${formatDollars(claim.outOfPocket)}.`}`);
   }
-  if (!before.flags.drawFreeze && after.flags.drawFreeze) {
+  if (!before.flags.outOfBalance && after.flags.outOfBalance) add('hurt', 'The lender found a gap between committed funding and the remaining build. Review Money for financing options; clearing paperwork cannot cure this funding gap.');
+  else if (!before.flags.drawFreeze && after.flags.drawFreeze) {
     // Only identify a storm cause when the actual new claim proves it.
     const storm = after.claims.some(c => c.kind === 'storm' && !before.claims.some(old => old.id === c.id));
     add('hurt', storm && !after.insurance.dsu
       ? 'The storm hit without delay cover. The lender froze construction draws until you cure the paperwork.'
       : 'The lender froze construction draws. Work cannot draw funding until the freeze is cured.');
   }
-  if (before.flags.drawFreeze && !after.flags.drawFreeze) add('helped', 'You cured the lender freeze. Construction funding is available again; it does not recover the months already lost.');
+  if (before.flags.outOfBalance && !after.flags.outOfBalance) add('helped', `The lender funding gap cleared.${after.flags.drawFreeze?' A separate paperwork freeze still blocks construction funding.':' Construction funding is available again.'} Months already lost are not recovered.`);
+  else if (before.flags.drawFreeze && !after.flags.drawFreeze) add('helped', 'You cured the lender freeze. Construction funding is available again; it does not recover the months already lost.');
   for (const h of after.halls) {
     const old = before.halls.find(o => o.id === h.id);
     if (!old) continue;
