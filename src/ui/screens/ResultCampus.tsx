@@ -22,7 +22,7 @@ export function ResultCampus({state,content}:{state:GameState;content:Content}){
     const stageName=stage==='rfs'&&!h.stageActive?'Final testing not started':stageNames[stage];
     visual.flags={...visual.flags,active:false};
     return <div key={h.id} style={{textAlign:'center'}} data-testid="result-hall" data-stage={stage}>
-     <div role="img" aria-label={`${h.id}: ${stageName}${h.terminated?', tenant left':''}`} style={{height:225}}><HallSprite visual={visual} late={false} failedInspection={false} queuedGhost={false} rent={null} spendFloat={0} coinBurst={0} reducedMotion/></div>
+     <div role="img" aria-label={`${h.id}: ${stageName}${h.terminated?', tenant left':''}`} style={{height:state.halls.length>4?100:state.halls.length>1?130:225}}><HallSprite visual={visual} late={false} failedInspection={false} queuedGhost={false} rent={null} spendFloat={0} coinBurst={0} reducedMotion/></div>
      <div style={{fontSize:12,color:'#354c35',background:'#edf0df',border:'1px solid #c1cbb0',borderRadius:4,padding:'4px 8px',display:'inline-block'}}>{state.halls.length>1?`${h.id} · `:''}{stageName}{h.terminated?' · Tenant left':''}</div>
     </div>;
    })}</div>
