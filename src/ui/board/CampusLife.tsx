@@ -1,10 +1,11 @@
+import {constructionWorking} from './constructionFunds';
 import {useStore} from '../store';
 import {usePrefersReducedMotion} from './boardStyles';
 
 /** Scenery only. Traffic never represents a paid order or construction progress. */
 export function CampusLife(){
- const state=useStore(s=>s.draft),reduced=usePrefersReducedMotion();
- const working=state.halls.some(h=>h.stageActive&&!h.terminated&&!h.delivered);
+ const state=useStore(s=>s.draft),content=useStore(s=>s.content),reduced=usePrefersReducedMotion();
+ const working=constructionWorking(state,content);
  const open=state.halls.some(h=>h.delivered);
  return <div data-testid="campus-life" data-reduced-motion={reduced} aria-hidden="true" style={{position:'absolute',inset:0,overflow:'hidden',pointerEvents:'none',zIndex:1}}>
   <svg viewBox="0 0 1200 800" preserveAspectRatio="none" style={{width:'100%',height:'100%',position:'absolute',inset:0}}>

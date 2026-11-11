@@ -4,7 +4,7 @@ import {createGame} from '../../src/engine/init';
 import {DEFAULT_SETUP,DEFAULT_NEGOTIATION} from '../../src/ui/defaultGame';
 import {resolveContent} from '../../src/engine/resolve';
 import {hallWorkForMonth,tryFundAmount,tick} from '../../src/engine/systems/construction';
-import {unfundedWork} from '../../src/ui/board/constructionFunds';
+import {unfundedWork,constructionWorking} from '../../src/ui/board/constructionFunds';
 import {turnFeedback} from '../../src/ui/board/turnFeedback';
 import {hallCaption} from '../../src/ui/board/legibility';
 const content=loadContent();
@@ -16,4 +16,9 @@ describe('construction funding feedback',()=>{
  it('shares the funding pool across halls in engine order',()=>{const {s,h}=fixture();const other={...h,id:'H2'};s.halls.push(other);s.cash=hallWorkForMonth(s,resolveContent(s,content),h).costThisMonth;expect(unfundedWork(s,content,h)).toBeNull();expect(unfundedWork(s,content,other)).not.toBeNull();const after=tick(s,resolveContent(s,content));expect(after.halls[0]!.costSpent).toBeGreaterThan(h.costSpent);expect(after.halls[1]!.stageMonthsDone).toBe(0);});
  it('an unfunded tick is unchanged and new cash resumes the existing order',()=>{const {s,h}=fixture();const after=tick(s,resolveContent(s,content));expect(after.halls[0]).toEqual(h);const cost=hallWorkForMonth(s,resolveContent(s,content),h).costThisMonth;after.cash=cost;const resumed=tick(after,resolveContent(s,content));expect(resumed.halls[0]!.costSpent).toBeGreaterThan(h.costSpent);});
  it('uses fitout schedule extensions and suppresses irrelevant warnings',()=>{const {s,h}=fixture();h.stageIndex=3;s.flags[`extraFitoutMonths:${h.id}`]=2;const cost=hallWorkForMonth(s,resolveContent(s,content),h).costThisMonth;expect(unfundedWork(s,content,h)).toBe(cost);h.pausedThisMonth=true;expect(unfundedWork(s,content,h)).toBeNull();h.pausedThisMonth=false;s.flags.drawFreeze=true;expect(unfundedWork(s,content,h)).toBeNull();s.flags.drawFreeze=false;h.stageActive=false;expect(unfundedWork(s,content,h)).toBeNull();});
+});
+
+describe('construction activity scenery',()=>{
+ it('only shows construction traffic when at least one current order can work',()=>{const {s,h}=fixture();expect(constructionWorking(s,content)).toBe(false);s.cash=1e8;expect(constructionWorking(s,content)).toBe(true);const before=structuredClone(s);expect(constructionWorking(s,content)).toBe(true);expect(s).toEqual(before);s.flags.drawFreeze=true;expect(constructionWorking(s,content)).toBe(false);s.flags.drawFreeze=false;s.flags[`inspectionFail:${h.id}`]=true;expect(constructionWorking(s,content)).toBe(false);s.flags[`inspectionFail:${h.id}`]=false;h.pausedThisMonth=true;expect(constructionWorking(s,content)).toBe(false);h.pausedThisMonth=false;h.delivered=true;expect(constructionWorking(s,content)).toBe(false);h.delivered=false;h.terminated=true;expect(constructionWorking(s,content)).toBe(false);h.terminated=false;h.stageActive=false;expect(constructionWorking(s,content)).toBe(false);});
+ it('keeps activity when another hall can still work',()=>{const {s,h}=fixture();s.cash=1e8;s.flags[`inspectionFail:${h.id}`]=true;s.halls.push({...h,id:'H2'});expect(constructionWorking(s,content)).toBe(true);s.flags['inspectionFail:H2']=true;expect(constructionWorking(s,content)).toBe(false);});
 });
