@@ -233,6 +233,8 @@ interface UIStore {
    * change. null before the first committed month of a run. */
   prevState: GameState | null;
   monthReview: MonthReview | null;
+  /** Historical pre-reload orders, outside the current undo scope. */
+  restoredMonth:SaveFile['currentMonth'];
   requestedOfficeView: OfficeView | null;
   requestedVisitGroup: string | null;
   setVisitGroup: (group: string | null) => void;
@@ -373,6 +375,7 @@ export const useStore = create<UIStore>((set, get) => ({
   boardPopover: null,
   prevState: null,
   monthReview: null,
+  restoredMonth:null,
   requestedOfficeView: null,
   requestedVisitGroup: null,
   seenBoardObjects: [],
@@ -464,6 +467,7 @@ export const useStore = create<UIStore>((set, get) => ({
       draft: takeoutPreview,
       prevState: state,
       takeoutPreview: null,
+      restoredMonth:null,
       plan: [],
       snapshots: [],
       error: null,
@@ -548,7 +552,8 @@ export const useStore = create<UIStore>((set, get) => ({
       set((s) => ({
         state: next,
         prevState: state,
-        monthReview: { before: s.snapshots[0] ?? state, after: next, actions: s.plan },
+        monthReview: { before: s.restoredMonth?.before ?? s.snapshots[0] ?? state, after: next, actions: [...(s.restoredMonth?.actions??[]),...s.plan] },
+        restoredMonth:null,
         plan: [],
         snapshots: [],
         draft: next,
@@ -589,7 +594,8 @@ export const useStore = create<UIStore>((set, get) => ({
     set((s) => ({
       state: next,
       prevState: state,
-      monthReview: { before: s.snapshots[0] ?? state, after: next, actions: s.plan },
+      monthReview: { before: s.restoredMonth?.before ?? s.snapshots[0] ?? state, after: next, actions: [...(s.restoredMonth?.actions??[]),...s.plan] },
+      restoredMonth:null,
       draft: next,
       plan: [],
       snapshots: [],
@@ -617,6 +623,7 @@ export const useStore = create<UIStore>((set, get) => ({
         monthReview: { before: s.monthReview?.before ?? state, after: next, actions: s.monthReview?.actions ?? [], eventChoices:[...(s.monthReview?.eventChoices??[]),{cardId:state.pending!.cardId,label,impact:choiceImpact(state,result.choiceState)}] },
         plan: [],
         snapshots: [],
+        restoredMonth:null,
         error: null,
         financialSnapshots: appendSnapshot(s.financialSnapshots, buildFinancialSnapshot(next, c)),
       }));
@@ -643,6 +650,7 @@ export const useStore = create<UIStore>((set, get) => ({
       boardPopover: null,
       prevState: null,
       monthReview: null,
+      restoredMonth:null,
       requestedOfficeView: null,
       requestedVisitGroup: null,
       seenBoardObjects: [],
@@ -673,6 +681,7 @@ export const useStore = create<UIStore>((set, get) => ({
       boardPopover: null,
       prevState: null,
       monthReview: save.monthReview ?? null,
+      restoredMonth:save.currentMonth?.before.month===save.state.month?save.currentMonth:null,
       requestedOfficeView: null,
       requestedVisitGroup: null,
       seenBoardObjects: [],
@@ -698,8 +707,10 @@ export const useStore = create<UIStore>((set, get) => ({
    * state-committing actions above, right after their own `set()`, so it always reads the
    * just-committed values rather than a stale snapshot. */
   autosave: () => {
-    const { state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots,monthReview } = get();
-    saveGame({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots,monthReview });
+    const { state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots,monthReview,restoredMonth,plan,snapshots } = get();
+    const actions=[...(restoredMonth?.actions??[]),...plan],before=restoredMonth?.before??snapshots[0];
+    const currentMonth=before&&actions.length?{before,actions}:null;
+    saveGame({ version: SAVE_VERSION, state, lastNegotiation, lastDifficultyId, dismissedCoachTips, financialSnapshots,monthReview,currentMonth });
   },
 }));
 
