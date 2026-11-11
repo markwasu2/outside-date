@@ -36,11 +36,11 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
     <div className={reducedMotion?undefined:'site-placement'} data-testid="hall-art-frame" style={{ position: 'relative', width: '100%', height: '100%', maxWidth: 400, maxHeight: 330, margin: 'auto' }}>
       {/* pictorial layer: the stage illustration over its warm fallback color */}
       <div style={{ position: 'absolute', inset: 0, background: 'transparent', borderRadius: 6, overflow: 'hidden' }} aria-hidden="true">
-        {baseLook?.img && <img src={baseLook.img} alt="" draggable={false}
+        {baseLook?.img && <img src={baseLook.img} alt="" draggable={false} data-art-stage={visual.baseStage}
           style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'contain',opacity:visual.flags.terminated ? 0.45 : 1}} />}
         {underConstruction && look?.img && (
           <img src={look.img} alt="" draggable={false} data-testid="hall-growth"
-            data-progress={progress0to1.toFixed(3)}
+            data-art-stage={stage} data-progress={progress0to1.toFixed(3)}
             style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'contain',
               transition: reducedMotion ? undefined : 'opacity 0.6s ease',
               opacity: visual.flags.terminated ? 0.45 : .12+.88*progress0to1}} />
