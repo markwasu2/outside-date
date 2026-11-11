@@ -18,16 +18,24 @@ parts=['''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserv
 <path d="M136 85V730H1088V105" fill="none" stroke="#c5c6ac" stroke-width="24"/>
 <path d="M136 85V730H1088V105" fill="none" stroke="#8b9585" stroke-width="17"/>
 <path d="M137 103V710M159 730H1069M1088 117V710" fill="none" stroke="#c5cbb3" stroke-width="1" stroke-dasharray="8 13"/>
-<path fill="#697b69" d="M900 550h145v145H900z"/><path fill="#798775" d="M904 554h137v137H904z"/>
+<g id="marked-parking-lot"><path fill="#536c60" opacity=".3" d="M899 551h148v148H899z"/><path fill="#c6c8b0" d="M900 550h145v145H900z"/><path fill="#6a7a73" d="M904 554h137v137H904z"/>
+<path d="M904 612h137v9H904z" fill="#cccdb7"/><path d="M909 617h127" stroke="#ece8cf" stroke-width="1.2"/>
+<path d="M945 627V686m54 -59v59" stroke="#c9cdb6" stroke-width="1" opacity=".5"/>
+<path d="M970 674v-24m-5 7 5-7 5 7" stroke="#e3dfc2" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M907 692h131" stroke="#dae0c6" stroke-width="2"/>
 <g stroke="#d2d5b9" stroke-width="1.3">''']
 for y in range(564,687,20):parts.append(f'<path d="M907 {y}h36m63 0h32"/>')
+parts.append('</g>')
+for y in (630,650,673):
+ for x in (913,1031):
+  parts.append(f'<path d="M{x} {y-6}v11" stroke="#2f4845" stroke-width="4" opacity=".4"/><path d="M{x-1} {y-7}v11" stroke="#d1d2bd" stroke-width="3"/>')
 parts.append('</g>')
 for i in range(400):
  x=random.randrange(1200);y=random.randrange(800)
  if 20<y<82 or 176<x<1029 and 112<y<700:continue
  c=random.choice(['#d4d3a0','#536e48','#bdc38d']);parts.append(f'<path d="M{x} {y}l3 -2m-1 2l3 0" stroke="{c}" opacity=".27" stroke-width="1"/>')
 # Surveyed earthwork detail belongs to the dirt plane, not paid roads or capacity.
-# Low-contrast blade passes and a compacted perimeter loop give an empty site scale.
+# Low-contrast broken blade passes and tire impressions give an empty site scale.
 parts.append('<g id="graded-site-earthwork">')
 for row,y in enumerate(range(210,618,31)):
  # Blade passes break into patches instead of reading as a painted sports pitch.

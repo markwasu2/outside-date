@@ -70,7 +70,7 @@ export function CampusCompound({night}:{night:boolean}){
    </g>}
    {fitted&&<g data-testid="campus-service-traffic">
     {/* Cars occupy the marked lot, never the build controls or utility yard. */}
-    {opened&&[{x:931,y:630,c:'#c9d3c7'},{x:985,y:651,c:'#718e99'},{x:931,y:673,c:'#b58a66'}].map(({x,y,c})=><g key={x+y} transform={`translate(${x} ${y})`} opacity={night?.76:1}>
+    {opened&&[{x:931,y:630,c:'#c9d3c7'},{x:1019,y:651,c:'#718e99'},{x:931,y:673,c:'#b58a66'}].map(({x,y,c})=><g key={x+y} data-testid="parked-campus-car" transform={`translate(${x} ${y})`} opacity={night?.76:1}>
      <ellipse cx="4" cy="7" rx="15" ry="8" fill="#203e35" opacity=".24"/><rect x="-12" y="-6" width="24" height="12" rx="4" fill="#293f42"/><rect x="-11" y="-7" width="22" height="11" rx="4" fill={c}/><path d="M-5 -6H4l3 3v5H-7v-5z" fill="#43616b"/><path d="M-4 -5h7" stroke="#bbd1c7" strokeWidth="1"/><path d="M9 -4v6" stroke={night?'#ffe5a1':'#e9e5cd'} strokeWidth="2"/>
     </g>)}
     <g transform="translate(733 365)"><g className={reduced?undefined:'service-van'} data-testid="service-van">

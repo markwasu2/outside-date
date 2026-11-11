@@ -6,7 +6,6 @@ import {usePrefersReducedMotion} from './boardStyles';
 export function CampusLife({night=false}:{night?:boolean}){
  const state=useStore(s=>s.draft),content=useStore(s=>s.content),reduced=usePrefersReducedMotion();
  const working=constructionWorking(state,content);
- const open=state.halls.some(h=>h.delivered);
  return <div data-testid="campus-life" data-reduced-motion={reduced} aria-hidden="true" style={{position:'absolute',inset:0,overflow:'hidden',pointerEvents:'none',zIndex:1}}>
   <svg viewBox="0 0 1200 800" preserveAspectRatio="none" style={{width:'100%',height:'100%',position:'absolute',inset:0}}>
    <defs><linearGradient id="traffic-body" x2="0" y2="1"><stop stopColor="#eef1e5"/><stop offset="1" stopColor="#a5b5ae"/></linearGradient><linearGradient id="headlight-east"><stop stopColor="#ffe5a1" stopOpacity=".26"/><stop offset="1" stopColor="#ffe5a1" stopOpacity="0"/></linearGradient><linearGradient id="headlight-west"><stop stopColor="#ffe5a1" stopOpacity="0"/><stop offset="1" stopColor="#ffe5a1" stopOpacity=".26"/></linearGradient><linearGradient id="headlight-service" x2="0" y2="1"><stop stopColor="#ffe5a1" stopOpacity=".26"/><stop offset="1" stopColor="#ffe5a1" stopOpacity="0"/></linearGradient></defs>
@@ -28,7 +27,7 @@ export function CampusLife({night=false}:{night?:boolean}){
     <ellipse cx="4" cy="2" rx="8" ry="18" fill="#263f38" opacity=".2"/>
     <rect x="-6" y="-17" width="12" height="23" rx="1" fill="#d6d8bc" stroke="#7e927f" strokeWidth=".6"/><rect x="-6" y="7" width="12" height="10" rx="2" fill="#d4a04b"/><path d="M-5 10H5v4H-5z" fill="#4b6f74"/>
    </g>}
-   {open&&[0,1,2,3].map(i=><g key={i} transform={`translate(${i%2?1018:920} ${574+Math.floor(i/2)*40})`}><ellipse cx="2" cy="3" rx="10" ry="5" fill="#264039" opacity=".25"/><rect x="-10" y="-4" width="20" height="8" rx="2" fill={['#c9d7cb','#a9b6bd','#d9c596','#729898'][i]}/><path d="M-5 -3h9v6H-5z" fill="#476772"/></g>)}
+
   </svg>
   <style>{`
    @keyframes campusTrafficEast{from{transform:translate(-70px,36px)}to{transform:translate(1260px,36px)}}
