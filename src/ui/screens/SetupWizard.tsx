@@ -146,7 +146,7 @@ export function SetupWizard() {
         />
       );
     case 'review':
-      return <ClosingReview preview={previewState(content,scenarioId,setup,wizard.negotiation,difficultyId)} onBack={() => setStep('insurance')} onStart={start} />;
+      return <ClosingReview simple={localStorage.getItem('outside-date-detailed')!=='true'} preview={previewState(content,scenarioId,setup,wizard.negotiation,difficultyId)} onBack={() => setStep('insurance')} onStart={start} />;
   }
   }
   return <OpeningCampus onNavigate={step === 'title' ? undefined : (target) => setStep(target as Step)} step={step} preview={previewState(content,scenarioId,setup,wizard.negotiation,difficultyId)} content={content}>{renderStep()}</OpeningCampus>;
