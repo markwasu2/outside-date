@@ -33,7 +33,7 @@ export function simpleActionName(action: PlannedAction, state: GameState): strin
 }
 export function simpleActionCost(row:ActionRow):string {
  const points=`${row.ap} point${row.ap===1?'':'s'}`;
- return row.action.actionId==='advanceHall' ? `${points} · building costs paid monthly` : `${points} · ${row.cashLabel}`;
+ return row.action.actionId==='advanceHall' ? `${points} · building costs paid monthly` : `${points} · ${plainWords(row.cashLabel)}`;
 }
 export function simpleRows(objectId:string,state:GameState,content:Content):ActionRow[]{
  let rows=objectId==='road'?buildRows('land',state,content,null):boardActionsForObject(objectId==='people'?'siteOffice':objectId,state,content);
