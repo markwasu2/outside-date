@@ -21,6 +21,15 @@ describe('small tycoon milestones and choices',()=>{
  it('power and all required permits count only when ready',()=>{
   const state=fresh();state.permits.building.status='pending';state.power.substationStatus='building';expect(campusMilestones(state).filter(m=>['permit','power'].includes(m.id)&&m.done)).toHaveLength(0);state.permits.building.status='granted';state.power.substationStatus='done';expect(campusMilestones(state).filter(m=>['permit','power'].includes(m.id)&&m.done)).toHaveLength(2);
  });
+ it('targets each unfinished stage at the hall that still needs it',()=>{
+  const s=fresh();const first=s.halls[0]!;first.delivered=true;first.stageIndex=5;
+  const h2={...structuredClone(first),id:'H2',delivered:false,stageIndex:1};const h3={...structuredClone(first),id:'H3',delivered:false,stageIndex:3};s.halls.push(h2,h3);
+  const targets=Object.fromEntries(campusMilestones(s).map(m=>[m.id,m.target]));expect(targets.foundation).toBe('H1');for(const id of ['frame','walls','interiors','open'])expect(targets[id]).toBe('H2');
+  h2.stageIndex=4;const updated=Object.fromEntries(campusMilestones(s).map(m=>[m.id,m.target]));expect(updated.interiors).toBe('H3');expect(updated.open).toBe('H2');
+ });
+ it('prioritizes unfinished live work over an ended hall without marking its milestone complete',()=>{
+  const s=fresh();s.halls[0]!.terminated=true;const next={...structuredClone(s.halls[0]!),id:'H2',terminated:false};s.halls.push(next);expect(campusMilestones(s).find(m=>m.id==='foundation')).toMatchObject({done:false,target:'H2'});next.delivered=true;expect(campusMilestones(s).find(m=>m.id==='foundation')).toMatchObject({done:false,target:'H1'});
+ });
  it('standard quote uses the same total/deposit and market-adjusted lead as the engine',()=>{
   const state=fresh();state.markets.equipmentIndex=1.137;const t=resolveContent(state,content).tuning;
   const text=standardEquipmentWords('switchgear',state,content);expect(text).toContain(formatDollars(priceWithIndex(t.power.switchgearDeposit+t.power.switchgearBalance,1.137))+' total');expect(text).toContain(formatDollars(priceWithIndex(t.power.switchgearDeposit,1.137))+' deposit');expect(text).toContain(`${leadWithIndex(t.power.switchgearLeadMin,1.137,t.markets.leadElasticity)}-${leadWithIndex(t.power.switchgearLeadMax,1.137,t.markets.leadElasticity)} months`);
