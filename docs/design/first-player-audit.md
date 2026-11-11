@@ -113,3 +113,9 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Replayed the final sale confirmation and found it still rounded a 0.996x owner return to 1.00x. It now shares the precise return label with the summary/report and warns when owners recover less than they invested.
 - Separated the player share from the owners' return. Debt is labeled loans owed rather than claiming every loan has been repaid before the sale is committed.
 - The real engine-priced edge test now exercises preview, cancel without ending, reprice, commit, summary, full report, return and restart. Both normal desktop journeys, related close/rating routes, report unit cases, lint/build and built decoding pass. Actual confirmation pixels inspected.
+
+## November 10 evening: Money starts with the actual position
+- Cold inspection found the Money panel opened on actions, with no current debt or ownership summary despite the main screen directing players there to review the sale numbers.
+- Added cash, unused committed build budget, all debt including accrued interest, contributed owner equity and the player's current ownership share above the existing actions.
+- Pending financing shows its arrival month and explicitly is not cash in the bank yet. The summary explains why committed construction money is not bill-paying cash and why ownership is not a guaranteed payout.
+- Actual opening and debt/pending-funds pixels inspected at 1280x720. Browser checks cover full debt components, changed ownership, pending cash, sticky Close, both complete desktop journeys and opening offers. Related financing/loss/sale/popup routes, lint/build and built decoding pass. No engine or insurance behavior changed.

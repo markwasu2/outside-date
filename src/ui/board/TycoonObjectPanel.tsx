@@ -1,9 +1,10 @@
+import {totalDebt} from '../../engine/selectors';
 import {hallBlocker} from './legibility';
 import {canConnectOnNextTick,powerCapacityWords} from './powerWords';
 import {activeWorkWords} from './activeWorkWords';
 import {useEffect} from 'react';
 import {checkAction,useStore} from '../store';
-import {simpleRows,simpleActionName,simpleActionCost,plainWords,standardEquipmentWords} from './simpleWords';
+import {simpleRows,simpleActionName,simpleActionCost,plainWords,standardEquipmentWords,buildingFunds} from './simpleWords';
 import {decisionResult} from './decisionWords';
 import {permitReviewWords} from './permitWords';
 import {resolveContent} from '../../engine/resolve';
@@ -19,6 +20,18 @@ export function TycoonObjectPanel({objectId,left,top,onClose}:{objectId:string;l
  const hall=draft.halls.find(h=>h.id===objectId);
  return <section data-testid="simple-object-panel" role="dialog" aria-label={titles[objectId]??`Build ${objectId}`} style={{position:'absolute',left,top,width:360,maxHeight:'min(440px,90%)',overflowY:'auto',boxSizing:'border-box',padding:14,border:'1px solid #aa9c7a',background:'#fffdf4',borderRadius:10,boxShadow:'0 10px 32px #30291833',zIndex:70,fontSize:13,lineHeight:1.4}}>
   <header style={{display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:-14,padding:'8px 0',background:'#fffdf4',zIndex:2}}><strong style={{fontSize:17}}>{titles[objectId]??`Build ${objectId}`}</strong><button onClick={onClose}>Close</button></header>
+  {objectId==='finance'&&<section data-testid="money-current-position" style={{padding:'10px 11px',background:'#edf1df',border:'1px solid #c0cba9',borderRadius:7,margin:'8px 0 12px'}}>
+   <strong>Current position</strong>
+   <dl style={{display:'grid',gridTemplateColumns:'1fr auto',gap:'5px 10px',margin:'8px 0',fontSize:12}}>
+    <dt>Cash in bank</dt><dd style={{margin:0,fontWeight:700}}>{formatDollars(draft.cash)}</dd>
+    <dt>Unused build budget</dt><dd style={{margin:0}}>{formatDollars(buildingFunds(draft))}</dd>
+    <dt>Loans owed, with interest</dt><dd style={{margin:0}}>{formatDollars(totalDebt(draft))}</dd>
+    <dt>Owners' investment so far</dt><dd style={{margin:0}}>{formatDollars(draft.equity.calledTotal)}</dd>
+    <dt>Your ownership share</dt><dd style={{margin:0}}>{Number((draft.equity.playerShare*100).toFixed(2))}%</dd>
+   </dl>
+   {draft.capital.pending.map((entry,i)=><p data-testid="money-pending-funds" key={i} style={{margin:'5px 0',fontSize:11,color:'#7e603c'}}>Cash arriving month {entry.arrivesMonth+1}: {formatDollars(entry.amount)}. Not in the bank yet.</p>)}
+   <p style={{margin:'8px 0 0',fontSize:11,color:'#61694f'}}>The build budget is committed loans and equity, not spare cash for bills. Loans are repaid before the owners share the sale value. Your share is not a guaranteed payout.</p>
+  </section>}
   {objectId==='siteOffice'&&permitReviewWords(draft).map(text=><p key={text} style={{padding:8,background:'#edf0df',borderRadius:4}}>{plainWords(text)}</p>)}
   {objectId==='people'&&<p style={{padding:8,background:'#eaf0de'}}>Use spare points to improve relationships, or keep cash for construction. Visits help trust, not construction speed.</p>}
   {objectId==='substation'&&<p>{draft.power.substationStatus==='done'?'Power connection ready. It connects buildings automatically when they are ready.':draft.power.substationStatus==='building'?'Connection being built. Advance the month to keep work moving.':draft.power.studyStatus==='pending'?'Power study running. Order the equipment while you wait.':'Plan the power connection before your buildings need it.'}</p>}
