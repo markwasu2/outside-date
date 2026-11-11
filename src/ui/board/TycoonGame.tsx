@@ -1,3 +1,4 @@
+import {campusMilestones} from './campusMilestones';
 import {useState} from 'react';
 import {useStore} from '../store';
 import {BoardStyles} from './boardStyles';
@@ -22,6 +23,7 @@ export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
  const deadline=remaining.length?Math.min(...remaining.map(h=>h.outsideMonth))+1:null;
  const target=remaining.length?Math.min(...remaining.map(h=>h.deliveryMonth))+1:null;
  const points=draft.apPerMonth-draft.apUsedThisMonth;
+ const milestones=campusMilestones(draft),complete=milestones.filter(m=>m.done).length;
  const news=review?developments(review,content).filter(n=>!n.text.startsWith('DSCR headroom')):[];
  const nextEvents=ledger(draft,content).filter(e=>e.month>=draft.month&&e.month<=draft.maxMonths&&!['takeoutWindow','conversionTest'].includes(e.kind)&&(!['hallDelivery','hallOutside'].includes(e.kind)||remaining.length>0)).slice(0,3);
  const converted=draft.flags.conversionMonth;
@@ -42,10 +44,11 @@ export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
   </header>
   <section data-testid="simple-goal" style={{display:'flex',alignItems:'center',gap:18,padding:'10px 18px',background:'#dce7d1',borderBottom:'1px solid #b5c5a5'}}>
    <strong>{built}/{draft.halls.length} data centers open</strong>
-   <progress aria-label="Data centers open" value={built} max={draft.halls.length} style={{width:140,accentColor:'#365c45'}}/>
+   <progress aria-label="Campus milestones complete" value={complete} max={milestones.length} style={{width:140,accentColor:'#365c45'}}/>
    <span>{remaining.length?`Build → connect power → open for rent → sell.${target?` Target: month ${target}.`:''}`:saleMonth?`Buildings open. Collect rent; sale available month ${saleMonth}.`:'Buildings open. Collect rent while the lender checks your income.'}</span>
    {deadline&&<span style={{marginLeft:'auto',fontSize:12,color:draft.month+1>=deadline-3?'#9f4c32':'#5b6650'}}>Tenant leaves after month {deadline}</span>}
   </section>
+  <nav data-testid="milestone-trail" aria-label="Campus milestones" style={{display:'flex',alignItems:'center',gap:6,padding:'6px 18px',background:'#f6f8ed',borderBottom:'1px solid #c7d2b4',fontSize:11}}><strong style={{marginRight:8,color:'#4c6a45'}}>{complete}/{milestones.length} ready</strong>{milestones.map(m=><button key={m.id} data-milestone={m.id} data-complete={m.done} title={m.done?`${m.label} complete`:`Inspect ${m.label.toLowerCase()}`} onClick={()=>open(m.target)} style={{border:`1px solid ${m.done?'#a7c494':'#d2d5c2'}`,borderRadius:20,padding:'4px 12px',background:m.done?'#deecd1':'#fffdf3',color:m.done?'#365d3f':'#85856c',fontSize:11}}>{m.done?'✓':'○'} {m.label}</button>)}<span style={{marginLeft:'auto',color:'#7b836a'}}>Click any step to inspect</span></nav>
   {freeze&&<div data-testid="simple-freeze" style={{background:'#f8dfc0',padding:'8px 18px',display:'flex',gap:16,alignItems:'center'}}><strong>Building paused: lender paperwork</strong><span>Fix it to restart construction funding.</span><button style={button} onClick={()=>queue({actionId:'cureDraw'})}>Unfreeze building funds · 2 points</button></div>}
   <div style={{flex:1,minHeight:0,position:'relative'}}>
    <MapGrid simple night={night}/>

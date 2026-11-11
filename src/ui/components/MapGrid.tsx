@@ -291,10 +291,10 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
       <CampusLife/>
       {!simple && <BoardLegend />}
       <div {...selectableCellProps(boardPopover === 'people', () => openObject('people', null))}
-        ref={(el) => { if (el) { el.dataset.campusObject = 'people'; cellRefs.current.set('people', el); } }} aria-label="People on site" data-testid="campus-people" data-simple-hidden={simple&&!draft.halls.some(h=>h.delivered)}
+        ref={(el) => { if (el) { el.dataset.campusObject = 'people'; cellRefs.current.set('people', el); } }} aria-label="People on site" data-testid="campus-people" data-simple-hidden={simple&&!draft.flags.siteOptioned&&!draft.flags.siteOptionedAtStart}
         style={{ position: 'absolute', left: '7%', bottom: '8%', width: 110, height: 110, cursor: 'pointer', zIndex: 3 }}>
         <img src={campusPeopleImg} alt="" aria-hidden="true" style={{width:'100%',height:'100%',objectFit:'contain',pointerEvents:'none'}} />
-        <span style={{...ART_CHIP,position:'absolute',bottom:0,left:16,fontSize:11}}>People on site</span>
+        <span style={{...ART_CHIP,position:'absolute',bottom:0,left:16,fontSize:11}}>{simple?'Crew & contacts':'People on site'}</span>
       </div>
 
       {/* Road: no popover (D1). Phase 4: the site's transmission poles queue at the road. */}

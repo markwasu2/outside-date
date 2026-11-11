@@ -14,3 +14,11 @@ Review of the shipped desktop game before the tycoon-view change, using the visi
 ## New default
 
 One-screen goal, ready-made first campus, cash and action points, build controls on the map, upcoming milestones, Next month, compact consequences and Sell campus. Keep the full financing and setup interface as an optional Detailed view, not the first thing a player must learn. Engine rules and costs are unchanged. The new first-campus scenario allows 30 months and a month-23 opening target, drops the two forced tutorial disruptions, and starts with local road/school work funded. Ordinary random events and inspections remain. A separate fresh-storage journey must exercise this default; the existing detailed-mode regression suite is not proof that the new view works.
+
+## November 10: first-campus small wins
+
+- The default campus now tracks eight actual milestones: land, foundation, permits, power, frame, walls, interiors, opening. Buying land moves progress immediately; starting construction does not falsely mark it finished.
+- First-campus building permit review is one month at 98% base odds. Frame, shell and fit-out have two-month minimums. Only this starter scenario changes; other scenario balance stays unchanged.
+- Standard versus express equipment is a real cash/timing choice. Quotes include standard total, deposit, balance and market-adjusted lead; disabled choices retain their effect text.
+- Contacts appear after land purchase. Visits explicitly change relationships rather than construction speed. Extra crews become available once relevant.
+- Verification: 665 unit tests; 156 browser tests (39+39+38 completed in shard 3, its one interrupted fast-forward test rerun passed, then 39 in shard 4); built-app ground decode check. Two complete fresh desktop journeys and a separate first-three-month choice journey passed. Inspected actual 1280x720 early-game pixels and both desktop scene fixtures.
