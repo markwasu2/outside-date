@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 
-import { formatMonth } from '../../engine/format';
+import { formatDollars, formatMonth } from '../../engine/format';
+import { dscr, totalDebt } from '../../engine/selectors';
+import { resolveContent } from '../../engine/resolve';
 import { checkAction, useStore } from '../store';
 import { buildRows } from '../components/TracksPanel';
 import { actionCostWords, decisionResult, isContextOnlyAction } from './decisionWords';
@@ -19,8 +21,8 @@ import { boardActionsForObject, boardObjectTagline, laydownSummary } from './act
  * object is opened in a run, the header carries a one-line "what this is" teaching line (D6).
  */
 
-export const POPOVER_WIDTH = 300;
-export const POPOVER_MAX_HEIGHT = 360;
+export const POPOVER_WIDTH = 380;
+export const POPOVER_MAX_HEIGHT = 440;
 
 interface MapPopoverProps {
   objectId: string;
@@ -100,6 +102,11 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
     : objectId === 'siteOffice' && officeView !== 'permits' ? buildRows(officeView, state, content, null)
     : objectId === 'people' ? boardActionsForObject('siteOffice', state, content).filter((r) => r.action.actionId === 'visitCast' || r.action.actionId === 'meetIntervenor')
     : boardActionsForObject(objectId, state, content);
+  // Put the decision that brought the player here above optional policy switches.
+  if (objectId === 'siteOffice' && officeView === 'money') rows.sort((a,b) => {
+    const rank = (id: string) => id === 'priceTakeout' ? 0 : id === 'cureDraw' && state.flags.drawFreeze ? 1 : 2;
+    return rank(a.action.actionId) - rank(b.action.actionId);
+  });
   const tagline = boardObjectTagline(objectId, state);
   const yard = laydownSummary(state,content);
   const orders = objectId === 'laydownYard' ? yard.orders : [];
@@ -128,12 +135,11 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
                   background: '#fff',
                 }}
               >
-                <div>
-                  <strong>{r.label}</strong> ({actionCostWords(r.ap)}; {r.cashLabel})
-                </div>
-                <div style={{ fontSize: '0.7rem', color: check.ok ? '#555' : '#b71c1c' }}>{check.ok ? decisionResult(r.action,state,content,r.help) : check.reason}</div>
+                <strong style={{display:'block',fontSize:14,lineHeight:1.3}}>{r.label}</strong>
+                <div data-action-cost style={{fontSize:12,margin:'5px 0',color:'#36563e'}}>({actionCostWords(r.ap)}; {r.cashLabel})</div>
+                <div style={{ fontSize: 12, lineHeight:1.45, color: check.ok ? '#635b49' : '#8a523d' }}>{check.ok ? decisionResult(r.action,state,content,r.help) : check.reason}</div>
               </button>
-              {!check.ok && <button style={{ fontSize: 11, marginBottom: 6 }} onClick={() => setFeedback(`${r.label}: ${check.reason}`)}>Why unavailable: {r.label}?</button>}
+              {!check.ok && <button data-action-explain aria-label={`Why unavailable: ${r.label}?`} onClick={() => setFeedback(`${r.label}: ${check.reason}`)}>Explain restriction</button>}
               </Fragment>
             );
           };
@@ -157,9 +163,9 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
           border: '1px solid #8d6e63',
           borderRadius: 6,
           boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
-          fontFamily: 'sans-serif',
-          fontSize: '0.75rem',
-          padding: '0.4rem',
+          fontFamily: 'system-ui, sans-serif',
+          fontSize: 13,
+          padding: '10px 12px',
         }}
       >
         <div data-testid="popover-header" style={{ position:'sticky',top:-7,zIndex:2,background:'#fffdf7',padding:'5px 0',display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4, borderBottom:'1px solid #d9cfb9' }}>
@@ -185,12 +191,17 @@ export function MapPopover({ objectId, left, top, onClose }: MapPopoverProps) {
         })()}
         {objectId === 'siteOffice' && <DocketBrief state={state} content={content} />}
         {objectId === 'siteOffice' && (
-          <div style={{ display: 'flex', gap: 4, marginBottom: 8, flexWrap: 'wrap' }}>
+          <div data-testid="office-tabs" style={{ display: 'flex', gap: 4, marginBottom: 10, flexWrap: 'wrap' }}>
             <button aria-pressed={officeView === 'permits'} onClick={() => setOfficeView('permits')}>Permits & people</button>
             <button aria-pressed={officeView === 'money'} onClick={() => setOfficeView('money')}>Insurance & lender</button>
             <button aria-pressed={officeView === 'capital'} onClick={() => setOfficeView('capital')}>Raise capital</button>
           </div>
         )}
+        {objectId === 'siteOffice' && officeView === 'money' && <div data-testid="lender-snapshot" style={{padding:'9px 10px',background:'#eee8d7',borderRadius:6,marginBottom:10,lineHeight:1.5}}>
+          <strong>Debt & closing</strong><div>Outstanding debt: {formatDollars(totalDebt(state))}</div>
+          <div>Income / annual debt service: {Number.isFinite(dscr(state,resolveContent(state,content))) ? `${dscr(state,resolveContent(state,content)).toFixed(2)}x` : 'No debt service'}</div>
+          <div>{state.phase === 'takeoutAvailable' ? 'Closing is available. Pricing the takeout ends this campaign.' : state.debt.converted ? 'Loan converted. Rent must season before closing.' : 'The lender tests income and debt payments each month.'}</div>
+        </div>}
         {objectId === 'siteOffice' && officeView === 'permits' && <div data-testid="permit-review" style={{marginBottom:8,lineHeight:1.4}}>{permitReviewWords(state).map(words=><p key={words} style={{margin:'4px 0'}}>{words}</p>)}</div>}
         {objectId === 'pond' && <p data-testid="pond-progress" style={{lineHeight:1.4}}>{pondProgressWords(state)}</p>}
         {objectId === 'substation' && <p data-testid="substation-progress" style={{lineHeight:1.4}}>{substationWords(state)}</p>}

@@ -96,7 +96,11 @@ const ART_CHIP: CSSProperties = {
   position: 'relative',
   background: 'rgba(255,253,248,0.85)',
   borderRadius: 3,
-  padding: '0 3px',
+  padding: '2px 5px',
+  fontFamily: 'system-ui, sans-serif',
+  fontSize: 11,
+  whiteSpace: 'nowrap',
+  lineHeight: 1.35,
   display: 'inline-block',
   color: '#3a3026',
 };
@@ -287,7 +291,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
       <div {...selectableCellProps(boardPopover === 'road', () => openObject('road', null))} ref={(el) => { if (el) { el.dataset.campusObject = 'road'; cellRefs.current.set('road', el); } }} data-testid="map-road" style={{ cursor: 'pointer', gridColumn: '1 / 13', gridRow: '1 / 2', position: 'relative', background: TILE_ART.road.bg, ...cellStyle }}>
         <ArtLayer img={TILE_ART.road.img} />
         <span style={ART_CHIP}>
-          {TILE_ART.road.label}
+          Land & access
         </span>
         {siteTheme.poles > 0 && (
           <span data-testid="road-poles" title={`${siteTheme.poles} transmission poles at the road`} style={{ ...ART_CHIP, marginLeft: 6 }}>
@@ -464,7 +468,7 @@ export function MapGrid({cue}: {cue?: {title:string;why:string;objectId:string;w
                     ? 'mitigating'
                     : 'pond'
                   : hall.stageIndex === -1
-                    ? 'unplaced'
+                    ? 'Choose pad'
                     : (hall.pad ?? 'near') === 'near'
                       ? 'near pad'
                       : 'far pad'}

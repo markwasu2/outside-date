@@ -28,7 +28,19 @@ export function BoardStyles() {
       [data-testid="review-option"]:after { content: '  ↗'; color:#8a967c; }
       [data-testid="review-option"]:hover { text-decoration: underline !important; }
       [data-testid="map-popover"] { border-radius: 10px !important; box-shadow: 0 10px 30px #30291830 !important; }
-      [data-testid="map-popover"] button { border-radius: 5px; }
+      [data-testid="map-popover"] button { border-radius: 5px; font: inherit; }
+      [data-testid="map-popover"] [data-testid="popover-action"] { padding: 10px 11px !important; margin-bottom: 8px !important; border: 1px solid #c7cbb9 !important; background: #fffef8 !important; color:#343c2c; }
+      [data-testid="map-popover"] [data-testid="popover-action"]:not(:disabled):hover { border-color:#4a7051 !important; background:#edf3e7 !important; }
+      [data-testid="map-popover"] [data-testid="popover-action"]:disabled { opacity: 1 !important; background: #f1eee5 !important; border-color:#ded6c4 !important; color:#756e60; }
+      [data-action-explain] { display:block; border:0; background:none; color:#71523f; font-size:11px !important; margin:-4px 0 10px; padding:0 2px; text-decoration:underline; cursor:pointer; }
+      [data-testid="office-tabs"] button { border:1px solid #c8bfa6; background:#f5efdf; color:#514831; padding:6px 8px; cursor:pointer; font-size:12px; }
+      [data-testid="office-tabs"] button[aria-pressed="true"] { background:#365c45; color:#fffdf5; border-color:#365c45; }
+      [data-testid="map-popover"] button:focus-visible { outline:2px solid #365c45; outline-offset:2px; }
+      [data-testid^="caption-"], [data-testid^="pad-"] { font-family:system-ui,sans-serif; font-size:11px !important; line-height:1.35; padding:2px 5px !important; }
+      [data-testid^="pad-"] { opacity:.95; }
+      @media (max-width: 1050px) {
+        [data-testid^="caption-"], [data-testid^="pad-"] { font-size:9.5px !important; padding:1px 3px !important; }
+      }
       [data-campus-scene] [data-scene-object] {
         background: transparent !important;
         border: none !important;
