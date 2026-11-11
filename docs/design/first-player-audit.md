@@ -66,3 +66,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - The blocked building now links straight to the correct power view. An unbuilt connection points to study/equipment; a completed connection points to capacity; capacity ready for next tick gives the automatic hookup instruction instead of asking for duplicate work. The footer names the testing blocker.
 - The simple power-capacity view reports finite capacity and says when waiting cannot fix a permanent gap. Event trust arrows now say immediate event effects are separately recorded rather than claiming they cannot be isolated.
 - 692 unit cases passed. Nine targeted browser cases passed across real delayed-power recovery, both normal build-to-sale journeys, ready-hookup/permanent-capacity fixtures, detailed power timing and all opening choices. Lint/build, built-image decoding, diff checks and actual blocker/recovery/capacity pixels passed.
+
+## November 10 evening: operating-building night lighting
+- Night view lights selected upper windows and entrance glass using the same camera and window coordinates as the original building illustration, with a small pool of light on the entrance pavement.
+- Lighting is purely visual and only appears for an opened, non-terminated building. It never suggests that an unpowered shell is operating. Day view is unchanged.
+- Eight targeted browser cases passed across both full desktop journeys, delayed-power recovery, hookup/capacity fixtures, original-art and multi-hall bounds, and paused inspection handling. Actual 1280/1440 night pixels, lint/build, built-image decode and diff checks passed.

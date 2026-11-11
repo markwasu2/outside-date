@@ -1,3 +1,4 @@
+import {HallNightLights} from './HallNightLights';
 import { formatDollars } from '../../engine/format';
 import { STAGE_ART, VEHICLE_ART } from '../art';
 import type { HallVisual } from './hallVisual';
@@ -7,6 +8,7 @@ import type { HallVisual } from './hallVisual';
 
 interface HallSpriteProps {
   visual: HallVisual;
+  night?:boolean;
   /** Extra warning state the pure function cannot see (needs the current month / state flags). */
   late: boolean;
   failedInspection: boolean;
@@ -22,7 +24,7 @@ interface HallSpriteProps {
   reducedMotion: boolean;
 }
 
-export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, spendFloat, coinBurst, coolingSteam, reducedMotion }: HallSpriteProps) {
+export function HallSprite({ night=false,visual, late, failedInspection, queuedGhost, rent, spendFloat, coinBurst, coolingSteam, reducedMotion }: HallSpriteProps) {
   const { stage, progress0to1 } = visual;
   const look = STAGE_ART[stage] ?? STAGE_ART.notStarted;
   const baseLook = STAGE_ART[visual.baseStage] ?? STAGE_ART.notStarted;
@@ -41,6 +43,7 @@ export function HallSprite({ visual, late, failedInspection, queuedGhost, rent, 
               transition: reducedMotion ? undefined : 'opacity 0.6s ease',
               opacity: visual.flags.terminated ? 0.45 : .12+.88*progress0to1}} />
         )}
+        {night&&stage==='delivered'&&!visual.flags.terminated&&<HallNightLights/>}
       </div>
 
       {coolingSteam&&<div data-testid="cooling-vapor" aria-hidden="true" style={{position:'absolute',left:'43%',top:'24%',width:70,height:65,pointerEvents:'none',opacity:.7}}>{[0,1,2].map(i=><span key={i} className={reducedMotion?undefined:'site-vapor'} style={{position:'absolute',left:i*12,bottom:4,width:19,height:27,borderRadius:'50%',background:'radial-gradient(ellipse,#f4f5e9cc,transparent 70%)',filter:'blur(3px)',animationDelay:`-${i*1.5}s`}}/>)}</div>}

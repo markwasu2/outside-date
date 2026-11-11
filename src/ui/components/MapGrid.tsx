@@ -488,6 +488,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
               {simple && <TycoonMapControl objectId={hall.id}/>}
               <HallSprite key={`${hall.id}-${hall.stageIndex}-${hall.stageActive}`}
                 visual={visual}
+                night={night}
                 late={late}
                 failedInspection={failedInspection}
                 queuedGhost={!simple&&objectHasQueuedAction(hall.id, plan, hallIds)}
