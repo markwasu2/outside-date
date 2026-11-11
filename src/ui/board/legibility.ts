@@ -133,7 +133,7 @@ export const LEGEND_ENTRIES: { symbol: string; meaning: string }[] = [
   { symbol: 'Caption line', meaning: 'the stage in words, plus what the hall is waiting on' },
   { symbol: 'Green strip', meaning: 'progress through the current stage' },
   { symbol: 'near pad / far pad', meaning: 'pad position; far pads trench a feeder and pay monthly line losses' },
-  { symbol: '+$x/mo', meaning: 'rent the delivered hall earns each month' },
+  { symbol: 'Rent $x/mo', meaning: 'usual rent after landlord share and line losses, before loan payments and other bills; rent-free periods can reduce actual receipts' },
   { symbol: 'Blue "Done" marker', meaning: 'you acted on this tile this month' },
   { symbol: '⚠️', meaning: 'past its outside date' },
   { symbol: '⏸', meaning: 'paused this month' },
