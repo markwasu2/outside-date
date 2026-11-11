@@ -332,9 +332,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
         title="Site office"
       >
         <ArtLayer img={TILE_ART.siteOffice.img} />
-        <span style={ART_CHIP}>
-          {simple ? 'Permits' : TILE_ART.siteOffice.label}
-        </span>
+        {!simple&&<span style={ART_CHIP}>{TILE_ART.siteOffice.label}</span>}
         {simple && <TycoonMapControl objectId="siteOffice"/>}{objectHasQueuedAction('siteOffice', plan, hallIds) && <QueuedGhost />}
       </div>
 
