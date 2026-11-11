@@ -232,7 +232,25 @@ def equipment(kind):
 def tile(kind):
  if kind=='site-office':
   s=pad()+box(-58,-30,2,112,62,28,IVORY,'#cfceba','#9fb3a2')
-  for x in (-45,-16,13):s+=poly([p(x,32,11),p(x+18,32,11),p(x+18,32,23),p(x,32,23)],TEAL)
+  # Standing-seam roof, modest rooftop service unit and rainwater trim.
+  s+=box(-60,-32,29,116,66,2,'#dfdec7','#b8c0ac','#8fa99b')
+  for x in range(-52,54,12):s+=line(p(x,-30,31.1),p(x,32,31.1),'#b5bca8',.55)
+  s+=box(20,-21,31,18,15,7,'#a5b8ad','#7f9d95','#527b7b')
+  cx,cy=p(29,-13.5,38)
+  s+=f'<ellipse cx="{cx}" cy="{cy}" rx="4.5" ry="2.5" fill="#476971" stroke="#b6c9b8" stroke-width=".6"/>'
+  for z in (7,14,21):s+=line(p(-57,32.1,z),p(52,32.1,z),'#b6bca9',.35)
+  for x in (-45,-16):s+=pane(x,32.4,12,18,12)
+  # Glass entrance, striped awning, two shallow steps and a sheltered notice board.
+  s+=poly([p(25,32.3,3),p(42,32.3,3),p(42,32.3,25),p(25,32.3,25)],'#537c82','#d8deca',1)
+  s+=line(p(33,32.6,4),p(33,32.6,24),'#b8d0c5',.65)
+  s+=line(p(38,32.8,12),p(40,32.8,12),'#e0d7b3',1)
+  s+=box(21,32,25,25,10,2,'#bba984','#94876a','#6b7867')
+  for x in (23,32,41):s+=poly([p(x,32,27.2),p(x+4,32,27.2),p(x+4,42,27.2),p(x,42,27.2)],'#e4dcc1','none')
+  s+=box(23,33,1,22,9,1.2,'#c1c5b5','#a6b09e','#8ca495')
+  s+=box(25,39,0,18,7,1,'#d0ceb9','#a7b2a0','#8aa190')
+  s+=poly([p(54.2,-20,9),p(54.2,-3,9),p(54.2,-3,22),p(54.2,-20,22)],'#7a6e50','#d2c39c',.8)
+  for y,z in [(-17,12),(-9,13)]:s+=poly([p(54.4,y,z),p(54.4,y+5,z),p(54.4,y+5,z+6),p(54.4,y,z+6)],'#e9e2c4','none')
+  s+=line(p(-57,32,3),p(-57,32,29),'#8da99b',1.2)
   return s+box(40,-41,0,9,10,16,GOLD,'#b78e49','#a17a3a')
  if kind=='laydown':return pad()+''.join(box(x,y,1,32,22,19,'#d8b779','#b49359','#9a7d4c')+line(p(x+16,y,1),p(x+16,y,20),'#6f7968',2) for x,y in [(-55,-30),(-13,-30),(27,-30),(-34,5),(10,5)])
  if kind=='pond':
