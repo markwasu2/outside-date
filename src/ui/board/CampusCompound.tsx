@@ -1,3 +1,7 @@
+import steelYard from '../../assets/campus/yard-steel.svg';
+import panelYard from '../../assets/campus/yard-panels.svg';
+import crane from '../../assets/campus/vehicle-crane.svg';
+import truck from '../../assets/campus/vehicle-truck.svg';
 import {useEffect,useRef,useState} from 'react';
 import {useStore} from '../store';
 import {usePrefersReducedMotion} from './boardStyles';
@@ -13,6 +17,9 @@ export function CampusCompound({night}:{night:boolean}){
  const draft=useStore(s=>s.draft),plan=useStore(s=>s.plan),reduced=usePrefersReducedMotion();
  const land=!!draft.flags.siteOptioned||!!draft.flags.siteOptionedAtStart;
  const started=draft.halls.some(h=>h.stageIndex>=0),fitted=draft.halls.some(h=>h.stageIndex>=3),opened=draft.halls.some(h=>h.delivered);
+ const stage=Math.max(-1,...draft.halls.filter(h=>!h.terminated).map(h=>h.stageIndex));
+ const materialArt=stage>=2?panelYard:stage>=1?steelYard:yard;
+ const workArt=stage>=2?truck:stage>=1?crane:excavator;
  const working=!draft.flags.drawFreeze&&draft.halls.some(h=>h.stageActive&&!h.delivered&&!h.terminated&&!h.pausedThisMonth&&!draft.flags[`inspectionFail:${h.id}`]);
  const last=plan.at(-1),previous=useRef(0),cash=useRef(draft.cash),[receipt,setReceipt]=useState<{label:string;cash:number;id:number}|null>(null);
  useEffect(()=>{
@@ -63,8 +70,8 @@ export function CampusCompound({night}:{night:boolean}){
    {working&&draft.halls.some(h=>h.stageIndex===0)&&<g className={reduced?undefined:'site-dust'}><ellipse cx="580" cy="500" rx="34" ry="13" fill="#ddcba1" opacity=".35"/><ellipse cx="602" cy="488" rx="23" ry="17" fill="#e7d5b0" opacity=".3"/></g>}
   </svg>}
   {started&&<section data-testid="support-yard" style={{position:'absolute',left:'68%',top:'23%',width:'23%',height:'42%',display:'flex',flexDirection:'column',alignItems:'center',gap:0}}>
-   <div style={{position:'relative',width:'100%',height:'60%'}}><img src={fitted?cooling:yard} alt="" style={{width:'100%',height:'100%',objectFit:'contain',filter:night?'brightness(.73)':'none'}}/><span style={{position:'absolute',left:'50%',bottom:2,transform:'translateX(-50%)',fontSize:10,padding:'2px 7px',borderRadius:4,background:'#fff9e4d9',color:'#415748',whiteSpace:'nowrap'}}>{fitted?'Cooling yard':'Materials & site crew'}</span></div>
-   <div style={{position:'relative',width:'100%',height:'60%'}}><img src={fitted?backup:excavator} alt="" style={{width:'100%',height:'100%',objectFit:'contain',filter:night?'brightness(.73)':'none'}}/><span style={{position:'absolute',left:'50%',bottom:2,transform:'translateX(-50%)',fontSize:10,padding:'2px 7px',borderRadius:4,background:'#fff9e4d9',color:'#415748',whiteSpace:'nowrap'}}>{fitted?'Backup units · part of building':'Site preparation'}</span></div>
+   <div style={{position:'relative',width:'100%',height:'60%'}}><img src={fitted?cooling:materialArt} alt="" style={{width:'100%',height:'100%',objectFit:'contain',filter:night?'brightness(.73)':'none'}}/><span style={{position:'absolute',left:'50%',bottom:2,transform:'translateX(-50%)',fontSize:10,padding:'2px 7px',borderRadius:4,background:'#fff9e4d9',color:'#415748',whiteSpace:'nowrap'}}>{fitted?'Cooling yard':stage>=2?'Wall panels & loading':stage>=1?'Steel bundles & lifting':'Materials & site crew'}</span></div>
+   <div style={{position:'relative',width:'100%',height:'60%'}}><img src={fitted?backup:workArt} alt="" style={{width:'100%',height:'100%',objectFit:'contain',filter:night?'brightness(.73)':'none'}}/><span style={{position:'absolute',left:'50%',bottom:2,transform:'translateX(-50%)',fontSize:10,padding:'2px 7px',borderRadius:4,background:'#fff9e4d9',color:'#415748',whiteSpace:'nowrap'}}>{fitted?'Backup units · part of building':stage>=2?'Cladding deliveries':stage>=1?'Structural lifting':'Site preparation'}</span></div>
   </section>}
   {opened&&night&&<div style={{position:'absolute',left:'34%',top:'47%',width:'16%',height:20,background:'#ffe6a333',filter:'blur(14px)',borderRadius:'50%'}}/>}
   {receipt&&<div key={receipt.id} data-testid="build-receipt" className={reduced?undefined:'site-build-receipt'} style={{position:'absolute',left:'40%',top:'17%',padding:'10px 15px',borderRadius:8,background:'#f5ffe8f2',boxShadow:'0 5px 18px #284b3426',border:'1px solid #8dad75',fontSize:13,color:'#36583d',fontWeight:700}}>{receipt.label} ✓{receipt.cash>0&&<small style={{display:'block',marginTop:4,color:'#966543'}}>Cash -{formatDollars(receipt.cash)}</small>}</div>}
