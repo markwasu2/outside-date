@@ -350,6 +350,17 @@ def save(name,body):
   rgb=[int(c[i:i+2],16) for i in (1,3,5)]
   def tint(f):return '#'+''.join(f'{max(0,min(255,round(v*f))):02x}' for v in rgb)
   defs+=f'<linearGradient id="{key}" x1="0" y1="0" x2=".65" y2="1"><stop stop-color="{tint(1.12)}"/><stop offset=".52" stop-color="{c}"/><stop offset="1" stop-color="{tint(.88)}"/></linearGradient>'
+ # Finished cladding stays pale against the darker graphite roof and shaded side.
+ # Keep the same materials through shell, fitout, testing and occupation.
+ if name in ('hall-shell','hall-fitout','hall-rfs','hall-delivered'):
+  import re
+  materials={'7d98aa-wall':['#e1e2d3','#c8cbbb','#a7b0a6'],'38566d-shade':['#758c8b','#536e72','#40585f'],'a6b9c1-wall':['#edf0e1','#d6dccc','#bdc9bd'],'6e899b-shade':['#9baca2','#7c9390','#607c7e'],'d7dfe2-roof':['#f5f3df','#e0e4d3','#bdcbbf']}
+  for key,colors in materials.items():
+   def recolor(m):
+    shades=iter(colors)
+    return m[1]+re.sub(r'stop-color="#[a-fA-F0-9]+"',lambda _: 'stop-color="'+next(shades)+'"',m[2])+m[3]
+   defs=re.sub(r'(<linearGradient id="'+key+r'"[^>]*>)(.*?)(</linearGradient>)',recolor,defs)
+  body=body.replace('fill="#647d88"','fill="#3e555c"').replace('stroke="#668286"','stroke="#96a69b"').replace('stroke="#8b9ca3"','stroke="#6e8587"')
  defs+='</defs><style>.crane-boom{transform-origin:147px 21px;animation:sway 7s ease-in-out infinite alternate}@keyframes sway{to{transform:rotate(2deg)}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}</style>'
  detail_path=Path('scripts/campus-details')/(name+'.svg')
  detail=detail_path.read_text().strip() if detail_path.exists() else ''
