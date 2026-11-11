@@ -23,6 +23,20 @@ export function CampusCompound({night}:{night:boolean}){
  return <div data-testid="campus-compound" aria-hidden="true" style={{position:'absolute',inset:0,pointerEvents:'none',zIndex:2,overflow:'hidden'}}>
   {land&&<svg viewBox="0 0 1200 800" preserveAspectRatio="none" style={{position:'absolute',inset:0,width:'100%',height:'100%'}}>
    <defs><radialGradient id="site-light"><stop stopColor="#ffdf8b" stopOpacity=".32"/><stop offset="1" stopColor="#ffdf8b" stopOpacity="0"/></radialGradient></defs>
+   {fitted&&<g data-testid="campus-landscape" style={{filter:night?'brightness(.6) saturate(.8)':undefined}}>
+    <defs><linearGradient id="court-turf" x2=".6" y2="1"><stop stopColor="#6b9864"/><stop offset="1" stopColor="#476d53"/></linearGradient></defs>
+    <path d="M218 590H1024M733 649V208H1024" stroke="#c6c6b4" strokeWidth="49" fill="none"/>
+    <path d="M218 590H1024M733 649V208H1024" stroke="#657476" strokeWidth="40" fill="none"/>
+    <path d="M218 590H1024M733 649V208H1024" stroke="#d4d8bd" strokeWidth="1.2" strokeDasharray="11 16" fill="none"/>
+    <path d="M567 258h103v247H567z" fill="#c6c9b5"/>
+    <path d="M577 268h83v226H577z" fill="url(#court-turf)"/>
+    <path d="M594 272v216M641 272v216" stroke="#9fb48a" strokeWidth="1" opacity=".4"/>
+    <path d="M568 395h101v18H568z" fill="#d7cfb9"/>
+    {[282,335,443,478].map((y,i)=><g key={y}><ellipse cx={i%2?640:598} cy={y+5} rx="17" ry="7" fill="#213e36" opacity=".23"/><circle cx={i%2?635:593} cy={y-4} r="13" fill={i%2?'#527e59':'#71915b'}/><circle cx={i%2?631:589} cy={y-8} r="8" fill="#a8b97a" opacity=".65"/></g>)}
+    {[300,464].map(y=><g key={y}><rect x="657" y={y} width="10" height="21" rx="2" fill="#5c726b"/><path d={`M658 ${y+4}h8m-8 4h8m-8 4h8m-8 4h8`} stroke="#c7b68b" strokeWidth="2"/></g>)}
+    <path d="M798 168h180v21H798z" fill="#455f4b"/>
+    {Array.from({length:10},(_,i)=><circle key={i} cx={808+i*17} cy="174" r="9" fill={i%2?'#7e9a62':'#55774d'}/>)}
+   </g>}
    <g stroke="#a6b5a0" strokeWidth="1" fill="none"><path d="M172 124H1047V705H172V124"/><path d="M172 137H1047M172 692H1047" opacity=".45"/>{Array.from({length:31},(_,i)=><path key={i} d={`M${172+i*29} 124v15M${172+i*29} 692v14`}/>)}{Array.from({length:20},(_,i)=><path key={i} d={`M172 ${140+i*28}h4M1044 ${140+i*28}h5`}/>)}</g>
    {[{x:205,y:190},{x:1025,y:195},{x:205,y:658},{x:1025,y:658}].map(({x,y},i)=><g key={i}><ellipse cx={x+8} cy={y+6} rx="13" ry="5" fill="#243e35" opacity=".2"/><path d={`M${x} ${y}v-43l13 -3`} stroke="#658079" strokeWidth="2" fill="none"/><path d={`M${x+8} ${y-47}h12v4h-12z`} fill={night?'#ffe6a3':'#c6d4c5'}/>{night&&<ellipse cx={x+18} cy={y+7} rx="62" ry="37" fill="url(#site-light)"/>}</g>)}
    {working&&[0,1,2,3].map(i=><g key={i} className={reduced?undefined:`site-worker worker-${i}`} transform={`translate(${650+i*24} ${590+i*11})`} data-testid="walking-worker"><ellipse cy="6" rx="6" ry="2.5" fill="#243e35" opacity=".25"/><path d="M-2 1l-2 6m5-6 2 6" stroke="#3b5962" strokeWidth="2"/><path d="M0 -7V2" stroke={i%2?'#d9ab50':'#e5c871'} strokeWidth="5"/><circle cy="-10" r="3.2" fill="#e7cda0"/><path d="M-4 -11h8" stroke="#ffe4a1" strokeWidth="2"/></g>)}

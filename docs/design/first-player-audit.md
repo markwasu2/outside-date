@@ -22,3 +22,10 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Standard versus express equipment is a real cash/timing choice. Quotes include standard total, deposit, balance and market-adjusted lead; disabled choices retain their effect text.
 - Contacts appear after land purchase. Visits explicitly change relationships rather than construction speed. Extra crews become available once relevant.
 - Verification: 665 unit tests; 156 browser tests (39+39+38 completed in shard 3, its one interrupted fast-forward test rerun passed, then 39 in shard 4); built-app ground decode check. Two complete fresh desktop journeys and a separate first-three-month choice journey passed. Inspected actual 1280x720 early-game pixels and both desktop scene fixtures.
+
+## November 10 evening: second material pass
+- Recessed blue-gray roof membrane with parapet shadows, equipment plinth shadows and solar modules.
+- Warm masonry/glass entrance pavilion, canopy columns, side conduit, fire escape and distinct cladding materials.
+- Fit-out now reveals connected campus service roads and a planted courtyard with walks, benches and shrubs. These are scenery in the hall build, not new power or income.
+- Night shading applies to the added landscape as well as buildings.
+- Seven relevant browser regressions passed including both desktop full journeys and six-hall art. Built image decode, build and lint passed; inspected actual day and night images at 1280x720.
