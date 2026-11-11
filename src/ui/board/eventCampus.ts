@@ -8,6 +8,7 @@ const TARGETS: Record<string, CampusTarget> = {
   laydownYard:{id:'laydownYard',label:'Laydown yard'},
 };
 const CARD_OBJECTS: Record<string,string> = {
+  starter_neighbors:'people',starter_crews:'people',starter_tenant:'people',
   supply_shock:'substation', transformer_factory_fire:'substation', restudy:'substation', interconnect_queue_jump:'substation',
   drought:'pond', neighbor_wells:'pond', chip_generation:'laydownYard',
   labor_shortfall:'people', town_hall:'people', newspaper_profile:'people', governor_visit:'people', union_pla:'people', hiring_fair:'people',

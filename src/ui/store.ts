@@ -606,10 +606,12 @@ export const useStore = create<UIStore>((set, get) => ({
     if (state.phase !== 'awaitingChoice' || !state.pending) return;
     try {
       const result = resolveEvent(state, choiceId, c);
+      const card=c.events.find(e=>e.id===state.pending?.cardId),level=/^level:(\d+)$/.exec(choiceId);
+      const label=(level?card?.scale?.levels[Number(level[1])]?.label:state.pending.choices.find(c=>c.id===choiceId)?.label)??choiceId;
       set((s) => ({
         state: result.state,
         draft: result.state,
-        monthReview: { before: s.monthReview?.before ?? state, after: result.state, actions: s.monthReview?.actions ?? [] },
+        monthReview: { before: s.monthReview?.before ?? state, after: result.state, actions: s.monthReview?.actions ?? [], eventChoices:[...(s.monthReview?.eventChoices??[]),{cardId:state.pending!.cardId,label}] },
         plan: [],
         snapshots: [],
         error: null,

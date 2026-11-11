@@ -164,6 +164,7 @@ export function currentHolder(state: GameState, riskId: string): RiskHolder | nu
  * delay) use the closest risks.json row, so the chip's mitigation text stays real.
  */
 export const EVENT_STAKEHOLDER: Record<string, { riskId?: string; roleId?: StakeholderRoleId }> = {
+  starter_neighbors:{roleId:'town'},starter_crews:{roleId:'gc'},starter_tenant:{roleId:'tenant'},
   storm: { riskId: 'stormDelay' },
   water_damage: { roleId: 'insurer' },
   theft: { roleId: 'insurer' },

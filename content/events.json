@@ -1563,5 +1563,200 @@
       }
     ],
     "note": "Phase 3 small class: odds 0.015/mo while any hall is under construction. Loss is tuning.events.theftShare of a random active hall's costBudget, inside the deductible. No schedule hit."
+  },
+  {
+    "id": "starter_neighbors",
+    "title": "Before the trucks arrive",
+    "body": "Neighbors want to see the site plan. A small open house costs $100K and adds 5 town trust, which helps permit odds. It does not guarantee approval or speed up construction. You can keep the cash instead.",
+    "art": "hiring_fair",
+    "scripted": false,
+    "once": true,
+    "requires": [],
+    "effects": [],
+    "choices": [
+      {
+        "id": "save",
+        "label": "Keep the cash and points",
+        "effects": []
+      },
+      {
+        "id": "accept",
+        "label": "Hold the open house",
+        "effects": [
+          {
+            "type": "cash",
+            "args": [
+              -100000
+            ]
+          },
+          {
+            "type": "goodwill",
+            "args": [
+              "town",
+              5
+            ]
+          }
+        ]
+      }
+    ],
+    "scale": {
+      "minLabel": "Keep resources",
+      "maxLabel": "Hold the open house",
+      "levels": [
+        {
+          "label": "Keep the cash and points",
+          "effects": []
+        },
+        {
+          "label": "Hold the open house",
+          "effects": [
+            {
+              "type": "cash",
+              "args": [
+                -100000
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "town",
+                5
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "note": "First-campus-only scenario-scheduled choice. No random odds and not globally scripted, so this card cannot draw in other scenarios."
+  },
+  {
+    "id": "starter_crews",
+    "title": "A steadier crew for the build",
+    "body": "A local training program costs $250K. It reduces the base chance of a labor shortage by 5 percentage points for 8 months, with a floor of zero. Shortages can still happen; this does not make ordinary construction faster.",
+    "art": "hiring_fair",
+    "scripted": false,
+    "once": true,
+    "requires": [],
+    "effects": [],
+    "choices": [
+      {
+        "id": "save",
+        "label": "Keep the cash and points",
+        "effects": []
+      },
+      {
+        "id": "accept",
+        "label": "Fund crew training",
+        "effects": [
+          {
+            "type": "cash",
+            "args": [
+              -250000
+            ]
+          },
+          {
+            "type": "setFlag",
+            "args": [
+              "hiringFairUntil",
+              "monthPlus:8"
+            ]
+          }
+        ]
+      }
+    ],
+    "scale": {
+      "minLabel": "Keep resources",
+      "maxLabel": "Fund crew training",
+      "levels": [
+        {
+          "label": "Keep the cash and points",
+          "effects": []
+        },
+        {
+          "label": "Fund crew training",
+          "effects": [
+            {
+              "type": "cash",
+              "args": [
+                -250000
+              ]
+            },
+            {
+              "type": "setFlag",
+              "args": [
+                "hiringFairUntil",
+                "monthPlus:8"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "note": "First-campus-only scenario-scheduled choice. No random odds and not globally scripted, so this card cannot draw in other scenarios."
+  },
+  {
+    "id": "starter_tenant",
+    "title": "Your tenant asks for a walkthrough",
+    "body": "A design walkthrough uses 1 action point next month and adds 6 tenant trust. Tenant trust affects deadline flexibility and sale value. It does not complete work for your crews. Or keep all your points for building.",
+    "art": "hiring_fair",
+    "scripted": false,
+    "once": true,
+    "requires": [],
+    "effects": [],
+    "choices": [
+      {
+        "id": "save",
+        "label": "Keep the cash and points",
+        "effects": []
+      },
+      {
+        "id": "accept",
+        "label": "Host the walkthrough",
+        "effects": [
+          {
+            "type": "owedAp",
+            "args": [
+              1
+            ]
+          },
+          {
+            "type": "goodwill",
+            "args": [
+              "tenant",
+              6
+            ]
+          }
+        ]
+      }
+    ],
+    "scale": {
+      "minLabel": "Keep resources",
+      "maxLabel": "Host the walkthrough",
+      "levels": [
+        {
+          "label": "Keep the cash and points",
+          "effects": []
+        },
+        {
+          "label": "Host the walkthrough",
+          "effects": [
+            {
+              "type": "owedAp",
+              "args": [
+                1
+              ]
+            },
+            {
+              "type": "goodwill",
+              "args": [
+                "tenant",
+                6
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "note": "First-campus-only scenario-scheduled choice. No random odds and not globally scripted, so this card cannot draw in other scenarios."
   }
 ]
