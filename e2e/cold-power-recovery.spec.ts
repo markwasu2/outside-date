@@ -10,7 +10,7 @@ test('a player who overlooks power can inspect the actual blocker and recover wi
   const panel=page.getByTestId('simple-object-panel');if(await panel.count())await panel.getByRole('button',{name:'Close',exact:true}).click();
   await page.getByTestId('simple-next-month').click();
  }
- await expect(page.getByTestId('simple-feedback')).toContainText('Final testing needs power.');await page.locator('[data-campus-object="H1"]').click();await expect(page.getByTestId('simple-object-panel')).toContainText('power');await page.screenshot({path:'/tmp/cold-missed-power.png'});
+ await expect(page.getByTestId('simple-feedback')).toContainText('Final testing needs power.');await page.locator('[data-campus-object="H1"]').click();await expect(page.getByTestId('simple-object-panel')).toContainText('power');await page.screenshot({path:'/tmp/cold-missed-power.png'});await page.getByTestId('night-view').click();await expect(page.getByTestId('hall-night-lights')).toHaveCount(0);await page.getByTestId('night-view').click();
  await page.getByTestId('inspect-power').click();await expect(page.getByTestId('simple-object-panel')).toContainText('Power connection');
  await page.getByTestId('simple-object-panel').getByRole('button',{name:'Start power study',exact:true}).click();await page.getByTestId('simple-object-panel').getByRole('button',{name:'Order electrical equipment',exact:true}).click();await page.getByTestId('simple-object-panel').getByRole('button',{name:'Close',exact:true}).click();
  for(let i=0;i<14;i++){
