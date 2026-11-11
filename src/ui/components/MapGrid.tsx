@@ -642,7 +642,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
       <div
         {...selectableCellProps(boardPopover === 'powerPlants', () => openObject('powerPlants', null))}
         ref={(el) => { if (el) { el.dataset.campusObject = 'powerPlants'; cellRefs.current.set('powerPlants', el); } }}
-        style={{ cursor: 'pointer', gridColumn: '11 / 13', gridRow: '4 / 8', background: '#bcaaa4', ...cellStyle, justifyContent: 'flex-start', padding: 4 }}
+        style={{ cursor: 'pointer', gridColumn: '11 / 13', gridRow: '4 / 8', background: '#bcaaa4', ...cellStyle, justifyContent: 'flex-start', padding: 4, paddingTop:simple?30:4 }}
         data-scene-object="plants"
         aria-label="Power plants"
         title="Power plants"
