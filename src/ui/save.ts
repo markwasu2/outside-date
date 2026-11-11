@@ -2,7 +2,7 @@ import type {MonthReview} from './board/monthReview';
 import { emptyCapital, type DifficultyId, type NegotiationChoices } from '../engine/init';
 import tuningJson from '../../content/tuning.json';
 import { migrateSiteId } from '../content/sites';
-import type { GameState } from '../engine/types';
+import type { GameState,PlannedAction } from '../engine/types';
 import type { FinancialSnapshot } from './financials';
 
 /** P10.1: bump this whenever `SaveFile`'s shape changes incompatibly. v2 (Phase 2, D1) adds
@@ -28,6 +28,8 @@ export interface SaveFile {
   financialSnapshots: FinancialSnapshot[];
   /** Optional UI history. Old saves still load without a prior-month report. */
   monthReview?:MonthReview|null;
+  /** Orders already charged before reload, for the next receipt only. Never replayed. */
+  currentMonth?:{before:GameState;actions:PlannedAction[]}|null;
 }
 
 /** Accepts a parsed save of any known version and returns a current-version SaveFile, or null
@@ -153,7 +155,7 @@ export function saveGame(save: SaveFile): void {
     localStorage.setItem(SAVE_KEY, JSON.stringify(save));
   } catch {
     // Last-month history is optional. If storage is tight, still save the game itself.
-    if(save.monthReview){try{const core={...save};delete core.monthReview;localStorage.setItem(SAVE_KEY,JSON.stringify(core));}catch{/* Storage itself may be unavailable. */}}
+    if(save.monthReview||save.currentMonth){try{const core={...save};delete core.monthReview;delete core.currentMonth;localStorage.setItem(SAVE_KEY,JSON.stringify(core));}catch{/* Storage itself may be unavailable. */}}
   }
 }
 
