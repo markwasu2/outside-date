@@ -426,7 +426,9 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
               }}
               title={`${hall.id}: ${look.label}`}
             >
-              <div style={{ position: 'absolute', top: 1, left: 3, fontSize: '0.7rem', zIndex: 2 }}>
+              <div data-testid={`hall-sign-${hall.id}`} style={{ position: 'absolute', top: 1, left: 3, fontSize: '0.7rem', zIndex: 2,
+                ...(simple?{background:selected?'#305d48':'#405e53',color:'#fff9e8',padding:'2px 7px',borderRadius:'4px 4px 0 0',border:'1px solid #e0e2c8',boxShadow:'0 1px 3px #243d3426',lineHeight:'16px',pointerEvents:'none' as const}:{}),
+              }}>
                 <strong>{hall.id}</strong>
               </div>
               {/* UX legibility: the stage in words plus what the hall is waiting on. */}
@@ -439,9 +441,10 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
                   fontSize: '0.6rem',
                   zIndex: 2,
                   pointerEvents: 'none',
-                  padding: '0 3px',
-                  borderRadius: 3,
-                  background: blocked ? '#fff1cc' : 'rgba(255,253,248,0.85)',
+                  padding: simple?'2px 6px':'0 3px',
+                  borderRadius: simple?'0 4px 4px 4px':3,
+                  ...(simple?{border:'1px solid #b0b79b',boxShadow:'0 1px 3px #243d3426',lineHeight:'14px'}:{}),
+                  background: blocked ? '#fff1cc' : simple?'#fbfaef':'rgba(255,253,248,0.85)',
                   borderLeft: blocked ? '3px solid #a66517' : undefined,
                   color: '#3a3026',
                   maxWidth: '90%',
