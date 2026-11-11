@@ -175,7 +175,21 @@ def hall(stage):
   s+=box(x,-27,49,2,24,1.5,'#d0d8d1','#869d98','#627d7b')
  s+=line(p(-43,-29,50),p(45,-29,50),'#b3c7c4',2)
  s+=line(p(-43,-31,50),p(45,-31,50),'#526f73',.7)
- s+=box(-38,10,49,65,18,8,'#afc4b3','#7c9c91','#688b82')
+ # Separate air-handler cabinets, louver faces and low ducts replace a blank roof block.
+ # Keep this service row clear of the delivered solar modules at y=18..33.
+ s+='<g data-testid="hall-roof-air-handlers">'
+ for x in (-38,-15,8):
+  s+=poly([p(x+3,2,48.6),p(x+23,2,48.6),p(x+23,18,48.6),p(x+3,18,48.6)],'#304e5d','none')
+  s+=box(x,0,48.5,19,15,1.5,'#6e8587','#4c696c','#3a5861')
+  s+=box(x+1,1,50,17,12,9,'#c3cec4','#90a79d','#658780')
+  # Folded lid, two access doors and a recessed bank of horizontal intake blades.
+  s+=line(p(x+1,6,59.2),p(x+18,6,59.2),'#e3e8d7',.7)
+  s+=line(p(x+9.5,13.1,51),p(x+9.5,13.1,58),'#486a68',.65)
+  for xx in (x+7,x+12):s+=line(p(xx,13.3,54),p(xx,13.3,55.5),'#d9dfc9',.7)
+  s+=poly([p(x+18.2,3,52),p(x+18.2,11,52),p(x+18.2,11,57),p(x+18.2,3,57)],'#36585c','#9bb4a6',.4)
+  for z in (53,54.5,56):s+=line(p(x+18.4,3.5,z),p(x+18.4,10.5,z),'#aec4b5',.55)
+  s+=box(x+5,-3,49,9,4,4,'#aebfbb','#849e99','#5c7d7b')
+ s+='</g>'
  if stage in ('rfs','delivered'):
   s+=box(-72,28,1,7,8,13,TEAL,'#456b66',DARK)
   for x in (-35,8,47):s+=box(x,51,1,5,5,2,'#8da97c','#6f8f65','#637d59')
