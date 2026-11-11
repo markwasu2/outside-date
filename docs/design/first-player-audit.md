@@ -124,3 +124,8 @@ One-screen goal, ready-made first campus, cash and action points, build controls
 - Simple Contacts now shows the actual named character, portrait and recorded response after a visit, with the group's live trust total. No new dialogue, effect or random draw is introduced.
 - The panel returns to the response after a lower-row visit so it is not silently above the scroll position. Undo removes an undone visit; moving to the next month clears the current-month response.
 - Inspected town and tenant responses at desktop size. Browser checks compare the exact engine log/member/trust, undo, lower-row visibility and month expiry. Both full desktop journeys, opening offers, Money panel checks, lint/build and built decoding pass.
+
+## November 10 late evening: make financing confirmation visible
+- A real bridge-loan playthrough revealed the new arrival row was above the scroll position after choosing financing lower in the list. Money now returns to the current-position summary when pending financing changes.
+- Actual pixels show the arrival confirmation, current cash and debt together. A real-action browser test verifies the confirmation is in view without scrolling, pending proceeds are not cash yet, and undo restores the entire previous summary.
+- Both full desktop journeys, Money state/real-bridge tests, contact response/undo and built decoding pass. Lint/build/diff checks pass. The prior 182 baseline completed all 174 browser and 699 unit cases.
