@@ -365,12 +365,27 @@ def compound(kind):
   for y in (16,21):s+=line(p(-82,y,8),p(80,y,8),'#adc8c3',3)
   s+=box(-85,50,1,31,12,16,'#c9d4c5','#8fa9a0','#5b817e')
  else:
+  s+='<g data-testid="backup-generator-detail">'
   for x in (-78,-20,38):
-   s+=box(x,-41,2,42,71,23,'#d3d2b7','#9ba896','#68847c')
-   for y in range(-35,22,5):s+=line(p(x+42,y,7),p(x+42,y,20),'#3b6065',1)
-   s+=box(x+5,-30,25,9,9,22,'#bac9be','#8ba49c','#496f75')
+   # Enclosed backup sets: low plinth, folded roof and two visible service faces.
+   s+=box(x-1,-42,1,44,73,2,'#80958a','#607c72','#46685f')
+   s+=box(x,-41,3,42,71,22,'#d3d2b7','#9ba896','#68847c')
+   s+=box(x-.5,-41.5,25,43,72,1,'#e0dfc7','#b1bba5','#7e998a')
+   for xx in (x+14,x+28):s+=line(p(xx,-40,26.2),p(xx,29,26.2),'#bbc1a9',.6)
+   # Recessed side intakes with bright blades and a quieter lower panel seam.
+   s+=poly([p(x+42.2,-32,8),p(x+42.2,20,8),p(x+42.2,20,21),p(x+42.2,-32,21)],'#294e55','#93aa99',.5)
+   for y in range(-30,20,5):s+=line(p(x+42.4,y,9),p(x+42.4,y,20),'#829f90',1.1)
+   s+=line(p(x+42.3,-37,6),p(x+42.3,25,6),'#466d68',.7)
+   # Front access doors and small control cabinet, not glowing windows.
+   for xx in (x+4,x+23):
+    s+=poly([p(xx,30.2,5),p(xx+15,30.2,5),p(xx+15,30.2,22),p(xx,30.2,22)],'#8fa28e','#c5cbb0',.55)
+    s+=line(p(xx+12,30.4,12),p(xx+12,30.4,15),'#d9d9bd',1)
+   s+=poly([p(x+6,30.5,16),p(x+12,30.5,16),p(x+12,30.5,20),p(x+6,30.5,20)],'#385b60','#b3c5aa',.4)
+   s+=line(p(x+25,30.5,19),p(x+30,30.5,19),'#d6bc73',1.1)
+   s+=box(x+5,-30,26,9,9,21,'#bac9be','#8ba49c','#496f75')
+   for z in (31,39,45):s+=line(p(x+14,-29,z),p(x+14,-21,z),'#c1cbb8',.6)
    s+=box(x+4,-31,47,11,11,2,'#536d70','#435d60','#304e56')
-   s+=poly([p(x+6,30,10),p(x+30,30,10),p(x+30,30,17),p(x+6,30,17)],'#b7c99e','#718876',.4)
+  s+='</g>'
   s+=box(-81,44,1,53,15,16,'#b0c4bb','#739892','#416e77')
   for x in (-74,-60,-46):s+=line(p(x,59,4),p(x,59,15),'#456973',.8)
  for x in (-90,84):
