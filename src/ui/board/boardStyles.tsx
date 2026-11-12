@@ -90,7 +90,8 @@ export function BoardStyles() {
       [data-simple-campus="true"] [data-simple-hidden="true"], [data-simple-local-grid="true"] [data-scene-object="plants"] { visibility:hidden; pointer-events:none; }
       [data-simple-campus="true"] [data-testid="hall-art-frame"] {max-width:520px !important;max-height:410px !important;}
       [data-night="true"]::before {content:'';position:absolute;inset:0;background:#102c50aa;z-index:0;pointer-events:none;}
-      [data-night="true"] [data-testid="hall-art-frame"] img, [data-night="true"] [data-scene-object] > img {filter:brightness(.68) saturate(.76) drop-shadow(4px 8px 6px #101e31aa);}
+      [data-night="true"] [data-scene-object] > img {filter:brightness(.68) saturate(.76) drop-shadow(4px 8px 6px #101e31aa);}
+      [data-night="true"] [data-testid="hall-art-frame"] img {filter:brightness(.68) saturate(.76);}
       /* Flat surveys and low foundations never cast a floating night silhouette. */
       [data-night="true"] [data-testid="hall-art-frame"] img[data-art-stage="notStarted"] {filter:brightness(.68) saturate(.76);}
       [data-night="true"] [data-testid="hall-art-frame"] img[data-art-stage="pad"] {filter:brightness(.68) saturate(.76) drop-shadow(1px 2px 1px #101e3140);}
