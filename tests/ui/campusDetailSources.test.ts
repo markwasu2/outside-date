@@ -23,6 +23,7 @@ import backup from '../../src/assets/campus/compound-backup.svg?raw';
 import cabinet from '../../src/assets/campus/substation-done.svg?raw';
 import office from '../../src/assets/campus/tile-site-office.svg?raw';
 describe('authored campus detail sources',()=>{
+ it('keeps finished hall contact shadows close to the ground',()=>{for(const art of [entranceShell,entranceReady]){expect(art).toContain('dx="2" dy="3" stdDeviation="1"');expect(art).not.toContain('dx="7" dy="10"');}});
  it('grounds crew figures with individual contact shadows instead of a raised display plinth',()=>{expect(crew.split('grounded-crew-figures')).toHaveLength(2);expect(crew.match(/<polygon/g)).toHaveLength(9);expect(crew).not.toContain('<g filter="url(#shadow)">');expect(crew.match(/<ellipse/g)).toHaveLength(3);});
  it('gives delivered transformers one tank, radiator bank and ceramic bushing set',()=>{for(const marker of ['transformer-tank-assembly','transformer-cooling-fins','transformer-ceramic-bushings'])expect(transformer.split(marker)).toHaveLength(2);});
  it('models delivery truck running gear, cab access and front equipment once',()=>{for(const marker of ['delivery-truck-chassis','delivery-truck-cab-detail','delivery-truck-front-detail'])expect(truck.split(marker)).toHaveLength(2);});
