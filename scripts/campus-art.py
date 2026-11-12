@@ -579,12 +579,14 @@ def construction_yard(kind):
  return s
 
 def people():
- s=box(-55,-26,-2,110,52,3,'#ded0af','#c1b18c','#ac9f80')
+ s='<g data-testid="grounded-crew-figures">'
  for x,y,col in [(-30,0,TEAL),(0,6,GOLD),(30,0,TEAL)]:
-  s+=line(p(x-5,y,1),p(x-4,y,24),DARK,6)+line(p(x+5,y,1),p(x+4,y,24),DARK,6)
+  cx,cy=p(x,y,0)
+  s+=f'<ellipse cx="{cx+1:.1f}" cy="{cy+1:.1f}" rx="10" ry="3.2" fill="#294c3d" opacity=".24"/>'
+  s+=line(p(x-5,y,1),p(x-4,y,24),DARK,5)+line(p(x+5,y,1),p(x+4,y,24),DARK,5)
   s+=box(x-8,y-6,23,16,12,24,col,col,DARK)
-  cx,cy=p(x,y,55);s+=f'<circle cx="{cx}" cy="{cy}" r="7" fill="#d8ad7c" stroke="{INK}" stroke-width="1.5"/><path d="M{cx-9},{cy-2} q0,-12 18,0z" fill="{GOLD}" stroke="{INK}" stroke-width="1.5"/>'
- return s
+  cx,cy=p(x,y,53);s+=f'<circle cx="{cx}" cy="{cy}" r="5.5" fill="#d8ad7c" stroke="{INK}" stroke-width="1.5"/><path d="M{cx-7},{cy-2} q0,-10 14,0z" fill="{GOLD}" stroke="{INK}" stroke-width="1.5"/>'
+ return s+'</g>'
 
 def compound(kind):
  s=box(-95,-68,-3,190,136,4,'#98a9a4','#6e8480','#526f6c')
@@ -697,7 +699,7 @@ def save(name,body):
  # Detail groups belong inside the scene shadow only for the office entry rails.
  if name=='tile-site-office':body+=detail;detail=''
  # Keep surveyed ground flat and foundation contact tight to the soil.
- if name in ('hall-not-started','substation-planned'):body_group='<g>'+body+'</g>'
+ if name in ('hall-not-started','substation-planned','campus-people'):body_group='<g>'+body+'</g>'
  elif name=='hall-pad':
   defs=defs.replace('dx="7" dy="10" stdDeviation="4"','dx="2" dy="3" stdDeviation="1"')
   body_group='<g filter="url(#shadow)">'+body+'</g>'
