@@ -1,3 +1,4 @@
+import excavator from '../../src/assets/campus/vehicle-excavator.svg?raw';
 import substationConstruction from '../../src/assets/campus/substation-building.svg?raw';
 import substationReady from '../../src/assets/campus/substation-done.svg?raw';
 import construction from '../../src/assets/campus/plant-building.svg?raw';
@@ -16,6 +17,7 @@ import backup from '../../src/assets/campus/compound-backup.svg?raw';
 import cabinet from '../../src/assets/campus/substation-done.svg?raw';
 import office from '../../src/assets/campus/tile-site-office.svg?raw';
 describe('authored campus detail sources',()=>{
+ it('draws continuous excavator tracks, hydraulic cylinders and an open toothed bucket',()=>{for(const marker of ['excavator-tracked-undercarriage','excavator-cab-and-hydraulics','excavator-digging-bucket'])expect(excavator.split(marker)).toHaveLength(2);});
  it('keeps unfinished supports and staging out of the finished power connection',()=>{expect(substationConstruction).toContain('substation-erection-detail');expect(substationConstruction).toContain('substation-support-frame');expect(substationReady).not.toContain('substation-erection-detail');expect(substationReady).not.toContain('substation-support-frame');});
  it('shows plant erection only before the plant is online',()=>{expect(construction).toContain('plant-construction-frame');expect(construction).toContain('plant-construction-lifting');expect(online).not.toContain('plant-construction-frame');expect(online).not.toContain('plant-construction-lifting');});
  it('keeps every supplementary detail in its generated asset exactly once',()=>{

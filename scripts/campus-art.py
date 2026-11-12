@@ -326,11 +326,45 @@ def vehicle(kind):
   s+=line(p(65,0,63),p(65,0,58),INK,2)+line(p(65,0,58),p(69,0,57),INK,2)
   for x,y in [(-39,-21),(35,22),(-39,22),(35,-21)]:s+=box(x,y,0,7,6,3,'#6a7c76','#435654','#2d454b')
  elif kind=='excavator':
-  s=box(-35,-20,1,65,36,10,DARK,DARK,DARK)+box(-29,-15,12,50,27,13,GOLD,'#b5863a','#a67831')+box(-20,-12,25,20,24,22,IVORY,'#9bb5aa',TEAL)
-  s+=pane(-18,12,28,15,15)
-  for x in (-27,-15,-3,9,21):s+=wheel(x,18,7,6)
-  for xx in range(-26,20,5):s+=line(p(xx,18,3),p(xx+2,18,12),'#738078',.8)
-  s+=line(p(11,0,28),p(47,0,59),GOLD,9)+line(p(47,0,59),p(65,0,16),GOLD,7)+box(60,-12,0,19,25,12,DARK,TEAL,DARK)
+  s='<g data-testid="excavator-tracked-undercarriage">'
+  # Continuous crawler shoes surround the rollers instead of five loose road wheels.
+  s+=box(-35,-20,1,65,36,10,DARK,DARK,DARK)
+  for y in (-20,18):
+   s+=poly([p(-33,y,4),p(-36,y,9),p(-31,y,14),p(23,y,14),p(29,y,9),p(25,y,3)],'#283f42','#71867b',1.1)
+   for x in (-27,-15,-3,9,21):s+=wheel(x,y,8,5)
+   for xx in range(-30,26,5):
+    s+=line(p(xx,y,3),p(xx+3,y,3),'#a0ab91',.8)
+    s+=line(p(xx,y,14),p(xx+3,y,14),'#8b9a84',.8)
+  s+='</g>'
+  s+=box(-29,-15,12,50,27,13,GOLD,'#b5863a','#a67831')+box(-20,-12,25,20,24,22,IVORY,'#9bb5aa',TEAL)
+  s+='<g data-testid="excavator-cab-and-hydraulics">'+pane(-18,12,28,15,15)
+  # Cab rear glass, door rail, engine vents and top service hatch.
+  s+=poly([p(.3,-9,29),p(.3,8,29),p(.3,8,43),p(.3,-9,43)],'url(#glass)','#c2d2bf',.7)
+  s+=line(p(-10,12.3,28),p(-10,12.3,43),'#dce3c7',.7)
+  s+=line(p(-17,12.4,27),p(-3,12.4,27),'#546d6c',1)
+  for x in range(3,18,3):s+=line(p(x,12.3,16),p(x,12.3,22),'#6f704d',1)
+  s+=dock_box(5,-10,25.2,12,14,.8,'#e1b75d','#a38343','#8a793f')
+  s+=line(p(14,-9,26),p(14,-9,33),'#44565a',2)
+  s+=line(p(11,0,28),p(47,0,59),GOLD,9)+line(p(47,0,59),p(65,0,16),GOLD,7)
+  # Paired cylinders and bright piston rods follow the existing arm geometry.
+  for start,end in [((16,2,31),(36,2,50)),((46,2,52),(57,2,26))]:
+   s+=line(p(*start),p(*end),'#6b7164',3.3)
+  s+=line(p(29,2,43),p(43,2,56),'#d6dfd0',1.4)
+  s+=line(p(53,2,34),p(62,2,17),'#d6dfd0',1.4)
+  for x,z in [(11,28),(47,59),(65,16)]:
+   cx,cy=p(x,1,z);s+=f'<circle cx="{cx}" cy="{cy}" r="2.3" fill="#6e7661" stroke="#e4bf67" stroke-width=".8"/>'
+  s+='</g>'
+  # Preserve registered materials while replacing the former solid box bucket.
+  box(60,-12,0,19,25,12,DARK,TEAL,DARK)
+  s+='<g data-testid="excavator-digging-bucket">'
+  s+=poly([p(61,-12,15),p(77,-12,12),p(82,-12,1),p(65,-12,0)],'#647d76')
+  s+=poly([p(61,13,15),p(77,13,12),p(82,13,1),p(65,13,0)],'#47645f')
+  s+=poly([p(65,-12,0),p(82,-12,1),p(82,13,1),p(65,13,0)],'#2d4549')
+  s+=poly([p(61,-12,15),p(61,13,15),p(65,13,0),p(65,-12,0)],'#334e50')
+  s+=line(p(77,-12,12),p(77,13,12),'#adba9d',1)
+  for y in (-10,-3,4,11):s+=poly([p(80,y,1),p(85,y,-1),p(85,y+2,-1),p(80,y+2,1)],'#c3c5a6')
+  s+='</g>'
+
  else:
   s=box(-44,-21,10,58,40,24,'#d5d7c7','#aebcae','#8ca597')+box(15,-21,8,28,40,22,GOLD,'#bd8e42','#a77e3b')+box(19,-19,30,21,36,6,IVORY,'#aac3b6',TEAL)
   for x in (-31,-15,29):s+=wheel(x,21,8,8)
