@@ -68,3 +68,11 @@ export function standardEquipmentWords(kind:'switchgear'|'transformer',state:Gam
  const min=kind==='switchgear'?power.switchgearLeadMin:power.transformerLeadMonths,max=kind==='switchgear'?power.switchgearLeadMax:power.transformerLeadMonths;
  return `Standard: ${formatDollars(deposit+balance)} total. ${formatDollars(deposit)} deposit now, ${formatDollars(balance)} on arrival. Takes ${leadWithIndex(min,index,markets.leadElasticity)}-${leadWithIndex(max,index,markets.leadElasticity)} months.`;
 }
+
+/** Keep the stage and progress readable without repeating "building" over the roof. */
+export function simpleHallCaption(caption:string,progress:number|null):string {
+ const words=plainWords(caption).replace('Delivered','Open for rent').replace('Not started - ','').replace('site not bought yet','Buy the land first').replace(/^Pad - /,'Foundation - ');
+ if(words==='Final testing - waiting on power hookup')return 'Final testing needs power';
+ if(progress!==null&&/ - (building|testing)$/.test(words))return `${words.replace(/ - (building|testing)$/,'')}: ${Math.round(progress*100)}%`;
+ return words+(progress!==null?` (${Math.round(progress*100)}%)`:'');
+}

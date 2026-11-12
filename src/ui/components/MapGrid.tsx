@@ -4,7 +4,7 @@ import {CampusCompound} from '../board/CampusCompound';
 import {CampusLife} from '../board/CampusLife';
 import {TycoonObjectPanel} from '../board/TycoonObjectPanel';
 import {TycoonMapControl} from '../board/TycoonMapControl';
-import {plainWords} from '../board/simpleWords';
+import {simpleHallCaption,plainWords} from '../board/simpleWords';
 import campusPeopleImg from '../../assets/campus/campus-people.svg';
 import {siteTerrain} from '../board/siteTerrain';
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
@@ -436,6 +436,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
               {/* UX legibility: the stage in words plus what the hall is waiting on. */}
               <div
                 data-testid={`caption-${hall.id}`}
+                title={hallCaption(draft,content,hall)}
                 style={{
                   position: 'absolute',
                   top: 23,
@@ -452,7 +453,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
                   maxWidth: '90%',
                 }}
               >
-                {simple ? plainWords(hallCaption(draft, content, hall)).replace('Delivered','Open for rent').replace('Not started - ','').replace('site not bought yet','Buy the land first') : hallCaption(draft, content, hall)}{hall.stageActive && !hall.delivered && !hall.terminated ? ` (${Math.round(visual.progress0to1 * 100)}%)` : ''}
+                {simple ? simpleHallCaption(hallCaption(draft, content, hall),hall.stageActive && !hall.delivered && !hall.terminated?visual.progress0to1:null) : <>{hallCaption(draft, content, hall)}{hall.stageActive && !hall.delivered && !hall.terminated ? ` (${Math.round(visual.progress0to1 * 100)}%)` : ''}</>}
               </div>
               {/* Phase 6 (spatial spike): the pad chip. Unbroken halls are unplaced; broken
                   ground fixes near (adjacent to the substation, free) or far (feeder + line
