@@ -224,9 +224,37 @@ def substation(stage):
   for x,y in [(-30,-10),(26,12)]:
    s+=line(p(x-4,y),p(x+4,y),'#8d8468',.85)+line(p(x,y-4),p(x,y+4),'#8d8468',.85)
   return s+bollards()+'</g>'
+ if stage=='building':
+  # Rear gantry is behind the transformer, before the foreground detail pass.
+  s+='<g data-testid="substation-support-frame">'
+  for x in (-45,30):s+=dock_box(x,-43,1,3,3,52,'#bdcbbd','#829f94','#5f807b')
+  s+=line(p(-44,-43,53),p(31,-43,53),'#64877f',3)
+  for x in (-32,-2,24):s+=line(p(x,-43,49),p(x,-43,43),'#a6b7aa',2)
+  s+='</g>'
  s+=box(-50,-30,1,42,40,28,'#b7c5ba','#8ba398','#65877f')
  for x in (-44,-31,-18): s+=box(x,-34,7,3,4,18,TEAL,'#76988c',DARK)
- if stage=='building':return s+bollards()
+ if stage=='building':
+  s+='<g data-testid="substation-erection-detail">'
+  # Transformer tank ribs and bushings are installed, but buswork is not connected.
+  for x in range(-47,-9,5):
+   s+=dock_box(x,10,4,2,5,20,'#b2c2b5','#7e9c94','#4f7277')
+  for x in (-44,-31,-18):
+   for z in (11,15,19,23):s+=dock_box(x-1,-35,z,5,6,.8,'#d1d8bf','#a7b8a6','#76938b')
+  # Low opposite posts leave the high-voltage span unfinished.
+  for x in (-45,30):s+=dock_box(x,40,1,3,3,24,'#bdcbbd','#829f94','#5f807b')
+  # A short open cable trench, cabinet deliveries and a temporary striped barrier.
+  s+=line(p(-4,-24,1.6),p(49,-24,1.6),'#657970',4)
+  s+=line(p(49,-24,1.6),p(49,28,1.6),'#657970',4)
+  s+=line(p(-4,-24,2),p(49,-24,2),'#c0bda1',1)
+  for y in (-7,12):
+   s+=dock_box(19,y,1,22,13,3,'#b6bea6','#8c9c89','#6c8378')
+   s+=dock_box(23,y+2,4,13,9,16,'#d9deca','#acbeb0','#7d9c92')
+   s+=line(p(23,y+11,15),p(36,y+11,15),'#e9e6cf',1)
+   s+=line(p(29,y+11,5),p(29,y+11,19),'#75938b',.8)
+  for x in (1,37):s+=line(p(x,46,1),p(x,46,14),'#6d8275',2)
+  s+=line(p(1,46,12),p(37,46,12),'#e0c177',5)
+  for x in (4,16,28):s+=line(p(x,46,10),p(x+4,46,14),'#927448',2)
+  return s+bollards()+'</g>'
  for x in (-45,30):
   for y in (-43,40):s+=box(x,y,1,3,3,64,'#b5c7bd','#809e92','#5f7f77')
   s+=line(p(x,-43,65),p(x,43,65),TEAL,3)
