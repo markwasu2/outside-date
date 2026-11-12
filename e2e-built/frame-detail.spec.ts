@@ -10,5 +10,5 @@ test('built foundation and frame art decode through real construction',async({pa
   await page.locator('[data-testid="hall-art-frame"] img').evaluateAll(images=>Promise.all(images.map(img=>(img as HTMLImageElement).decode())));
   if(i===0){await page.screenshot({path:'/tmp/steel-built-foundation.png'});await page.getByTestId('night-view').click();await expect(page.locator('[data-testid=hall-art-frame] img[data-art-stage=pad]').first()).toHaveCSS('filter','brightness(0.68) saturate(0.76) drop-shadow(rgba(16, 30, 49, 0.25) 1px 2px 1px)');await page.screenshot({path:'/tmp/foundation-contact-night.png'});await page.getByTestId('night-view').click();}
  }
- await expect(page.locator('[data-milestone="frame"]')).toHaveAttribute('data-complete','true');await page.screenshot({path:'/tmp/steel-built-frame.png'});
+ await expect(page.locator('[data-milestone="frame"]')).toHaveAttribute('data-complete','true');const frame=page.locator('[data-art-stage=steel]').first();const src=await frame.getAttribute('src');expect(await page.evaluate(async src=>(await(await fetch(src!)).text()).includes('hall-frame-bracing'),src)).toBe(true);await page.screenshot({path:'/tmp/steel-built-frame.png'});await page.getByTestId('night-view').click();await page.screenshot({path:'/tmp/steel-built-frame-night.png'});
 });
