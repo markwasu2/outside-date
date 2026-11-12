@@ -7,7 +7,7 @@ export function HallNightLights(){
   <defs><radialGradient id="entry-night-light"><stop stopColor="#ffd68b" stopOpacity=".36"/><stop offset="1" stopColor="#ffd68b" stopOpacity="0"/></radialGradient></defs>
   <ellipse cx={ground[0]} cy={ground[1]} rx="30" ry="10" fill="url(#entry-night-light)"/>
   {[-54,-18,36].map((x,i)=><polygon key={x} points={pane(x,40.2,32,13,7)} fill={i===1?'#a6c8b2':'#e5c28c'} opacity={i===1?.56:.72} stroke="#47615e" strokeWidth=".6"/>)}
-  {[-51,-43,-35].map(x=><g key={x}><polygon points={pane(x,42.4,7,5,19)} fill="#f0d199" opacity=".88"/><path d={`M${project(x+2.5,42.4,7).join(',')}L${project(x+2.5,42.4,26).join(',')}`} stroke="#4f6b68" strokeWidth=".55"/></g>)}
-  <path d={`M${project(-54,50,25.7).join(',')}L${project(-25,50,25.7).join(',')}`} stroke="#f4dca4" strokeWidth="1.4" opacity=".85"/>
+  <g data-testid="hall-entry-night-glazing">{[-51,-43,-35].map(x=><g key={x}><polygon points={pane(x,50.4,7,5,19)} fill="#f0d199" opacity=".88"/><path d={`M${project(x+2.5,50.4,7).join(',')}L${project(x+2.5,50.4,26).join(',')}`} stroke="#4f6b68" strokeWidth=".55"/></g>)}</g>
+  <path d={`M${project(-54,56,26.8).join(',')}L${project(-27,56,26.8).join(',')}`} stroke="#f4dca4" strokeWidth="1.4" opacity=".85"/>
  </svg>;
 }
