@@ -446,6 +446,11 @@ def compound(kind):
 
 def save(name,body):
  if ONLY_HALLS and not name.startswith("hall-"):return
+ # Full authored templates keep their exact SVG defs, geometry and formatting.
+ template=Path('scripts/campus-templates')/(name+'.svg')
+ if template.exists():
+  (OUT/(name+'.svg')).write_bytes(template.read_bytes())
+  return
  defs='<defs><radialGradient id="foliage" cx="30%" cy="25%"><stop stop-color="#c6d58b"/><stop offset=".4" stop-color="#729558"/><stop offset="1" stop-color="#355d47"/></radialGradient><linearGradient id="glass" x2="1" y2="1"><stop stop-color="#b4d8dc"/><stop offset=".45" stop-color="#4f7d8a"/><stop offset=".5" stop-color="#b3cace"/><stop offset="1" stop-color="#355461"/></linearGradient><filter id="shadow" x="-35%" y="-35%" width="180%" height="190%"><feDropShadow dx="7" dy="10" stdDeviation="4" flood-color="#223c3c" flood-opacity=".32"/></filter>'
  for key,(c,face) in GRADIENTS.items():
   if f'url(#{key})' not in body:continue
