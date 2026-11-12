@@ -98,7 +98,6 @@ export function BoardStyles() {
       [data-simple-campus="true"] [data-testid^="pad-"] { display:none; }
       [data-simple-campus="true"] [data-scene-object="hall"] > div:first-child { font-size:13px !important; }
       [data-simple-campus="true"] [data-testid^="caption-"] { max-width:90%; font-size:11px !important; }
-      [data-simple-campus="true"] [data-testid="map-road"] > span { transform:translateX(-160px); }
       [data-simple-campus="true"] [data-scene-object="office"] > span,
       [data-simple-campus="true"] [data-scene-object="substation"] > div { font-size:11px; }
       @keyframes boardGlowPulse {

@@ -8,6 +8,7 @@ for(const width of [1440,1280])test(`built utility yards decode through sale at 
  await expect(page.getByTestId('simple-goal')).toContainText('0/1');await expect(page.getByTestId('action-desk')).toHaveCount(0);await expect(page.getByTestId('cold-intro')).toHaveCount(0);await expect(page.getByTestId('month-review')).toHaveCount(0);
  await page.screenshot({path:`/tmp/utility-built-${width}-opening.png`});
  await expect(page.getByTestId('simple-next-month')).toBeInViewport();
+ const roadLabel=page.getByTestId('road-label-group');await expect(roadLabel).toBeVisible();const nameBox=await roadLabel.locator('span').first().boundingBox(),poleBox=await page.getByTestId('road-poles').boundingBox(),landBox=await page.locator('[data-map-control="road"] button').boundingBox();expect(nameBox&&poleBox&&landBox).toBeTruthy();expect(poleBox!.x).toBeGreaterThan(nameBox!.x+nameBox!.width);expect(Math.abs(poleBox!.y-nameBox!.y)).toBeLessThan(2);expect(poleBox!.x+poleBox!.width).toBeLessThan(landBox!.x);
  for(let month=0;month<35;month++){
   if(!await page.getByTestId('tycoon-game').count())break;
   const slider=page.getByTestId('event-scale');if(await slider.count()){await slider.fill('0');await page.getByTestId('event-choice-commit').click();}

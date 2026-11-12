@@ -306,6 +306,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
       {/* Road: no popover (D1). Phase 4: the site's transmission poles queue at the road. */}
       <div {...selectableCellProps(boardPopover === 'road', () => openObject('road', null))} ref={(el) => { if (el) { el.dataset.campusObject = 'road'; cellRefs.current.set('road', el); } }} data-testid="map-road" style={{ cursor: 'pointer', gridColumn: '1 / 13', gridRow: '1 / 2', position: 'relative', background: TILE_ART.road.bg, ...cellStyle }}>
         <ArtLayer img={TILE_ART.road.img} />
+        <div data-testid="road-label-group" style={simple?{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',display:'flex',alignItems:'center',gap:6}: {display:'contents'}}>
         <span style={ART_CHIP}>
           Land & access
         </span>
@@ -314,6 +315,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
             {siteTheme.poles} poles
           </span>
         )}
+        </div>
         {simple && <TycoonMapControl objectId="road"/>}
       </div>
 
