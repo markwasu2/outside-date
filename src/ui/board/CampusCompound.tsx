@@ -34,7 +34,7 @@ export function CampusCompound({night}:{night:boolean}){
  return <div data-testid="campus-compound" aria-hidden="true" style={{position:'absolute',inset:0,pointerEvents:'none',zIndex:2,overflow:'hidden'}}>
   {land&&<svg viewBox="0 0 1200 800" preserveAspectRatio="none" style={{position:'absolute',inset:0,width:'100%',height:'100%'}}>
    <defs><radialGradient id="site-light"><stop stopColor="#ffdf8b" stopOpacity=".32"/><stop offset="1" stopColor="#ffdf8b" stopOpacity="0"/></radialGradient></defs>
-   {started&&!fitted&&<g data-testid="construction-haul-yard" opacity={night?.64:1}>
+   {started&&!fitted&&<g data-testid="construction-haul-yard" style={{filter:night?'brightness(.6) saturate(.8)':undefined}}>
     {/* Temporary construction surfaces, not purchased roads or extra building capacity. */}
     <defs><pattern id="haul-gravel" width="19" height="17" patternUnits="userSpaceOnUse"><path d="M2 4h3m6 8h4m-11 3h2m8-13h2" stroke="#8b8b73" strokeWidth="1" opacity=".4"/></pattern></defs>
     <path d="M190 590H1005M736 590V263H1005" fill="none" stroke="#c9bc96" strokeWidth="51"/>
