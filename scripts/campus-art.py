@@ -314,17 +314,42 @@ def vehicle(kind):
  s=''
  if kind=='crane':
   s=box(-35,-20,2,65,35,12,GOLD,'#bf8b3d','#a47132')+box(-5,-12,14,20,22,16,IVORY,'#afb8aa','#78988b')
-  s+=line(p(-10,0,28),p(-15,0,112),GOLD,8)+line(p(-40,0,105),p(80,0,119),GOLD,6)+line(p(65,0,117),p(65,0,63),INK,1.5)
-  s+='<g class="crane-boom">'
-  s+=line(p(-15,0,112),p(80,0,119),'#ffe295',2)+line(p(-30,0,104),p(65,0,113),'#ab7330',1)
-  for x in range(-25,75,12):s+=line(p(x,0,106),p(x+9,0,118),'#775e36',.8)
+  # Keep the existing jib reach and silhouette, but give both structures two chords.
+  s+='<g data-testid="crane-lattice-mast">'
+  for x in (-14,-8):s+=line(p(x,0,28),p(x,0,112),GOLD,2.4)
+  for z in range(30,106,10):
+   s+=line(p(-14,0,z),p(-8,0,z+10),'#eac46c',1.1)
+   s+=line(p(-8,0,z),p(-14,0,z+10),'#947446',.9)
+   s+=line(p(-14,0,z),p(-8,0,z),'#b08a48',.9)
+  s+='</g><g class="crane-boom" data-testid="crane-lattice-jib">'
+  s+=line(p(-40,0,105),p(80,0,119),GOLD,2.2)
+  s+=line(p(-40,0,110),p(80,0,124),'#edc464',2)
+  for x in range(-40,80,10):
+   z=105+(x+40)*14/120
+   s+=line(p(x,0,z),p(x+10,0,z+6.2),'#aa8244',1)
+   s+=line(p(x,0,z+5),p(x+10,0,z+1.2),'#f0ce79',.75)
+  s+=line(p(-10,0,112),p(-29,0,109),'#4b6565',.9)
   s+='</g>'
-  for z in range(35,103,14):
-   s+=line(p(-15,0,z),p(-10,0,z+10),INK,.7)+line(p(-10,0,z),p(-15,0,z+10),'#ffe2a1',.8)
-  s+=pane(-2,10,19,14,10)
+  # Cab glass, safety rail, machinery enclosure and a stack of counterweights.
+  s+='<g data-testid="crane-cab-and-stabilizers">'+pane(-2,10,19,14,10)
+  s+=poly([p(15.3,-9,19),p(15.3,7,19),p(15.3,7,28),p(15.3,-9,28)],'url(#glass)','#789991',.6)
+  s+=line(p(15.4,-1,19),p(15.4,-1,28),'#c0d3ba',.7)
+  s+=line(p(-2,10.3,18),p(12,10.3,18),'#8e875b',.8)
+  for z in (14,17,20):s+=dock_box(-32,-14,z,19,23,2.5,'#a8b39f','#7e968b','#5b7975')
+  for x in (20,23,26):s+=line(p(x,15.2,6),p(x,15.2,11),'#8d703d',.7)
   for x in (-28,-15,0,15,27):s+=wheel(x,16,6,6)
-  s+=line(p(65,0,63),p(65,0,58),INK,2)+line(p(65,0,58),p(69,0,57),INK,2)
-  for x,y in [(-39,-21),(35,22),(-39,22),(35,-21)]:s+=box(x,y,0,7,6,3,'#6a7c76','#435654','#2d454b')
+  for x,y in [(-39,-21),(35,22),(-39,22),(35,-21)]:
+   s+=line(p(x*.7,y*.65,6),p(x,y,6),'#71847a',2)
+   s+=box(x,y,0,7,6,3,'#6a7c76','#435654','#2d454b')
+   s+=line(p(x+3,y+3,3),p(x+3,y+3,8),'#cad1b5',1.5)
+  s+='</g><g data-testid="crane-hoist-hardware">'
+  s+=line(p(64,-.6,117),p(64,-.6,63),'#4b5e5c',.85)
+  s+=line(p(66,.6,117),p(66,.6,63),'#d1c491',.8)
+  s+=dock_box(61,-3,60,8,6,5,'#f1cb72','#d3a54c','#876a3a')
+  s+=line(p(65,0,60),p(65,0,56),INK,1.6)+line(p(65,0,56),p(69,0,55),INK,1.6)
+  s+=line(p(69,0,55),p(71,0,58),'#63766b',1.1)
+  s+='</g>'
+
  elif kind=='excavator':
   s='<g data-testid="excavator-tracked-undercarriage">'
   # Continuous crawler shoes surround the rollers instead of five loose road wheels.
