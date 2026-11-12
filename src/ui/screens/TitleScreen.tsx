@@ -91,7 +91,7 @@ export function TitleScreen({ scenarioId, difficultyId, onScenarioChange, onDiff
         gap: '1rem',
       }}
     >
-      <h1>Outside Date</h1>
+      <h1>Data Center Simulator</h1>
       <p style={{ maxWidth: 480, textAlign: 'center', color: '#555' }}>{content.scenarios[scenarioId]?.introText}</p>
 
       <label>

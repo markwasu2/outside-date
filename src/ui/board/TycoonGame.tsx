@@ -39,8 +39,8 @@ export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
  const button={border:'1px solid #b6af95',borderRadius:6,padding:'7px 11px',background:'#fffdf4',color:'#3f4c38',cursor:'pointer'};
  return <main data-testid="tycoon-game" style={{height:'100vh',display:'flex',flexDirection:'column',background:'#f4eddb',color:'#343c2e',fontFamily:'system-ui,sans-serif'}}>
   <BoardStyles/>
-  <header style={{display:'flex',alignItems:'center',gap:24,padding:'10px 18px',background:'#fffdf5',borderBottom:'1px solid #d6cbb0'}}>
-   <strong style={{fontFamily:'Georgia,serif',fontSize:20}}>Outside Date</strong>
+  <header style={{display:'flex',alignItems:'center',gap:16,padding:'10px 18px',background:'#fffdf5',borderBottom:'1px solid #d6cbb0'}}>
+   <strong style={{fontFamily:'Georgia,serif',fontSize:18,whiteSpace:'nowrap'}}>Data Center Simulator</strong>
    <strong data-testid="simple-month">Month {draft.month+1}</strong>
    <span title="Cash pays running costs, fees and orders. Building work can also use your committed loans and equity.">Cash <strong>{formatDollars(draft.cash)}</strong></span>
    <span title="Loans and equity already committed to construction, not extra cash to spend on running costs.">Build budget <strong>{formatDollars(buildingFunds(draft))}</strong></span>

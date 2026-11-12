@@ -12,7 +12,7 @@ export function CloseoutCampus({children,rating}:{children:ReactNode;rating:bool
   return <div data-testid="closeout-campus" style={{height:'100vh',display:'flex',flexDirection:'column',fontFamily:'Arial,sans-serif',background:'#f1eadc',color:'#302d25'}}>
     <BoardStyles />
     <header style={{display:'flex',alignItems:'center',gap:22,padding:'12px 22px',background:'#fffdf6',borderBottom:'1px solid #cdbf9f'}}>
-      <span style={{fontFamily:'Georgia,serif',fontSize:20}}>Outside Date</span><strong>{formatMonth(draft.month)} · Campaign closed</strong>
+      <span style={{fontFamily:'Georgia,serif',fontSize:20}}>Data Center Simulator</span><strong>{formatMonth(draft.month)} · Campaign closed</strong>
       <span>{draft.halls.filter(h=>h.delivered).length}/{draft.halls.length} halls delivered</span>
       <button style={{marginLeft:'auto'}} aria-expanded={lookAround} onClick={()=>setLookAround(v=>!v)}>{lookAround?'Return to closeout':'Look around campus'}</button>
       {!rating && <button title="Return to setup choices. Your closed campus stays saved until you start another campaign." onClick={()=>setScreen('start')}>Back to site gate</button>}
