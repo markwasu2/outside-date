@@ -1,3 +1,5 @@
+import construction from '../../src/assets/campus/plant-building.svg?raw';
+import online from '../../src/assets/campus/plant-online.svg?raw';
 import {describe,it,expect} from 'vitest';
 import frameDetail from '../../scripts/campus-details/hall-steel.svg?raw';
 import frame from '../../src/assets/campus/hall-steel.svg?raw';
@@ -12,6 +14,7 @@ import backup from '../../src/assets/campus/compound-backup.svg?raw';
 import cabinet from '../../src/assets/campus/substation-done.svg?raw';
 import office from '../../src/assets/campus/tile-site-office.svg?raw';
 describe('authored campus detail sources',()=>{
+ it('shows plant erection only before the plant is online',()=>{expect(construction).toContain('plant-construction-frame');expect(construction).toContain('plant-construction-lifting');expect(online).not.toContain('plant-construction-frame');expect(online).not.toContain('plant-construction-lifting');});
  it('keeps every supplementary detail in its generated asset exactly once',()=>{
   expect(fieldTemplate).toBe(field);
   for(const [source,asset] of [[frameDetail,frame],[coolingDetail,cooling],[backupDetail,backup],[cabinetDetail,cabinet],[officeDetail,office]]){const detail=source!.trim();expect(detail.startsWith('<g')).toBe(true);expect(detail.endsWith('</g>')).toBe(true);expect(asset!.split(detail)).toHaveLength(2);}

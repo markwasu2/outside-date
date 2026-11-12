@@ -239,6 +239,33 @@ def substation(stage):
  return s
 
 def plant(online):
+ if not online:
+  # An erection site, not a finished power station before its online date.
+  s='<g data-testid="plant-construction-frame">'+pad()
+  s+=dock_box(-55,-30,1,74,61,3,'#d3d9c8','#a8b9a8','#809d90')
+  for y in (-28,29):
+   for x in (-53,-18,17):s+=dock_box(x,y,4,3,3,30,'#b4c1b4','#708b86','#506f71')
+   s+=line(p(-52,y,34),p(19,y,34),'#54747a',3)
+  for x in (-52,-17,18):s+=line(p(x,-27,34),p(x,30,34),'#9fb4ad',3)
+  for x in (-41,-29,-5,7):s+=line(p(x,-27,34),p(x,30,34),'#8da49e',1.3)
+  for x in (-52,-17):
+   s+=line(p(x,30,5),p(x+35,30,33),'#5c7b7c',1.4)
+   s+=line(p(x+35,30,5),p(x,30,33),'#5c7b7c',1.4)
+  s+='</g><g data-testid="plant-construction-lifting">'
+  # Low service shell, unfinished stack bases and a fixed lifting mast.
+  s+=dock_box(24,-25,1,26,51,13,'#a5b9ac','#869e90','#617f79')
+  for y in (-17,18):s+=dock_box(32,y,14,8,8,15,'#ece9ce','#b8c4ae','#829b8b')
+  s+=dock_box(53,-42,1,13,13,5,GOLD,'#b28a43','#8c713e')
+  s+=line(p(59,-36,6),p(59,-36,91),GOLD,4)
+  s+=line(p(33,-36,85),p(70,31,94),GOLD,3.5)
+  s+=line(p(59,-36,91),p(70,31,94),'#f0d991',1)
+  s+=line(p(70,31,94),p(70,31,48),INK,1.2)
+  s+=line(p(68,31,48),p(72,31,48),INK,2)
+  for z in range(9,83,12):
+   s+=line(p(57,-36,z),p(61,-36,z+10),'#846c3f',1)
+  for x in (-57,-43,-29):s+=dock_box(x,39,2,10,7,5,'#9bad9e','#6f8e87','#537471')
+  s+=bollards()+line(p(-68,50,1),p(70,50,1),GOLD,3)
+  return s+'</g>'
  s=pad()+box(-55,-30,1,74,61,32,'#d3d9c8','#a8b9a8','#809d90')
  s+=box(22,-28,1,30,60,21,'#abc0b0','#8ba79b','#698b82')
  for x in (-43,-14):s+=box(x,-18,33,17,17,10,'#e1e4d4','#a8b9a8','#809d90')
@@ -248,10 +275,8 @@ def plant(online):
  for xx in range(-50,17,10):s+=pane(xx,31.5,17,7,9)
  for y in (-18,18):
   for z in (30,42,54,66):s+=box(33,y-1,z,9,9,.7,'#b8c6bf','#849c95','#516f72')
- if not online:s+=bollards()+line(p(-68,50,1),p(70,50,1),GOLD,4)
- else:
-  for y in (-18,18):
-   cx,cy=p(37,y+3,92);s+=f'<path d="M{cx},{cy} q-9,-9 1,-17 q10,-9 0,-18" stroke="#e7e9dd" stroke-width="7" fill="none" stroke-linecap="round"/>'
+ for y in (-18,18):
+  cx,cy=p(37,y+3,92);s+=f'<path d="M{cx},{cy} q-9,-9 1,-17 q10,-9 0,-18" stroke="#e7e9dd" stroke-width="7" fill="none" stroke-linecap="round"/>'
  return s
 
 def wheel(x,y,z=6,r=7):
