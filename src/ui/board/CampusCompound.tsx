@@ -65,6 +65,19 @@ export function CampusCompound({night}:{night:boolean}){
      <path d="M181 524l24 -8 21 12v25l-24 8 -21 -12z" fill="#b2b9a3"/>
      <path d="M181 524l21 12v25l-21 -12z" fill="#c9ccaf"/><path d="M202 536l24 -8v25l-24 8z" fill="#758c81"/>
      <path d="M178 522l27 -9 25 13 -28 11z" fill="#e1dfc2"/><path d="M187 532l11 6v12l-11 -6zM206 540l14 -5v11l-14 5z" fill={night?'#c0c79a':'#53737a'}/>
+     <g data-testid="entry-gatehouse-detail">
+      {/* Glazing, door and folded roof stay inside the existing gatehouse footprint. */}
+      <path d="M181 549l21 12 24-8v3l-24 8-21-12z" fill="#5a7769"/>
+      <path d="M181 525l21 12 25-9" stroke="#f1e8c8" strokeWidth="1" fill="none"/>
+      <path d="M185 522l20-6 20 11m-32-7 21 12m-14-14 21 11" stroke="#b1b49c" strokeWidth=".7" fill="none"/>
+      <path d="M207 540v11m6-13v11M188 533v11m5-8v11" stroke="#cfdbc1" strokeWidth=".8" fill="none"/>
+      <path d="M206 544l14-5m-32-2 10 6" stroke="#a8c6bf" strokeWidth=".6" opacity=".65" fill="none"/>
+      <path d="M183 538l4 2v9l-4-2z" fill="#526e69" stroke="#d4d4b7" strokeWidth=".6"/>
+      <path d="M185.5 544v2" stroke="#d9cb91" strokeWidth=".8"/>
+      <path d="M217 550l4-1v3l-4 1z" fill="#415f5d"/><path d="M218 550v2" stroke={night?'#d8cd87':'#a2ba91'} strokeWidth="1"/>
+      <path d="M192 558l11 7 20-7v3l-20 7-11-7z" fill="#adb49b"/>
+      <path d="M193 557l10 6 20-7-10-4z" fill="#d8d5b9"/>
+     </g>
      <path d="M195 570v36" stroke="#ebdfb8" strokeWidth="5"/><path d="M195 570v36" stroke="#a86a50" strokeWidth="5" strokeDasharray="5 5"/><circle cx="195" cy="568" r="4" fill="#4d675a"/>
      <path d="M708 579h6m-6 6h6m-6 6h6m-6 6h6m-6 6h6" stroke="#e1dec3" strokeWidth="3"/>
     </g>
