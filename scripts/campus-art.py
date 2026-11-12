@@ -212,7 +212,18 @@ def hall(stage):
 
 def substation(stage):
  s=pad()
- if stage=='planned':return plot()+bollards()+line(p(-50,-30),p(50,30),TEAL,2,'5 5')+line(p(-50,30),p(50,-30),TEAL,2,'5 5')
+ if stage=='planned':
+  s='<g data-testid="surveyed-power-plot">'
+  corners=[(-77,-57),(77,-57),(77,57),(-77,57)]
+  for i,(x,y) in enumerate(corners):
+   nx,ny=corners[(i+1)%4]
+   s+=line(p(x,y),p(nx,ny),'#ead8a8',1.2,'5 4')
+  # Surveyed conduit run and equipment center marks are ground markings, not installed gear.
+  s+=line(p(-48,-28),p(38,-28),'#8f9e85',1,'3 3')
+  s+=line(p(38,-28),p(38,28),'#8f9e85',1,'3 3')
+  for x,y in [(-30,-10),(26,12)]:
+   s+=line(p(x-4,y),p(x+4,y),'#8d8468',.85)+line(p(x,y-4),p(x,y+4),'#8d8468',.85)
+  return s+bollards()+'</g>'
  s+=box(-50,-30,1,42,40,28,'#b7c5ba','#8ba398','#65877f')
  for x in (-44,-31,-18): s+=box(x,-34,7,3,4,18,TEAL,'#76988c',DARK)
  if stage=='building':return s+bollards()
@@ -458,7 +469,7 @@ def save(name,body):
  # Detail groups belong inside the scene shadow only for the office entry rails.
  if name=='tile-site-office':body+=detail;detail=''
  # Keep surveyed ground flat and foundation contact tight to the soil.
- if name=='hall-not-started':body_group='<g>'+body+'</g>'
+ if name in ('hall-not-started','substation-planned'):body_group='<g>'+body+'</g>'
  elif name=='hall-pad':
   defs=defs.replace('dx="7" dy="10" stdDeviation="4"','dx="2" dy="3" stdDeviation="1"')
   body_group='<g filter="url(#shadow)">'+body+'</g>'
