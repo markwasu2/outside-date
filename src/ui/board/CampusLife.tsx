@@ -10,9 +10,9 @@ export function CampusLife({night=false}:{night?:boolean}){
   <svg viewBox="0 0 1200 800" preserveAspectRatio="none" style={{width:'100%',height:'100%',position:'absolute',inset:0}}>
    <defs><linearGradient id="traffic-body" x2="0" y2="1"><stop stopColor="#eef1e5"/><stop offset="1" stopColor="#a5b5ae"/></linearGradient><linearGradient id="headlight-east"><stop stopColor="#ffe5a1" stopOpacity=".26"/><stop offset="1" stopColor="#ffe5a1" stopOpacity="0"/></linearGradient><linearGradient id="headlight-west"><stop stopColor="#ffe5a1" stopOpacity="0"/><stop offset="1" stopColor="#ffe5a1" stopOpacity=".26"/></linearGradient><linearGradient id="headlight-service" x2="0" y2="1"><stop stopColor="#ffe5a1" stopOpacity=".26"/><stop offset="1" stopColor="#ffe5a1" stopOpacity="0"/></linearGradient></defs>
    <g className={reduced?undefined:'campus-traffic-east'} transform="translate(260 36)" data-testid="ambient-truck">
-    {night&&<g data-testid="road-truck-headlights"><path d="M25 -4l64 -14v34L25 4z" fill="url(#headlight-east)"/><path d="M25 -4v2m0 4v2" stroke="#fff0bc" strokeWidth="2.5"/><path d="M-24 -4v2m0 4v2" stroke="#d87855" strokeWidth="1.7"/></g>}
-    <g data-testid="road-freight-vehicle">
-     <ellipse cx="1" cy="4" rx="25" ry="8" fill="#183a35" opacity=".2"/>
+    {night&&<g data-testid="road-truck-headlights" style={{transform:"scaleY(var(--scene-vertical-correction,1))",transformOrigin:"0px 0px"}}><path d="M25 -4l64 -14v34L25 4z" fill="url(#headlight-east)"/><path d="M25 -4v2m0 4v2" stroke="#fff0bc" strokeWidth="2.5"/><path d="M-24 -4v2m0 4v2" stroke="#d87855" strokeWidth="1.7"/></g>}
+    <ellipse cx="1" cy="4" rx="25" ry="8" fill="#183a35" opacity=".2"/>
+     <g data-testid="road-freight-vehicle" style={{transform:"scaleY(var(--scene-vertical-correction,1))",transformOrigin:"0px 0px"}}>
      <path d="M-22 -7h8m-8 14h8m15-14h7M1 7h7m10-14h5m-5 14h5" stroke="#304e51" strokeWidth="2.5" strokeLinecap="round"/>
      <path d="M-22 0h46" stroke="#506e6c" strokeWidth="7"/>
      <rect x="-24" y="-6" width="34" height="12" rx="1.5" fill="url(#traffic-body)" stroke="#637d7c" strokeWidth=".7"/>
@@ -27,9 +27,9 @@ export function CampusLife({night=false}:{night?:boolean}){
     </g>
    </g>
    <g className={reduced?undefined:'campus-traffic-west'} transform="translate(830 62)">
-    {night&&<g data-testid="road-car-headlights"><path d="M-12 -3l-48 -12v30L-12 3z" fill="url(#headlight-west)"/><path d="M-12 -3v2m0 2v2" stroke="#fff0bc" strokeWidth="2"/><path d="M12 -3v2m0 2v2" stroke="#d87855" strokeWidth="1.4"/></g>}
-    <g data-testid="road-passenger-vehicle">
-     <ellipse cx="2" cy="3" rx="13" ry="6" fill="#183a35" opacity=".2"/>
+    {night&&<g data-testid="road-car-headlights" style={{transform:"scaleY(var(--scene-vertical-correction,1))",transformOrigin:"0px 0px"}}><path d="M-12 -3l-48 -12v30L-12 3z" fill="url(#headlight-west)"/><path d="M-12 -3v2m0 2v2" stroke="#fff0bc" strokeWidth="2"/><path d="M12 -3v2m0 2v2" stroke="#d87855" strokeWidth="1.4"/></g>}
+    <ellipse cx="2" cy="3" rx="13" ry="6" fill="#183a35" opacity=".2"/>
+     <g data-testid="road-passenger-vehicle" style={{transform:"scaleY(var(--scene-vertical-correction,1))",transformOrigin:"0px 0px"}}>
      <path d="M-8 -5h4m-4 10h4m9-10h4M5 5h4" stroke="#304e51" strokeWidth="2.1" strokeLinecap="round"/>
      <path d="M-12 -2q0 -3 4 -3h15q5 0 5 3v4q0 3 -5 3H-8q-4 0 -4 -3Z" fill="#e7d9b1" stroke="#8d9b87" strokeWidth=".7"/>
      <path d="M-6 -3.8h3v7.6h-3l-1 -1.5v-4.6zM3 -3.8h3l1 1.5v4.6l-1 1.5H3z" fill="#496e78" stroke="#bed0bb" strokeWidth=".4"/>
@@ -39,9 +39,9 @@ export function CampusLife({night=false}:{night?:boolean}){
     </g>
    </g>
    {working&&<g className={reduced?undefined:'campus-service-truck'} transform="translate(136 580)" data-testid="ambient-service-truck">
-    {night&&<g data-testid="service-truck-headlights"><path d="M-4 17l-13 43h34L4 17z" fill="url(#headlight-service)"/><path d="M-5 17h3m4 0h3" stroke="#fff0bc" strokeWidth="2"/></g>}
-    <g data-testid="road-site-service-vehicle">
-     <ellipse cx="4" cy="2" rx="8" ry="18" fill="#263f38" opacity=".2"/>
+    {night&&<g data-testid="service-truck-headlights" style={{transform:"scaleY(var(--scene-vertical-correction,1))",transformOrigin:"0px 0px"}}><path d="M-4 17l-13 43h34L4 17z" fill="url(#headlight-service)"/><path d="M-5 17h3m4 0h3" stroke="#fff0bc" strokeWidth="2"/></g>}
+    <ellipse cx="4" cy="2" rx="8" ry="18" fill="#263f38" opacity=".2"/>
+     <g data-testid="road-site-service-vehicle" style={{transform:"scaleY(var(--scene-vertical-correction,1))",transformOrigin:"0px 0px"}}>
      <path d="M-6 -13v5M6 -13v5M-6 10v4M6 10v4" stroke="#304e51" strokeWidth="2.4" strokeLinecap="round"/>
      <path d="M0 -13v29" stroke="#516f6a" strokeWidth="7"/>
      <rect x="-6" y="-17" width="12" height="23" rx="1" fill="#d6d8bc" stroke="#7e927f" strokeWidth=".6"/>
