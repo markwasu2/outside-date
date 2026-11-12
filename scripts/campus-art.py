@@ -307,17 +307,43 @@ def plant(online):
   for x in (-57,-43,-29):s+=dock_box(x,39,2,10,7,5,'#9bad9e','#6f8e87','#537471')
   s+=bollards()+line(p(-68,50,1),p(70,50,1),GOLD,3)
   return s+'</g>'
+ # Preserve shared material registration order for later generated vehicle assets.
+ material(IVORY,'roof')
  s=pad()+box(-55,-30,1,74,61,32,'#d3d9c8','#a8b9a8','#809d90')
- s+=box(22,-28,1,30,60,21,'#abc0b0','#8ba79b','#698b82')
- for x in (-43,-14):s+=box(x,-18,33,17,17,10,'#e1e4d4','#a8b9a8','#809d90')
- for y in (-18,18):s+=box(34,y,22,7,7,60,IVORY,'#a8b9a8','#809d90')+box(34,y,68,7,7,5,GOLD,'#b28a43','#a07736')
- for yy in range(-25,28,7):
-  for zz in range(8,27,4):s+=line(p(19,yy,zz),p(19,yy+4,zz),'#4d6a71',1)
+ s+='<g data-testid="online-plant-service-building">'
+ # A folded roof edge, standing seams and recessed service access break up the plain block.
+ s+=box(-56,-31,33,76,63,1.5,'#e1e4cf','#b9c7b4','#849e92')
+ for x in range(-48,18,11):s+=line(p(x,-27,34.6),p(x,28,34.6),'#9ead9e',.65)
+ for x in (-49,-20,9):s+=line(p(x,31.4,3),p(x,31.4,29),'#91a58f',.65)
  for xx in range(-50,17,10):s+=pane(xx,31.5,17,7,9)
+ s+=poly([p(-46,31.7,3),p(-34,31.7,3),p(-34,31.7,16),p(-46,31.7,16)],'#4b6d69','#d1d6bb',.7)
+ s+=line(p(-40,31.9,3),p(-40,31.9,16),'#a2b7a3',.6)
+ s+=line(p(-38,32,8),p(-38,32,11),'#e1d29b',.8)
+ s+=dock_box(-48,31,1,17,9,2,'#c6c9b2','#99aa96','#718e80')
+ for x in (-43,-14):
+  s+=box(x,-18,35,17,17,10,'#e1e4d4','#a8b9a8','#809d90')
+  s+=poly([p(x+1,-.7,37),p(x+16,-.7,37),p(x+16,-.7,43),p(x+1,-.7,43)],'#355b5c','#9db6a4',.5)
+  for z in (38,40,42):s+=line(p(x+2,-.5,z),p(x+15,-.5,z),'#a8bda8',.65)
+  s+=line(p(x+2,-15,45.1),p(x+15,-15,45.1),'#bdcbb8',.65)
+ s+='</g>'
+ s+=box(22,-28,1,30,60,21,'#abc0b0','#8ba79b','#698b82')
+ s+='<g data-testid="online-plant-intake-bank">'
+ for y in (-23,-5,13):
+  s+=poly([p(52.2,y,5),p(52.2,y+13,5),p(52.2,y+13,18),p(52.2,y,18)],'#34565a','#acc1aa',.6)
+  for z in (7,10,13,16):s+=line(p(52.4,y+1,z),p(52.4,y+12,z),'#9bb3a4',.9)
+ s+='</g><g data-testid="online-plant-exhaust-stacks">'
+ # Thin round collars replace oversized square shelves. The stack envelope stays unchanged.
  for y in (-18,18):
-  for z in (30,42,54,66):s+=box(33,y-1,z,9,9,.7,'#b8c6bf','#849c95','#516f72')
- for y in (-18,18):
-  cx,cy=p(37,y+3,92);s+=f'<path d="M{cx},{cy} q-9,-9 1,-17 q10,-9 0,-18" stroke="#e7e9dd" stroke-width="7" fill="none" stroke-linecap="round"/>'
+  cx,base=p(37.5,y+3.5,22);_,top=p(37.5,y+3.5,82)
+  s+=f'<path d="M{cx-4.1:.1f} {base:.1f}V{top:.1f}a4.1 2.4 0 0 1 8.2 0V{base:.1f}a4.1 2.4 0 0 1-8.2 0Z" fill="#bacab9" stroke="#698d83" stroke-width=".8"/>'
+  s+=line((cx-2,base-2),(cx-2,top+1),'#edf0d7',1.2)
+  for z in (30,42,54,66):
+   _,cy=p(37.5,y+3.5,z);s+=f'<ellipse cx="{cx:.1f}" cy="{cy:.1f}" rx="4.8" ry="2.7" fill="none" stroke="#7e9b8c" stroke-width="1"/>'
+  _,cy=p(37.5,y+3.5,73);s+=f'<path d="M{cx-4:.1f} {cy-4:.1f}v4a4 2.3 0 0 0 8 0v-4a4 2.3 0 0 1-8 0Z" fill="#d7b56a" stroke="#9b854e" stroke-width=".5"/>'
+  s+=f'<ellipse cx="{cx:.1f}" cy="{top:.1f}" rx="4.1" ry="2.4" fill="#425f60" stroke="#c6d5bd" stroke-width=".8"/>'
+  cx,cy=p(37.5,y+3.5,89);s+=f'<path d="M{cx:.1f},{cy:.1f} q-7,-8 1,-16 q9,-9 0,-17" stroke="#e7e9dd" opacity=".8" stroke-width="6" fill="none" stroke-linecap="round"/>'
+ s+='</g>'
+
  return s
 
 def wheel(x,y,z=6,r=7):
