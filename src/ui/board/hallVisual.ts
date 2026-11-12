@@ -57,3 +57,8 @@ export function hallVisual(hall: Hall, stageMin: number[]): HallVisual {
     flags,
   };
 }
+
+/** Future structure is not built at zero progress, even when work has stopped. */
+export function hallStageOpacity(visual: HallVisual): number {
+  return visual.progress0to1 * (visual.flags.terminated ? .45 : 1);
+}

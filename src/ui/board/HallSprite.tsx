@@ -3,9 +3,9 @@ import {HallOperations} from './HallOperations';
 import {HallNightLights} from './HallNightLights';
 import { formatDollars } from '../../engine/format';
 import { STAGE_ART, VEHICLE_ART } from '../art';
-import type { HallVisual } from './hallVisual';
+import { hallStageOpacity, type HallVisual } from './hallVisual';
 
-/** Layer the next stage over the completed structure, fading its blueprint into solid materials as work
+/** Layer the next stage over the completed structure, fading actual progress into solid materials as work
  * advances. Pauses keep their exact progress and remove working vehicles. */
 
 interface HallSpriteProps {
@@ -43,7 +43,7 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
             data-art-stage={stage} data-progress={progress0to1.toFixed(3)}
             style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'contain',
               transition: reducedMotion ? undefined : 'opacity 0.6s ease',
-              opacity: visual.flags.terminated ? 0.45 : .12+.88*progress0to1}} />
+              opacity: hallStageOpacity(visual)}} />
         )}
         {night&&underConstruction&&visual.flags.active&&!visual.flags.paused&&!visual.flags.terminated&&!failedInspection&&<HallWorkLights/>}
         {stage==='delivered'&&!visual.flags.terminated&&<HallOperations reducedMotion={reducedMotion} night={night}/>}

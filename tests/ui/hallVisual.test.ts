@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { loadContent } from '../../src/content/load';
 import { createGame, type NegotiationChoices } from '../../src/engine/init';
 import type { Setup } from '../../src/engine/types';
-import { hallVisual, stageMinMonths } from '../../src/ui/board/hallVisual';
+import { hallVisual, hallStageOpacity, stageMinMonths } from '../../src/ui/board/hallVisual';
 
 // Phase 1 (D2): the hall sprite's height/shade is driven by hallVisual(); these tests pin the
 // pure mapping so the sprite can never silently stop growing between End months.
@@ -74,5 +74,21 @@ describe('stageMinMonths', () => {
     for (let i = 1; i < megaMins.length; i += 1) {
       expect(farmMins[i]).toBe(megaMins[i]);
     }
+  });
+});
+
+describe('hallStageOpacity', () => {
+  it('does not draw an upcoming stage before work advances', () => {
+    const state=freshState(), hall=state.halls[0]!;hall.stageIndex=2;hall.stageMonthsDone=0;
+    for(const active of [false,true]) {hall.stageActive=active;expect(hallStageOpacity(hallVisual(hall,stageMinMonths(state,content)))).toBe(0);}
+    hall.terminated=true;expect(hallStageOpacity(hallVisual(hall,stageMinMonths(state,content)))).toBe(0);
+  });
+  it('preserves actual partial progress when work pauses', () => {
+    const state=freshState(), hall=state.halls[0]!,mins=stageMinMonths(state,content);hall.stageIndex=1;hall.stageMonthsDone=mins[1]!/2;
+    expect(hallStageOpacity(hallVisual(hall,mins))).toBe(.5);hall.pausedThisMonth=true;expect(hallStageOpacity(hallVisual(hall,mins))).toBe(.5);
+  });
+  it('dims only the progress actually built on a terminated hall', () => {
+    const state=freshState(), hall=state.halls[0]!,mins=stageMinMonths(state,content);hall.stageIndex=1;hall.stageMonthsDone=mins[1]!/2;hall.terminated=true;
+    expect(hallStageOpacity(hallVisual(hall,mins))).toBe(.225);
   });
 });
