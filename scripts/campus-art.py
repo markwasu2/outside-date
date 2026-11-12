@@ -584,9 +584,20 @@ def compound(kind):
     s+=line(p(xx+12,30.4,12),p(xx+12,30.4,15),'#d9d9bd',1)
    s+=poly([p(x+6,30.5,16),p(x+12,30.5,16),p(x+12,30.5,20),p(x+6,30.5,20)],'#385b60','#b3c5aa',.4)
    s+=line(p(x+25,30.5,19),p(x+30,30.5,19),'#d6bc73',1.1)
-   s+=box(x+5,-30,26,9,9,21,'#bac9be','#8ba49c','#496f75')
-   for z in (31,39,45):s+=line(p(x+14,-29,z),p(x+14,-21,z),'#c1cbb8',.6)
-   s+=box(x+4,-31,47,11,11,2,'#536d70','#435d60','#304e56')
+   # Keep material registration stable for later generated assets.
+   box(x+5,-30,26,9,9,21,'#bac9be','#8ba49c','#496f75')
+   box(x+4,-31,47,11,11,2,'#536d70','#435d60','#304e56')
+   s+='<g data-testid="backup-round-exhaust">'
+   cx,base=p(x+9.5,-25.5,26);_,top=p(x+9.5,-25.5,46)
+   s+=f'<path d="M{cx-3.4:.1f} {base:.1f}V{top:.1f}a3.4 2 0 0 1 6.8 0V{base:.1f}a3.4 2 0 0 1-6.8 0Z" fill="#9cb6aa" stroke="#496f70" stroke-width=".65"/>'
+   s+=line((cx-1.5,base-1),(cx-1.5,top+1),'#dce2ca',1)
+   for z in (30,42):
+    _,cy=p(x+9.5,-25.5,z);s+=f'<ellipse cx="{cx:.1f}" cy="{cy:.1f}" rx="3.7" ry="2.1" fill="none" stroke="#547c77" stroke-width=".8"/>'
+   s+=f'<ellipse cx="{cx:.1f}" cy="{top:.1f}" rx="3.4" ry="2" fill="#34585e" stroke="#c4d1bb" stroke-width=".6"/>'
+   # Small raised rain hood leaves an exhaust gap, rather than a solid square lid.
+   s+=line((cx-2,top-1),(cx-2,top-3),'#718f83',.6)+line((cx+2,top-1),(cx+2,top-3),'#718f83',.6)
+   s+=f'<path d="M{cx-4.5:.1f} {top-3:.1f}l4.5 -2.3 4.5 2.3 -4.5 1.5Z" fill="#718d82" stroke="#3b6162" stroke-width=".55"/>'
+   s+='</g>'
   s+='</g>'
   s+=box(-81,44,1,53,15,16,'#b0c4bb','#739892','#416e77')
   for x in (-74,-60,-46):s+=line(p(x,59,4),p(x,59,15),'#456973',.8)
