@@ -120,6 +120,16 @@ export function CampusCompound({night}:{night:boolean}){
      {night&&<path d="M-6 15l-15 54h42L6 15z" fill="#ffebb0" opacity=".10"/>}
      <ellipse cx="4" cy="5" rx="14" ry="22" fill="#1b362e" opacity=".24"/>
      <rect x="-9" y="-20" width="18" height="38" rx="4" fill="#405b5e"/><rect x="-8" y="-21" width="16" height="36" rx="3" fill="#e0ddc4"/><rect x="-6" y="3" width="12" height="6" rx="1" fill="#446974"/><rect x="-6" y="-18" width="12" height="18" rx="1" fill="#a1b2a4"/><path d="M-6 14h3m6 0h3" stroke={night?'#ffe39c':'#ecead8'} strokeWidth="2"/><path d="M-5 -14h10m-10 4h10m-10 4h10" stroke="#c6d0b9" strokeWidth="1"/>
+     <g data-testid="service-van-detail">
+      {/* Glazing, roof seams and wheels stay inside the existing moving van. */}
+      <path d="M-8-14h-2v6m18-6h2v6M-8 7h-2v6m18-6h2v6" fill="none" stroke="#2b4546" strokeWidth="1.6"/>
+      <path d="M-6-18h12m-12 17h12m-9-17v17m6-17v17" fill="none" stroke="#d0d8be" strokeWidth=".65"/>
+      <path d="M-6 5h12M0 3v6" fill="none" stroke="#9cbabb" strokeWidth=".7"/>
+      <path d="M-7-19h3m4 0h3" stroke="#a1644c" strokeWidth="1.3"/>
+      <path d="M-8 4h-2m18 0h2" stroke="#617e7c" strokeWidth="1.2"/>
+      <path d="M-5 11h10m-11-8v8m12-8v8" stroke="#a6b6a5" strokeWidth=".65" fill="none"/>
+      <path d="M-2 14h4" stroke="#7e8d7c" strokeWidth="1"/>
+     </g>
     </g></g>
     {opened&&draft.halls.length===1&&[0,1].map(i=><g key={i} transform={`translate(${607+i*24} ${405+i*10})`}><g className={reduced?undefined:`campus-visitor visitor-${i}`}><ellipse cy="7" rx="5" ry="2" fill="#233e35" opacity=".22"/><path d="M-2 2l-2 5m5-5 2 5" stroke="#3d5960" strokeWidth="2"/><path d="M0 -5v8" stroke={i?'#cbb68d':'#738e9d'} strokeWidth="4"/><circle cy="-8" r="3" fill="#d5b78e"/></g></g>)}
    </g>}
