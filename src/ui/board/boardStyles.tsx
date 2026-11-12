@@ -86,7 +86,7 @@ export function BoardStyles() {
       [data-scene-object="hall"] { border-radius:6px; }
       [data-testid^="caption-"] { box-shadow:0 1px 3px #5b401c18; }
       [data-testid^="pad-"] { border-color:#a59c82 !important; background:#f6f0df !important; color:#635b47; }
-      [data-testid="campus-people"] > img { filter:drop-shadow(0 5px 4px #4d3a2428); }
+      [data-testid="campus-people"] > img { position:absolute; width:80px !important; height:80px !important; left:22px; top:26px; filter:none; }
       [data-simple-campus="true"] [data-simple-hidden="true"], [data-simple-local-grid="true"] [data-scene-object="plants"] { visibility:hidden; pointer-events:none; }
       [data-simple-campus="true"] [data-testid="hall-art-frame"] {max-width:520px !important;max-height:410px !important;}
       [data-night="true"]::before {content:'';position:absolute;inset:0;background:#102c50aa;z-index:0;pointer-events:none;}

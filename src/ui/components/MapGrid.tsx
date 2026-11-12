@@ -208,6 +208,12 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
   // (by a cell click or by the spine's "Show me"), position the popover next to that element,
   // opening leftward for right-half objects so it never runs off-screen.
   const containerRef = useRef<HTMLDivElement>(null);
+  // Ground routes stretch to the available scene. Upright figures must not squash with them.
+  useEffect(()=>{
+    const el=containerRef.current;if(!el)return;
+    const update=()=>{const{width,height}=el.getBoundingClientRect();if(height>0)el.style.setProperty('--scene-vertical-correction',String((width/1200)/(height/800)));};
+    update();const observer=new ResizeObserver(update);observer.observe(el);return()=>observer.disconnect();
+  },[]);
   const cellRefs = useRef(new Map<string, HTMLDivElement>());
   const [popoverPos, setPopoverPos] = useState<{ left: number; top: number } | null>(null);
   useEffect(() => {
