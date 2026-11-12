@@ -1,0 +1,8 @@
+import {test,expect} from '@playwright/test';
+test.use({storageState:{cookies:[],origins:[]}});
+test('delivered transformer has tank hardware, cooling fins and ceramic bushings on the desktop map',async({page})=>{
+ await page.setViewportSize({width:1280,height:720});await page.goto('/');await page.getByTestId('start-first-campus').click();await page.evaluate(async()=>{
+ // @ts-expect-error browser fixture
+ const{useStore}=await import('/src/ui/store.ts');const s=structuredClone(useStore.getState().draft);s.flags.siteOptioned=true;s.month=12;s.halls[0].stageIndex=2;s.power.orders=[{kind:'transformer',supplier:'standard',orderedMonth:0,arrivalMonth:11,price:100,deposit:25,arrived:true}];useStore.setState({state:s,draft:s,plan:[]});
+ });await page.getByRole('button',{name:'Detailed view',exact:true}).click();const image=page.getByAltText('Transformer on site',{exact:true});await expect(image).toBeVisible();await image.evaluate(e=>(e as HTMLImageElement).decode());const source=await image.getAttribute('src');const details=await page.evaluate(async(src)=>{const d=new DOMParser().parseFromString(await(await fetch(src!)).text(),'image/svg+xml');return{tank:d.querySelectorAll('[data-testid="transformer-tank-assembly"]').length,fins:d.querySelector('[data-testid="transformer-cooling-fins"]')?.querySelectorAll('polygon').length,bushings:d.querySelector('[data-testid="transformer-ceramic-bushings"]')?.querySelectorAll('ellipse').length};},source);expect(details.tank).toBe(1);expect(details.fins).toBe(63);expect(details.bushings).toBe(15);await page.screenshot({path:'/tmp/transformer-map-day.png'});
+});
