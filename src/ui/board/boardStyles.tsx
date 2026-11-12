@@ -112,7 +112,7 @@ export function BoardStyles() {
       @keyframes boardCoinFly {
         0% { opacity: 0; transform: translate(0, 0) scale(0.8); }
         15% { opacity: 1; }
-        100% { opacity: 0; transform: translate(60px, -140px) scale(1.1); }
+        100% { opacity: 0; transform: translate(8px, -20px) scale(1.1); }
       }
       @keyframes boardFloatUp {
         0% { opacity: 0; transform: translateY(4px); }
