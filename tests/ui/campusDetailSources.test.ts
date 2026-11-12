@@ -1,5 +1,6 @@
 import entranceShell from '../../src/assets/campus/hall-shell.svg?raw';
 import entranceReady from '../../src/assets/campus/hall-delivered.svg?raw';
+import truck from '../../src/assets/campus/vehicle-truck.svg?raw';
 import crane from '../../src/assets/campus/vehicle-crane.svg?raw';
 import excavator from '../../src/assets/campus/vehicle-excavator.svg?raw';
 import substationConstruction from '../../src/assets/campus/substation-building.svg?raw';
@@ -20,6 +21,7 @@ import backup from '../../src/assets/campus/compound-backup.svg?raw';
 import cabinet from '../../src/assets/campus/substation-done.svg?raw';
 import office from '../../src/assets/campus/tile-site-office.svg?raw';
 describe('authored campus detail sources',()=>{
+ it('models delivery truck running gear, cab access and front equipment once',()=>{for(const marker of ['delivery-truck-chassis','delivery-truck-cab-detail','delivery-truck-front-detail'])expect(truck.split(marker)).toHaveLength(2);});
  it('gives all three backup sets one round muffler with a raised rain hood',()=>{expect(backup.split('backup-round-exhaust')).toHaveLength(4);expect(cooling).not.toContain('backup-round-exhaust');});
  it('keeps finished plant service buildings, intake banks and round exhaust stacks out of erection art',()=>{for(const marker of ['online-plant-service-building','online-plant-intake-bank','online-plant-exhaust-stacks']){expect(online.split(marker)).toHaveLength(2);expect(construction).not.toContain(marker);}});
  it('gives enclosed halls one projecting entrance pavilion with a covered porch',()=>{for(const art of [entranceShell,entranceReady]){expect(art.split('hall-entrance-pavilion')).toHaveLength(2);expect(art).toContain('fill="url(#glass)"');}expect(frame).not.toContain('hall-entrance-pavilion');});
