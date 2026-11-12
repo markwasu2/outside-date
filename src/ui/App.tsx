@@ -138,7 +138,7 @@ function CampusGame({onSimple}:{onSimple:()=>void}) {
     <div data-testid="campus-workspace" style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#f1eadc', color: '#302d25', fontFamily: 'Arial, sans-serif' }}>
       <BoardStyles />
       <header data-testid="campus-status" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: '#fffdf6', borderBottom: '1px solid #cdbf9f', fontSize: 13, flexShrink: 0 }}>
-        <span style={{ fontFamily: 'Georgia, serif', fontSize: 18 }}>Outside Date</span>
+        <span style={{ fontFamily: 'Georgia, serif', fontSize: 18 }}>Data Center Simulator</span>
         <strong>{formatMonth(draft.month)}</strong>
         <span>Cash {formatDollars(draft.cash)}</span>
         <button data-testid="actions-remaining" aria-expanded={showBasics} onClick={() => setShowBasics(!showBasics)} style={{padding:'6px 9px',background:'#e6efdf',border:'1px solid #a6b69d',borderRadius:5}}>Focus this month: {actionsLeft} of {draft.apPerMonth} left</button>
@@ -189,7 +189,7 @@ function CampusGame({onSimple}:{onSimple:()=>void}) {
       {isFreshStart && state.phase === 'playing' && content.scenarios[state.scenarioId]?.coachTips === true && !dismissedCoachTips.includes('cold-intro') && (
         <div data-testid="cold-intro" style={{ position: 'fixed', bottom: 64, left: '50%', transform: 'translateX(-50%)', zIndex: 70, maxWidth: 520, padding: '12px 16px', background: '#fffdf7', border: '1px solid #aa9874', borderRadius: 10, boxShadow: '0 8px 32px #0004', fontSize: 13, lineHeight: 1.5, pointerEvents: 'none' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'baseline' }}>
-            <strong>Welcome to Outside Date</strong>
+            <strong>Welcome to Data Center Simulator</strong>
             <button data-testid="cold-intro-dismiss" style={{ pointerEvents: 'auto' }} onClick={() => dismissCoachTip('cold-intro')}>Got it</button>
           </div>
           <div>{goalSentence(draft).replace('all 1 hall', 'your hall').replace('outside date', 'tenant deadline').replace('close the takeout', 'sell or refinance the finished campus (the takeout)')}</div>

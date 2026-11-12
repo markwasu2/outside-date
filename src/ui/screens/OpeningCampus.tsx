@@ -37,7 +37,7 @@ export function OpeningCampus({step,preview,content,children,onNavigate}:{step:s
   );
   return <div data-testid="opening-campus" data-opening-step={step} data-site={site.id} style={{height:'100vh',display:'flex',flexDirection:'column',fontFamily:'Arial,sans-serif',color:'#302d25',background:'#f1eadc'}}>
     <header style={{display:'flex',alignItems:'center',gap:24,padding:'12px 22px',background:'#fffdf6',borderBottom:'1px solid #cdbf9f'}}>
-      <span style={{fontFamily:'Georgia,serif',fontSize:20}}>Outside Date</span>
+      <span style={{fontFamily:'Georgia,serif',fontSize:20}}>Data Center Simulator</span>
       <strong>{step === 'title' ? 'Your next campus' : 'Before construction'}</strong>
       <span>{site.name}</span>{step!=='title'&&<span style={{marginLeft:'auto',fontSize:12}}>Click a place to edit your setup</span>}
     </header>
