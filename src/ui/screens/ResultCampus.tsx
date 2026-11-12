@@ -15,8 +15,8 @@ export function ResultCampus({state,content}:{state:GameState;content:Content}){
  const terrain=siteTerrain(resolveSite(content,state.scenarioId,state.setup.site,content.tuning).mapTheme);
  return <figure data-testid="result-campus" style={{margin:0,alignSelf:'stretch',background:sold?'#dce6cb':'#e5e2d1',borderRadius:9,overflow:'hidden',display:'flex',flexDirection:'column'}}>
   <div style={{padding:'18px 20px 0',fontSize:11,letterSpacing:1.4,color:'#53664a',fontWeight:700}}>{sold?'CAMPUS SOLD':'SITE AT CLOSE'}</div>
-  <div style={{position:'relative',flex:1,minHeight:220,display:'grid',placeItems:'center',padding:'12px 20px',isolation:'isolate'}}>
-   <img data-testid="result-terrain" data-terrain={terrain.id} src={terrain.image} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',opacity:.28,zIndex:-1}}/>
+  <div style={{position:'relative',flex:1,minHeight:220,display:'grid',placeItems:'center',padding:'12px 20px',isolation:'isolate',overflow:'hidden'}}>
+   <img data-testid="result-terrain" data-terrain={terrain.id} src={terrain.image} alt="" style={{position:'absolute',left:'50%',top:0,width:'auto',height:'100%',aspectRatio:'3 / 2',maxWidth:'none',transform:'translateX(-50%)',opacity:.28,zIndex:-1}}/>
    <div style={{display:'grid',gridTemplateColumns:state.halls.length>1?'1fr 1fr':'1fr',width:'100%'}}>{state.halls.map(h=>{
     const visual=hallVisual(h,months),stage=visual.stage;
     const stageName=stage==='rfs'&&!h.stageActive?'Final testing not started':stageNames[stage];
