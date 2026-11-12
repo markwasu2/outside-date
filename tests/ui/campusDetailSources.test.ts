@@ -1,3 +1,5 @@
+import entranceShell from '../../src/assets/campus/hall-shell.svg?raw';
+import entranceReady from '../../src/assets/campus/hall-delivered.svg?raw';
 import crane from '../../src/assets/campus/vehicle-crane.svg?raw';
 import excavator from '../../src/assets/campus/vehicle-excavator.svg?raw';
 import substationConstruction from '../../src/assets/campus/substation-building.svg?raw';
@@ -18,6 +20,7 @@ import backup from '../../src/assets/campus/compound-backup.svg?raw';
 import cabinet from '../../src/assets/campus/substation-done.svg?raw';
 import office from '../../src/assets/campus/tile-site-office.svg?raw';
 describe('authored campus detail sources',()=>{
+ it('gives enclosed halls one projecting entrance pavilion with a covered porch',()=>{for(const art of [entranceShell,entranceReady]){expect(art.split('hall-entrance-pavilion')).toHaveLength(2);expect(art).toContain('fill="url(#glass)"');}expect(frame).not.toContain('hall-entrance-pavilion');});
  it('draws a paired crane mast and jib with stabilizers and hoist hardware',()=>{for(const marker of ['crane-lattice-mast','crane-lattice-jib','crane-cab-and-stabilizers','crane-hoist-hardware'])expect(crane.split(marker)).toHaveLength(2);});
  it('draws continuous excavator tracks, hydraulic cylinders and an open toothed bucket',()=>{for(const marker of ['excavator-tracked-undercarriage','excavator-cab-and-hydraulics','excavator-digging-bucket'])expect(excavator.split(marker)).toHaveLength(2);});
  it('keeps unfinished supports and staging out of the finished power connection',()=>{expect(substationConstruction).toContain('substation-erection-detail');expect(substationConstruction).toContain('substation-support-frame');expect(substationReady).not.toContain('substation-erection-detail');expect(substationReady).not.toContain('substation-support-frame');});

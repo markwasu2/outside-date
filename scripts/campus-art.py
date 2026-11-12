@@ -139,12 +139,27 @@ def hall(stage):
    s+=dock_box(x-2,39.6,26,24,3,2,'#a6b9b7','#6c8791','#405c6c')
    # High-contrast stand-clear stripes stay within the existing concrete pad.
    for xx in (x+2,x+9,x+16):s+=line(p(xx,54,1.2),p(xx+4,57,1.2),'#e0c981',.8)
- # Warm masonry entrance pavilion breaks up the industrial metal facade.
- s+=box(-55,38,3,29,4,27,'#b28d69','#ac785a','#765641')
+ # A real entrance volume projects from the industrial hall, not a thin facade panel.
+ # Its porch and doors remain within the original concrete pad (y <= 57).
+ s+='<g data-testid="hall-entrance-pavilion">'
+ s+=box(-57,38,1,34,18,2,'#c4c5b2','#939f90','#6f897e')
+ s+=box(-55,38,3,29,12,27,'#cbb38b','#ac785a','#765641')
  for z in range(7,29,3):
-  s+=line(p(-54,42.1,z),p(-27,42.1,z),'#dfb08b',.38)
-  for x in range(-52+(z%2)*2,-27,6):s+=line(p(x,42.2,z),p(x,42.2,z+3),'#704c3c',.3)
- for x in (-51,-43,-35):s+=pane(x,42.4,7,5,19)
+  s+=line(p(-54,50.1,z),p(-27,50.1,z),'#dfb08b',.38)
+  for x in range(-52+(z%2)*2,-27,6):s+=line(p(x,50.2,z),p(x,50.2,z+3),'#704c3c',.3)
+ # Full-height glazed entrance doors, transom and a return window on the shaded face.
+ for x in (-51,-43,-35):s+=pane(x,50.4,7,5,19)
+ s+=line(p(-51,50.6,21),p(-30,50.6,21),'#d5d5bd',.8)
+ for x in (-44,-40):s+=line(p(x,50.8,13),p(x,50.8,17),'#e6d8aa',.9)
+ s+=poly([p(-25.8,41,9),p(-25.8,48,9),p(-25.8,48,26),p(-25.8,41,26)],'url(#glass)','#c3c7b2',.7)
+ s+=line(p(-25.6,44.5,9),p(-25.6,44.5,26),'#9eb6b2',.6)
+ s+=line(p(-25.6,41,21),p(-25.6,48,21),'#c8cfb9',.6)
+ # Folded cap and shallow covered porch give the entry a clear silhouette in every built stage.
+ s+=box(-57,37,30,33,15,2,'#e1ceb0','#a98d6b','#76684e')
+ s+=box(-56,49,27,31,8,1.5,'#dbc199','#9e7e59','#6b5a48')
+ for x in (-54,-27):s+=line(p(x,55,3),p(x,55,27),'#c2c9bf',1.1)
+ s+=line(p(-55,56,3.2),p(-25,56,3.2),'#ebe2bf',1)
+ s+='</g>'
  # Service elevation: recessed intake louvers, a fire exit and a low access landing.
  # All geometry uses the same hall camera and stays inside the existing pad.
  s+='<g data-testid="hall-service-elevation">'
@@ -197,8 +212,6 @@ def hall(stage):
   for x in range(-60,50,15):
    s+=line(p(x,50,1.2),p(x+9,50,1.2),'#e7e4ca',.8)
   for x in (-57,57):s+=shrub(x,53,4,5)
-  s+=box(-55,43,26,32,9,2,'#dfc299','#9e7e59','#6b5a48')
-  for x in (-54,-25):s+=line(p(x,50,1),p(x,50,26),'#c2c9bf',1.1)
   s+=box(-24,40,25,45,6,2,'#aecbd4','#779eae','#3d6478')
   # Rooftop solar strips: small, deep-blue reflective modules.
   for x in (-25,-6,13,32):
