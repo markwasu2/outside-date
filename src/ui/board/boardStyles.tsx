@@ -64,7 +64,7 @@ export function BoardStyles() {
       [data-campus-scene] [data-scene-object] > img { filter: drop-shadow(0 5px 3px #4a3b251a); }
       [data-scene-object="office"], [data-scene-object="field"], [data-scene-object="substation"] { justify-content:flex-start !important; padding-top:8px !important; }
       [data-scene-object="office"] > img, [data-scene-object="field"] > img { width:145% !important; max-width:none; left:-22.5% !important; }
-      [data-scene-object="office"] > img { transform:translateY(18%); }
+      [data-scene-object="office"] > img { height:auto !important;top:auto !important;bottom:0;transform:translateY(18%); }
       [data-scene-object="substation"] > img { transform:translateY(12%); }
       [data-simple-campus="true"] [data-scene-object="substation"] > img {width:145% !important; max-width:none;left:-22.5% !important;transform:translateY(-10%);}
       [data-simple-campus="true"] [data-map-control="substation"], [data-simple-campus="true"] [data-map-control="siteOffice"] {bottom:0 !important;}
@@ -91,7 +91,8 @@ export function BoardStyles() {
       [data-simple-campus="true"] [data-testid="hall-art-frame"] {max-width:520px !important;max-height:410px !important;}
       [data-night="true"]::before {content:'';position:absolute;inset:0;background:#102c50aa;z-index:0;pointer-events:none;}
       [data-night="true"] [data-scene-object] > img {filter:brightness(.68) saturate(.76) drop-shadow(4px 8px 6px #101e31aa);}
-      [data-night="true"] [data-testid="hall-art-frame"] img {filter:brightness(.68) saturate(.76);}
+      [data-night="true"] [data-testid="hall-art-frame"] img, [data-night="true"] [data-scene-object="office"] > img {filter:brightness(.68) saturate(.76);}
+      [data-campus-scene]:not([data-night="true"]) [data-scene-object="office"] > img {filter:none;}
       /* Flat surveys and low foundations never cast a floating night silhouette. */
       [data-night="true"] [data-testid="hall-art-frame"] img[data-art-stage="notStarted"] {filter:brightness(.68) saturate(.76);}
       [data-night="true"] [data-testid="hall-art-frame"] img[data-art-stage="pad"] {filter:brightness(.68) saturate(.76) drop-shadow(1px 2px 1px #101e3140);}
