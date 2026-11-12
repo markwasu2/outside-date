@@ -474,8 +474,40 @@ def equipment(kind):
   h=35 if kind=='cooling-tower' else 12 if kind=='dry-cooler' else 22
   return box(-45,-27,1,90,54,h,'#ccdbcd','#96b3a5','#72958a')+fans(-39,-11,h+1,4)
  if kind=='transformer':
-  s=box(-35,-25,1,70,50,35,'#b9ccbf','#8aa79a','#63877d')
-  for x in (-28,-8,12):s+=box(x,-12,36,7,7,20,IVORY,'#a7bcae',TEAL)
+  s='<g data-testid="transformer-tank-assembly">'
+  s+=dock_box(-37,-27,0,74,54,3,'#a7b6a5','#718d80','#50766f')
+  s+=box(-35,-25,3,70,50,31,'#b9ccbf','#8aa79a','#63877d')
+  # Overhanging bolted lid and lifting eyes keep the original tank envelope.
+  s+=dock_box(-36,-26,34,72,52,2,'#c8d5c4','#92ac9a','#6a9082')
+  for x in (-30,-14,2,18,30):
+   for y in (-23,23):
+    cx,cy=p(x,y,36.2)
+    s+=f'<ellipse cx="{cx:.1f}" cy="{cy:.1f}" rx=".9" ry=".5" fill="#4c6d68"/>'
+  for x,y in ((-29,-20),(29,20)):
+   cx,cy=p(x,y,36)
+   s+=f'<path d="M{cx-2:.1f} {cy:.1f}v-3a2 2 0 0 1 4 0v3" fill="none" stroke="#567970" stroke-width="1.2"/>'
+  s+='</g><g data-testid="transformer-cooling-fins">'
+  # Repeated narrow radiator plates stand proud of both visible tank faces.
+  for x in range(-29,29,5):
+   s+=dock_box(x,25.2,7,2.2,5,22,'#b4c9b6','#72958a','#456e69')
+  for y in range(-19,23,5):
+   s+=dock_box(35.2,y,7,5,2.2,22,'#adc4b1','#6f9386','#426b66')
+  s+=line(p(-31,30.3,10),p(31,30.3,10),'#63877a',1.3)
+  s+=line(p(40.3,-21,10),p(40.3,24,10),'#4c766b',1.3)
+  s+='</g><g data-testid="transformer-ceramic-bushings">'
+  # Ceramic discs around a narrow core replace the old square posts.
+  for x in (-24,-4,16):
+   cx,cy=p(x,-12,36)
+   s+=f'<path d="M{cx-2:.1f} {cy:.1f}v-17h4v17Z" fill="#bdcbb4" stroke="#658377" stroke-width=".55"/>'
+   for z in (3,6,9,12,15):
+    s+=f'<ellipse cx="{cx:.1f}" cy="{cy-z:.1f}" rx="4" ry="1.6" fill="#dbe0c8" stroke="#91aa94" stroke-width=".55"/>'
+   s+=f'<path d="M{cx-1.4:.1f} {cy-16:.1f}v-4h2.8v4Z" fill="#6b8c7c" stroke="#486e67" stroke-width=".5"/>'
+  s+='</g>'
+  # Inspection plate, drain valve and a grounding lead on the near tank face.
+  s+=poly([p(-28,25.1,17),p(-18,25.1,17),p(-18,25.1,23),p(-28,25.1,23)],'#e0dfc7','#54776d',.5)
+  s+=line(p(-26,25.2,21),p(-20,25.2,21),'#6c8578',.55)
+  s+=dock_box(24,26,5,4,7,3,'#b5c6a9','#779785','#436d65')
+  s+=line(p(-31,25.4,7),p(-31,25.4,1),'#a59255',1.1)
   return s
  return ''.join(box(x,-23,1,22,46,48,'#cdd8c9','#9cb6a6','#75988a') for x in (-38,-12,14))
 
