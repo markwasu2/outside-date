@@ -114,11 +114,11 @@ export function CampusCompound({night}:{night:boolean}){
    {fitted&&<g data-testid="campus-service-traffic">
     {/* Cars occupy the marked lot, never the build controls or utility yard. */}
     {opened&&[{x:931,y:630,c:'#c9d3c7'},{x:1019,y:651,c:'#718e99'},{x:931,y:673,c:'#b58a66'}].map(({x,y,c})=><g key={x+y} data-testid="parked-campus-car" transform={`translate(${x} ${y})`} opacity={night?.76:1}>
-     <ellipse cx="4" cy="7" rx="15" ry="8" fill="#203e35" opacity=".24"/><rect x="-12" y="-6" width="24" height="12" rx="4" fill="#293f42"/><rect x="-11" y="-7" width="22" height="11" rx="4" fill={c}/><path d="M-5 -6H4l3 3v5H-7v-5z" fill="#43616b"/><path d="M-4 -5h7" stroke="#bbd1c7" strokeWidth="1"/><path d="M9 -4v6" stroke={night?'#ffe5a1':'#e9e5cd'} strokeWidth="2"/><g data-testid="parked-car-detail"><path d="M-8-7h15m-15 11h15" stroke="#e1dfc4" strokeWidth=".65" opacity=".7"/><path d="M-5-5v6m9-6v6" stroke="#c5d1bf" strokeWidth=".6"/><path d="M-7-3h13m-13 4h13" stroke="#93b0b0" strokeWidth=".5" opacity=".7"/><path d="M-10-4v6M8-4v6" stroke="#516c6a" strokeWidth=".7"/><path d="M-7-7v-1m11 1v-1m-11 14v-1m11 1v-1" stroke="#283f40" strokeWidth="2"/><path d="M-11-3v4" stroke="#a8684d" strokeWidth="1.2"/><path d="M-1-8h2M-1 5h2" stroke="#516f6b" strokeWidth="1.2"/></g>
+     <ellipse cx="4" cy="7" rx="15" ry="8" fill="#203e35" opacity=".24"/><g data-testid="proportioned-parked-car" style={{transform:"scaleY(var(--scene-vertical-correction,1))",transformOrigin:"0px 0px"}}><rect x="-12" y="-6" width="24" height="12" rx="4" fill="#293f42"/><rect x="-11" y="-7" width="22" height="11" rx="4" fill={c}/><path d="M-5 -6H4l3 3v5H-7v-5z" fill="#43616b"/><path d="M-4 -5h7" stroke="#bbd1c7" strokeWidth="1"/><path d="M9 -4v6" stroke={night?'#ffe5a1':'#e9e5cd'} strokeWidth="2"/><g data-testid="parked-car-detail"><path d="M-8-7h15m-15 11h15" stroke="#e1dfc4" strokeWidth=".65" opacity=".7"/><path d="M-5-5v6m9-6v6" stroke="#c5d1bf" strokeWidth=".6"/><path d="M-7-3h13m-13 4h13" stroke="#93b0b0" strokeWidth=".5" opacity=".7"/><path d="M-10-4v6M8-4v6" stroke="#516c6a" strokeWidth=".7"/><path d="M-7-7v-1m11 1v-1m-11 14v-1m11 1v-1" stroke="#283f40" strokeWidth="2"/><path d="M-11-3v4" stroke="#a8684d" strokeWidth="1.2"/><path d="M-1-8h2M-1 5h2" stroke="#516f6b" strokeWidth="1.2"/></g></g>
     </g>)}
     <g transform="translate(733 365)"><g className={reduced?undefined:'service-van'} data-testid="service-van">
-     {night&&<path d="M-6 15l-15 54h42L6 15z" fill="#ffebb0" opacity=".10"/>}
-     <ellipse cx="4" cy="5" rx="14" ry="22" fill="#1b362e" opacity=".24"/>
+     {night&&<path style={{transform:"scaleY(var(--scene-vertical-correction,1))",transformOrigin:"0px 0px"}} d="M-6 15l-15 54h42L6 15z" fill="#ffebb0" opacity=".10"/>}
+     <ellipse cx="4" cy="5" rx="14" ry="22" fill="#1b362e" opacity=".24"/><g data-testid="proportioned-service-van" style={{transform:"scaleY(var(--scene-vertical-correction,1))",transformOrigin:"0px 0px"}}>
      <rect x="-9" y="-20" width="18" height="38" rx="4" fill="#405b5e"/><rect x="-8" y="-21" width="16" height="36" rx="3" fill="#e0ddc4"/><rect x="-6" y="3" width="12" height="6" rx="1" fill="#446974"/><rect x="-6" y="-18" width="12" height="18" rx="1" fill="#a1b2a4"/><path d="M-6 14h3m6 0h3" stroke={night?'#ffe39c':'#ecead8'} strokeWidth="2"/><path d="M-5 -14h10m-10 4h10m-10 4h10" stroke="#c6d0b9" strokeWidth="1"/>
      <g data-testid="service-van-detail">
       {/* Glazing, roof seams and wheels stay inside the existing moving van. */}
@@ -130,7 +130,7 @@ export function CampusCompound({night}:{night:boolean}){
       <path d="M-5 11h10m-11-8v8m12-8v8" stroke="#a6b6a5" strokeWidth=".65" fill="none"/>
       <path d="M-2 14h4" stroke="#7e8d7c" strokeWidth="1"/>
      </g>
-    </g></g>
+    </g></g></g>
     {opened&&draft.halls.length===1&&[0,1].map(i=><g key={i} transform={`translate(${607+i*24} ${405+i*10})`}><g className={reduced?undefined:`campus-visitor visitor-${i}`}><g data-testid="upright-campus-visitor" style={{transform:"scale(.8) scaleY(var(--scene-vertical-correction,1))",transformOrigin:"0px 7px"}}><ellipse cy="7" rx="5" ry="2" fill="#233e35" opacity=".22"/><path d="M-2 2l-2 5m5-5 2 5" stroke="#3d5960" strokeWidth="2"/><path d="M0 -5v8" stroke={i?'#cbb68d':'#738e9d'} strokeWidth="4"/><circle cy="-8" r="3" fill="#d5b78e"/></g></g></g>)}
    </g>}
    <CampusPerimeter fitted={fitted} night={night}/>
