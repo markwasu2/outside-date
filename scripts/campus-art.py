@@ -313,10 +313,29 @@ def tile(kind):
   return s+box(40,-41,0,9,10,16,GOLD,'#b78e49','#a17a3a')
  if kind=='laydown':return pad()+''.join(box(x,y,1,32,22,19,'#d8b779','#b49359','#9a7d4c')+line(p(x+16,y,1),p(x+16,y,20),'#6f7968',2) for x,y in [(-55,-30),(-13,-30),(27,-30),(-34,5),(10,5)])
  if kind=='pond':
-  s=poly([p(-75,-38),p(-25,-56),p(57,-30),p(76,20),p(22,51),p(-58,32)],'#b4c1a0','#8e9c7b')
-  s+=poly([p(-57,-29),p(-24,-42),p(46,-23),p(59,14),p(21,37),p(-43,25)],'#8db7ae','#6b9690')
-  for x,y in [(-25,-11),(12,10),(-8,23)]:s+=line(p(x,y),p(x+22,y),'#c2d8c8',2)
-  return s
+  # A shallow wetland basin, not a raised geometric swimming pool.
+  def shore(points,color,stroke='none',width=.6):
+   v=[p(x,y) for x,y in points];mid=lambda a,b:((a[0]+b[0])/2,(a[1]+b[1])/2)
+   start=mid(v[-1],v[0]);d=f'M{start[0]:.1f},{start[1]:.1f}'
+   for i,a in enumerate(v):
+    end=mid(a,v[(i+1)%len(v)]);d+=f' Q{a[0]:.1f},{a[1]:.1f} {end[0]:.1f},{end[1]:.1f}'
+   return f'<path d="{d}Z" fill="{color}" stroke="{stroke}" stroke-width="{width}"/>'
+  s='<g data-testid="wetland-pond-detail"><defs><linearGradient id="pond-water" x2=".6" y2="1"><stop stop-color="#a2c9bd"/><stop offset=".45" stop-color="#709f98"/><stop offset="1" stop-color="#416e77"/></linearGradient></defs>'
+  s+=shore([(-75,-38),(-45,-54),(-19,-51),(8,-42),(51,-35),(76,-2),(70,24),(25,51),(-8,44),(-58,32)],'#829778','#6b846b')
+  s+=shore([(-68,-34),(-43,-47),(-16,-45),(8,-35),(48,-29),(67,-1),(62,22),(23,43),(-9,37),(-52,27)],'#b6bca0')
+  s+=shore([(-57,-28),(-38,-39),(-14,-37),(10,-27),(42,-24),(57,0),(53,19),(21,34),(-7,30),(-44,23)],'url(#pond-water)','#6c9a91')
+  s+=shore([(-38,-18),(-11,-29),(24,-18),(43,0),(35,19),(7,25),(-28,14)],'#416f78')
+  for x,y,w in [(-29,-15,21),(-5,13,24),(17,-5,19),(-21,24,13)]:
+   a,b=p(x,y),p(x+w,y)
+   s+=f'<path d="M{a[0]:.1f},{a[1]:.1f}q{(b[0]-a[0])*.45:.1f},{(b[1]-a[1])*.45-2:.1f} {b[0]-a[0]:.1f},{b[1]-a[1]:.1f}" fill="none" stroke="#c3d9c6" stroke-width=".8" opacity=".65"/>'
+  for i,(x,y) in enumerate([(-58,-28),(-39,-43),(-4,-40),(45,-25),(64,9),(35,37),(-27,35)]):
+   for dx,dy,h in [(-3,0,9),(0,2,13),(3,-1,11)]:
+    s+=line(p(x+dx,y+dy),p(x+dx-1,y+dy,h),'#5f7950',.9)
+    if i%2==0:s+=line(p(x+dx-1,y+dy,h-3),p(x+dx-1,y+dy,h),'#977e4d',1.8)
+   s+=line(p(x-4,y,1),p(x-8,y+1,5),'#93a371',1.1)
+  for x,y in [(-59,18),(48,26),(-16,-47)]:
+   s+=box(x,y,.2,5,4,2,'#c0bca0','#929f87','#748e7e')
+  return s+'</g>'
  return plot()+''.join(line(p(x,-25),p(x+12,-13),'#9aa37d',2) for x in range(-50,51,18))
 
 def construction_yard(kind):
