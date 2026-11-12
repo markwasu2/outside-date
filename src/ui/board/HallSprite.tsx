@@ -126,9 +126,10 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
         </div>
       )}
 
-      {/* rent coin burst toward the HUD (D4) - skipped under reduced motion */}
+      {/* rent coin burst beside the building (D4) - skipped under reduced motion */}
       {coinBurst > 0 && !reducedMotion && (
-        <div style={{ position: 'absolute', top: '30%', right: 4, pointerEvents: 'none' }} aria-hidden="true">
+        <div data-testid="rent-coin-burst" style={{position:'absolute',inset:0,overflow:'hidden',pointerEvents:'none'}} aria-hidden="true">
+        <div style={{position:'absolute',bottom:'22%',right:'18%'}}>
           {[0, 1, 2].map((i) => (
             <span
               key={i}
@@ -144,6 +145,7 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
               {'\u{1FA99}'}
             </span>
           ))}
+        </div>
         </div>
       )}
 
