@@ -13,7 +13,7 @@ import {TycoonObjectPanel} from './TycoonObjectPanel';
 import {developments} from './monthReview';
 import {simpleRows,plainWords,simpleTimelineLabel,buildingFunds} from './simpleWords';
 import {formatDollars} from '../../engine/format';
-import {ledger} from '../../engine/selectors';
+import {fastForwardMilestones} from '../../engine/selectors';
 import {resolveContent} from '../../engine/resolve';
 import {warnings} from './warnings';
 
@@ -29,7 +29,7 @@ export function TycoonGame({onDetailed}:{onDetailed:()=>void}){
  const points=draft.apPerMonth-draft.apUsedThisMonth;
  const milestones=campusMilestones(draft),complete=milestones.filter(m=>m.done).length;
  const news=review?developments(review,content).filter(n=>!n.text.startsWith('DSCR headroom')):[];
- const nextEvents=ledger(draft,content).filter(e=>e.month>=draft.month&&e.month<=draft.maxMonths&&!['takeoutWindow','conversionTest'].includes(e.kind)&&(!['hallDelivery','hallOutside'].includes(e.kind)||remaining.length>0)).slice(0,3);
+ const nextEvents=fastForwardMilestones(draft,content).filter(e=>e.month>=draft.month&&e.month<=draft.maxMonths&&!['takeoutWindow','conversionTest'].includes(e.kind)&&(!['hallDelivery','hallOutside'].includes(e.kind)||remaining.length>0)).slice(0,3);
  const converted=draft.flags.conversionMonth;
  const saleMonth=draft.debt.converted&&typeof converted==='number'?Math.min(draft.maxMonths,converted+resolveContent(draft,content).tuning.takeout.seasoningMonths)+1:null;
  const alerts=warnings(draft,content);
