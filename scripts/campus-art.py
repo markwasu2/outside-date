@@ -431,13 +431,42 @@ def vehicle(kind):
 
  else:
   s=box(-44,-21,10,58,40,24,'#d5d7c7','#aebcae','#8ca597')+box(15,-21,8,28,40,22,GOLD,'#bd8e42','#a77e3b')+box(19,-19,30,21,36,6,IVORY,'#aac3b6',TEAL)
-  for x in (-31,-15,29):s+=wheel(x,21,8,8)
+  s+='<g data-testid="delivery-truck-chassis">'
+  s+=dock_box(-43,17,7,85,4,4,'#73867b','#3e5857','#294448')
+  for x in (-31,-15,29):
+   # Short angular fenders frame each tire without changing its radius or center.
+   s+=poly([p(x-10,22,9),p(x-9,22,16),p(x-5,22,19),p(x+5,22,19),p(x+9,22,15),p(x+10,22,9),p(x+7,22,9),p(x+6,22,14),p(x+3,22,16),p(x-4,22,16),p(x-7,22,14),p(x-7,22,9)],'#687d73','#405d5c',.65)
+   s+=wheel(x,22.4,8,8)
+   cx,cy=p(x,22.4,8)
+   for angle in (0,math.pi/2,math.pi,math.pi*1.5):
+    s+=f'<circle cx="{cx+1.5*math.cos(angle):.1f}" cy="{cy-1+2.2*math.sin(angle):.1f}" r=".45" fill="#c7d0ba"/>'
+  s+='</g>'
   s+=pane(19,19.5,22,19,8)
   s+=poly([p(43,-17,22),p(43,17,22),p(43,17,30),p(43,-17,30)],'url(#glass)','#5b7980',.6)
   s+=line(p(39,21,10),p(39,21,22),'#885e30',.7)+line(p(23,21,18),p(28,21,18),'#334c54',1)
   for xx in range(-40,12,6):s+=line(p(xx,20,13),p(xx,20,32),'#8ea29f',.4)
   for yy in (-16,13):s+=box(43,yy,11,2,4,3,'#fff4bc','#e0c98d','#bfa271')
   s+=line(p(45,-18,9),p(45,18,9),'#596c71',2)
+  s+='<g data-testid="delivery-truck-cab-detail">'
+  # Recessed cab-door seam, access step and front screen wiper in the original camera.
+  for xx in (18,40):s+=line(p(xx,20.4,12),p(xx,20.4,29),'#92743e',.65)
+  s+=dock_box(16,21,8,5,5,2,'#b3b9a3','#647d71','#3d5e5c')
+  s+=line(p(16.5,25.5,10.2),p(20.5,25.5,10.2),'#dfd8b9',.7)
+  s+=line(p(43.3,-13,23),p(43.3,-1,27),'#425f64',.7)
+  s+=line(p(43.3,3,23),p(43.3,14,27),'#425f64',.7)
+  s+=line(p(43.4,0,22),p(43.4,0,30),'#c3d1ba',.6)
+  # Mirror arms and compact housings stay alongside the cab, not out in the road.
+  for y in (-22,22):
+   s+=line(p(38,y,27),p(43,y,29),'#425d5c',1)
+   s+=dock_box(42,y-1,27,2,3,4,'#aebeb0','#4e7071','#304e56')
+  s+='</g><g data-testid="delivery-truck-front-detail">'
+  s+=poly([p(43.4,-12,12),p(43.4,12,12),p(43.4,12,19),p(43.4,-12,19)],'#35545a','#afae8a',.55)
+  for z in (13.5,15.5,17.5):s+=line(p(43.6,-11,z),p(43.6,11,z),'#a4b4a4',.65)
+  s+=dock_box(43,-20,7,3,38,3,'#b4bfab','#6a8278','#4b6b68')
+  s+=poly([p(46.2,-4,7.8),p(46.2,4,7.8),p(46.2,4,10),p(46.2,-4,10)],'#dedcc3','#536d66',.4)
+  s+=line(p(45,-18,11),p(45,18,11),'#d6d5b8',.8)
+  s+='</g>'
+
  return s
 
 def equipment(kind):
