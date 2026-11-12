@@ -98,8 +98,18 @@ export function CampusCompound({night}:{night:boolean}){
     </g>;})}
     {[300,464].map(y=><g key={y}><rect x="657" y={y} width="10" height="21" rx="2" fill="#5c726b"/><path d={`M658 ${y+4}h8m-8 4h8m-8 4h8m-8 4h8`} stroke="#c7b68b" strokeWidth="2"/></g>)}
     </g>}
-    <path d="M798 168h180v21H798z" fill="#455f4b"/>
-    {Array.from({length:10},(_,i)=><circle key={i} cx={808+i*17} cy="174" r="9" fill={i%2?'#7e9a62':'#55774d'}/>)}
+    <g data-testid="utility-screen-planting">
+     {/* Low shrubs screen the utility edge without obscuring the road or fence. */}
+     <path d="M796 166h184v25H796z" fill="#526d51"/><path d="M798 167h180v3H798z" fill="#b7bd93" opacity=".65"/>
+     {Array.from({length:10},(_,i)=>{const x=808+i*17,y=179+(i%3);return <g key={i}>
+      <ellipse cx={x+4} cy={y+5} rx="12" ry="5" fill="#294a3a" opacity=".28"/>
+      <path d={`M${x} ${y+2}v-10m0 6-4-4m4 4 4-5`} stroke="#6b7250" strokeWidth="1.4" fill="none"/>
+      <ellipse cx={x-4} cy={y-3} rx="8" ry={7+i%2} fill="#3e6548"/>
+      <ellipse cx={x+4} cy={y-5} rx="9" ry={9-i%2} fill={i%2?'#678951':'#53794d'}/>
+      <ellipse cx={x-1} cy={y-10} rx="8" ry="6" fill={i%2?'#90a66a':'#779559'}/>
+      <path d={`M${x-6} ${y-12}l5-2m4 5 3-1`} stroke="#b4c282" strokeWidth="1" opacity=".5" fill="none"/>
+     </g>;})}
+    </g>
    </g>}
    {fitted&&<g data-testid="campus-service-traffic">
     {/* Cars occupy the marked lot, never the build controls or utility yard. */}
