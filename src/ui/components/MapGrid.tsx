@@ -368,7 +368,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
         <span style={ART_CHIP}>
           {siteTheme.pond ? TILE_ART.pond.label : 'Low field'}
         </span>
-        <span style={{ ...ART_CHIP, fontSize: '0.65rem' }}>{siteTheme.pond ? pondStateWords(draft) : 'Water permit'}</span>
+        <span data-testid="pond-map-state" style={{ ...ART_CHIP, fontSize: '0.65rem',maxWidth:'100%',boxSizing:'border-box',whiteSpace:'normal',textAlign:'center' }}>{siteTheme.pond ? pondStateWords(draft) : 'Water permit'}</span>
         {objectHasQueuedAction('pond', plan, hallIds) && <QueuedGhost />}
       </div>
 
