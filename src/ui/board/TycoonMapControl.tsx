@@ -1,24 +1,123 @@
-import {hallBlocker} from './legibility';
-import {unfundedWork} from './constructionFunds';
-import {checkAction,useStore} from '../store';
-import {simpleRows,simpleActionName,simpleActionCost} from './simpleWords';
+import { hallBlocker } from './legibility';
+import { unfundedWork } from './constructionFunds';
+import { checkAction, useStore } from '../store';
+import { simpleRows, simpleActionName, simpleActionCost } from './simpleWords';
 
 /** On-map controls expose the build choices without an instruction card. */
-export function TycoonMapControl({objectId}:{objectId:string}){
- const state=useStore(s=>s.state),draft=useStore(s=>s.draft),content=useStore(s=>s.content),plan=useStore(s=>s.plan),queue=useStore(s=>s.queueAction),open=useStore(s=>s.setBoardPopover);
- const hall=draft.halls.find(h=>h.id===objectId);
- const needsLiquid=!!hall&&hallBlocker(draft,content,hall)==='waiting on liquid cooling';
- const rows=simpleRows(objectId,draft,content);
- const available=rows.filter(r=>checkAction(state,content,plan,r.action).ok);
- // Keep spatial alternatives explicit: the first available plot is named on the button.
- const direct=objectId==='road'?available.find(r=>r.action.actionId==='optionSite'):hall?available.find(r=>['advanceHall','fixInspection','mitigateWetlands'].includes(r.action.actionId)||(needsLiquid&&r.action.actionId==='readyLiquid')):undefined;
- const paused=!!hall?.stageActive&&(!!draft.flags.drawFreeze||!!draft.flags[`inspectionFail:${hall.id}`]||!!hall.pausedThisMonth||unfundedWork(draft,content,hall)!==null);
- const title=direct?simpleActionName(direct.action,draft):objectId==='siteOffice'?'Permits':objectId==='substation'?'Power':hall?hall.delivered?'Open for rent':needsLiquid?'Inspect liquid cooling':paused?'Inspect paused work':hall.stageActive?'Inspect building work':!draft.flags.siteOptioned&&!draft.flags.siteOptionedAtStart?'Buy land first':'Build options':objectId==='pond'?'Water permits':undefined;
- const dense=!!hall&&draft.halls.length>1;
- if(!title||(dense&&hall.delivered&&!direct))return null;
- return <div data-map-control={objectId} style={{position:'absolute',left:'50%',bottom:objectId==='road'?'0':dense?'3%':hall?'10%':'8%',transform:'translateX(-50%)',zIndex:8,width:hall&&!dense?'min(92%,240px)':'auto',maxWidth:'95%',textAlign:'center'}}>
-  <button data-testid="map-build-button" disabled={!!hall&&hall.delivered&&!direct} title={direct?simpleActionCost(direct):undefined} onClick={e=>{e.stopPropagation();if(direct)queue(direct.action);else open(objectId);}} style={{display:'block',margin:'auto',width:hall&&!dense?'100%':undefined,whiteSpace:'nowrap',background:direct?'#365c45':'#fffdf2',color:direct?'#fff':'#48533d',border:'1px solid #80966d',borderRadius:6,padding:'7px 10px',boxShadow:'0 2px 5px #4a3b2518',fontWeight:700,cursor:'pointer',fontSize:12}}>
-   {dense&&!direct?'Inspect':title}{direct&&<small style={{display:'block',fontWeight:400,fontSize:10,marginTop:2}}>{direct.ap} point{direct.ap===1?'':'s'}{direct.action.actionId==='optionSite'?` · ${direct.cashLabel.split(',')[0]} from budget`:direct.action.actionId!=='advanceHall'?` · ${direct.cashLabel.split(',')[0]}`:' · costs paid as built'}</small>}
-  </button>
- </div>;
+export function TycoonMapControl({
+  objectId,
+  compact = false,
+  caption,
+}: {
+  objectId: string;
+  compact?: boolean;
+  caption?: string;
+}) {
+  const state = useStore((s) => s.state),
+    draft = useStore((s) => s.draft),
+    content = useStore((s) => s.content),
+    plan = useStore((s) => s.plan),
+    queue = useStore((s) => s.queueAction),
+    open = useStore((s) => s.setBoardPopover);
+  const hall = draft.halls.find((h) => h.id === objectId);
+  const needsLiquid = !!hall && hallBlocker(draft, content, hall) === 'waiting on liquid cooling';
+  const rows = simpleRows(objectId, draft, content);
+  const available = rows.filter((r) => checkAction(state, content, plan, r.action).ok);
+  // Keep spatial alternatives explicit: the first available plot is named on the button.
+  const direct =
+    objectId === 'road'
+      ? available.find((r) => r.action.actionId === 'optionSite')
+      : hall
+        ? available.find(
+            (r) =>
+              ['advanceHall', 'fixInspection', 'mitigateWetlands'].includes(r.action.actionId) ||
+              (needsLiquid && r.action.actionId === 'readyLiquid'),
+          )
+        : undefined;
+  const paused =
+    !!hall?.stageActive &&
+    (!!draft.flags.drawFreeze ||
+      !!draft.flags[`inspectionFail:${hall.id}`] ||
+      !!hall.pausedThisMonth ||
+      unfundedWork(draft, content, hall) !== null);
+  const title = direct
+    ? simpleActionName(direct.action, draft)
+    : objectId === 'siteOffice'
+      ? 'Permits'
+      : objectId === 'substation'
+        ? 'Power'
+        : hall
+          ? hall.delivered
+            ? 'Open for rent'
+            : needsLiquid
+              ? 'Inspect liquid cooling'
+              : paused
+                ? 'Inspect paused work'
+                : hall.stageActive
+                  ? 'Inspect building work'
+                  : !draft.flags.siteOptioned && !draft.flags.siteOptionedAtStart
+                    ? 'Buy land first'
+                    : 'Build options'
+          : objectId === 'pond'
+            ? 'Water permits'
+            : undefined;
+  const dense = !!hall && draft.halls.length > 1;
+  if (!title || (dense && hall.delivered && !direct && !compact)) return null;
+  return (
+    <div
+      data-map-control={objectId}
+      data-control-action={direct?.action.actionId ?? 'inspect'}
+      style={{
+        position: 'absolute',
+        left: '50%',
+        bottom: objectId === 'road' ? '0' : dense ? '3%' : hall ? '10%' : '8%',
+        transform: 'translateX(-50%)',
+        zIndex: 8,
+        width: hall && !dense ? 'min(92%,240px)' : 'auto',
+        maxWidth: '95%',
+        textAlign: 'center',
+      }}
+    >
+      <button
+        data-testid="map-build-button"
+        disabled={!!hall && hall.delivered && !direct && !compact}
+        title={direct ? simpleActionCost(direct) : undefined}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (direct) queue(direct.action);
+          else open(objectId);
+        }}
+        style={{
+          display: 'block',
+          margin: 'auto',
+          width: hall && !dense ? '100%' : undefined,
+          whiteSpace: 'nowrap',
+          background: direct ? '#365c45' : '#fffdf2',
+          color: direct ? '#fff' : '#48533d',
+          border: '1px solid #80966d',
+          borderRadius: 6,
+          padding: compact ? '3px 5px' : '7px 10px',
+          boxShadow: '0 2px 5px #4a3b2518',
+          fontWeight: 700,
+          cursor: 'pointer',
+          fontSize: compact ? 10 : 12,
+        }}
+      >
+        {compact && hall ? `${hall.id} · ` : ''}
+        {compact && !direct && caption ? caption : dense && !direct ? 'Inspect' : title}
+        {direct && (
+          <small
+            style={{ display: 'block', fontWeight: 400, fontSize: compact ? 9 : 10, marginTop: 2 }}
+          >
+            {direct.ap} point{direct.ap === 1 ? '' : 's'}
+            {direct.action.actionId === 'optionSite'
+              ? ` · ${direct.cashLabel.split(',')[0]} from budget`
+              : direct.action.actionId !== 'advanceHall'
+                ? ` · ${direct.cashLabel.split(',')[0]}`
+                : ' · costs paid as built'}
+          </small>
+        )}
+      </button>
+    </div>
+  );
 }
