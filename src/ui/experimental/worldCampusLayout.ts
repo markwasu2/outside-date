@@ -13,7 +13,7 @@ export function worldCampusLayout(count: number) {
   const columns = count > 3 ? Math.ceil(count / 2) : Math.max(1, count),
     rows = count > 3 ? 2 : 1;
   const right = columns * 210 + 160,
-    bottom = count === 1 ? 275 : rows * 180 - 30;
+    bottom = Math.max(275, rows * 180 - 30);
   const minX = (-260 - bottom) * 0.866 - 50,
     minY = -220;
   const width = (columns * 210 + 65 + 240 + 170) * 0.866 - minX + 70,
