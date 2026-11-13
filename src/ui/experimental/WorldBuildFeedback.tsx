@@ -11,7 +11,7 @@ export function WorldBuildFeedback() {
     cash = useRef(draft.cash);
   const [receipt, setReceipt] = useState<{ label: string; cash: number; id: number } | null>(null);
   useEffect(() => {
-    if (plan.length === 0) setReceipt(null);
+    if (plan.length === 0 || plan.length < previous.current) setReceipt(null);
     if (plan.length > previous.current && last) {
       const name = simpleActionName(last, draft) || 'Order placed',
         hall = last.params?.hallId;
