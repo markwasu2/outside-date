@@ -1,7 +1,8 @@
+// Historical renderer layout regression. Shared-camera layout is covered separately.
 import {test,expect} from '@playwright/test';
 test.use({storageState:{cookies:[],origins:[]}});
 for(const width of [1280,1440])test(`ordered equipment stays clear of the cooling yard at desktop ${width}`,async({page})=>{
- await page.setViewportSize({width,height:width===1280?720:900});await page.goto('/');await page.getByTestId('start-first-campus').click();await page.evaluate(async()=>{
+ await page.setViewportSize({width,height:width===1280?720:900});await page.addInitScript(()=>localStorage.setItem('outside-date-single-world-preview','false'));await page.goto('/');await page.getByTestId('start-first-campus').click();await page.evaluate(async()=>{
  // @ts-expect-error fixture
  const {useStore}=await import('/src/ui/store.ts');const s=structuredClone(useStore.getState().draft);s.flags.siteOptioned=true;s.halls[0].stageIndex=4;s.month=10;s.power.studyStatus='done';s.power.orders=[{kind:'transformer',supplier:'standard',orderedMonth:0,arrivalMonth:11,price:100,deposit:25,arrived:false},{kind:'switchgear',supplier:'standard',orderedMonth:0,arrivalMonth:8,price:100,deposit:25,arrived:true}];useStore.setState({state:s,draft:s,plan:[]});
  });const support=page.getByTestId('support-yard');await page.screenshot({path:`/tmp/equipment-yard-${width}.png`});const a=await page.getByTestId('simple-yard-summary').boundingBox(),b=await support.boundingBox();expect(a&&b).toBeTruthy();expect(a!.y+a!.height).toBeLessThan(b!.y);await page.getByTestId('simple-yard-summary').click();await expect(page.getByRole('dialog',{name:'Equipment deliveries'})).toBeVisible();await expect(page.getByTestId('simple-object-panel')).toContainText('arrives month 12');await page.getByTestId('simple-object-panel').getByRole('button',{name:'Close',exact:true}).click();

@@ -1,7 +1,8 @@
+// Historical single-hall renderer regression. New default is covered by single-world and world-campus specs.
 import {test,expect} from '@playwright/test';
 test.use({storageState:{cookies:[],origins:[]}});
 for(const width of [1280,1440])test(`courtyard trees retain upright crowns and fixed roots at ${width}`,async({page})=>{
- await page.setViewportSize({width,height:width===1280?720:900});await page.goto('/');await page.getByTestId('start-first-campus').click();await page.evaluate(async()=>{
+ await page.setViewportSize({width,height:width===1280?720:900});await page.addInitScript(()=>localStorage.setItem('outside-date-single-world-preview','false'));await page.goto('/');await page.getByTestId('start-first-campus').click();await page.evaluate(async()=>{
  // @ts-expect-error fixture
  const {useStore}=await import('/src/ui/store.ts');const s=structuredClone(useStore.getState().draft);s.flags.siteOptioned=true;s.halls[0].stageIndex=5;s.halls[0].delivered=true;useStore.setState({state:s,draft:s,plan:[]});
  });await page.emulateMedia({reducedMotion:'reduce'});

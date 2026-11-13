@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 test('built campus ground survives CSS parsing and the image decodes',async({page})=>{
- await page.goto('/');
+ await page.addInitScript(()=>localStorage.setItem('outside-date-single-world-preview','false'));await page.goto('/');
  for(const ground of [page.getByTestId('opening-land').locator('..')]){
   const css=await ground.evaluate(el=>getComputedStyle(el).backgroundImage);
   expect(css).toMatch(/url\("(?:data:image\/svg|http[^" ]*campus-ground-)/);

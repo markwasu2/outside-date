@@ -26,7 +26,7 @@ import { siteTerrain } from '../board/siteTerrain';
 import { plantWords, plantWaitingWords } from '../board/powerWords';
 import { formatDollars } from '../../engine/format';
 
-/** Simple multi-hall campus: existing rules and action panels, one physical camera. */
+/** Simple campus: existing rules and action panels, one physical camera. */
 export function WorldCampusMap({ night }: { night: boolean }) {
   const draft = useStore((s) => s.draft),
     state = useStore((s) => s.state),
@@ -106,6 +106,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
       ref={root}
       data-testid="map-root"
       data-world-camera="true"
+      data-world-single={draft.halls.length === 1}
       data-night={night}
       data-terrain={theme}
       style={
@@ -121,7 +122,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
         } as CSSProperties
       }
     >
-      <style>{`[data-world-camera="true"] [data-testid="campus-people"]{width:var(--world-people-size)!important;height:var(--world-people-size)!important;}[data-world-camera="true"] [data-scene-object="office"]{padding:0!important;}[data-world-camera="true"] [data-testid="campus-people"] > img,[data-world-camera="true"] [data-scene-object="office"] > img{width:100%!important;height:100%!important;inset:0!important;transform:none!important;}[data-world-camera="true"] [data-map-control="siteOffice"],[data-world-camera="true"] [data-map-control="substation"]{bottom:-12px!important;}[data-world-camera="true"]::before{display:none;}[data-world-hall-placard] [data-map-control]{position:relative!important;bottom:auto!important;left:0!important;transform:translateX(-50%)!important;max-width:none!important;}[data-world-camera="true"] [data-testid="hall-art-frame"]{max-width:none!important;max-height:none!important;}`}</style>
+      <style>{`[data-world-single="true"] [data-world-hall-placard] button{font-size:12px!important;}[data-world-camera="true"] [data-testid="campus-people"]{width:var(--world-people-size)!important;height:var(--world-people-size)!important;}[data-world-camera="true"] [data-scene-object="office"]{padding:0!important;}[data-world-camera="true"] [data-testid="campus-people"] > img,[data-world-camera="true"] [data-scene-object="office"] > img{width:100%!important;height:100%!important;inset:0!important;transform:none!important;}[data-world-camera="true"] [data-map-control="siteOffice"],[data-world-camera="true"] [data-map-control="substation"]{bottom:-12px!important;}[data-world-camera="true"]::before{display:none;}[data-world-hall-placard] [data-map-control]{position:relative!important;bottom:auto!important;left:0!important;transform:translateX(-50%)!important;max-width:none!important;}[data-world-camera="true"] [data-testid="hall-art-frame"]{max-width:none!important;max-height:none!important;}`}</style>
       <div
         data-testid="world-camera-scroll"
         style={{ position: 'absolute', inset: 0, overflow: 'auto' }}
@@ -140,6 +141,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
             poles={site.mapTheme.poles}
             land={land}
             fitted={fitted}
+            opened={draft.halls.some((h) => h.delivered && !h.terminated)}
             theme={theme}
             working={constructionWorking(draft, content)}
             reducedMotion={reduced}
@@ -193,6 +195,14 @@ export function WorldCampusMap({ night }: { night: boolean }) {
             />
             <span data-testid="power-map-state" style={{ ...label, top: 'calc(100% + 16px)' }}>
               {substationStateWords(draft)}
+              {draft.power.substationStatus === 'building' && (
+                <span data-testid="power-ready-date" style={{ display: 'block' }}>
+                  Due{' '}
+                  {draft.power.substationDoneMonth !== null
+                    ? `month ${draft.power.substationDoneMonth + 1}`
+                    : 'soon'}
+                </span>
+              )}
             </span>
             <TycoonMapControl objectId="substation" />
           </div>
@@ -254,6 +264,11 @@ export function WorldCampusMap({ night }: { night: boolean }) {
               <div
                 key={hall.id}
                 data-hall-id={hall.id}
+                className={
+                  deltas.deliveredHalls.includes(hall.id) && !reduced
+                    ? 'board-arrival-flash'
+                    : undefined
+                }
                 data-campus-object={hall.id}
                 data-blocked={blocked}
                 style={{
@@ -331,11 +346,17 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                 <div
                   data-world-hall-placard
                   title={hallCaption(draft, content, hall)}
-                  style={{ position: 'absolute', left: '62%', top: '90%', zIndex: 20 }}
+                  style={{
+                    position: 'absolute',
+                    left: '62%',
+                    top: '90%',
+                    zIndex: 20,
+                    width: draft.halls.length === 1 ? 160 : undefined,
+                  }}
                 >
                   <TycoonMapControl
                     objectId={hall.id}
-                    compact
+                    compact={draft.halls.length > 1}
                     caption={
                       hall.terminated
                         ? 'Closed'
@@ -349,23 +370,32 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                     }
                   />
                   {rent !== null && (
-                    <div
+                    <button
+                      type="button"
                       data-testid="rent-ticker"
+                      aria-label={`Inspect ${hall.id} rent`}
+                      title="Usual rent before loan payments and other bills. Click to inspect."
+                      onClick={() => {
+                        select(hall.id);
+                        open(hall.id);
+                      }}
                       style={{
                         position: 'absolute',
                         top: 'calc(100% + 2px)',
-                        left: '50%',
+                        left: draft.halls.length === 1 ? 0 : '50%',
                         transform: 'translateX(-50%)',
                         background: '#fffdf2',
                         whiteSpace: 'nowrap',
                         color: '#427444',
+                        cursor: 'pointer',
                         fontSize: 9,
                         padding: '1px 3px',
                         borderRadius: 2,
+                        border: 0,
                       }}
                     >
                       Rent {formatDollars(rent)}/mo
-                    </div>
+                    </button>
                   )}
                 </div>
               </div>
@@ -398,26 +428,26 @@ export function WorldCampusMap({ night }: { night: boolean }) {
               alt=""
               style={picture}
             />
+            <button
+              data-campus-object="pond"
+              aria-label="Water permits"
+              onClick={() => open('pond')}
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 80 * scale,
+                fontSize: 11,
+                zIndex: 30,
+              }}
+            >
+              Water
+              {theme === 'meadow' && land && (
+                <span data-testid="pond-map-state" style={{ display: 'block', fontSize: 9 }}>
+                  {pondStateWords(draft)}
+                </span>
+              )}
+            </button>
           </div>
-          <button
-            data-campus-object="pond"
-            aria-label="Water permits"
-            onClick={() => open('pond')}
-            style={{
-              position: 'absolute',
-              left: layout.field.x * scale,
-              top: (layout.field.y + 80) * scale,
-              fontSize: 11,
-              zIndex: 30,
-            }}
-          >
-            Water
-            {theme === 'meadow' && land && (
-              <span data-testid="pond-map-state" style={{ display: 'block', fontSize: 9 }}>
-                {pondStateWords(draft)}
-              </span>
-            )}
-          </button>
           <button
             data-campus-object="laydownYard"
             data-testid="simple-yard-summary"

@@ -3,7 +3,7 @@ import { worldCampusLayout } from './worldCampusLayout';
 describe('shared isometric world camera', () => {
   it('keeps physical art dimensions independent of hall count', () => {
     const single = worldCampusLayout(1);
-    for (const count of [2, 3, 4, 5, 6]) {
+    for (const count of [1, 2, 3, 4, 5, 6]) {
       const l = worldCampusLayout(count);
       expect(l.halls).toHaveLength(count);
       for (const r of [...l.halls, l.office, l.substation, l.cooling, l.backup]) {
@@ -21,6 +21,12 @@ describe('shared isometric world camera', () => {
         expect(l[key].height).toBe(single[key].height);
       }
     }
+  });
+  it('contains single-hall backup and courtyard inside the owned perimeter', () => {
+    const l = worldCampusLayout(1);
+    expect(l.bottom).toBeGreaterThanOrEqual(265);
+    expect(l.utilityWorldX + 65).toBeLessThan(l.right);
+    expect(l.halls[0]!.width).toBe(300);
   });
   it('uses exactly the building art camera for ground edges without distorting upright height', () => {
     const l = worldCampusLayout(6),

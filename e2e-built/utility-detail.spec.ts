@@ -1,9 +1,10 @@
+// Historical single-hall asset-layout regression; default is verified by single-world-replay.
 import {test,expect} from '@playwright/test';
 import fs from 'node:fs';
 test.use({storageState:{cookies:[],origins:[]}});
 for(const width of [1440,1280])test(`built utility yards decode through sale at desktop ${width}`,async({page})=>{
  test.setTimeout(65000);await page.setViewportSize({width,height:width===1280?720:900});const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));const trace:string[]=[];let transformerChecked=false;
- await page.goto('/');await expect(page).toHaveTitle('Data Center Simulator');await expect(page.getByTestId('simple-start')).toContainText('Build a data center.');await page.screenshot({path:`/tmp/utility-built-${width}-title.png`});
+ await page.addInitScript(()=>localStorage.setItem('outside-date-single-world-preview','false'));await page.goto('/');await expect(page).toHaveTitle('Data Center Simulator');await expect(page.getByTestId('simple-start')).toContainText('Build a data center.');await page.screenshot({path:`/tmp/utility-built-${width}-title.png`});
  await page.getByTestId('start-first-campus').click();await expect(page.getByTestId('tycoon-game')).toBeVisible();await expect(page.getByTestId('tycoon-game').locator('header')).toContainText('Data Center Simulator');
  const office=page.locator('[data-scene-object=office] > img');await office.evaluate(e=>(e as HTMLImageElement).decode());const officeStart=await office.boundingBox();expect(officeStart).toBeTruthy();expect(officeStart!.width/officeStart!.height).toBeCloseTo(300/242,2);await expect(page.getByTestId('simple-goal')).toContainText('0/1');await expect(page.getByTestId('action-desk')).toHaveCount(0);await expect(page.getByTestId('cold-intro')).toHaveCount(0);await expect(page.getByTestId('month-review')).toHaveCount(0);
  await page.screenshot({path:`/tmp/utility-built-${width}-opening.png`});

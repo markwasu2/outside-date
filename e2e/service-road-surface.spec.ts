@@ -1,7 +1,8 @@
+// Historical single-hall renderer regression. New default is covered by single-world and world-campus specs.
 import {test,expect} from '@playwright/test';
 test.use({storageState:{cookies:[],origins:[]}});
 test('service road material follows developed campus without adding roads to the opening',async({page})=>{
- await page.goto('/');await page.getByTestId('start-first-campus').click();await expect(page.getByTestId('service-road-surface')).toHaveCount(0);
+ await page.addInitScript(()=>localStorage.setItem('outside-date-single-world-preview','false'));await page.goto('/');await page.getByTestId('start-first-campus').click();await expect(page.getByTestId('service-road-surface')).toHaveCount(0);
  await page.evaluate(async()=>{
  // @ts-expect-error controlled developed campus art fixture
  const {useStore}=await import('/src/ui/store.ts');const now=structuredClone(useStore.getState().state);now.flags.siteOptioned=true;now.halls[0].stageIndex=5;now.halls[0].delivered=true;useStore.setState({state:now,draft:now,plan:[]});
