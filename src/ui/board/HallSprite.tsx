@@ -149,7 +149,8 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
         </div>
       )}
 
-      {/* GFX 2: the stage's construction vehicle while crews are actively working it */}
+      {/* The crane SVG moves its boom internally. Keep its chassis and deployed
+          stabilizer feet fixed to the foundation instead of rocking the whole image. */}
       {underConstruction && visual.flags.active && !visual.flags.paused && !failedInspection && VEHICLE_ART[stage] && (
         <div data-testid="stage-vehicle-anchor" style={{position:'absolute',top:'44%',right:'-16.3%',width:'80%',aspectRatio:'300 / 242',transform:'translateY(-37%)',pointerEvents:'none'}}>
         <img
@@ -159,7 +160,7 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
           draggable={false}
           title={VEHICLE_ART[stage]!.label}
           data-testid="stage-vehicle"
-          className={reducedMotion?undefined:stage==='steel'||stage==='shell'?'site-crane':stage==='pad'?'site-excavator':'site-work-truck'}
+          className={reducedMotion||stage==='steel'||stage==='shell'?undefined:stage==='pad'?'site-excavator':'site-work-truck'}
           style={{width:'100%',height:'auto',display:'block',pointerEvents:'none'}}
         />
         </div>
@@ -169,14 +170,12 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
        @keyframes sitePlacement{from{opacity:.6;translate:0 5px}to{opacity:1;translate:0 0}}
        .site-placement{animation:sitePlacement .35s ease-out}
        @keyframes siteVapor{0%{transform:translate(0,0) scale(.5);opacity:0}20%{opacity:.5}100%{transform:translate(14px,-52px) scale(1.8);opacity:0}}
-       @keyframes craneWork{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(1.5deg)}}
        @keyframes excavatorWork{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
        @keyframes truckIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-1px)}}
        .site-vapor{animation:siteVapor 5.5s ease-out infinite}
-       .site-crane{animation:craneWork 9s ease-in-out infinite;transform-origin:40% 80%}
        .site-excavator{animation:excavatorWork 7s ease-in-out infinite}
        .site-work-truck{animation:truckIdle 1.5s ease-in-out infinite}
-       @media(prefers-reduced-motion:reduce){.site-placement,.site-vapor,.site-crane,.site-excavator,.site-work-truck{animation:none!important}}
+       @media(prefers-reduced-motion:reduce){.site-placement,.site-vapor,.site-excavator,.site-work-truck{animation:none!important}}
       `}</style>
       
     </div>
