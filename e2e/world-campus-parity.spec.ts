@@ -84,7 +84,13 @@ test('world camera keeps blocked, paused, failed and terminal hall display seman
         late: await hall.getByLabel('Late', { exact: true }).count(),
         failed: await hall.getByLabel('Failed inspection', { exact: true }).count(),
         terminated: await hall.getByLabel('Terminated', { exact: true }).count(),
-        control: await hall.locator('[data-map-control] button').allTextContents(),
+        control: await hall
+          .locator('[data-map-control] button')
+          .evaluateAll((es) =>
+            es
+              .map((e) => e.parentElement?.getAttribute('data-control-action'))
+              .filter((a) => a !== 'inspect'),
+          ),
       };
     };
     const original = await read();

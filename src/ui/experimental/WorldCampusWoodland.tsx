@@ -1,7 +1,15 @@
 import { useMemo } from 'react';
 import woodland from '../../assets/campus/campus-woodland.svg?raw';
 /** Reuse owned tree art without the old stretched-ground camera. */
-export function WorldCampusWoodland({ width, height }: { width: number; height: number }) {
+export function WorldCampusWoodland({
+  width,
+  height,
+  points,
+}: {
+  width: number;
+  height: number;
+  points?: { x: number; y: number }[];
+}) {
   const art = useMemo(() => {
     const doc = new DOMParser().parseFromString(woodland, 'image/svg+xml');
     return {
@@ -16,7 +24,7 @@ export function WorldCampusWoodland({ width, height }: { width: number; height: 
       }),
     };
   }, []);
-  const positions = [
+  const positions = points ?? [
     ...Array.from({ length: Math.floor((width - 200) / 75) }, (_, i) => ({
       x: 110 + i * 75,
       y: height - 15,

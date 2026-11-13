@@ -33,8 +33,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
     content = useStore((s) => s.content),
     open = useStore((s) => s.setBoardPopover),
     popover = useStore((s) => s.boardPopover),
-    select = useStore((s) => s.selectHall),
-    selected = useStore((s) => s.selectedHallId);
+    select = useStore((s) => s.selectHall);
   const [zoom, setZoom] = useState(1),
     [viewport, setViewport] = useState({ width: 1280, height: 420 });
   const root = useRef<HTMLDivElement>(null),
@@ -116,7 +115,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
         } as CSSProperties
       }
     >
-      <style>{`[data-world-camera="true"] [data-testid="campus-people"]{width:var(--world-people-size)!important;height:var(--world-people-size)!important;}[data-world-camera="true"] [data-scene-object="office"]{padding:0!important;}[data-world-camera="true"] [data-testid="campus-people"] > img,[data-world-camera="true"] [data-scene-object="office"] > img{width:100%!important;height:100%!important;inset:0!important;transform:none!important;}[data-world-camera="true"] [data-map-control="siteOffice"],[data-world-camera="true"] [data-map-control="substation"]{bottom:-30px!important;}[data-world-camera="true"]::before{display:none;}[data-world-camera="true"] [data-testid="hall-art-frame"]{max-width:none!important;max-height:none!important;}`}</style>
+      <style>{`[data-world-camera="true"] [data-testid="campus-people"]{width:var(--world-people-size)!important;height:var(--world-people-size)!important;}[data-world-camera="true"] [data-scene-object="office"]{padding:0!important;}[data-world-camera="true"] [data-testid="campus-people"] > img,[data-world-camera="true"] [data-scene-object="office"] > img{width:100%!important;height:100%!important;inset:0!important;transform:none!important;}[data-world-camera="true"] [data-map-control="siteOffice"],[data-world-camera="true"] [data-map-control="substation"]{bottom:-12px!important;}[data-world-camera="true"]::before{display:none;}[data-world-hall-placard] [data-map-control]{position:relative!important;bottom:auto!important;left:0!important;transform:translateX(-50%)!important;max-width:none!important;}[data-world-camera="true"] [data-testid="hall-art-frame"]{max-width:none!important;max-height:none!important;}`}</style>
       <div
         data-testid="world-camera-scroll"
         style={{ position: 'absolute', inset: 0, overflow: 'auto' }}
@@ -153,7 +152,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
           <div
             data-campus-object="road"
             data-testid="map-road"
-            style={rect({ x: 5, y: 25, width: 150, height: 40 })}
+            style={rect(layout.sprite(-200, -120, 150))}
           >
             <TycoonMapControl objectId="road" />
           </div>
@@ -251,7 +250,10 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                 data-hall-id={hall.id}
                 data-campus-object={hall.id}
                 data-blocked={blocked}
-                style={{ ...rect(layout.halls[i]!), cursor: 'pointer' }}
+                style={{
+                  ...rect(layout.halls[i]!),
+                  cursor: 'pointer',
+                }}
                 role="group"
                 aria-label={`${hall.id} data center`}
               >
@@ -260,6 +262,8 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                   style={{
                     position: 'absolute',
                     inset: 0,
+                    zIndex: (i % layout.columns) + Math.floor(i / layout.columns) + 2,
+                    clipPath: 'polygon(45% 15%,90% 48%,90% 72%,50% 92%,8% 64%,8% 45%)',
                     background: 'transparent',
                     border: 0,
                     cursor: 'pointer',
@@ -269,41 +273,41 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                     open(hall.id);
                   }}
                 />
-                <div
+                <span
+                  data-testid={`hall-sign-${hall.id}`}
                   style={{
-                    ...label,
-                    minHeight: 17,
-                    pointerEvents: 'none',
-                    maxWidth: '95%',
-                    whiteSpace: 'normal',
+                    position: 'absolute',
+                    width: 1,
+                    height: 1,
+                    overflow: 'hidden',
+                    clipPath: 'inset(50%)',
                   }}
                 >
-                  <strong
-                    data-testid={`hall-sign-${hall.id}`}
-                    style={{ marginRight: 6, color: selected === hall.id ? '#a46c35' : undefined }}
-                  >
-                    {hall.id}
-                  </strong>
-                  <span
-                    data-testid={`caption-${hall.id}`}
-                    title={hallCaption(draft, content, hall)}
-                  >
-                    {simpleHallCaption(
-                      hallCaption(draft, content, hall),
-                      hall.stageActive ? visual.progress0to1 : null,
-                    )}
-                  </span>
-                  {rent !== null && (
-                    <div
-                      data-testid="rent-ticker"
-                      title="Usual rent before loan payments and other bills"
-                      style={{ fontSize: 10, color: '#427444', marginTop: 2 }}
-                    >
-                      Rent {formatDollars(rent)}/mo
-                    </div>
+                  {hall.id}
+                </span>
+                <span
+                  data-testid={`caption-${hall.id}`}
+                  style={{
+                    position: 'absolute',
+                    width: 1,
+                    height: 1,
+                    overflow: 'hidden',
+                    clipPath: 'inset(50%)',
+                  }}
+                >
+                  {simpleHallCaption(
+                    hallCaption(draft, content, hall),
+                    hall.stageActive ? visual.progress0to1 : null,
                   )}
-                </div>
-                <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+                </span>
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    pointerEvents: 'none',
+                    zIndex: (i % layout.columns) + Math.floor(i / layout.columns) + 2,
+                  }}
+                >
                   <HallSprite
                     visual={visual}
                     night={night}
@@ -317,7 +321,46 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                     reducedMotion={reduced}
                   />
                 </div>
-                <TycoonMapControl objectId={hall.id} />
+                <div
+                  data-world-hall-placard
+                  title={hallCaption(draft, content, hall)}
+                  style={{ position: 'absolute', left: '62%', top: '90%', zIndex: 20 }}
+                >
+                  <TycoonMapControl
+                    objectId={hall.id}
+                    compact
+                    caption={
+                      hall.terminated
+                        ? 'Closed'
+                        : hall.delivered
+                          ? 'Open for rent'
+                          : failedInspection
+                            ? 'Repair needed'
+                            : visual.flags.paused
+                              ? 'Paused'
+                              : `${{ notStarted: 'Plot', pad: 'Foundation', steel: 'Frame', shell: 'Walls', fitout: 'Interiors', rfs: 'Testing', delivered: 'Open' }[visual.stage]}${hall.stageActive ? ` ${Math.round(visual.progress0to1 * 100)}%` : ''}`
+                    }
+                  />
+                  {rent !== null && (
+                    <div
+                      data-testid="rent-ticker"
+                      style={{
+                        position: 'absolute',
+                        top: 18,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: '#fffdf2',
+                        whiteSpace: 'nowrap',
+                        color: '#427444',
+                        fontSize: 9,
+                        padding: '1px 3px',
+                        borderRadius: 2,
+                      }}
+                    >
+                      Rent {formatDollars(rent)}/mo
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -326,7 +369,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
             aria-label="Crew and contacts"
             data-campus-object="people"
             style={{
-              ...rect({ x: 10, y: layout.height - 180, width: 80, height: 80 }),
+              ...rect(layout.people),
               padding: 0,
               border: 0,
               background: 'transparent',
@@ -335,12 +378,12 @@ export function WorldCampusMap({ night }: { night: boolean }) {
             onClick={() => open('people')}
           >
             <img src={people} alt="" style={picture} />
-            <span style={{ ...label, top: '90%' }}>Crew & contacts</span>
+            <span style={{ ...label, top: '90%' }}>Contacts</span>
           </button>
           <div
             data-testid="map-pond-slot"
             data-pond={theme === 'meadow'}
-            style={rect({ x: 8, y: 215, width: 100, height: 81 })}
+            style={rect(layout.field)}
           >
             <img
               src={theme === 'meadow' ? TILE_ART.pond.img : TILE_ART.dryField.img}
@@ -350,18 +393,25 @@ export function WorldCampusMap({ night }: { night: boolean }) {
           </div>
           <button
             data-campus-object="pond"
+            aria-label="Water permits"
             onClick={() => open('pond')}
-            style={{ position: 'absolute', left: 12, top: 285 * scale, fontSize: 11 }}
+            style={{
+              position: 'absolute',
+              left: layout.field.x * scale,
+              top: (layout.field.y + 80) * scale,
+              fontSize: 11,
+              zIndex: 30,
+            }}
           >
-            Water permits
+            Water
           </button>
           <button
             data-campus-object="laydownYard"
             onClick={() => open('laydownYard')}
             style={{
               position: 'absolute',
-              left: (layout.utilityX + 15) * scale,
-              top: 75 * scale,
+              left: layout.deliveries.x * scale,
+              top: layout.deliveries.y * scale,
               fontSize: 11,
             }}
           >
@@ -369,12 +419,37 @@ export function WorldCampusMap({ night }: { night: boolean }) {
           </button>
           <section
             data-campus-object="powerPlants"
-            style={rect({ x: layout.utilityX + 190, y: 260, width: 100, height: 270 })}
+            style={rect({
+              x: layout.plantSlots[0]!.x,
+              y: layout.plantSlots[0]!.y,
+              width: 240,
+              height: 180,
+            })}
             onClick={() => open('powerPlants')}
           >
-            <button style={{ fontSize: 11, whiteSpace: 'nowrap' }}>Power plants</button>
+            <button
+              style={{
+                fontSize: 11,
+                whiteSpace: 'nowrap',
+                position: 'absolute',
+                top: -18,
+                left: 0,
+              }}
+            >
+              Power plants
+            </button>
             {!draft.docketEnabled ? (
-              <span data-testid="local-grid-supply" style={{ fontSize: 11, background: '#fffdf2' }}>
+              <span
+                data-testid="local-grid-supply"
+                style={{
+                  fontSize: 10,
+                  background: '#fffdf2',
+                  position: 'absolute',
+                  top: 5,
+                  left: 0,
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 Local grid supply
               </span>
             ) : (
@@ -389,7 +464,8 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                     data-build-state={status}
                     style={{
                       position: 'absolute',
-                      top: (25 + i * 125) * scale,
+                      left: (layout.plantSlots[i]!.x - layout.plantSlots[0]!.x) * scale,
+                      top: (layout.plantSlots[i]!.y - layout.plantSlots[0]!.y + 25) * scale,
                       width: 100 * scale,
                       height: 100 * scale,
                     }}

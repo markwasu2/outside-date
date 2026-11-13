@@ -45,7 +45,7 @@ test('world-camera prototype carries a real six-hall expansion through sale', as
     for (const id of ['road', 'substation', 'siteOffice', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6']) {
       const b = page.locator(`[data-map-control="${id}"] button`);
       if (!(await b.count()) || !(await b.isEnabled())) continue;
-      const label = await b.innerText();
+      const label = (await b.innerText()).replace(/^H\d+ · /, '');
       if (
         /Buy land|Build foundation|Build frame|Build walls|Install interiors|Install liquid cooling|Test & open|Repair/.test(
           label,
@@ -92,11 +92,9 @@ test('world-camera prototype carries a real six-hall expansion through sale', as
       await page.getByTestId('night-view').click();
       const fit = await page.locator('[data-hall-id="H1"]').boundingBox();
       expect(fit).toBeTruthy();
-      const rent = await page
-          .locator('[data-hall-id="H1"] [data-testid="rent-ticker"]')
-          .boundingBox(),
-        next = await page.getByTestId('hall-sign-H4').boundingBox();
-      expect(rent!.y + rent!.height).toBeLessThan(next!.y);
+      await expect(page.locator('[data-hall-id=H1] [data-map-control] button')).toContainText(
+        'Open for rent',
+      );
       await page.getByTestId('world-zoom').click();
       const large = await page.locator('[data-hall-id="H1"]').boundingBox();
       expect(large!.width / fit!.width).toBeCloseTo(1.7, 1);

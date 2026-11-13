@@ -1,37 +1,42 @@
-# Shared-world camera prototype
+# Shared isometric world camera
 
-Local opt-in visual/gameplay experiment. Not the default map and not ready to replace it.
+Local opt-in playable prototype. Not the default map and not deployed.
 
 Enable `outside-date-world-campus-preview=true` in local storage before reloading. It applies only to simple view with more than one hall. Detailed view and single-hall campuses retain the current map. No engine or content changes.
 
-## What changed
+## Geometry and behavior
 
-- Fixed physical world dimensions for halls, utilities and roads, with a larger site as hall count grows.
-- One measured, uniform camera, fit view, 1.7x zoom and native scrolling.
-- Screen-space captions, action controls and panels stay readable while art shares one scale.
-- Existing HallSprite stages, active equipment, inspection/funding pauses, operating fans, rent and night lights.
-- Grounded owned woodland, gatehouse, parking, transmission poles and ambient road vehicles.
-- Action receipts clear on month advance instead of lingering over the next month's empty order list.
-- Existing engine action panels, finance, permits, power supply, water and contacts routes retained.
+- Fixed physical dimensions for halls, utilities, people, trees and equipment, independent of hall count.
+- Ground x/y axes use the exact `.866, .5` orthographic projection of `campus-art.py`. Upright z is unscaled.
+- Site extent grows with hall count. A measured uniform camera offers fit view and 1.7x zoom with scrolling.
+- Roads, hall aprons, service yard, power yard, parking, perimeter and woodland use that same ground plane.
+- Owned gatehouse, natural tree art, traffic details and real game art are reused.
+- Compact clickable hall placards keep identity, stage/progress and direct build actions near the hall. Full status remains available in accessible text, hover text and the hall's unchanged action panel.
+- Existing HallSprite stages, active equipment, inspection/funding pauses, operating fans, rent, coins and night lights remain.
+- Utility, water, contacts, power supply and finance use existing action panels, held inside the viewport during zoom/scroll.
+- Receipts clear on month advance rather than lingering over the next month's empty order list.
+- Both cameras now share `hallDisplay` for stage offsets, funding state, warnings and rent. The old default behavior is unchanged by that extraction.
 
-## Verification so far
+The earlier rectangular-ground version is preserved in local commit `32eb20b`. Its mismatched ground/building axes were rejected after pixel inspection. The static isometric study led to this playable version.
 
-- 769 unit tests pass, including two physical-layout tests.
+## Verification
+
+- 772 unit tests pass, including physical-camera and shared display checks.
 - Lint and production build pass.
-- A real deterministic Whale campaign expands from four to six halls and reaches sale through ordinary controls. Repeated source-browser and production-bundle replays pass.
-- The replay also checks fit/zoom ratio, opens H6 after scrolling and checks panel bounds, and resizes to 1024x768 and 1536x960.
-- Source-fixture visual tests cover two through six halls, four terrain themes, transmission-pole counts, machine/crew/office proportions, contacts and Escape-to-close.
-- Eight existing default-map regressions pass: office, gatehouse, lights and construction equipment at two desktop sizes.
-- Pixels inspected for real developed day/night, zoomed H6 panel, both desktop resize cases, two/four/six-hall work scenes and meadow.
+- All 283 source-browser tests pass, run sequentially in 16 shards with two workers.
+- All 33 built-app tests pass, in three shards with one worker.
+- A deterministic real Whale campaign expands from four to six halls and reaches sale through ordinary controls. Source and built-bundle replays pass repeatedly.
+- That replay also checks 1.7x camera ratio, H6 inspection after scroll, panel bounds, and 1024x768/1536x960 desktop resizing.
+- Fixture checks cover two through six halls, four terrain themes, pole counts, machine/crew/office proportions, contacts and Escape-to-close.
+- Seven cases compare old/new display semantics: permit blocked, funding freeze, failed inspection, termination, delivered rent, lateness and liquid cooling.
+- Four- and six-hall early receipts avoid all caption anchors. Every utility/contact/finance panel remains inside the scene after zoom/scroll.
+- Actual pixels inspected after the final build: real developed six-hall day/night, zoomed H6 panel, 1024 desktop; earlier inspections include wide desktop, two/four/six-hall construction, meadow, failed inspection, liquid cooling, termination, receipts and finance.
 
-## Still needed
+## Still needed before a default-map release
 
-- This is not a full release regression or a live replay. Nothing has been pushed or deployed.
-- Final art-direction pass. Ground treatment is still simpler and more orthogonal than the shipped campus scene. The artwork remains a compact illustrated campus, not a literal survey of a full-size data-center site.
-- Check compact four-hall and six-hall early-game receipts, complete theme-specific field/pole context, and check all utility/finance panels while zoomed and scrolled.
-- Check blocked, terminated, late, paused and liquid-cooling edge cases in the new camera.
-- Fit/zoom button placement can crowd the crew caption at the bottom edge after scrolling.
-- Review shared renderer extraction before making this the default. Avoid maintaining two versions of gameplay display rules indefinitely.
-- Full source browser regression, full built suite and production inspection before any default-map release.
-
-The static standalone visual study was removed once the real playable prototype worked. The local opt-in remains reversible.
+- Nothing has been pushed, merged or deployed. The regression above proves old-default safety plus explicit opt-in behavior, not automatic adoption of the new map.
+- Test default adoption deliberately. Existing default-map visual checks pin rectangular layouts and need review, not blind assertion replacement. Keep single-hall and detailed view unaffected unless intentionally expanded.
+- Review compact placard legibility and direct-build cost/AP discoverability for a cold player. In fit view the entire campus is visible but buildings are smaller; zoom gives the detail view.
+- Consider a larger default camera or clearer panning affordance if fit view is too distant. Do not crop utilities silently.
+- Finish any desired traffic/service detail and night-ground lighting work using actual pixels.
+- Verify production deployment and replay the shipped map after any eventual release. No production result exists for this prototype yet.
