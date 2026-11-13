@@ -311,10 +311,16 @@ export function WorldCampusGround({
         )}
         {poles > 0 && (
           <g data-testid="world-power-poles">
-            {Array.from({ length: poles }, (_, i) => {
-              const q = p(80 + i * 100, -158);
+            {l.powerPoleAnchors(poles).map(({ x, y }, i) => {
+              const q = p(x, y);
               return (
-                <g key={i} data-testid="world-power-pole" transform={`translate(${q.x} ${q.y})`}>
+                <g
+                  key={i}
+                  data-testid="world-power-pole"
+                  data-world-x={x}
+                  data-world-y={y}
+                  transform={`translate(${q.x} ${q.y})`}
+                >
                   <path
                     d="M0 0v-59m-11 8h22m-9-7v10m-4-10v10"
                     stroke="#7e8165"
