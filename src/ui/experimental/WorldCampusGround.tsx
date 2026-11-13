@@ -1,6 +1,6 @@
 import { WorldCampusWoodland } from './WorldCampusWoodland';
 import { worldCampusLayout } from './worldCampusLayout';
-import { WorldCampusTraffic } from './WorldCampusTraffic';
+import { RoadVehicle, WorldCampusTraffic } from './WorldCampusTraffic';
 export function WorldCampusGround({
   count,
   night,
@@ -292,21 +292,8 @@ export function WorldCampusGround({
             {[0, 1, 2].map((i) => {
               const q = p(utilityWorldX - 40 + i * 40, -95);
               return (
-                <g
-                  key={i}
-                  data-testid="parked-campus-car"
-                  transform={`translate(${q.x} ${q.y}) rotate(30) scale(1 .57)`}
-                >
-                  <ellipse cx="2" cy="3" rx="14" ry="6" fill="#284b3b" opacity=".2" />
-                  <rect
-                    x="-11"
-                    y="-6"
-                    width="22"
-                    height="12"
-                    rx="4"
-                    fill={['#dfc58a', '#8daca4', '#b7c3b1'][i]}
-                  />
-                  <path d="M-4-5h7l3 3v4H-6v-4z" fill="#476c75" />
+                <g key={i} data-testid="parked-campus-car" transform={`translate(${q.x} ${q.y})`}>
+                  <RoadVehicle car parked paint={['#dfc58a', '#8daca4', '#b7c3b1'][i]} />
                 </g>
               );
             })}

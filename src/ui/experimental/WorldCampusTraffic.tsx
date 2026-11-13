@@ -1,13 +1,17 @@
 import type { WorldPoint } from './worldCampusLayout';
 
 /** Vehicle roofs share the road's isometric axes; body height and wheels stay upright. */
-function RoadVehicle({
+export function RoadVehicle({
   car = false,
+  parked = false,
+  paint = '#e4d6af',
   service = false,
   van = false,
   night = false,
 }: {
   car?: boolean;
+  parked?: boolean;
+  paint?: string;
   service?: boolean;
   van?: boolean;
   night?: boolean;
@@ -64,11 +68,13 @@ function RoadVehicle({
   return (
     <g
       data-testid={
-        car
-          ? 'road-passenger-vehicle'
-          : service
-            ? 'road-site-service-vehicle'
-            : 'road-freight-vehicle'
+        parked
+          ? 'parked-passenger-body'
+          : car
+            ? 'road-passenger-vehicle'
+            : service
+              ? 'road-site-service-vehicle'
+              : 'road-freight-vehicle'
       }
     >
       <polygon
@@ -113,8 +119,67 @@ function RoadVehicle({
       )}
       {car ? (
         <>
-          {box(-12, -5, 24, 10, 3, 4, '#e4d6af', '#b8b994', '#94a38e')}
+          {box(-12, -5, 24, 10, 3, 4, paint, '#b8b994', '#94a38e')}
           {box(-5, -4, 10, 8, 7, 4, '#d9d8bb', '#536f75', '#496873')}
+          <g data-testid="passenger-car-body-detail">
+            <polyline
+              points={poly([
+                [0, 5, 3],
+                [0, 5, 7],
+              ])}
+              stroke="#778e85"
+              strokeWidth=".6"
+            />
+            <polyline
+              points={poly([
+                [-4, 5, 6],
+                [-2, 5, 6],
+              ])}
+              stroke="#eef0da"
+              strokeWidth=".65"
+            />
+            <polygon
+              points={poly([
+                [12, -4, 4.5],
+                [12, 4, 4.5],
+                [12, 4, 5.5],
+                [12, -4, 5.5],
+              ])}
+              fill="#546b68"
+            />
+            {[-4, 3].map((y) => (
+              <polygon
+                key={y}
+                points={poly([
+                  [12, y, 5.8],
+                  [12, y + 1.3, 5.8],
+                  [12, y + 1.3, 6.8],
+                  [12, y, 6.8],
+                ])}
+                fill="#f6e6bd"
+              />
+            ))}
+            {[-4, 3].map((y) => (
+              <polygon
+                key={y}
+                points={poly([
+                  [-12, y, 4.5],
+                  [-12, y + 1.3, 4.5],
+                  [-12, y + 1.3, 6],
+                  [-12, y, 6],
+                ])}
+                fill="#ac785d"
+              />
+            ))}
+            <polyline
+              points={poly([
+                [5, -4, 7],
+                [5, 4, 7],
+              ])}
+              stroke="#d9e0c9"
+              strokeWidth=".65"
+            />
+          </g>
           <polyline
             points={poly([
               [-4, 0, 11],
