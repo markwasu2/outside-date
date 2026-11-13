@@ -14,7 +14,7 @@ export function SimpleResult(){
  const reason=state.outcome?.kind==='lose'?({default:'Cash ran out before the campus was ready.',allTerminated:'The tenant left because the building missed its final deadline.',docketDead:'Power approval failed.',equityWiped:'The sale did not cover the loans.'}[state.outcome.reason]??'The project could not finish.'):'';
  return <main data-testid="simple-result" style={{minHeight:'100vh',boxSizing:'border-box',display:'grid',placeItems:'center',padding:32,background:'#e9eddb',color:'#35442e',fontFamily:'system-ui,sans-serif'}}><section style={{width:940,maxWidth:'100%',padding:24,boxSizing:'border-box',background:'#fffdf4',border:'1px solid #b4bb98',borderRadius:14,boxShadow:'0 15px 40px #33442e15'}}>
   <div style={{display:'grid',gridTemplateColumns:'minmax(260px, .8fr) minmax(0, 1.2fr)',gap:28}}><ResultCampus state={state} content={content}/><div>
-  <div style={{fontSize:13,color:'#687b59'}}>OUTSIDE DATE · MONTH {state.month+1}</div>
+  <div data-testid="result-game-name" style={{fontSize:13,color:'#687b59'}}>Data Center Simulator · Month {state.month+1}</div>
   <h1 style={{fontFamily:'Georgia,serif',fontSize:34}}>{won?'Campus sold': 'Project ended'}</h1>
   <p style={{fontSize:18}}>{state.halls.filter(h=>h.delivered).length}/{state.halls.length} data centers opened.</p>
   {reason&&<p>{reason}</p>}

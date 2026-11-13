@@ -128,6 +128,9 @@ for (const width of [1280, 1024])
       await next.first().click();
     }
     await expect(page.getByRole('heading', { name: 'Campus sold', exact: true })).toBeVisible();
+    await expect(page.getByTestId('result-game-name')).toHaveText(/^Data Center Simulator · Month \d+$/);
+    await expect(page.getByTestId('simple-result')).not.toContainText('OUTSIDE DATE');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await expect(page.locator('body')).toContainText('1/1 data centers opened');
     await page.screenshot({ path: `/tmp/single-real-${width}-result.png` });
     expect(errors).toEqual([]);
