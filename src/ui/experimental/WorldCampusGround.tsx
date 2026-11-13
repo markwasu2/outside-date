@@ -207,63 +207,90 @@ export function WorldCampusGround({
               />
               <polygon points={quad(-87, 138, 169, 104)} fill="#829c6e" />
               <polygon points={quad(-95, 182, 185, 16)} fill="#dbd4bb" />
-              {[-52, 48].flatMap((x, i) =>
-                [160, 222].map((y, j) => {
-                  const q = p(x, y);
-                  return (
-                    <g
-                      key={`${i}-${j}`}
-                      data-testid="courtyard-shade-tree"
-                      transform={`translate(${q.x} ${q.y})`}
-                    >
-                      <ellipse cx="8" cy="4" rx="19" ry="7" fill="#213e36" opacity=".24" />
-                      <path
-                        d="M-2 2l1-27m0 11-7-10m7 10 7-13"
-                        stroke="#6d7051"
-                        strokeWidth="3"
-                        fill="none"
-                      />
-                      <path d="M-2 2v-22" stroke="#a4a078" strokeWidth="1" />
-                      <ellipse cx="-6" cy="-22" rx="13" ry="15" fill="#426a4c" />
-                      <ellipse cx="8" cy="-23" rx="13" ry="15" fill={i ? '#557e52' : '#68864f'} />
-                      <ellipse cy="-33" rx="16" ry="15" fill={j ? '#71945e' : '#879e60'} />
-                      <ellipse cx="-5" cy="-38" rx="9" ry="8" fill="#b0bf7e" opacity=".65" />
-                      <path
-                        d="M-12-27l5-3m7-10 5 2m0 17 5-2"
-                        stroke="#bfca8b"
-                        strokeWidth="1.5"
-                        opacity=".45"
-                      />
-                    </g>
-                  );
+              {/* Ground depth, not object type, decides which upright object is in front. */}
+              {[
+                ...[-52, 48].flatMap((x, i) =>
+                  [160, 222].map((y, j) => {
+                    const q = p(x, y);
+                    return {
+                      depth: x + y,
+                      node: (
+                        <g
+                          key={`tree-${i}-${j}`}
+                          data-world-depth={x + y}
+                          data-testid="courtyard-shade-tree"
+                          transform={`translate(${q.x} ${q.y})`}
+                        >
+                          <ellipse cx="8" cy="4" rx="19" ry="7" fill="#213e36" opacity=".24" />
+                          <path
+                            d="M-2 2l1-27m0 11-7-10m7 10 7-13"
+                            stroke="#6d7051"
+                            strokeWidth="3"
+                            fill="none"
+                          />
+                          <path d="M-2 2v-22" stroke="#a4a078" strokeWidth="1" />
+                          <ellipse cx="-6" cy="-22" rx="13" ry="15" fill="#426a4c" />
+                          <ellipse
+                            cx="8"
+                            cy="-23"
+                            rx="13"
+                            ry="15"
+                            fill={i ? '#557e52' : '#68864f'}
+                          />
+                          <ellipse cy="-33" rx="16" ry="15" fill={j ? '#71945e' : '#879e60'} />
+                          <ellipse cx="-5" cy="-38" rx="9" ry="8" fill="#b0bf7e" opacity=".65" />
+                          <path
+                            d="M-12-27l5-3m7-10 5 2m0 17 5-2"
+                            stroke="#bfca8b"
+                            strokeWidth="1.5"
+                            opacity=".45"
+                          />
+                        </g>
+                      ),
+                    };
+                  }),
+                ),
+                ...(opened
+                  ? [0, 1].map((i) => {
+                      const q = p(-10 + i * 22, 190);
+                      return {
+                        depth: -10 + i * 22 + 190,
+                        node: (
+                          <g
+                            key={`visitor-${i}`}
+                            data-world-depth={-10 + i * 22 + 190}
+                            data-testid="world-courtyard-visitor"
+                            transform={`translate(${q.x} ${q.y}) scale(.8)`}
+                          >
+                            <ellipse cy="7" rx="5" ry="2" fill="#233e35" opacity=".22" />
+                            <path d="M-2 2l-2 5m5-5 2 5" stroke="#3d5960" strokeWidth="2" />
+                            <path d="M0-5v8" stroke={i ? '#cbb68d' : '#738e9d'} strokeWidth="4" />
+                            <circle cy="-8" r="3" fill="#d5b78e" />
+                          </g>
+                        ),
+                      };
+                    })
+                  : []),
+                ...[-70, 50].map((x, i) => {
+                  const q = p(x, 191);
+                  return {
+                    depth: x + 191,
+                    node: (
+                      <g
+                        key={`bench-${i}`}
+                        data-world-depth={x + 191}
+                        transform={`translate(${q.x} ${q.y})`}
+                      >
+                        <ellipse cy="3" rx="13" ry="5" fill="#334c36" opacity=".2" />
+                        <path d="M-9-2l16 9m-16-13 16 9" stroke="#bcb08b" strokeWidth="3" />
+                        <path d="M-8-1v7M6 7v7" stroke="#597060" strokeWidth="2" />
+                      </g>
+                    ),
+                  };
                 }),
-              )}
-              {opened &&
-                [0, 1].map((i) => {
-                  const q = p(-10 + i * 22, 190);
-                  return (
-                    <g
-                      key={i}
-                      data-testid="world-courtyard-visitor"
-                      transform={`translate(${q.x} ${q.y}) scale(.8)`}
-                    >
-                      <ellipse cy="7" rx="5" ry="2" fill="#233e35" opacity=".22" />
-                      <path d="M-2 2l-2 5m5-5 2 5" stroke="#3d5960" strokeWidth="2" />
-                      <path d="M0-5v8" stroke={i ? '#cbb68d' : '#738e9d'} strokeWidth="4" />
-                      <circle cy="-8" r="3" fill="#d5b78e" />
-                    </g>
-                  );
-                })}
-              {[-70, 50].map((x, i) => {
-                const q = p(x, 191);
-                return (
-                  <g key={i} transform={`translate(${q.x} ${q.y})`}>
-                    <ellipse cy="3" rx="13" ry="5" fill="#334c36" opacity=".2" />
-                    <path d="M-9-2l16 9m-16-13 16 9" stroke="#bcb08b" strokeWidth="3" />
-                    <path d="M-8-1v7M6 7v7" stroke="#597060" strokeWidth="2" />
-                  </g>
-                );
-              })}
+              ]
+                .sort((a, b) => a.depth - b.depth)
+                .map(({ node }) => node)}
             </g>
           </g>
         )}
