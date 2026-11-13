@@ -50,6 +50,7 @@ for x,y,w in [(285,645,210),(557,659,160),(767,635,151)]:
 parts.append('<path d="M270 153l154 -2 78 6 152 -5 123 3 168 -2 22 12-173 -2-137 3-159 -1-121 -3-119 3z" fill="#998f70" opacity=".18"/><path d="M270 153l154 -2 78 6 152 -5 123 3 168 -2-10 -7-157 3-126 -3-153 5-81 -6-137 1z" fill="#e6d3a7" opacity=".34"/><path d="M981 215V610" stroke="#8c8c70" stroke-width="4" opacity=".12"/><path d="M985 215V610" stroke="#e6d8b0" stroke-width="2" opacity=".3"/></g>')
 # Mixed woodland lies outside the circulation loop and construction boundary.
 # Hand-set positions keep the office, power connection and clickable labels clear.
+woodland_start=len(parts)
 parts.append('<g id="perimeter-woodland">')
 locations=[(35,y) for y in range(140,730,96)]+[(1163,y) for y in range(130,760,78)]+[(x,776) for x in range(185,1100,89)]
 for i,(x,y) in enumerate(locations):
@@ -60,9 +61,9 @@ for i,(x,y) in enumerate(locations):
  # The first trees stay shorter to leave the public road clear.
  crown_scale=1.2 if y<160 else 1.5
  if y==776:y=816;crown_scale=1.3
- parts.append(f'<g data-tree="{i}" transform="translate({x} {y}) scale(1 {crown_scale}) translate({-x} {-y})">')
+ parts.append(f'<g data-tree="{i}" style="--tree-x:{x}px;--tree-y:{y}px;--tree-minus-x:{-x}px;--tree-minus-y:{-y}px;--tree-edge-scale:{crown_scale/1.5}" transform="translate({x} {y}) scale(1 {crown_scale}) translate({-x} {-y})">')
  # Quiet planting beds, trunk, ground shadow and a smaller companion shrub.
- parts.append(f'<ellipse cx="{x+4}" cy="{y+3}" rx="{spread+12}" ry="13" fill="#75815d" opacity=".3"/><ellipse cx="{x+15}" cy="{y+9}" rx="{spread+7}" ry="10" fill="#284b3b" opacity=".22" filter="url(#blur)"/><path d="M{x} {y}v-{height}" stroke="#726e4d" stroke-width="3.2"/>')
+ parts.append(f'<ellipse cx="{x+4}" cy="{y+3}" rx="{spread+12}" ry="13" fill="#75815d" opacity=".3"/><ellipse cx="{x+15}" cy="{y+9}" rx="{spread+7}" ry="10" fill="#284b3b" opacity=".22" filter="url(#blur)"/><g data-testid="upright-perimeter-tree"><path d="M{x} {y}v-{height}" stroke="#726e4d" stroke-width="3.2"/>')
  if species==0:
   # Layered spruce, darker below and lit from the upper left.
   for dz,w in [(14,spread),(25,spread-3),(35,spread-8)]:
@@ -83,12 +84,15 @@ for i,(x,y) in enumerate(locations):
    parts.append(f'<circle cx="{x+dx}" cy="{y+dy}" r="{r}" fill="{c}"/>')
  for dx,dy,r in [(-19,2,7),(15,-1,6),(23,4,4)]:
   parts.append(f'<ellipse cx="{x+dx+3}" cy="{y+dy+2}" rx="{r+2}" ry="3" fill="#284b3b" opacity=".2"/><ellipse cx="{x+dx}" cy="{y+dy-2}" rx="{r}" ry="{r*.65}" fill="{["#829566","#687f55","#a0aa74"][i%3]}"/>')
- parts.append('</g>')
+ parts.append('</g></g>')
 parts.append('</g>')
+woodland=''.join(parts[woodland_start:])
+Path('src/assets/campus/campus-woodland.svg').write_text(parts[0].split('</defs>')[0]+'</defs>'+woodland+'</svg>\n')
 # Whole ground texture stays low contrast so interface remains quiet.
 parts.append('<path fill="#9ca088" opacity=".08" filter="url(#grain)" d="M0 0h1200v800H0z"/><path d="M68 110V752H1133V110" fill="none" stroke="#c6ccaf" stroke-opacity=".65" stroke-dasharray="3 4"/></svg>')
 base=''.join(parts)+'\n'
 Path('src/assets/campus/campus-ground.svg').write_text(base)
+Path('src/assets/campus/campus-floor.svg').write_text(base.replace(woodland,''))
 # Keep circulation and build coordinates identical. Terrain outside the access
 # loop carries the site's character; it is scenery, never buildable capacity.
 for theme in ('meadow','quarry','depot'):
@@ -118,3 +122,4 @@ for theme in ('meadow','quarry','depot'):
  # Insert under the existing woodland, keeping its trunks and shadows in front.
  ground=ground.replace('<g id="perimeter-woodland">',detail+'<g id="perimeter-woodland">')
  Path('src/assets/campus/campus-ground-'+theme+'.svg').write_text(ground)
+ Path('src/assets/campus/campus-floor-'+theme+'.svg').write_text(ground.replace(woodland,''))

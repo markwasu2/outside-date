@@ -10,6 +10,7 @@ describe('visible site terrain',()=>{
   expect(new Set(themes.map(t=>siteTerrain(t).image)).size).toBe(4);
   expect(siteTerrain({ground:'#fff',pond:false,poles:0}).id).toBe('campus');
  });
+ it('separates upright tree bodies from flat ground shadows in each terrain',()=>{for(const svg of [meadow,quarry,depot]){expect((svg.match(/data-testid="upright-perimeter-tree"/g)??[]).length).toBe((svg.match(/data-tree=/g)??[]).length);expect(svg).toContain('--tree-edge-scale:');expect(svg).toContain('filter="url(#blur)"/><g data-testid="upright-perimeter-tree">');}});
  it('keeps the same roads and build area with different scenery beyond them',()=>{
   for(const svg of [meadow,quarry,depot]){expect(svg).toContain('M185 121H1019V690H185z');expect(svg).toContain('M136 85V730H1088V105');expect(svg).toContain('viewBox="0 0 1200 800"');}
   expect(meadow).toContain('meadow-field-rows');expect(quarry).toContain('quarry-rock-ledges');expect(depot).toContain('depot-old-siding');
