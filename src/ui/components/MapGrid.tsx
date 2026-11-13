@@ -1,5 +1,5 @@
 import {WorldCampusMap} from '../experimental/WorldCampusMap';
-import {unfundedWork} from '../board/constructionFunds';
+import {hallDisplay} from '../board/hallDisplay';
 import {TerrainLayer} from '../board/TerrainLayer';
 import {CampusGrounds} from '../board/CampusGrounds';
 import {CampusCompound} from '../board/CampusCompound';
@@ -13,18 +13,17 @@ import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } f
 
 import { formatMonth } from '../../engine/format';
 import { resolveContent } from '../../engine/resolve';
-import { hallGrossRent } from '../../engine/selectors';
 import { pondMitigated } from '../../engine/systems/construction';
 import { resolveSite } from '../../content/sites';
 import { STAGES } from '../../engine/types';
 import type { PlannedAction } from '../../engine/types';
 import { STAGE_ART, TILE_ART, SUBSTATION_ART, PLANT_ART, type TileArt } from '../art';
-import { LEGEND_ENTRIES, hallBlocker, hallCaption, pondStateWords, substationStateWords } from '../board/legibility';
+import { LEGEND_ENTRIES, hallCaption, pondStateWords, substationStateWords } from '../board/legibility';
 import { COOLING_ART, DELIVERY_TRUCK, EQUIP_ART } from '../art';
 import { checkAction, useStore } from '../store';
 import { usePrefersReducedMotion } from '../board/boardStyles';
 import { monthDeltas } from '../board/deltas';
-import { hallVisual, stageMinMonths } from '../board/hallVisual';
+import { stageMinMonths } from '../board/hallVisual';
 import { HallSprite } from '../board/HallSprite';
 import { laydownSummary } from '../board/actions';
 import { plantWaitingWords } from '../board/powerWords';
@@ -399,22 +398,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
         {draft.halls.map((hall) => {
           const look = hallLook(hall.stageIndex, hall.delivered);
           const selected = selectedHallId === hall.id;
-          const hallMins = [...stageMin];
-          if (hall.pad === 'far') hallMins[0] = (hallMins[0] ?? 1) + resolvedContent.tuning.spatial.farPadExtraMonths;
-          const extraFitout = draft.flags[`extraFitoutMonths:${hall.id}`];
-          if (typeof extraFitout === 'number') hallMins[3] = (hallMins[3] ?? 1) + extraFitout;
-          const visual = hallVisual(hall, hallMins);
-          if (hall.stageActive && (draft.flags.drawFreeze || unfundedWork(draft,content,hall)!==null)) visual.flags.paused = true;
-          const blocked = !hall.delivered && !hall.terminated && (!!hallBlocker(draft, content, hall) || visual.flags.paused || !!draft.flags[`inspectionFail:${hall.id}`]);
-          const late = !hall.delivered && !hall.terminated && draft.month > hall.outsideMonth;
-          const failedInspection = !!draft.flags[`inspectionFail:${hall.id}`];
-          // D4: the rent ticker reads the committed state every render (not just month deltas).
-          // Phase 6 (spatial spike): the rent ticker nets out a far pad's line losses.
-          const rent =
-            hall.delivered && !hall.terminated
-              ? hallGrossRent(state, content, hall) * (1 - content.tuning.lease.landlordCostShare) -
-                ((hall.pad ?? 'near') === 'far' ? content.tuning.spatial.farLineLossPerMonth : 0)
-              : null;
+          const {visual,blocked,late,failedInspection,rent} = hallDisplay(state,draft,content,hall,stageMin);
           const arrivalFlash = deltas.deliveredHalls.includes(hall.id) && !reducedMotion;
           return (
             <div

@@ -5,14 +5,14 @@ import { WorldBuildFeedback } from './WorldBuildFeedback';
 import { WorldCampusGround } from './WorldCampusGround';
 import { TILE_ART, SUBSTATION_ART, PLANT_ART, VEHICLE_ART } from '../art';
 import { HallSprite } from '../board/HallSprite';
-import { hallVisual, stageMinMonths } from '../board/hallVisual';
-import { hallBlocker, hallCaption, substationStateWords } from '../board/legibility';
+import { stageMinMonths } from '../board/hallVisual';
+import { hallCaption, substationStateWords } from '../board/legibility';
 import { simpleHallCaption } from '../board/simpleWords';
 import { TycoonMapControl } from '../board/TycoonMapControl';
 import { TycoonObjectPanel } from '../board/TycoonObjectPanel';
 import { usePrefersReducedMotion } from '../board/boardStyles';
 import { monthDeltas } from '../board/deltas';
-import { hallGrossRent } from '../../engine/selectors';
+import { hallDisplay } from '../board/hallDisplay';
 import { constructionWorking, unfundedWork } from '../board/constructionFunds';
 import cooling from '../../assets/campus/compound-cooling.svg';
 import backup from '../../assets/campus/compound-backup.svg';
@@ -140,6 +140,8 @@ export function WorldCampusMap({ night }: { night: boolean }) {
             reducedMotion={reduced}
             workers={draft.halls.flatMap((h, i) =>
               h.stageActive &&
+              !h.delivered &&
+              !h.terminated &&
               !h.pausedThisMonth &&
               !draft.flags.drawFreeze &&
               !draft.flags[`inspectionFail:${h.id}`] &&
@@ -236,35 +238,19 @@ export function WorldCampusMap({ night }: { night: boolean }) {
             </section>
           )}
           {draft.halls.map((hall, i) => {
-            const hallMins = [...mins];
-            if (hall.pad === 'far')
-              hallMins[0] = (hallMins[0] ?? 1) + resolved.tuning.spatial.farPadExtraMonths;
-            const extra = draft.flags[`extraFitoutMonths:${hall.id}`];
-            if (typeof extra === 'number') hallMins[3] = (hallMins[3] ?? 1) + extra;
-            const visual = hallVisual(hall, hallMins);
-            if (
-              hall.stageActive &&
-              (draft.flags.drawFreeze || unfundedWork(draft, content, hall) !== null)
-            )
-              visual.flags.paused = true;
-            const rent =
-              hall.delivered && !hall.terminated
-                ? hallGrossRent(state, content, hall) *
-                    (1 - content.tuning.lease.landlordCostShare) -
-                  ((hall.pad ?? 'near') === 'far' ? content.tuning.spatial.farLineLossPerMonth : 0)
-                : null;
+            const { visual, blocked, late, failedInspection, rent } = hallDisplay(
+              state,
+              draft,
+              content,
+              hall,
+              mins,
+            );
             return (
               <div
                 key={hall.id}
                 data-hall-id={hall.id}
                 data-campus-object={hall.id}
-                data-blocked={
-                  !hall.delivered &&
-                  !hall.terminated &&
-                  (!!hallBlocker(draft, content, hall) ||
-                    visual.flags.paused ||
-                    !!draft.flags[`inspectionFail:${hall.id}`])
-                }
+                data-blocked={blocked}
                 style={{ ...rect(layout.halls[i]!), cursor: 'pointer' }}
                 role="group"
                 aria-label={`${hall.id} data center`}
@@ -283,7 +269,15 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                     open(hall.id);
                   }}
                 />
-                <div style={{ ...label, minHeight: 17 }}>
+                <div
+                  style={{
+                    ...label,
+                    minHeight: 17,
+                    pointerEvents: 'none',
+                    maxWidth: '95%',
+                    whiteSpace: 'normal',
+                  }}
+                >
                   <strong
                     data-testid={`hall-sign-${hall.id}`}
                     style={{ marginRight: 6, color: selected === hall.id ? '#a46c35' : undefined }}
@@ -313,8 +307,8 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                   <HallSprite
                     visual={visual}
                     night={night}
-                    late={!hall.delivered && !hall.terminated && draft.month > hall.outsideMonth}
-                    failedInspection={!!draft.flags[`inspectionFail:${hall.id}`]}
+                    late={late}
+                    failedInspection={failedInspection}
                     queuedGhost={false}
                     rent={null}
                     spendFloat={deltas.spendByHall[hall.id] ?? 0}
@@ -424,14 +418,25 @@ export function WorldCampusMap({ night }: { night: boolean }) {
             )}
           </section>
         </div>
-        <button
-          data-testid="world-zoom"
-          onClick={() => setZoom(zoom === 1 ? 1.7 : 1)}
-          style={{ position: 'sticky', bottom: 10, left: 10, zIndex: 10 }}
-        >
-          {zoom === 1 ? 'Zoom in' : 'Fit campus'}
-        </button>
       </div>
+      <button
+        data-testid="world-zoom"
+        onClick={() => setZoom(zoom === 1 ? 1.7 : 1)}
+        style={{
+          position: 'absolute',
+          top: 8,
+          left: 10,
+          zIndex: 15,
+          padding: '5px 9px',
+          borderRadius: 5,
+          border: '1px solid #82947c',
+          background: '#fffdf2',
+          color: '#3c553d',
+          cursor: 'pointer',
+        }}
+      >
+        {zoom === 1 ? 'Zoom in' : 'Fit campus'}
+      </button>
       <WorldBuildFeedback />
       {popover && (
         <TycoonObjectPanel
