@@ -4,4 +4,4 @@ Local candidate after PR290. Two- and three-hall layouts still had a shallow 150
 
 Inspected actual two/three-hall construction fixture pixels. Both equipment pads now lie within the roads, rather than through the tree border. Construction leaves a large southern reserve court; do not claim finished art or add scenery solely to fill it.
 
-So far: 8 layout unit cases, 16 focused source-browser cases, production build pass. All-unit, compiled-app and production replay still required before release. Nothing pushed or deployed.
+Verification: 780 unit cases, 20 focused source-browser cases, all 37 compiled-app cases, lint/build pass. Completed two/three-hall fixtures at 1024/1280 day/night visually inspected, with rent inspection still reachable. These are synthetic state fixtures, not claimed real two/three-hall full journeys. Real single/four/six-hall sale journeys remain in the compiled regression suite. Production replay follows deployment.
