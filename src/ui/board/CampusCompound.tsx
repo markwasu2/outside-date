@@ -86,8 +86,8 @@ export function CampusCompound({night}:{night:boolean}){
     <path d="M577 268h83v226H577z" fill="url(#court-turf)"/>
     <path d="M594 272v216M641 272v216" stroke="#9fb48a" strokeWidth="1" opacity=".4"/>
     <path d="M568 395h101v18H568z" fill="#d7cfb9"/>
-    {[282,335,443,478].map((y,i)=>{const x=i%2?635:593;return <g key={y} data-testid="courtyard-shade-tree" transform={`translate(${x} ${y}) scale(1 1.6) translate(${-x} ${-y})`}>
-     <ellipse cx={x+9} cy={y+8} rx="20" ry="9" fill="#213e36" opacity=".24"/>
+    {[282,335,443,478].map((y,i)=>{const x=i%2?635:593;return <g key={y} data-testid="courtyard-shade-tree" transform={`translate(${x} ${y})`}>
+     <ellipse cx="9" cy="8" rx="20" ry="9" fill="#213e36" opacity=".24"/><g data-testid="upright-courtyard-tree" style={{transform:"scaleY(var(--scene-vertical-correction,1))",transformOrigin:"0px 0px"}}><g transform={`translate(${-x} ${-y})`}>
      <path d={`M${x-2} ${y+3}l1 -27m0 11-7-10m7 10 7-13`} stroke="#6d7051" strokeWidth="3" fill="none"/>
      <path d={`M${x-2} ${y+2}v-22`} stroke="#a4a078" strokeWidth="1"/>
      <ellipse cx={x-6} cy={y-22} rx="13" ry="15" fill="#426a4c"/>
@@ -95,7 +95,7 @@ export function CampusCompound({night}:{night:boolean}){
      <ellipse cx={x} cy={y-33} rx="16" ry="15" fill={i%2?'#71945e':'#879e60'}/>
      <ellipse cx={x-5} cy={y-38} rx="9" ry="8" fill="#b0bf7e" opacity=".65"/>
      <path d={`M${x-12} ${y-27}l5 -3m7-10 5 2m0 17 5-2`} stroke="#bfca8b" strokeWidth="1.5" opacity=".45"/>
-    </g>;})}
+    </g></g></g>;})}
     {[300,464].map(y=><g key={y}><rect x="657" y={y} width="10" height="21" rx="2" fill="#5c726b"/><path d={`M658 ${y+4}h8m-8 4h8m-8 4h8m-8 4h8`} stroke="#c7b68b" strokeWidth="2"/></g>)}
     </g>}
     <g data-testid="utility-screen-planting">
