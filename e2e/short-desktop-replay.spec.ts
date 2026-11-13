@@ -1,0 +1,146 @@
+import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+test.use({ storageState: { cookies: [], origins: [] } });
+for (const width of [1280, 1024])
+  test(`short desktop controls stay clickable through sale at ${width}`, async ({ page }) => {
+    test.setTimeout(65000);
+    await page.setViewportSize({ width, height: 640 });
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    const trace: string[] = [];
+    await page.goto('/');
+    await expect(page.getByTestId('simple-start')).toContainText('Build a data center.');
+    await page.screenshot({ path: `/tmp/short-real-${width}-title.png` });
+    await page.getByTestId('start-first-campus').click();
+    await expect(page.getByTestId('tycoon-game')).toBeVisible();
+    await expect(page.getByTestId('map-root')).toHaveAttribute('data-world-camera', 'true');
+    await expect(page.getByTestId('simple-goal')).toContainText('0/1');
+    await expect(page.getByTestId('action-desk')).toHaveCount(0);
+    await expect(page.getByTestId('cold-intro')).toHaveCount(0);
+    await expect(page.getByTestId('month-review')).toHaveCount(0);
+    await page.screenshot({ path: `/tmp/short-real-${width}-opening.png` });
+    await expect(page.getByTestId('simple-next-month')).toBeInViewport();
+    for (let month = 0; month < 35; month++) {
+      if (!(await page.getByTestId('tycoon-game').count())) break;
+      const slider = page.getByTestId('event-scale');
+      if (await slider.count()) {
+        await slider.fill('0');
+        await page.getByTestId('event-choice-commit').click();
+      }
+      if ([0,2,4,6,8].includes(month)) {
+        await page.getByTestId('world-zoom').click();
+        await page.screenshot({path:`/tmp/short-stage-${width}-${month}-north.png`});
+        await page.getByTestId('world-camera-scroll').evaluate(e=>{e.scrollTop=e.scrollHeight;e.scrollLeft=e.scrollWidth});
+        await page.screenshot({path:`/tmp/short-stage-${width}-${month}-south.png`});
+        await page.getByTestId('world-zoom').click();
+        await page.getByTestId('world-camera-scroll').evaluate(e=>{e.scrollTop=0;e.scrollLeft=0});
+      }
+      if (await page.getByTestId('simple-sell').count()) {
+        await expect(page.getByTestId('ambient-service-truck')).toBeVisible();
+        await expect(page.getByTestId('campus-entry')).toBeVisible();
+        await expect(page.getByTestId('world-single-courtyard')).toBeVisible();
+        await expect(page.getByTestId('world-courtyard-visitor')).toHaveCount(2);
+        // Upright objects must paint back-to-front, not people on a front tree's canopy.
+        const courtyardDepths = await page
+          .getByTestId('campus-courtyard')
+          .locator(':scope > [data-world-depth]')
+          .evaluateAll((els) => els.map((el) => Number(el.getAttribute('data-world-depth'))));
+        expect(courtyardDepths).toEqual([108, 121, 170, 180, 202, 208, 241, 270]);
+        await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
+        await page.getByTestId('world-camera-scroll').evaluate((el) => {
+          el.scrollLeft = el.scrollWidth;
+          el.scrollTop = el.scrollHeight;
+        });
+        await page.screenshot({ path: `/tmp/short-courtyard-${width}-day.png` });
+        await page.getByTestId('night-view').click();
+        await page.screenshot({ path: `/tmp/short-courtyard-${width}-night.png` });
+        await page.getByTestId('night-view').click();
+        await page.getByRole('button', { name: 'Fit campus', exact: true }).click();
+        await expect(page.getByTestId('simple-feedback')).toContainText('Campus ready to sell');
+        await expect(page.getByTestId('monthly-receipt')).not.toContainText('Review the blockers');
+        await page.screenshot({ path: `/tmp/short-real-${width}-ready-sale.png` });
+        await expect(page.getByTestId('hall-night-lights')).toHaveCount(0);
+        await page.getByTestId('night-view').click();
+        await expect(page.getByTestId('hall-night-lights')).toBeVisible();
+        await page.screenshot({ path: `/tmp/short-real-${width}-night.png` });
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await expect(
+          page.getByTestId('ambient-service-truck').locator('animateMotion'),
+        ).toHaveCount(0);
+        await page.getByTestId('rent-ticker').click();
+        await expect(page.getByTestId('rent-income-explanation')).toBeVisible();
+        await page.getByTestId('inspect-rent-money').click();
+        await expect(page.getByTestId('money-current-position')).toBeVisible();
+        await page
+          .getByTestId('simple-object-panel')
+          .getByRole('button', { name: 'Close', exact: true })
+          .click();
+        await page.getByTestId('night-view').click();
+        await page.getByTestId('simple-sell').click();
+        await page.getByTestId('commit-takeout').click();
+        break;
+      }
+      const cure = page.getByRole('button', {
+        name: 'Unfreeze building funds · 2 points',
+        exact: true,
+      });
+      if ((await cure.count()) && (await cure.isEnabled())) await cure.click();
+      for (const id of width === 1440
+        ? ['road', 'substation', 'siteOffice', 'H1']
+        : ['road', 'siteOffice', 'H1', 'substation']) {
+        const direct = page.locator(`[data-map-control="${id}"] button`);
+        if (!(await direct.count()) || !(await direct.isEnabled())) continue;
+        const label = await direct.innerText();
+        if (
+          /Buy land|Build foundation|Build frame|Build walls|Install interiors|Test & open|Repair/.test(
+            label,
+          )
+        ) {
+          trace.push(`month ${month + 1}: ${label}`);
+          await direct.click();
+          continue;
+        }
+        if (id === 'H1') continue;
+        await direct.click({timeout:5000});
+        const panel = page.getByTestId('simple-object-panel');
+        await expect(panel).toBeVisible();
+        for (let pass = 0; pass < 3; pass++) {
+          const buttons = panel.getByTestId('simple-do-action');
+          let acted = false;
+          for (let i = 0; i < (await buttons.count()); i++) {
+            const b = buttons.nth(i),
+              name = await b.innerText();
+            if (
+              /Start power study|Order electrical equipment|Apply for building permit/.test(name) &&
+              (await b.isEnabled())
+            ) {
+              trace.push(`month ${month + 1}: ${name}`);
+              await b.click();
+              acted = true;
+              break;
+            }
+          }
+          if (!acted) break;
+        }
+        await panel.getByRole('button', { name: 'Close', exact: true }).click();
+      }
+      trace.push(await page.getByTestId('simple-feedback').innerText());
+      fs.writeFileSync('/tmp/short-real-trace.txt', trace.join('\n'));
+      if ([1, 4, 10, 16, 19].includes(month))
+        await page.screenshot({ path: `/tmp/short-real-${width}-month-${month + 1}.png` });
+      await page.getByTestId('simple-next-month').click();
+    }
+    for (let i = 0; i < 8; i++) {
+      const next = page.getByRole('button', { name: /^(Skip|Continue)$/ });
+      if (!(await next.count())) break;
+      await next.first().click();
+    }
+    await expect(page.getByRole('heading', { name: 'Campus sold', exact: true })).toBeVisible();
+    await expect(page.getByTestId('result-game-name')).toHaveText(/^Data Center Simulator · Month \d+$/);
+    await expect(page.getByTestId('simple-result')).not.toContainText('OUTSIDE DATE');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await expect(page.locator('body')).toContainText('1/1 data centers opened');
+    await page.screenshot({ path: `/tmp/short-real-${width}-result.png` });
+    expect(errors).toEqual([]);
+    fs.writeFileSync('/tmp/short-real-trace.txt', trace.join('\n'));
+  });
