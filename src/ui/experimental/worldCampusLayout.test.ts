@@ -47,6 +47,22 @@ describe('shared isometric world camera', () => {
     }
     expect(l.perimeterTrees.filter((q) => q.x === l.right + 65).every((q) => q.y >= 10)).toBe(true);
   });
+  it.each([1, 2, 3, 4, 5, 6])('keeps all utility poles on clear verge for %i halls', (count) => {
+    const l = worldCampusLayout(count);
+    for (const n of [0, 1, 2, 3, 4]) {
+      const poles = l.powerPoleAnchors(n);
+      expect(poles).toHaveLength(n);
+      for (const q of poles) {
+        expect(q.x).toBeLessThanOrEqual(l.utilityWorldX - 90);
+        expect(q.x).toBeGreaterThanOrEqual(-40);
+        expect(q.y).toBe(-158);
+      }
+      for (let i = 1; i < poles.length; i++)
+        expect(poles[i]!.x - poles[i - 1]!.x).toBeGreaterThanOrEqual(70);
+      if (count > 1 || n <= 2)
+        expect(poles.map((q) => q.x)).toEqual(Array.from({ length: n }, (_, i) => 80 + i * 100));
+    }
+  });
   it('uses exactly the building art camera for ground edges without distorting upright height', () => {
     const l = worldCampusLayout(6),
       o = l.project(0, 0),

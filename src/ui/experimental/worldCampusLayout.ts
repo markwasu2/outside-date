@@ -42,6 +42,16 @@ export function worldCampusLayout(count: number) {
     project,
     sprite,
     utilityWorldX,
+    powerPoleAnchors: (count: number) => {
+      // Keep upright poles on the north verge, clear of the substation/reserve.
+      // Existing 100-unit spacing stays unless a small campus needs a shorter row.
+      const last = Math.min(80 + (count - 1) * 100, utilityWorldX - 90);
+      const first = Math.max(-40, last - (count - 1) * 100);
+      return Array.from({ length: count }, (_, i) => ({
+        x: count === 1 ? 80 : first + (i * (last - first)) / (count - 1),
+        y: -158,
+      }));
+    },
     // Upright trees sit outside both the roads and the reserved power-plant pad.
     perimeterTrees: [
       ...Array.from({ length: Math.ceil((right + 200) / 80) }, (_, i) => ({
