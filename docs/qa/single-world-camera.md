@@ -16,10 +16,10 @@ Extend the simple-mode shared camera to the first single-hall campus. Detailed m
 
 - 775 unit tests pass. Lint and production build pass.
 - 35 compiled-app tests pass across four shards and a targeted correction rerun. These include default 1024/1280 single-hall build-to-sale, custom air/liquid/meadow/siding sales, four-hall sale, six-hall expansion, no-power loss and legacy asset-layout coverage.
-- The 288-case source-browser suite was exercised across eight shards. Initial oversized concurrency caused timeouts; later two-worker runs were stable. Adoption failures were corrected and targeted cases rerun. Several shards were cut short by command duration and covered by named reruns. A fresh full source-suite shard pass remains the final pre-release check, rather than presenting that interrupted aggregate as a clean all-green run.
+- All 288 source-browser cases now pass in fresh two-worker 16-shard runs. Shard 16 was interrupted by a combined command duration cap after shard 15; its full standalone rerun passed all 18. Earlier migration failures and overloaded-run timeouts were corrected before this clean pass.
 - Inspected actual compiled-game 1024 sale and 1280 night pixels, plus construction, opening, wetlands, arrival-highlight and multi-hall fixtures. Screenshots in `docs/screenshots/single-world/`.
 - Exact historical renderer tests opt out explicitly. Default journeys and shared-world scale tests do not opt in, so they prove the changed default.
 
 ## Release state
 
-Local only. No push, PR, merge or production deployment yet. Next: fresh source-regression shards, review final diff, ship, then replay the production bundle and inspect production pixels.
+Source and compiled verification complete. Release candidate ready; production deployment and replay remain pending.
