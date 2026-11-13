@@ -286,16 +286,17 @@ export function WorldCampusTraffic({
     `translate(${points[0]!.x + (points[1]!.x - points[0]!.x) * fraction} ${points[0]!.y + (points[1]!.y - points[0]!.y) * fraction})`;
   return (
     <g data-testid="world-road-traffic">
-      <g data-testid="ambient-truck" transform={reducedMotion ? pose(freight, 0.4) : undefined}>
-        <RoadVehicle night={night} />
-        {!reducedMotion && (
-          <animateMotion dur="38s" begin="-15s" repeatCount="indefinite" path={d(freight)} />
-        )}
-      </g>
+      {/* Paint the far lane first so passing cars stay behind the nearer freight body. */}
       <g data-testid="ambient-car" transform={reducedMotion ? pose(car, 0.3) : undefined}>
         <RoadVehicle night={night} car />
         {!reducedMotion && (
           <animateMotion dur="29s" begin="-9s" repeatCount="indefinite" path={d(car)} />
+        )}
+      </g>
+      <g data-testid="ambient-truck" transform={reducedMotion ? pose(freight, 0.4) : undefined}>
+        <RoadVehicle night={night} />
+        {!reducedMotion && (
+          <animateMotion dur="38s" begin="-15s" repeatCount="indefinite" path={d(freight)} />
         )}
       </g>
       {(working || operating) && (
