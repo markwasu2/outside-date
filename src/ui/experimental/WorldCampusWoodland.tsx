@@ -46,6 +46,8 @@ export function WorldCampusWoodland({
         return tree ? (
           <g
             key={i}
+            data-tree-root-x={x}
+            data-tree-root-y={y}
             transform={`translate(${x - tree.x} ${y - tree.y})`}
             dangerouslySetInnerHTML={{ __html: tree.body }}
           />

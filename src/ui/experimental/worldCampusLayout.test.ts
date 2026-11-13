@@ -31,6 +31,22 @@ describe('shared isometric world camera', () => {
       expect(l.halls[0]!.width).toBe(300);
     },
   );
+  it.each([1, 2, 3, 4, 5, 6])('keeps tree roots out of the plant reserve for %i halls', (count) => {
+    const l = worldCampusLayout(count);
+    const pad = {
+      left: l.utilityWorldX - 50,
+      right: l.utilityWorldX + 300,
+      top: -190,
+      bottom: -90,
+    };
+    expect(l.perimeterTrees.length).toBeGreaterThan(10);
+    for (const q of l.perimeterTrees) {
+      expect(q.x >= pad.left && q.x <= pad.right && q.y >= pad.top && q.y <= pad.bottom).toBe(
+        false,
+      );
+    }
+    expect(l.perimeterTrees.filter((q) => q.x === l.right + 65).every((q) => q.y >= 10)).toBe(true);
+  });
   it('uses exactly the building art camera for ground edges without distorting upright height', () => {
     const l = worldCampusLayout(6),
       o = l.project(0, 0),
