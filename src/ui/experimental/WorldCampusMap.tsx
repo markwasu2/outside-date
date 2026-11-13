@@ -122,7 +122,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
         } as CSSProperties
       }
     >
-      <style>{`[data-world-single="true"] [data-world-hall-placard] button{font-size:12px!important;}[data-world-camera="true"] [data-testid="campus-people"]{width:var(--world-people-size)!important;height:var(--world-people-size)!important;}[data-world-camera="true"] [data-scene-object="office"]{padding:0!important;}[data-world-camera="true"] [data-testid="campus-people"] > img,[data-world-camera="true"] [data-scene-object="office"] > img{width:100%!important;height:100%!important;inset:0!important;transform:none!important;}[data-world-camera="true"] [data-map-control="siteOffice"],[data-world-camera="true"] [data-map-control="substation"]{bottom:-12px!important;}[data-world-camera="true"]::before{display:none;}[data-world-hall-placard] [data-map-control]{position:relative!important;bottom:auto!important;left:0!important;transform:translateX(-50%)!important;max-width:none!important;}[data-world-camera="true"] [data-testid="hall-art-frame"]{max-width:none!important;max-height:none!important;}`}</style>
+      <style>{`[data-world-single="true"] [data-world-hall-placard] button{font-size:12px!important;}[data-world-camera="true"] [data-testid="campus-people"]{width:var(--world-people-size)!important;height:var(--world-people-size)!important;}[data-world-camera="true"] [data-scene-object="office"]{padding:0!important;}[data-world-camera="true"] [data-testid="campus-people"] > img,[data-world-camera="true"] [data-scene-object="office"] > img{width:100%!important;height:100%!important;inset:0!important;transform:none!important;}[data-world-camera="true"] [data-map-control="siteOffice"],[data-world-camera="true"] [data-map-control="substation"]{bottom:-12px!important;}[data-world-camera="true"]::before{display:none;}[data-world-hall-placard] button{pointer-events:auto;}[data-world-hall-placard] [data-map-control]{position:relative!important;bottom:auto!important;left:0!important;transform:translateX(-50%)!important;max-width:none!important;}[data-world-camera="true"] [data-testid="hall-art-frame"]{max-width:none!important;max-height:none!important;}`}</style>
       <div
         data-testid="world-camera-scroll"
         style={{ position: 'absolute', inset: 0, overflow: 'auto' }}
@@ -350,6 +350,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                     position: 'absolute',
                     left: '62%',
                     top: '90%',
+                    pointerEvents: 'none',
                     zIndex: 20,
                     width: draft.halls.length === 1 ? 160 : undefined,
                   }}
