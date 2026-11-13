@@ -1,4 +1,5 @@
 import {unfundedWork} from '../board/constructionFunds';
+import {TerrainLayer} from '../board/TerrainLayer';
 import {CampusGrounds} from '../board/CampusGrounds';
 import {CampusCompound} from '../board/CampusCompound';
 import {CampusLife} from '../board/CampusLife';
@@ -299,6 +300,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
         background: `url("${siteTerrain(siteTheme).image}") center / 100% 100%, linear-gradient(#eadbbccc, #e0ca9acc), ${siteTheme.ground}`,
       }}
     >
+      <TerrainLayer groundImage={siteTerrain(siteTheme).groundImage}/>
       {simple&&<><CampusGrounds night={night}/><CampusCompound night={night}/></>}
       <CampusLife night={night}/>
       {!simple && <BoardLegend />}
