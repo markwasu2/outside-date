@@ -8,7 +8,7 @@ test('shared camera preserves art proportions, crew scale and reachable panels a
   await page.addInitScript(() => localStorage.setItem('outside-date-world-campus-preview', 'true'));
   await page.goto('/');
   await page.getByTestId('start-first-campus').click();
-  for (const count of [2, 3, 4, 5, 6]) {
+  for (const count of [1, 2, 3, 4, 5, 6]) {
     await page.evaluate(async (count) => {
       const { useStore } = await import('/src/ui/store.ts');
       const s = structuredClone(useStore.getState().draft);

@@ -275,7 +275,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
   const substationEnergized = power.substationStatus === 'done';
   const studyMonthsLeft = power.studyStatus === 'pending' && power.studyDoneMonth !== null ? power.studyDoneMonth - draft.month : null;
 
-  if(simple&&draft.halls.length>1&&localStorage.getItem('outside-date-world-campus-preview')!=='false')return <WorldCampusMap night={night}/>;
+  if(simple&&((draft.halls.length>1&&localStorage.getItem('outside-date-world-campus-preview')!=='false')||(draft.halls.length===1&&localStorage.getItem('outside-date-single-world-preview')!=='false')))return <WorldCampusMap night={night}/>;
   return (
     <div
       ref={containerRef}

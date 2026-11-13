@@ -4,10 +4,12 @@ import type { WorldPoint } from './worldCampusLayout';
 function RoadVehicle({
   car = false,
   service = false,
+  van = false,
   night = false,
 }: {
   car?: boolean;
   service?: boolean;
+  van?: boolean;
   night?: boolean;
 }) {
   const p = (x: number, y: number, z = 0) => {
@@ -58,7 +60,7 @@ function RoadVehicle({
       />
     </>
   );
-  const half = car ? 12 : service ? 17 : 25;
+  const half = car ? 12 : van ? 16 : service ? 17 : 25;
   return (
     <g
       data-testid={
@@ -138,7 +140,17 @@ function RoadVehicle({
                 strokeWidth=".7"
               />
             ))}
-          {box(half - 11, -6, 12, 12, 4, 9, '#dfbc72', '#ba9555', '#9c8e5e')}
+          {box(
+            half - 11,
+            -6,
+            12,
+            12,
+            4,
+            9,
+            van ? '#e1e3d2' : '#dfbc72',
+            van ? '#bec9b8' : '#ba9555',
+            van ? '#93a99d' : '#9c8e5e',
+          )}
           <polygon
             points={poly([
               [half + 1, -4.8, 9],
@@ -177,6 +189,7 @@ function RoadVehicle({
 export function WorldCampusTraffic({
   night,
   working,
+  operating = false,
   reducedMotion,
   road,
   service,
@@ -185,6 +198,7 @@ export function WorldCampusTraffic({
   height: number;
   night: boolean;
   working: boolean;
+  operating?: boolean;
   reducedMotion: boolean;
   road: WorldPoint[];
   service: WorldPoint[];
@@ -219,15 +233,19 @@ export function WorldCampusTraffic({
           <animateMotion dur="29s" begin="-9s" repeatCount="indefinite" path={d(car)} />
         )}
       </g>
-      {working && (
-        <g
-          data-testid="ambient-service-truck"
-          transform={reducedMotion ? pose(site, 0.65) : undefined}
-        >
-          <RoadVehicle night={night} service />
-          {!reducedMotion && (
-            <animateMotion dur="45s" begin="-18s" repeatCount="indefinite" path={d(site)} />
-          )}
+      {(working || operating) && (
+        <g data-testid={operating ? 'campus-service-traffic' : undefined}>
+          <g
+            data-testid="ambient-service-truck"
+            transform={reducedMotion ? pose(site, 0.65) : undefined}
+          >
+            <g data-testid={operating ? 'service-van' : undefined}>
+              <RoadVehicle night={night} service van={operating && !working} />
+            </g>
+            {!reducedMotion && (
+              <animateMotion dur="45s" begin="-18s" repeatCount="indefinite" path={d(site)} />
+            )}
+          </g>
         </g>
       )}
     </g>

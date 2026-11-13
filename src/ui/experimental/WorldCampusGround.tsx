@@ -8,6 +8,7 @@ export function WorldCampusGround({
   fitted,
   theme,
   working = false,
+  opened = false,
   reducedMotion = false,
   workers = [],
   poles = 0,
@@ -18,6 +19,7 @@ export function WorldCampusGround({
   fitted: boolean;
   theme: string;
   working?: boolean;
+  opened?: boolean;
   reducedMotion?: boolean;
   workers?: { x: number; y: number }[];
   poles?: number;
@@ -194,6 +196,91 @@ export function WorldCampusGround({
               />
             </g>
           ))}
+        {land && fitted && count === 1 && (
+          <g data-testid="world-single-courtyard">
+            <g data-testid="campus-courtyard">
+              <polygon
+                points={quad(-95, 130, 185, 120)}
+                fill="#ccd1bb"
+                stroke="#e2e1c6"
+                strokeWidth="2"
+              />
+              <polygon points={quad(-87, 138, 169, 104)} fill="#829c6e" />
+              <polygon points={quad(-95, 182, 185, 16)} fill="#dbd4bb" />
+              {[-52, 48].flatMap((x, i) =>
+                [160, 222].map((y, j) => {
+                  const q = p(x, y);
+                  return (
+                    <g
+                      key={`${i}-${j}`}
+                      data-testid="courtyard-shade-tree"
+                      transform={`translate(${q.x} ${q.y})`}
+                    >
+                      <ellipse cx="8" cy="4" rx="19" ry="7" fill="#213e36" opacity=".24" />
+                      <path
+                        d="M-2 2l1-27m0 11-7-10m7 10 7-13"
+                        stroke="#6d7051"
+                        strokeWidth="3"
+                        fill="none"
+                      />
+                      <path d="M-2 2v-22" stroke="#a4a078" strokeWidth="1" />
+                      <ellipse cx="-6" cy="-22" rx="13" ry="15" fill="#426a4c" />
+                      <ellipse cx="8" cy="-23" rx="13" ry="15" fill={i ? '#557e52' : '#68864f'} />
+                      <ellipse cy="-33" rx="16" ry="15" fill={j ? '#71945e' : '#879e60'} />
+                      <ellipse cx="-5" cy="-38" rx="9" ry="8" fill="#b0bf7e" opacity=".65" />
+                      <path
+                        d="M-12-27l5-3m7-10 5 2m0 17 5-2"
+                        stroke="#bfca8b"
+                        strokeWidth="1.5"
+                        opacity=".45"
+                      />
+                    </g>
+                  );
+                }),
+              )}
+              {opened &&
+                [0, 1].map((i) => {
+                  const q = p(-10 + i * 22, 190);
+                  return (
+                    <g
+                      key={i}
+                      data-testid="world-courtyard-visitor"
+                      transform={`translate(${q.x} ${q.y}) scale(.8)`}
+                    >
+                      <ellipse cy="7" rx="5" ry="2" fill="#233e35" opacity=".22" />
+                      <path d="M-2 2l-2 5m5-5 2 5" stroke="#3d5960" strokeWidth="2" />
+                      <path d="M0-5v8" stroke={i ? '#cbb68d' : '#738e9d'} strokeWidth="4" />
+                      <circle cy="-8" r="3" fill="#d5b78e" />
+                    </g>
+                  );
+                })}
+              {[-70, 50].map((x, i) => {
+                const q = p(x, 191);
+                return (
+                  <g key={i} transform={`translate(${q.x} ${q.y})`}>
+                    <ellipse cy="3" rx="13" ry="5" fill="#334c36" opacity=".2" />
+                    <path d="M-9-2l16 9m-16-13 16 9" stroke="#bcb08b" strokeWidth="3" />
+                    <path d="M-8-1v7M6 7v7" stroke="#597060" strokeWidth="2" />
+                  </g>
+                );
+              })}
+            </g>
+          </g>
+        )}
+        {land && fitted && count === 1 && (
+          <g data-testid="world-utility-screen">
+            {[0, 1, 2, 3, 4].map((i) => {
+              const q = p(210 + i * 29, 116);
+              return (
+                <g key={i} transform={`translate(${q.x} ${q.y})`}>
+                  <ellipse cx="5" cy="2" rx="9" ry="3" fill="#304d39" opacity=".2" />
+                  <ellipse cy="-5" rx="8" ry="7" fill="#577650" />
+                  <ellipse cx="-2" cy="-8" rx="6" ry="4" fill="#8aa36b" />
+                </g>
+              );
+            })}
+          </g>
+        )}
         {land && (
           <g data-testid="world-parking">
             <polygon
@@ -258,6 +345,7 @@ export function WorldCampusGround({
           height={height}
           night={night}
           working={working}
+          operating={opened}
           reducedMotion={reducedMotion}
           road={roads[0]!}
           service={roads[1]!}
@@ -279,7 +367,7 @@ export function WorldCampusGround({
         />
         {land && (
           <g
-            data-testid="world-gatehouse"
+            data-testid="campus-entry"
             transform={`translate(${gate.x} ${gate.y}) translate(-202 -561)`}
           >
             <ellipse cx="207" cy="560" rx="30" ry="8" fill="#29443b" opacity=".22" />
@@ -321,7 +409,12 @@ export function WorldCampusGround({
               <path d="M192 558l11 7 20-7v3l-20 7-11-7z" fill="#adb49b" />
               <path d="M193 557l10 6 20-7-10-4z" fill="#d8d5b9" />
             </g>
-            <path d="M225 565l25-14" stroke="#eddbaf" strokeWidth="3" />
+            <path
+              data-testid="campus-service-gate"
+              d="M225 565l25-14"
+              stroke="#eddbaf"
+              strokeWidth="3"
+            />
             <path d="M225 565l25-14" stroke="#a87055" strokeWidth="3" strokeDasharray="4 4" />
           </g>
         )}
