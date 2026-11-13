@@ -101,6 +101,14 @@ test('world camera keeps blocked, paused, failed and terminal hall display seman
     });
     await expect(page.getByTestId('map-root')).toHaveAttribute('data-world-camera', 'true');
     expect(await read()).toEqual(original);
+    if (['frozen', 'failed', 'terminated', 'late'].includes(scenario)) {
+      const hall = page.locator('[data-hall-id=H1]').getByTestId('hall-art-frame');
+      const badges = hall.getByTestId('hall-warning-badges');
+      const box = await hall.boundingBox(), badge = await badges.boundingBox();
+      expect((badge!.x+badge!.width/2-box!.x)/box!.width).toBeCloseTo(.48,2);
+      expect((badge!.y-box!.y)/box!.height).toBeCloseTo(.26,2);
+      await page.screenshot({path:`/tmp/warning-anchor-four-${scenario}.png`});
+    }
     if (['frozen', 'failed', 'terminated'].includes(scenario))
       await expect(page.locator('[data-hall-id=H1]').getByTestId('stage-vehicle')).toHaveCount(0);
     if (['terminated', 'delivered'].includes(scenario))

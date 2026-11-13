@@ -63,7 +63,7 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
       )}
 
       {/* warning pips */}
-      <div style={{ position: 'absolute', top: 1, right: 2, display: 'flex', gap: 3, fontSize: '0.7rem' }}>
+      <div data-testid="hall-warning-badges" style={{ position: 'absolute', top: 1, right: 2, display: 'flex', gap: 3, fontSize: '0.7rem' }}>
         {late && (
           <span title="Past its outside date" aria-label="Late">
             {'\u26A0\uFE0F'}
