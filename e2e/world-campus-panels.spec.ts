@@ -19,13 +19,17 @@ for (const count of [4, 6])
       useStore.setState({ state: s, draft: s, plan: [] });
     }, count);
     await page.locator('[data-map-control=road] button').click();
+    const direct = page.locator('[data-map-control=H1] button');
+    await expect(direct.locator('small')).toContainText('point');
+    await expect(direct.locator('small')).toContainText('costs paid as built');
+    await page.screenshot({ path: `/tmp/world-cost-${count}.png` });
     await page.locator('[data-map-control=H1] button').click();
     await page.locator('[data-map-control=H2] button').click();
     const receipt = page.getByTestId('build-receipt');
     await expect(receipt).toContainText('H2: Build foundation');
     const r = await receipt.boundingBox();
     for (let n = 1; n <= count; n++) {
-      const c = await page.getByTestId(`caption-H${n}`).boundingBox();
+      const c = await page.locator(`[data-map-control=H${n}] button`).boundingBox();
       expect(
         r!.x + r!.width <= c!.x ||
           r!.x >= c!.x + c!.width ||

@@ -70,7 +70,7 @@ test('world camera keeps blocked, paused, failed and terminal hall display seman
         h.stageIndex = 4;
         s.setup.hallTier = 'liquid';
       }
-      localStorage.removeItem('outside-date-world-campus-preview');
+      localStorage.setItem('outside-date-world-campus-preview', 'false');
       useStore.setState({ state: s, draft: s, plan: [] });
     }, scenario);
     const read = async () => {

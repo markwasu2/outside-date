@@ -1,4 +1,179 @@
 import type { WorldPoint } from './worldCampusLayout';
+
+/** Vehicle roofs share the road's isometric axes; body height and wheels stay upright. */
+function RoadVehicle({
+  car = false,
+  service = false,
+  night = false,
+}: {
+  car?: boolean;
+  service?: boolean;
+  night?: boolean;
+}) {
+  const p = (x: number, y: number, z = 0) => {
+    const [a, b] = service ? [y, x] : car ? [-x, -y] : [x, y];
+    return `${0.866 * (a! - b!)},${0.5 * (a! + b!) - z}`;
+  };
+  const poly = (points: number[][]) => points.map(([x, y, z]) => p(x!, y!, z)).join(' ');
+  const box = (
+    x: number,
+    y: number,
+    w: number,
+    d: number,
+    z: number,
+    h: number,
+    roof: string,
+    left: string,
+    right: string,
+  ) => (
+    <>
+      <polygon
+        points={poly([
+          [x, y + d, z],
+          [x + w, y + d, z],
+          [x + w, y + d, z + h],
+          [x, y + d, z + h],
+        ])}
+        fill={left}
+      />
+      <polygon
+        points={poly([
+          [x + w, y, z],
+          [x + w, y + d, z],
+          [x + w, y + d, z + h],
+          [x + w, y, z + h],
+        ])}
+        fill={right}
+      />
+      <polygon
+        points={poly([
+          [x, y, z + h],
+          [x + w, y, z + h],
+          [x + w, y + d, z + h],
+          [x, y + d, z + h],
+        ])}
+        fill={roof}
+        stroke="#73887b"
+        strokeWidth=".4"
+      />
+    </>
+  );
+  const half = car ? 12 : service ? 17 : 25;
+  return (
+    <g
+      data-testid={
+        car
+          ? 'road-passenger-vehicle'
+          : service
+            ? 'road-site-service-vehicle'
+            : 'road-freight-vehicle'
+      }
+    >
+      <polygon
+        points={poly([
+          [-half - 1, -8, 0],
+          [half + 3, -8, 0],
+          [half + 3, 10, 0],
+          [-half - 1, 10, 0],
+        ])}
+        fill="#1d3d33"
+        opacity=".2"
+      />
+      {night && (
+        <polygon
+          data-testid={
+            car
+              ? 'road-car-headlights'
+              : service
+                ? 'service-truck-headlights'
+                : 'road-truck-headlights'
+          }
+          points={poly([
+            [half, -5, 1],
+            [half + 50, -15, 0],
+            [half + 50, 15, 0],
+            [half, 5, 1],
+          ])}
+          fill="#ffe7aa"
+          opacity=".2"
+        />
+      )}
+      {[-half + 5, half - 6].flatMap((x) =>
+        [-6, 6].map((y) => {
+          const [cx, cy] = p(x, y, 3).split(',');
+          return (
+            <g key={`${x}-${y}`}>
+              <ellipse cx={cx} cy={cy} rx="2.4" ry="3.2" fill="#2c4545" />
+              <ellipse cx={cx} cy={cy} rx="1" ry="1.5" fill="#9da99b" />
+            </g>
+          );
+        }),
+      )}
+      {car ? (
+        <>
+          {box(-12, -5, 24, 10, 3, 4, '#e4d6af', '#b8b994', '#94a38e')}
+          {box(-5, -4, 10, 8, 7, 4, '#d9d8bb', '#536f75', '#496873')}
+          <polyline
+            points={poly([
+              [-4, 0, 11],
+              [4, 0, 11],
+            ])}
+            stroke="#f4edcc"
+            strokeWidth=".6"
+          />
+        </>
+      ) : (
+        <>
+          {box(-half, -6, half * 2 - 13, 12, 4, 12, '#e8eadc', '#acbcb0', '#8fa498')}
+          {[-half + 4, -half + 9, -half + 14, -half + 19]
+            .filter((x) => x < half - 13)
+            .map((x) => (
+              <polyline
+                key={x}
+                points={poly([
+                  [x, 6, 5],
+                  [x, 6, 15],
+                ])}
+                stroke="#cbd4c6"
+                strokeWidth=".7"
+              />
+            ))}
+          {box(half - 11, -6, 12, 12, 4, 9, '#dfbc72', '#ba9555', '#9c8e5e')}
+          <polygon
+            points={poly([
+              [half + 1, -4.8, 9],
+              [half + 1, 4.8, 9],
+              [half + 1, 4.8, 12],
+              [half + 1, -4.8, 12],
+            ])}
+            fill="#436a73"
+            stroke="#b6ccc0"
+            strokeWidth=".4"
+          />
+          <polygon
+            points={poly([
+              [half - 9, 6, 8],
+              [half - 3, 6, 8],
+              [half - 3, 6, 12],
+              [half - 9, 6, 12],
+            ])}
+            fill="#557b7b"
+          />
+          <polyline
+            points={poly([
+              [half + 1, -5, 5],
+              [half + 1, 5, 5],
+            ])}
+            stroke="#e0dbc1"
+            strokeWidth="1"
+          />
+        </>
+      )}
+    </g>
+  );
+}
+
+/** Ambient scenery only, never an implied paid order. Reduced-motion vehicles remain parked. */
 export function WorldCampusTraffic({
   night,
   working,
@@ -14,73 +189,44 @@ export function WorldCampusTraffic({
   road: WorldPoint[];
   service: WorldPoint[];
 }) {
+  const lane = (points: WorldPoint[], offset: number) => {
+    const a = points[0]!,
+      b = points[1]!,
+      length = Math.hypot(b.x - a.x, b.y - a.y);
+    return points.map((p) => ({
+      x: p.x - ((b.y - a.y) / length) * offset,
+      y: p.y + ((b.x - a.x) / length) * offset,
+    }));
+  };
+  const freight = lane(road, 5),
+    car = lane(road, -5).reverse(),
+    site = lane(service.slice(0, 2), 4);
   const d = (points: WorldPoint[]) =>
     points.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' ');
-  const truck = (
-    <g transform="rotate(30) scale(1 .57)">
-      <defs>
-        <linearGradient id="traffic-body" x2="0" y2="1">
-          <stop stopColor="#eef1e5" />
-          <stop offset="1" stopColor="#a5b5ae" />
-        </linearGradient>
-      </defs>
-      <ellipse cx="1" cy="4" rx="25" ry="8" fill="#183a35" opacity=".2" />
-
-      <path
-        d="M-22 -7h8m-8 14h8m15-14h7M1 7h7m10-14h5m-5 14h5"
-        stroke="#304e51"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-      <path d="M-22 0h46" stroke="#506e6c" strokeWidth="7" />
-      <rect
-        x="-24"
-        y="-6"
-        width="34"
-        height="12"
-        rx="1.5"
-        fill="url(#traffic-body)"
-        stroke="#637d7c"
-        strokeWidth=".7"
-      />
-      <path d="M-22 -3h30M-22 1h30M-22 4h30" stroke="#ccd6cb" strokeWidth=".5" />
-      <path d="M-24 -5v10M-22 -5v10" stroke="#8da49d" strokeWidth=".65" />
-      <rect
-        x="12"
-        y="-6"
-        width="13"
-        height="12"
-        rx="2"
-        fill="#d1a95e"
-        stroke="#816f46"
-        strokeWidth=".7"
-      />
-      <path d="M13 -4h4v8h-4z" fill="#edcf87" stroke="#aa8748" strokeWidth=".4" />
-      <path d="M19 -5h3.5l1 2v6l-1 2H19z" fill="#365f68" stroke="#b2c8bc" strokeWidth=".4" />
-      <path d="M20 -4v8" stroke="#88a7a4" strokeWidth=".6" />
-      <path d="M18 -6v-2h3m-3 14v2h3" fill="none" stroke="#617a70" strokeWidth="1" />
-      <path d="M25 -4v8" stroke="#c7cdb8" strokeWidth="1.3" />
-
-      {night && <path d="M25-4l55-12v32L25 4z" fill="#ffe9a4" opacity=".16" />}
-    </g>
-  );
+  const pose = (points: WorldPoint[], fraction: number) =>
+    `translate(${points[0]!.x + (points[1]!.x - points[0]!.x) * fraction} ${points[0]!.y + (points[1]!.y - points[0]!.y) * fraction})`;
   return (
     <g data-testid="world-road-traffic">
-      <g
-        transform={
-          reducedMotion
-            ? `translate(${road[0]!.x + (road[1]!.x - road[0]!.x) * 0.4} ${road[0]!.y + (road[1]!.y - road[0]!.y) * 0.4})`
-            : undefined
-        }
-      >
-        {truck}
-        {!reducedMotion && <animateMotion dur="38s" repeatCount="indefinite" path={d(road)} />}
+      <g data-testid="ambient-truck" transform={reducedMotion ? pose(freight, 0.4) : undefined}>
+        <RoadVehicle night={night} />
+        {!reducedMotion && (
+          <animateMotion dur="38s" begin="-15s" repeatCount="indefinite" path={d(freight)} />
+        )}
+      </g>
+      <g data-testid="ambient-car" transform={reducedMotion ? pose(car, 0.3) : undefined}>
+        <RoadVehicle night={night} car />
+        {!reducedMotion && (
+          <animateMotion dur="29s" begin="-9s" repeatCount="indefinite" path={d(car)} />
+        )}
       </g>
       {working && (
-        <g transform={reducedMotion ? `translate(${service[1]!.x} ${service[1]!.y})` : undefined}>
-          <g transform="rotate(-30) scale(.7 .4)">{truck}</g>
+        <g
+          data-testid="ambient-service-truck"
+          transform={reducedMotion ? pose(site, 0.65) : undefined}
+        >
+          <RoadVehicle night={night} service />
           {!reducedMotion && (
-            <animateMotion dur="45s" repeatCount="indefinite" path={d(service.slice(0, 2))} />
+            <animateMotion dur="45s" begin="-18s" repeatCount="indefinite" path={d(site)} />
           )}
         </g>
       )}

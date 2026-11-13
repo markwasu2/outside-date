@@ -6,7 +6,7 @@ import { WorldCampusGround } from './WorldCampusGround';
 import { TILE_ART, SUBSTATION_ART, PLANT_ART, VEHICLE_ART } from '../art';
 import { HallSprite } from '../board/HallSprite';
 import { stageMinMonths } from '../board/hallVisual';
-import { hallCaption, substationStateWords } from '../board/legibility';
+import { hallCaption, pondStateWords, substationStateWords } from '../board/legibility';
 import { simpleHallCaption } from '../board/simpleWords';
 import { TycoonMapControl } from '../board/TycoonMapControl';
 import { TycoonObjectPanel } from '../board/TycoonObjectPanel';
@@ -23,9 +23,10 @@ import { UtilityOperations } from '../board/UtilityOperations';
 import { resolveContent } from '../../engine/resolve';
 import { resolveSite } from '../../content/sites';
 import { siteTerrain } from '../board/siteTerrain';
+import { plantWords, plantWaitingWords } from '../board/powerWords';
 import { formatDollars } from '../../engine/format';
 
-/** Local opt-in playable prototype. Existing rules and action panels, one physical camera. */
+/** Simple multi-hall campus: existing rules and action panels, one physical camera. */
 export function WorldCampusMap({ night }: { night: boolean }) {
   const draft = useStore((s) => s.draft),
     state = useStore((s) => s.state),
@@ -59,6 +60,9 @@ export function WorldCampusMap({ night }: { night: boolean }) {
     width: r.width * scale,
     height: r.height * scale,
   });
+  const nextEquipmentMonth = Math.min(
+    ...draft.power.orders.filter((o) => !o.arrived).map((o) => o.arrivalMonth),
+  );
   const deltas = monthDeltas(prev, state, content),
     mins = stageMinMonths(state, content),
     land = !!draft.flags.siteOptioned || !!draft.flags.siteOptionedAtStart,
@@ -110,7 +114,9 @@ export function WorldCampusMap({ night }: { night: boolean }) {
           height: '100%',
           position: 'relative',
           overflow: 'hidden',
-          background: night ? '#243b46' : '#9ba77b',
+          background: night
+            ? 'linear-gradient(160deg,#69745b,#4f5e49)'
+            : `linear-gradient(160deg,${theme === 'quarry' ? '#b5ad96,#858d75' : theme === 'depot' ? '#b4ae87,#7c8c6d' : theme === 'meadow' ? '#a6bd84,#60875c' : '#afbb8e,#849a72'})`,
           fontFamily: 'system-ui',
         } as CSSProperties
       }
@@ -185,7 +191,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
               alt=""
               style={picture}
             />
-            <span data-testid="power-map-state" style={{ ...label, top: 'calc(100% + 34px)' }}>
+            <span data-testid="power-map-state" style={{ ...label, top: 'calc(100% + 16px)' }}>
               {substationStateWords(draft)}
             </span>
             <TycoonMapControl objectId="substation" />
@@ -287,6 +293,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                 </span>
                 <span
                   data-testid={`caption-${hall.id}`}
+                  title={hallCaption(draft, content, hall)}
                   style={{
                     position: 'absolute',
                     width: 1,
@@ -346,7 +353,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                       data-testid="rent-ticker"
                       style={{
                         position: 'absolute',
-                        top: 18,
+                        top: 'calc(100% + 2px)',
                         left: '50%',
                         transform: 'translateX(-50%)',
                         background: '#fffdf2',
@@ -382,6 +389,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
           </button>
           <div
             data-testid="map-pond-slot"
+            data-scene-object="field"
             data-pond={theme === 'meadow'}
             style={rect(layout.field)}
           >
@@ -404,21 +412,32 @@ export function WorldCampusMap({ night }: { night: boolean }) {
             }}
           >
             Water
+            {theme === 'meadow' && land && (
+              <span data-testid="pond-map-state" style={{ display: 'block', fontSize: 9 }}>
+                {pondStateWords(draft)}
+              </span>
+            )}
           </button>
           <button
             data-campus-object="laydownYard"
+            data-testid="simple-yard-summary"
             onClick={() => open('laydownYard')}
             style={{
               position: 'absolute',
               left: layout.deliveries.x * scale,
               top: layout.deliveries.y * scale,
+              transform: 'translateX(-40%)',
               fontSize: 11,
             }}
           >
             Deliveries
+            {draft.power.orders.length > 0
+              ? ` · ${nextEquipmentMonth === Infinity ? 'on site' : nextEquipmentMonth < draft.month ? 'check delivery' : nextEquipmentMonth === draft.month ? 'due now' : `next month ${nextEquipmentMonth + 1}`}`
+              : ''}
           </button>
           <section
             data-campus-object="powerPlants"
+            data-scene-object="plants"
             style={rect({
               x: layout.plantSlots[0]!.x,
               y: layout.plantSlots[0]!.y,
@@ -450,7 +469,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                   whiteSpace: 'nowrap',
                 }}
               >
-                Local grid supply
+                <span title={plantWaitingWords(draft)}>Local grid supply</span>
               </span>
             ) : (
               draft.power.plants.map((plant, i) => {
@@ -462,6 +481,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                     key={plant.id}
                     data-testid={`plant-buildout-${plant.id}`}
                     data-build-state={status}
+                    title={plantWords(plant, draft)}
                     style={{
                       position: 'absolute',
                       left: (layout.plantSlots[i]!.x - layout.plantSlots[0]!.x) * scale,
@@ -478,15 +498,23 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                     />
                     <div
                       data-testid={`plant-caption-${plant.id}`}
-                      style={{ ...label, top: '95%', left: 0, fontSize: 10 }}
+                      style={{
+                        ...label,
+                        top: 'calc(100% + 2px)',
+                        left: 0,
+                        fontSize: 10,
+                        zIndex: 4,
+                      }}
                     >
-                      {plant.id} {status}
+                      {plant.id} {planned && !online && plant.slipped ? 'delayed' : status}
                       <br />
                       {online
                         ? `${plant.mwGrid} MW`
                         : planned
                           ? `month ${(plant.onlineMonth ?? plant.plannedOnlineMonth ?? 0) + 1}`
-                          : 'needs docket'}
+                          : draft.docket.status === 'approved'
+                            ? 'starts next month'
+                            : 'needs docket'}
                     </div>
                   </div>
                 );
@@ -513,6 +541,25 @@ export function WorldCampusMap({ night }: { night: boolean }) {
       >
         {zoom === 1 ? 'Zoom in' : 'Fit campus'}
       </button>
+      {zoom > 1 && (
+        <span
+          data-testid="world-pan-hint"
+          style={{
+            position: 'absolute',
+            left: 105,
+            top: 13,
+            padding: '2px 6px',
+            fontSize: 11,
+            borderRadius: 3,
+            background: '#fffdf2',
+            color: '#3c553d',
+            pointerEvents: 'none',
+            zIndex: 15,
+          }}
+        >
+          Scroll to explore
+        </span>
+      )}
       <WorldBuildFeedback />
       {popover && (
         <TycoonObjectPanel

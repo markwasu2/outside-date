@@ -97,7 +97,6 @@ export function WorldCampusGround({
         </radialGradient>
       </defs>
       <g style={{ filter: night ? 'brightness(.6) saturate(.8)' : undefined }}>
-        <rect width={width} height={height} fill="url(#real-world-turf)" />
         {land && (
           <>
             <polygon

@@ -1,12 +1,11 @@
 import { test, expect } from '@playwright/test';
 test.use({ storageState: { cookies: [], origins: [] } });
-test('world-camera prototype carries a real six-hall expansion through sale', async ({ page }) => {
+test('default world camera carries a real six-hall expansion through sale', async ({ page }) => {
   test.setTimeout(110000);
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.addInitScript(() => {
-    localStorage.setItem('outside-date-world-campus-preview', 'true');
     localStorage.setItem('outside-date-detailed', 'true');
     Math.random = () => 0.123456789;
   });

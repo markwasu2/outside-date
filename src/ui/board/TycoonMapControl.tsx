@@ -105,8 +105,10 @@ export function TycoonMapControl({
       >
         {compact && hall ? `${hall.id} · ` : ''}
         {compact && !direct && caption ? caption : dense && !direct ? 'Inspect' : title}
-        {direct && !compact && (
-          <small style={{ display: 'block', fontWeight: 400, fontSize: 10, marginTop: 2 }}>
+        {direct && (
+          <small
+            style={{ display: 'block', fontWeight: 400, fontSize: compact ? 9 : 10, marginTop: 2 }}
+          >
             {direct.ap} point{direct.ap === 1 ? '' : 's'}
             {direct.action.actionId === 'optionSite'
               ? ` · ${direct.cashLabel.split(',')[0]} from budget`
