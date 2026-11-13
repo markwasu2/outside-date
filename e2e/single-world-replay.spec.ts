@@ -32,6 +32,22 @@ for (const width of [1280, 1024])
         await expect(page.getByTestId('campus-entry')).toBeVisible();
         await expect(page.getByTestId('world-single-courtyard')).toBeVisible();
         await expect(page.getByTestId('world-courtyard-visitor')).toHaveCount(2);
+        // Upright objects must paint back-to-front, not people on a front tree's canopy.
+        const courtyardDepths = await page
+          .getByTestId('campus-courtyard')
+          .locator(':scope > [data-world-depth]')
+          .evaluateAll((els) => els.map((el) => Number(el.getAttribute('data-world-depth'))));
+        expect(courtyardDepths).toEqual([108, 121, 170, 180, 202, 208, 241, 270]);
+        await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
+        await page.getByTestId('world-camera-scroll').evaluate((el) => {
+          el.scrollLeft = el.scrollWidth;
+          el.scrollTop = el.scrollHeight;
+        });
+        await page.screenshot({ path: `/tmp/courtyard-depth-${width}-day.png` });
+        await page.getByTestId('night-view').click();
+        await page.screenshot({ path: `/tmp/courtyard-depth-${width}-night.png` });
+        await page.getByTestId('night-view').click();
+        await page.getByRole('button', { name: 'Fit campus', exact: true }).click();
         await expect(page.getByTestId('simple-feedback')).toContainText('Campus ready to sell');
         await expect(page.getByTestId('monthly-receipt')).not.toContainText('Review the blockers');
         await page.screenshot({ path: `/tmp/single-real-${width}-ready-sale.png` });
