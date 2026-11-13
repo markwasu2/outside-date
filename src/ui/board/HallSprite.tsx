@@ -31,6 +31,8 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
   const look = STAGE_ART[stage] ?? STAGE_ART.notStarted;
   const baseLook = STAGE_ART[visual.baseStage] ?? STAGE_ART.notStarted;
   const underConstruction = stage !== 'notStarted' && stage !== 'delivered';
+  // Long crew trucks park beside the completed hall, not in the crane's work position.
+  const crewTruck = stage === 'fitout' || stage === 'rfs';
 
   return (
     <div className={reducedMotion?undefined:'site-placement'} data-testid="hall-art-frame" style={{ position: 'relative', width: '100%', height: '100%', maxWidth: 400, maxHeight: 330, margin: 'auto' }}>
@@ -152,7 +154,7 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
       {/* Keep tracked excavators and deployed cranes fixed to the ground.
           The crane SVG moves its boom internally without rocking its chassis. */}
       {underConstruction && visual.flags.active && !visual.flags.paused && !failedInspection && VEHICLE_ART[stage] && (
-        <div data-testid="stage-vehicle-anchor" style={{position:'absolute',top:'44%',right:'-16.3%',width:'80%',aspectRatio:'300 / 242',transform:'translateY(-37%)',pointerEvents:'none'}}>
+        <div data-testid="stage-vehicle-anchor" style={{position:'absolute',top:crewTruck?'57%':'44%',right:crewTruck?'-29.5%':'-16.3%',width:'80%',aspectRatio:'300 / 242',transform:'translateY(-37%)',pointerEvents:'none'}}>
         <img
           src={VEHICLE_ART[stage]!.img}
           alt=""
