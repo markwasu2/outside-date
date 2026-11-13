@@ -42,6 +42,21 @@ export function worldCampusLayout(count: number) {
     project,
     sprite,
     utilityWorldX,
+    // Upright trees sit outside both the roads and the reserved power-plant pad.
+    perimeterTrees: [
+      ...Array.from({ length: Math.ceil((right + 200) / 80) }, (_, i) => ({
+        x: -200 + i * 80,
+        y: bottom + 50,
+      })),
+      ...Array.from({ length: Math.ceil((bottom + 250) / 85) }, (_, i) => ({
+        x: right + 65,
+        y: -160 + i * 85,
+      })).filter((q) => q.y >= 10),
+      ...Array.from({ length: Math.ceil((right + 100) / 100) }, (_, i) => ({
+        x: -100 + i * 100,
+        y: -200,
+      })),
+    ],
     halls: Array.from({ length: count }, (_, i) =>
       sprite((i % columns) * 210, Math.floor(i / columns) * 180),
     ),

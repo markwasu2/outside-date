@@ -340,17 +340,7 @@ export function WorldCampusGround({
         <WorldCampusWoodland
           width={width}
           height={height}
-          points={[
-            ...Array.from({ length: Math.ceil((right + 200) / 80) }, (_, i) =>
-              p(-200 + i * 80, bottom + 50),
-            ),
-            ...Array.from({ length: Math.ceil((bottom + 250) / 85) }, (_, i) =>
-              p(right + 65, -160 + i * 85),
-            ),
-            ...Array.from({ length: Math.ceil((right + 100) / 100) }, (_, i) =>
-              p(-100 + i * 100, -200),
-            ),
-          ]}
+          points={l.perimeterTrees.map(({ x, y }) => p(x, y))}
         />
         {land && (
           <g
