@@ -22,12 +22,15 @@ describe('shared isometric world camera', () => {
       }
     }
   });
-  it('contains single-hall backup and courtyard inside the owned perimeter', () => {
-    const l = worldCampusLayout(1);
-    expect(l.bottom).toBeGreaterThanOrEqual(265);
-    expect(l.utilityWorldX + 65).toBeLessThan(l.right);
-    expect(l.halls[0]!.width).toBe(300);
-  });
+  it.each([1, 2, 3, 4, 5, 6])(
+    'contains backup yard inside the owned perimeter for %i halls',
+    (count) => {
+      const l = worldCampusLayout(count);
+      expect(l.bottom).toBeGreaterThanOrEqual(265);
+      expect(l.utilityWorldX + 65).toBeLessThan(l.right);
+      expect(l.halls[0]!.width).toBe(300);
+    },
+  );
   it('uses exactly the building art camera for ground edges without distorting upright height', () => {
     const l = worldCampusLayout(6),
       o = l.project(0, 0),
