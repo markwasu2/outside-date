@@ -1,3 +1,4 @@
+import {WorldCampusMap} from '../experimental/WorldCampusMap';
 import {unfundedWork} from '../board/constructionFunds';
 import {TerrainLayer} from '../board/TerrainLayer';
 import {CampusGrounds} from '../board/CampusGrounds';
@@ -275,6 +276,7 @@ export function MapGrid({cue,simple=false,night=false}: {night?:boolean;simple?:
   const substationEnergized = power.substationStatus === 'done';
   const studyMonthsLeft = power.studyStatus === 'pending' && power.studyDoneMonth !== null ? power.studyDoneMonth - draft.month : null;
 
+  if(simple&&draft.halls.length>1&&localStorage.getItem('outside-date-world-campus-preview')==='true')return <WorldCampusMap night={night}/>;
   return (
     <div
       ref={containerRef}
