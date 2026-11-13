@@ -23,6 +23,7 @@ import backup from '../../src/assets/campus/compound-backup.svg?raw';
 import cabinet from '../../src/assets/campus/substation-done.svg?raw';
 import office from '../../src/assets/campus/tile-site-office.svg?raw';
 describe('authored campus detail sources',()=>{
+ it('keeps construction vehicle contact shadows tight',()=>{for(const art of [crane,excavator,truck]){expect(art).toContain('dx="2" dy="3" stdDeviation="1"');expect(art).not.toContain('dx="7" dy="10"');}});
  it('gives the site office a human-height doorway and tight contact shadow',()=>{expect(office).toContain('data-testid="human-scale-site-office"');expect(office).toContain('data-testid="office-human-door" data-jamb-height="37"');expect(office).toContain('dx="2" dy="3" stdDeviation="1"');});
  it('keeps finished hall contact shadows close to the ground',()=>{for(const art of [entranceShell,entranceReady]){expect(art).toContain('dx="2" dy="3" stdDeviation="1"');expect(art).not.toContain('dx="7" dy="10"');}});
  it('grounds crew figures with individual contact shadows instead of a raised display plinth',()=>{expect(crew.split('grounded-crew-figures')).toHaveLength(2);expect(crew.match(/<polygon/g)).toHaveLength(9);expect(crew).not.toContain('<g filter="url(#shadow)">');expect(crew.match(/<ellipse/g)).toHaveLength(3);});

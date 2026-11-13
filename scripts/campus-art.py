@@ -700,7 +700,7 @@ def save(name,body):
  if name=='tile-site-office':body+=detail;detail=''
  # Keep surveyed ground flat and foundation contact tight to the soil.
  if name in ('hall-not-started','substation-planned','campus-people'):body_group='<g>'+body+'</g>'
- elif name.startswith('hall-') or name=='tile-site-office':
+ elif name.startswith('hall-') or name=='tile-site-office' or name.startswith('vehicle-'):
   defs=defs.replace('dx="7" dy="10" stdDeviation="4"','dx="2" dy="3" stdDeviation="1"')
   body_group='<g filter="url(#shadow)">'+body+'</g>'
  else:body_group='<g filter="url(#shadow)">'+body+'</g>'

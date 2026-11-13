@@ -151,6 +151,7 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
 
       {/* GFX 2: the stage's construction vehicle while crews are actively working it */}
       {underConstruction && visual.flags.active && !visual.flags.paused && !failedInspection && VEHICLE_ART[stage] && (
+        <div data-testid="stage-vehicle-anchor" style={{position:'absolute',top:'44%',right:'-16.3%',width:'80%',aspectRatio:'300 / 242',transform:'translateY(-37%)',pointerEvents:'none'}}>
         <img
           src={VEHICLE_ART[stage]!.img}
           alt=""
@@ -159,15 +160,9 @@ export function HallSprite({ night=false,visual, late, failedInspection, queuedG
           title={VEHICLE_ART[stage]!.label}
           data-testid="stage-vehicle"
           className={reducedMotion?undefined:stage==='steel'||stage==='shell'?'site-crane':stage==='pad'?'site-excavator':'site-work-truck'}
-          style={{
-            position: 'absolute',
-            top: '57%',
-            right: '10%',
-            width: '28%',
-            borderRadius: 4,
-            pointerEvents: 'none',
-          }}
+          style={{width:'100%',height:'auto',display:'block',pointerEvents:'none'}}
         />
+        </div>
       )}
 
       <style>{`
