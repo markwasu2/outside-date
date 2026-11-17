@@ -177,22 +177,22 @@ export function WorldCampusGround({
                 points={pts(road)}
                 fill="none"
                 stroke="#c6cbb0"
-                strokeWidth="28"
+                strokeWidth="56"
                 strokeLinejoin="round"
               />
               <polyline
                 points={pts(road)}
                 fill="none"
                 stroke="#687b72"
-                strokeWidth="22"
+                strokeWidth="44"
                 strokeLinejoin="round"
               />
               <polyline
                 points={pts(road)}
                 fill="none"
                 stroke="#d9dac1"
-                strokeWidth="1"
-                strokeDasharray="9 11"
+                strokeWidth="1.5"
+                strokeDasharray="12 14"
               />
             </g>
           ))}
@@ -311,13 +311,13 @@ export function WorldCampusGround({
         {land && (
           <g data-testid="world-parking">
             <polygon
-              points={quad(utilityWorldX - 60, -108, 130, 26)}
+              points={quad(utilityWorldX - 72, -92, 190, 26)}
               fill="#738878"
               stroke="#d6dac3"
               strokeWidth="1"
             />
             {[0, 1, 2].map((i) => {
-              const q = p(utilityWorldX - 40 + i * 40, -95);
+              const q = p(utilityWorldX - 46 + i * 56, -79);
               return (
                 <g key={i} data-testid="parked-campus-car" transform={`translate(${q.x} ${q.y})`}>
                   <RoadVehicle car parked paint={['#dfc58a', '#8daca4', '#b7c3b1'][i]} />
@@ -348,13 +348,14 @@ export function WorldCampusGround({
                   data-world-y={y}
                   transform={`translate(${q.x} ${q.y})`}
                 >
+                  <ellipse cx="6" cy="3" rx="12" ry="4" fill="#1d3d33" opacity=".2" />
                   <path
-                    d="M0 0v-59m-11 8h22m-9-7v10m-4-10v10"
+                    d="M0 0v-90m-16 12h32m-13-10v15m-6-15v15"
                     stroke="#7e8165"
-                    strokeWidth="2"
+                    strokeWidth="2.4"
                     fill="none"
                   />
-                  <path d="M-9-54v-5m18 5v-5" stroke="#aab69c" strokeWidth="3" />
+                  <path d="M-13-83v-7m26 7v-7" stroke="#aab69c" strokeWidth="3.4" />
                 </g>
               );
             })}

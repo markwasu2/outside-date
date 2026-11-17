@@ -8,7 +8,14 @@ export interface WorldPoint {
   x: number;
   y: number;
 }
-/** Same orthographic ground camera as campus-art.py: x/y ground, z upright. */
+/** Same orthographic ground camera as campus-art.py: x/y ground, z upright.
+ *
+ * One ruler: ground lengths and upright heights project 1 unit = 1 px, and a standing
+ * person is 18 units (1.8 m), so 1 unit = 10 cm. Every upright object in the world view
+ * is sized against that person: car 44x18x15, van 56x22x22, service truck 60x20x24,
+ * freight 100x25x34, power pole 90 tall, lamps ~50, perimeter trees 68-80, paved road
+ * 44 wide (two lanes). People stay slightly large for legibility; the ruler keeps every
+ * object's size and contact shadow consistent with its neighbours. */
 export function worldCampusLayout(count: number) {
   const columns = count > 3 ? Math.ceil(count / 2) : Math.max(1, count),
     rows = count > 3 ? 2 : 1;
