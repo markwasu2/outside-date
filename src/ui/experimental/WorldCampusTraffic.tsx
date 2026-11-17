@@ -64,7 +64,16 @@ export function RoadVehicle({
       />
     </>
   );
-  const half = car ? 12 : van ? 16 : service ? 17 : 25;
+  // One ruler: a standing person is 18 world units (1.8 m). Vehicle bodies are measured
+  // against it - car 44x18x15, van 56x22x22, service truck 60x20x24, freight 100x25x34.
+  const half = car ? 22 : van ? 28 : service ? 30 : 50;
+  const wide = car ? 9 : van ? 11 : service ? 10 : 12.5;
+  const wheelZ = car ? 3 : 4;
+  const wheelRx = car ? 3.4 : 3.8,
+    wheelRy = car ? 4.4 : 5;
+  const axles = car ? [-half + 9, half - 10] : [-half + 8, half - 19, half - 8];
+  const bodyH = van ? 18 : service ? 20 : 26,
+    cabH = van ? 14 : service ? 15 : 18;
   return (
     <g
       data-testid={
@@ -79,10 +88,10 @@ export function RoadVehicle({
     >
       <polygon
         points={poly([
-          [-half - 1, -8, 0],
-          [half + 3, -8, 0],
-          [half + 3, 10, 0],
-          [-half - 1, 10, 0],
+          [-half - 2, -wide - 2, 0],
+          [half + 4, -wide - 2, 0],
+          [half + 4, wide + 2, 0],
+          [-half - 2, wide + 2, 0],
         ])}
         fill="#1d3d33"
         opacity=".2"
@@ -97,149 +106,148 @@ export function RoadVehicle({
                 : 'road-truck-headlights'
           }
           points={poly([
-            [half, -5, 1],
-            [half + 50, -15, 0],
-            [half + 50, 15, 0],
-            [half, 5, 1],
+            [half, -wide + 2, 1],
+            [half + 70, -wide - 14, 0],
+            [half + 70, wide + 14, 0],
+            [half, wide - 2, 1],
           ])}
           fill="#ffe7aa"
           opacity=".2"
         />
       )}
-      {[-half + 5, half - 6].flatMap((x) =>
-        [-6, 6].map((y) => {
-          const [cx, cy] = p(x, y, 3).split(',');
+      {axles.flatMap((x) =>
+        [-wide + 2, wide - 2].map((y) => {
+          const [cx, cy] = p(x, y, wheelZ).split(',');
           return (
             <g key={`${x}-${y}`}>
-              <ellipse cx={cx} cy={cy} rx="2.4" ry="3.2" fill="#2c4545" />
-              <ellipse cx={cx} cy={cy} rx="1" ry="1.5" fill="#9da99b" />
+              <ellipse cx={cx} cy={cy} rx={wheelRx} ry={wheelRy} fill="#2c4545" />
+              <ellipse cx={cx} cy={cy} rx={wheelRx * 0.42} ry={wheelRy * 0.47} fill="#9da99b" />
             </g>
           );
         }),
       )}
       {car ? (
         <>
-          {box(-12, -5, 24, 10, 3, 4, paint, '#b8b994', '#94a38e')}
-          {box(-5, -4, 10, 8, 7, 4, '#d9d8bb', '#536f75', '#496873')}
+          {box(-22, -9, 44, 18, 3, 7, paint, '#b8b994', '#94a38e')}
+          {box(-9, -7, 18, 14, 10, 5, '#d9d8bb', '#536f75', '#496873')}
           <g data-testid="passenger-car-body-detail">
             <polyline
               points={poly([
-                [0, 5, 3],
-                [0, 5, 7],
+                [2, 9, 3],
+                [2, 9, 10],
               ])}
               stroke="#778e85"
-              strokeWidth=".6"
+              strokeWidth=".8"
             />
             <polyline
               points={poly([
-                [-4, 5, 6],
-                [-2, 5, 6],
+                [-8, 9, 8],
+                [-4, 9, 8],
               ])}
               stroke="#eef0da"
-              strokeWidth=".65"
+              strokeWidth=".8"
             />
             <polygon
               points={poly([
-                [12, -4, 4.5],
-                [12, 4, 4.5],
-                [12, 4, 5.5],
-                [12, -4, 5.5],
+                [22, -8, 5],
+                [22, 8, 5],
+                [22, 8, 7],
+                [22, -8, 7],
               ])}
               fill="#546b68"
             />
-            {[-4, 3].map((y) => (
+            {[-7, 5.5].map((y) => (
               <polygon
                 key={y}
                 points={poly([
-                  [12, y, 5.8],
-                  [12, y + 1.3, 5.8],
-                  [12, y + 1.3, 6.8],
-                  [12, y, 6.8],
+                  [22, y, 8],
+                  [22, y + 1.8, 8],
+                  [22, y + 1.8, 9.5],
+                  [22, y, 9.5],
                 ])}
                 fill="#f6e6bd"
               />
             ))}
-            {[-4, 3].map((y) => (
+            {[-7, 5.5].map((y) => (
               <polygon
                 key={y}
                 points={poly([
-                  [-12, y, 4.5],
-                  [-12, y + 1.3, 4.5],
-                  [-12, y + 1.3, 6],
-                  [-12, y, 6],
+                  [-22, y, 5],
+                  [-22, y + 1.8, 5],
+                  [-22, y + 1.8, 6.5],
+                  [-22, y, 6.5],
                 ])}
                 fill="#ac785d"
               />
             ))}
             <polyline
               points={poly([
-                [5, -4, 7],
-                [5, 4, 7],
+                [9, -7, 10],
+                [9, 7, 10],
               ])}
               stroke="#d9e0c9"
-              strokeWidth=".65"
+              strokeWidth=".8"
             />
           </g>
           <polyline
             points={poly([
-              [-4, 0, 11],
-              [4, 0, 11],
+              [-7, 0, 15],
+              [7, 0, 15],
             ])}
             stroke="#f4edcc"
-            strokeWidth=".6"
+            strokeWidth=".8"
           />
         </>
       ) : (
         <>
-          {box(-half, -6, half * 2 - 13, 12, 4, 12, '#e8eadc', '#acbcb0', '#8fa498')}
-          {[-half + 4, -half + 9, -half + 14, -half + 19]
-            .filter((x) => x < half - 13)
+          {box(-half, -wide, half * 2 - 16, wide * 2, 4, bodyH, '#e8eadc', '#acbcb0', '#8fa498')}
+          {Array.from({ length: Math.floor((half * 2 - 28) / 8) }, (_, i) => -half + 6 + i * 8)
             .map((x) => (
               <polyline
                 key={x}
                 points={poly([
-                  [x, 6, 5],
-                  [x, 6, 15],
+                  [x, wide, 5],
+                  [x, wide, 4 + bodyH - 2],
                 ])}
                 stroke="#cbd4c6"
-                strokeWidth=".7"
+                strokeWidth=".8"
               />
             ))}
           {box(
-            half - 11,
-            -6,
-            12,
-            12,
+            half - 15,
+            -wide,
+            15,
+            wide * 2,
             4,
-            9,
+            cabH,
             van ? '#e1e3d2' : '#dfbc72',
             van ? '#bec9b8' : '#ba9555',
             van ? '#93a99d' : '#9c8e5e',
           )}
           <polygon
             points={poly([
-              [half + 1, -4.8, 9],
-              [half + 1, 4.8, 9],
-              [half + 1, 4.8, 12],
-              [half + 1, -4.8, 12],
+              [half + 1, -wide + 2.5, 4 + cabH - 7],
+              [half + 1, wide - 2.5, 4 + cabH - 7],
+              [half + 1, wide - 2.5, 4 + cabH - 3],
+              [half + 1, -wide + 2.5, 4 + cabH - 3],
             ])}
             fill="#436a73"
             stroke="#b6ccc0"
-            strokeWidth=".4"
+            strokeWidth=".5"
           />
           <polygon
             points={poly([
-              [half - 9, 6, 8],
-              [half - 3, 6, 8],
-              [half - 3, 6, 12],
-              [half - 9, 6, 12],
+              [half - 11, wide, 4 + cabH - 7],
+              [half - 4, wide, 4 + cabH - 7],
+              [half - 4, wide, 4 + cabH - 3],
+              [half - 11, wide, 4 + cabH - 3],
             ])}
             fill="#557b7b"
           />
           <polyline
             points={poly([
-              [half + 1, -5, 5],
-              [half + 1, 5, 5],
+              [half + 1, -wide + 2, 5],
+              [half + 1, wide - 2, 5],
             ])}
             stroke="#e0dbc1"
             strokeWidth="1"
@@ -277,9 +285,9 @@ export function WorldCampusTraffic({
       y: p.y + ((b.x - a.x) / length) * offset,
     }));
   };
-  const freight = lane(road, 5),
-    car = lane(road, -5).reverse(),
-    site = lane(service.slice(0, 2), 4);
+  const freight = lane(road, 11),
+    car = lane(road, -11).reverse(),
+    site = lane(service.slice(0, 2), 10);
   const d = (points: WorldPoint[]) =>
     points.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' ');
   const pose = (points: WorldPoint[], fraction: number) =>
