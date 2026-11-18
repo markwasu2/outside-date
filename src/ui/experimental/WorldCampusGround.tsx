@@ -10,7 +10,6 @@ export function WorldCampusGround({
   working = false,
   opened = false,
   reducedMotion = false,
-  workers = [],
   poles = 0,
   fit,
 }: {
@@ -22,7 +21,6 @@ export function WorldCampusGround({
   working?: boolean;
   opened?: boolean;
   reducedMotion?: boolean;
-  workers?: { x: number; y: number }[];
   poles?: number;
   /** Optional preserveAspectRatio override when the scene fills a non-world container. */
   fit?: string;
@@ -433,19 +431,6 @@ export function WorldCampusGround({
             <path d="M225 565l25-14" stroke="#a87055" strokeWidth="3" strokeDasharray="4 4" />
           </g>
         )}
-        {workers.map(({ x, y }, i) => (
-          <g
-            key={i}
-            data-testid="world-working-person"
-            transform={`translate(${x} ${y}) scale(.8)`}
-          >
-            <ellipse cy="7.5" rx="6" ry="2.5" fill="#243e35" opacity=".25" />
-            <path d="M-2 1l-2 6m5-6 2 6" stroke="#3b5962" strokeWidth="2" />
-            <path d="M0-7V2" stroke="#e5c871" strokeWidth="3.8" />
-            <circle cy="-10" r="2.5" fill="#e7cda0" />
-            <path d="M-3.3-11h6.6" stroke="#ffe4a1" strokeWidth="2" />
-          </g>
-        ))}
       </g>
       {night && land && (
         <g data-testid="world-night-pools" fill="url(#world-lamp-pool)">

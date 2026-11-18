@@ -101,6 +101,25 @@ export function WorldCampusMap({ night }: { night: boolean }) {
     color: '#3c553d',
     zIndex: 3,
   };
+  // Working crews stand on their hall's concrete apron near its front edge. They render
+  // as DOM overlays (not in the ground SVG) so the hall art cannot cover them, and their
+  // position is projected from world units so they stay on the pad, not the service road.
+  const crews = draft.halls.flatMap((h, i) =>
+    h.stageActive &&
+    !h.delivered &&
+    !h.terminated &&
+    !h.pausedThisMonth &&
+    !draft.flags.drawFreeze &&
+    !draft.flags[`inspectionFail:${h.id}`] &&
+    unfundedWork(draft, content, h) === null
+      ? [
+          layout.project(
+            (i % layout.columns) * 210 + 30,
+            Math.floor(i / layout.columns) * 180 + 52,
+          ),
+        ]
+      : [],
+  );
   return (
     <div
       ref={root}
@@ -145,17 +164,6 @@ export function WorldCampusMap({ night }: { night: boolean }) {
             theme={theme}
             working={constructionWorking(draft, content)}
             reducedMotion={reduced}
-            workers={draft.halls.flatMap((h, i) =>
-              h.stageActive &&
-              !h.delivered &&
-              !h.terminated &&
-              !h.pausedThisMonth &&
-              !draft.flags.drawFreeze &&
-              !draft.flags[`inspectionFail:${h.id}`] &&
-              unfundedWork(draft, content, h) === null
-                ? [{ x: layout.halls[i]!.x + 268, y: layout.halls[i]!.y + 210 }]
-                : [],
-            )}
           />
           <div
             data-campus-object="road"
@@ -402,6 +410,31 @@ export function WorldCampusMap({ night }: { night: boolean }) {
               </div>
             );
           })}
+          {crews.map((q, i) => (
+            <svg
+              key={i}
+              data-testid="world-working-person"
+              viewBox="-8 -12 16 20"
+              style={{
+                position: 'absolute',
+                left: (q.x - 8) * scale,
+                top: (q.y - 12) * scale,
+                width: 16 * scale,
+                height: 20 * scale,
+                pointerEvents: 'none',
+                filter: night ? 'brightness(.6) saturate(.8)' : undefined,
+                zIndex: 8,
+              }}
+            >
+              <g transform="scale(.8)">
+                <ellipse cy="7.5" rx="6" ry="2.5" fill="#243e35" opacity=".25" />
+                <path d="M-2 1l-2 6m5-6 2 6" stroke="#3b5962" strokeWidth="2" />
+                <path d="M0-7V2" stroke="#e5c871" strokeWidth="3.8" />
+                <circle cy="-10" r="2.5" fill="#e7cda0" />
+                <path d="M-3.3-11h6.6" stroke="#ffe4a1" strokeWidth="2" />
+              </g>
+            </svg>
+          ))}
           <button
             data-testid="campus-people"
             aria-label="Crew and contacts"
