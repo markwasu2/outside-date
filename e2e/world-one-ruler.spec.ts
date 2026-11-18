@@ -37,6 +37,17 @@ for (const width of [1024, 1280])
       expect(pole.h / worker.h).toBeGreaterThan(3.6);
       expect(pole.h / worker.h).toBeLessThan(6.4);
     }
+    // Crews stand on their hall's concrete apron, not on the service road.
+    const onApron = await page.getByTestId('world-ground').evaluate((svg) => {
+      const apron = svg.querySelector('[data-testid="world-hall-apron"] polygon') as SVGPolygonElement | null;
+      const person = document.querySelector('[data-testid="world-working-person"]');
+      const ctm = (svg as SVGSVGElement).getScreenCTM();
+      if (!apron || !person || !ctm) return null;
+      const r = person.getBoundingClientRect();
+      const feet = new DOMPoint(r.x + r.width / 2, r.y + r.height * 0.9).matrixTransform(ctm.inverse());
+      return apron.isPointInFill(feet);
+    });
+    expect(onApron).toBe(true);
     await page.screenshot({ path: `/tmp/one-ruler-${width}-day.png` });
     await page.getByTestId('night-view').click();
     await page.screenshot({ path: `/tmp/one-ruler-${width}-night.png` });
