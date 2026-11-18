@@ -12,6 +12,7 @@ export function WorldCampusGround({
   reducedMotion = false,
   workers = [],
   poles = 0,
+  fit,
 }: {
   count: number;
   night: boolean;
@@ -23,6 +24,8 @@ export function WorldCampusGround({
   reducedMotion?: boolean;
   workers?: { x: number; y: number }[];
   poles?: number;
+  /** Optional preserveAspectRatio override when the scene fills a non-world container. */
+  fit?: string;
 }) {
   const l = worldCampusLayout(count),
     { width, height, columns, rows, project: p, right, bottom, utilityWorldX } = l;
@@ -63,6 +66,7 @@ export function WorldCampusGround({
     <svg
       data-testid="world-ground"
       viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio={fit}
       width="100%"
       height="100%"
       style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}

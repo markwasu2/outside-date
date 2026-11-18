@@ -3,9 +3,11 @@ import type { Content } from '../../content/schemas';
 import { resolveSite } from '../../content/sites';
 import type { GameState } from '../../engine/types';
 import { formatDollars } from '../../engine/format';
-import campusGround from '../../assets/campus/campus-ground.svg';
 import people from '../../assets/campus/campus-people.svg';
 import { STAGE_ART, TILE_ART, COOLING_ART, SUBSTATION_ART } from '../art';
+import { WorldCampusGround } from '../experimental/WorldCampusGround';
+import { siteTerrain } from '../board/siteTerrain';
+import { usePrefersReducedMotion } from '../board/boardStyles';
 
 const STEPS = ['title','setup','tier','cooling','contractor','lease','forecast','capital','power','insurance','review'];
 const OPENING: Record<string,{place:string;line:string}> = {
@@ -25,6 +27,8 @@ const OPENING: Record<string,{place:string;line:string}> = {
 /** A read-only preview of the same land. No campaign state or month ticks until close. */
 export function OpeningCampus({step,preview,content,children,onNavigate}:{step:string;preview:GameState;content:Content;children:ReactNode;onNavigate?:(step:string)=>void}) {
   const site = resolveSite(content,preview.scenarioId,preview.setup.site);
+  const theme = siteTerrain(site.mapTheme).id;
+  const reduced = usePrefersReducedMotion();
   const guide = OPENING[step]!;
   const at = step === 'power' ? 'power' : step === 'cooling' ? 'cooling' : step === 'contractor' ? 'people' : ['lease','forecast','capital','insurance','review'].includes(step) ? 'office' : 'land';
   const sprite = (src:string|undefined,left:string,top:string,width:string,label:string,active=false,target?:string) => (
@@ -41,14 +45,16 @@ export function OpeningCampus({step,preview,content,children,onNavigate}:{step:s
       <strong>{step === 'title' ? 'Your next campus' : 'Before construction'}</strong>
       <span>{site.name}</span>{step!=='title'&&<span style={{marginLeft:'auto',fontSize:12}}>Click a place to edit your setup</span>}
     </header>
-    <div style={{flex:1,minHeight:0,position:'relative',backgroundImage:`url("${campusGround}")`,backgroundSize:'100% 100%',backgroundColor:'#e9dcb8',backgroundPosition:'center'}}>
+    {/* Same one-ruler ground scene as the world view (unbuilt land), not the old stretched picture. */}
+    <div style={{flex:1,minHeight:0,position:'relative',background:'linear-gradient(160deg,#afbb8e,#849a72)'}}>
       <div data-testid="opening-land" data-pond={String(site.mapTheme.pond)} style={{position:'absolute',inset:0,overflow:'hidden',background:site.mapTheme.pond?'#65905c1a':site.extraPadMonths?'#ae74451a':'transparent'}}>
-        {sprite(TILE_ART.siteOffice.img,'2%','16%','10vw','Site office',at==='office','lease')}
-        {sprite(site.mapTheme.pond?TILE_ART.pond.img:TILE_ART.dryField.img,'1%','57%','11vw',site.mapTheme.pond?'Wetland pond':'Low field',step==='setup','setup')}
-        {preview.halls.map((h,i)=>sprite(STAGE_ART.notStarted?.img,`${13+(i%2)*14}%`,`${23+Math.floor(i/2)*28}%`,'13vw',`${h.id} planned`,step==='tier','tier'))}
-        {sprite(SUBSTATION_ART.none,'29%','4%','10vw','Power connection',at==='power','power')}
-        {sprite(COOLING_ART[preview.setup.cooling]?.img,'2%','38%','8vw',`${preview.setup.cooling} cooling planned`,at==='cooling','cooling')}
-        {sprite(people,'3%','77%','8vw','Your team',at==='people','contractor')}
+        <WorldCampusGround count={preview.halls.length} night={false} land={false} fitted={false} theme={theme} reducedMotion={reduced} poles={site.mapTheme.poles} fit="xMidYMid slice" />
+        {sprite(TILE_ART.siteOffice.img,'2%','16%','8vw','Site office',at==='office','lease')}
+        {sprite(site.mapTheme.pond?TILE_ART.pond.img:TILE_ART.dryField.img,'1%','57%','9vw',site.mapTheme.pond?'Wetland pond':'Low field',step==='setup','setup')}
+        {preview.halls.map((h,i)=>sprite(STAGE_ART.notStarted?.img,`${13+(i%2)*14}%`,`${23+Math.floor(i/2)*28}%`,'11vw',`${h.id} planned`,step==='tier','tier'))}
+        {sprite(SUBSTATION_ART.none,'26%','6%','8vw','Power connection',at==='power','power')}
+        {sprite(COOLING_ART[preview.setup.cooling]?.img,'6%','38%','7vw',`${preview.setup.cooling} cooling planned`,at==='cooling','cooling')}
+        {sprite(people,'3%','77%','10vw','Your team',at==='people','contractor')}
       </div>
       <aside data-testid="opening-conversation" style={{position:'absolute',right:16,top:14,bottom:14,width:'min(720px,56vw)',display:'flex',flexDirection:'column',background:'#fffdf5f5',border:'1px solid #a18b61',borderRadius:10,boxShadow:'0 8px 28px #38240544',overflow:'hidden'}}>
         <div style={{padding:'12px 18px',background:'#eee3c9',borderBottom:'1px solid #cdbf9f'}}>

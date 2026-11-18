@@ -1,11 +1,9 @@
 import {test,expect} from '@playwright/test';
 test('built campus ground survives CSS parsing and the image decodes',async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('outside-date-single-world-preview','false'));await page.goto('/');
- for(const ground of [page.getByTestId('opening-land').locator('..')]){
-  const css=await ground.evaluate(el=>getComputedStyle(el).backgroundImage);
-  expect(css).toMatch(/url\("(?:data:image\/svg|http[^" ]*campus-ground-)/);
-  expect(await ground.evaluate(async el=>{const url=getComputedStyle(el).backgroundImage.match(/url\("([^"]+)"\)/)?.[1];if(!url)return false;const image=new Image();image.src=url;await image.decode();return image.naturalWidth>0;})).toBe(true);
- }
+ // The opening preview renders the one-ruler world scene, not the retired stretched picture.
+ await expect(page.getByTestId('opening-land').getByTestId('world-ground')).toBeVisible();
+ await expect(page.getByTestId('opening-land').getByTestId('world-woodland')).toBeVisible();
  await page.getByTestId('start-first-campus').click();
  const css=await page.getByTestId('map-root').evaluate(el=>getComputedStyle(el).backgroundImage);
  expect(css).toMatch(/url\("(?:data:image\/svg|http[^" ]*campus-ground-)/);
