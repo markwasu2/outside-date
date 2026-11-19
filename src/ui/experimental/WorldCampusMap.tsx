@@ -141,7 +141,7 @@ export function WorldCampusMap({ night }: { night: boolean }) {
         } as CSSProperties
       }
     >
-      <style>{`[data-world-single="true"] [data-world-hall-placard] button{font-size:12px!important;}[data-world-camera="true"] [data-testid="campus-people"]{width:var(--world-people-size)!important;height:var(--world-people-size)!important;}[data-world-camera="true"] [data-scene-object="office"]{padding:0!important;}[data-world-camera="true"] [data-testid="campus-people"] > img,[data-world-camera="true"] [data-scene-object="office"] > img{width:100%!important;height:100%!important;inset:0!important;transform:none!important;}[data-world-camera="true"] [data-map-control="siteOffice"],[data-world-camera="true"] [data-map-control="substation"]{bottom:-12px!important;}[data-world-camera="true"]::before{display:none;}[data-world-camera="true"] [data-testid="hall-warning-badges"]{top:26%!important;left:48%!important;right:auto!important;transform:translateX(-50%);padding:2px 4px;border-radius:3px;background:#fffdf2;box-shadow:0 1px 2px #20382b33;}[data-world-camera="true"] [data-testid="hall-warning-badges"]:empty{display:none!important;}[data-world-hall-placard] button{pointer-events:auto;}[data-world-hall-placard] [data-map-control]{position:relative!important;bottom:auto!important;left:0!important;transform:translateX(-50%)!important;max-width:none!important;}[data-world-camera="true"] [data-testid="hall-art-frame"]{max-width:none!important;max-height:none!important;}`}</style>
+      <style>{`[data-world-single="true"] [data-world-hall-placard] button{font-size:12px!important;}[data-world-camera="true"] [data-testid="campus-people"]{width:var(--world-people-size)!important;height:var(--world-people-size)!important;}[data-world-camera="true"] [data-scene-object="office"]{padding:0!important;}[data-world-camera="true"] [data-testid="campus-people"] > img,[data-world-camera="true"] [data-scene-object="office"] > img{width:100%!important;height:100%!important;inset:0!important;transform:none!important;}[data-world-camera="true"] [data-map-control="siteOffice"],[data-world-camera="true"] [data-map-control="substation"]{bottom:-12px!important;}[data-world-camera="true"]::before{display:none;}[data-world-camera="true"] [data-testid="hall-warning-badges"]{top:26%!important;left:48%!important;right:auto!important;transform:translateX(-50%);padding:2px 4px;border-radius:3px;background:#fffdf2;box-shadow:0 1px 2px #20382b33;}[data-world-camera="true"] [data-testid="hall-warning-badges"]:empty{display:none!important;}[data-world-hall-placard] button{pointer-events:auto;}[data-world-hall-placard] [data-map-control]{position:relative!important;bottom:auto!important;left:0!important;transform:none!important;max-width:none!important;}[data-world-camera="true"] [data-testid="hall-art-frame"]{max-width:none!important;max-height:none!important;}`}</style>
       <div
         data-testid="world-camera-scroll"
         style={{ position: 'absolute', inset: 0, overflow: 'auto' }}
@@ -356,8 +356,14 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                   title={hallCaption(draft, content, hall)}
                   style={{
                     position: 'absolute',
-                    left: '62%',
+                    // Centered on the hall's own rect: at 62% the pill landed on the
+                    // down-right neighbor's art and read as its label.
+                    left: '50%',
                     top: '90%',
+                    transform: 'translateX(-50%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                     pointerEvents: 'none',
                     zIndex: 20,
                     width: draft.halls.length === 1 ? 160 : undefined,
@@ -391,7 +397,8 @@ export function WorldCampusMap({ night }: { night: boolean }) {
                       style={{
                         position: 'absolute',
                         top: 'calc(100% + 2px)',
-                        left: draft.halls.length === 1 ? 0 : '50%',
+                        // Centered under the status pill for every hall count.
+                        left: '50%',
                         transform: 'translateX(-50%)',
                         background: '#fffdf2',
                         whiteSpace: 'nowrap',
