@@ -31,6 +31,28 @@ describe('shared isometric world camera', () => {
       expect(l.halls[0]!.width).toBe(300);
     },
   );
+  it.each([1, 2, 3, 4, 5, 6])(
+    'keeps countryside trees south of the ring road and out of the parcel for %i halls',
+    (count) => {
+      const l = worldCampusLayout(count);
+      expect(l.outerTrees.length).toBeGreaterThan(6);
+      for (const q of l.outerTrees) {
+        // South of the paved ring road (its south shoulder is bottom + 22) and of the
+        // parcel (y <= bottom); never in the utility corridor; deterministic layout.
+        expect(q.y).toBeGreaterThan(l.bottom + 60);
+        expect(q.y).toBeLessThan(l.bottom + 240);
+        expect(q.x).toBeGreaterThanOrEqual(-240);
+        expect(q.x).toBeLessThanOrEqual(l.right + 110);
+        const corridor =
+          q.x >= l.utilityWorldX - 50 &&
+          q.x <= l.utilityWorldX + 300 &&
+          q.y >= -190 &&
+          q.y <= -90;
+        expect(corridor).toBe(false);
+      }
+      expect(l.outerTrees).toEqual(worldCampusLayout(count).outerTrees);
+    },
+  );
   it.each([1, 2, 3, 4, 5, 6])('keeps tree roots out of the plant reserve for %i halls', (count) => {
     const l = worldCampusLayout(count);
     const pad = {

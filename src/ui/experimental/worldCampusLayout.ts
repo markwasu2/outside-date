@@ -74,6 +74,23 @@ export function worldCampusLayout(count: number) {
         y: -200,
       })),
     ],
+    // Countryside south of the campus: a sparse scatter with gaps, so the foreground
+    // reads as land instead of a flat void. Roots stay south of the ring road
+    // (y > bottom + 22) and below the perimeter row; deterministic jitter keeps
+    // screenshots stable. Never inside the parcel or the utility corridor.
+    outerTrees: Array.from({ length: Math.ceil((right + 340) / 95) * 3 }, (_, i) => {
+      const c = Math.floor(i / 3),
+        r = i % 3,
+        j1 = Math.sin(i * 12.9898) * 43758.5453,
+        j2 = Math.sin(i * 78.233) * 12543.21,
+        f1 = j1 - Math.floor(j1),
+        f2 = j2 - Math.floor(j2);
+      if (f2 < 0.35) return null;
+      return {
+        x: -240 + c * 95 + r * 24 + f1 * 34,
+        y: bottom + 85 + r * 58 + f2 * 26,
+      };
+    }).filter((q): q is WorldPoint => q !== null),
     halls: Array.from({ length: count }, (_, i) =>
       sprite((i % columns) * 210, Math.floor(i / columns) * 180),
     ),

@@ -376,7 +376,7 @@ export function WorldCampusGround({
         <WorldCampusWoodland
           width={width}
           height={height}
-          points={l.perimeterTrees.map(({ x, y }) => p(x, y))}
+          points={[...l.perimeterTrees, ...l.outerTrees].map(({ x, y }) => p(x, y))}
         />
         {land && (
           <g
