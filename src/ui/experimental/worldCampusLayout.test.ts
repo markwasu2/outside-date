@@ -41,8 +41,11 @@ describe('shared isometric world camera', () => {
         // parcel (y <= bottom); never in the utility corridor; deterministic layout.
         expect(q.y).toBeGreaterThan(l.bottom + 60);
         expect(q.y).toBeLessThan(l.bottom + 240);
-        expect(q.x).toBeGreaterThanOrEqual(-240);
-        expect(q.x).toBeLessThanOrEqual(l.right + 110);
+        // Fully inside the canvas: canopy and shadow never clip at a world edge.
+        const s = l.project(q.x, q.y);
+        expect(s.x).toBeGreaterThanOrEqual(44);
+        expect(s.x).toBeLessThanOrEqual(l.width - 44);
+        expect(s.y).toBeLessThanOrEqual(l.height - 16);
         const corridor =
           q.x >= l.utilityWorldX - 50 &&
           q.x <= l.utilityWorldX + 300 &&
