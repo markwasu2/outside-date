@@ -90,7 +90,14 @@ export function worldCampusLayout(count: number) {
         x: -240 + c * 95 + r * 24 + f1 * 34,
         y: bottom + 85 + r * 58 + f2 * 26,
       };
-    }).filter((q): q is WorldPoint => q !== null),
+    })
+      .filter((q): q is WorldPoint => q !== null)
+      // Drop trees whose canopy or contact shadow would clip at a canvas edge;
+      // a half-cut trunk at the world border reads as a glitch, not countryside.
+      .filter((q) => {
+        const s = project(q.x, q.y);
+        return s.x >= 44 && s.x <= width - 44 && s.y <= height - 16;
+      }),
     halls: Array.from({ length: count }, (_, i) =>
       sprite((i % columns) * 210, Math.floor(i / columns) * 180),
     ),
